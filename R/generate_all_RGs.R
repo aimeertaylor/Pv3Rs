@@ -1,90 +1,113 @@
 # generate_all_models_3Ts() copied from the following link
 # https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R
 # The function generate_all_models_3Ts() was written by James Watson and edited by Aimee Taylor
-generate_all_models_3Ts = function(M1=2, M2=2, M3=2){
-  if(M1>4 | M2>4 | M3>4 | sum(c(M1,M2,M3))>6) stop('Whooh there, too complex')
+# Sort documentation
+enumerate_RGs = function(MOIs) {
   
-  # # Set up all the within timepoint models
+  # Hard code relationship types to satisfy the test_transitive function 
+  relationship_types = c(stranger = 0, sibling = 0.5, clone = 1) 
+  time_point_count <- length(MOIs) # Number of time points
+  gs_count <- sum(MOIs) # Number of genotypes
   
-  # AT: I think this is a only slightly more elegant way for within time points
-  T1models = if(M1 == 1){matrix(0,1,1)}else{permutations(n = 2, r = choose(M1,2), v = c(0,.5), repeats.allowed = TRUE)}
-  T2models = if(M2 == 1){matrix(0,1,1)}else{permutations(n = 2, r = choose(M2,2), v = c(0,.5), repeats.allowed = TRUE)}
-  T3models = if(M3 == 1){matrix(0,1,1)}else{permutations(n = 2, r = choose(M3,2), v = c(0,.5), repeats.allowed = TRUE)}
+  # Check if feasible to enumerate RGs
+  if (any(MOIs == 0)) stop("Zero-valued MOIs are not supported")
+  if (gs_count > 6 | time_point_count > 3) stop("Sorry, too many RGs")
+  if (gs_count <= 1) stop("Sorry, no RGs")
   
-  # and the across timepoint models
-  T12models = as.matrix(expand.grid( rep(list(c(0,.5, 1)), M1*M2) ))
-  T23models = as.matrix(expand.grid( rep(list(c(0,.5, 1)), M2*M3) ))
-  T13models = as.matrix(expand.grid( rep(list(c(0,.5, 1)), M1*M3) ))
+  # Enumerate indices for pairs of time points, etc.
+  if (time_point_count > 1) {
+    time_point_ijs <- gtools::combinations(n = time_point_count, 
+                                           r = 2, 
+                                           v = 1:time_point_count)   
+  } else {
+    time_point_ijs <- matrix(1,1,2)
+  }
   
-  # compute size of problem
-  KK1 = nrow(T1models)
-  KK2 = nrow(T2models)
-  KK3 = nrow(T3models)
+  time_point_pair_count <- nrow(time_point_ijs) # Number of pairs of time points
+  gs <- paste0("g",1:gs_count) # Genotype names
+  ts_per_gs <- rep(1:time_point_count, MOIs) # List time point indices per genotype
   
-  KK12= nrow(T12models)
-  KK23= nrow(T23models)
-  KK13= nrow(T13models)
+  # List genotypes per time point and time point pair
+  gs_per_ts <- split(gs, ts_per_gs) 
+  gs_per_t_pairs <- lapply(1:time_point_pair_count, function(t_pair) { 
+    list(gs_per_ts[[time_point_ijs[t_pair, 1]]], 
+         gs_per_ts[[time_point_ijs[t_pair, 2]]])
+  })
   
-  KK = (KK1 * KK2 * KK3) * (KK12 * KK23 * KK13)
+  # Enumerate all combinations of intra time-point relationships
+  intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")] 
+  intra_relationships <- lapply(MOIs, function(MOI) {
+    if (MOI > 1) {
+      gtools::permutations(n = length(intra_relationship_types), 
+                           r = choose(MOI,2), 
+                           v = intra_relationship_types, 
+                           repeats.allowed = T)
+    } else {matrix(0,1,1)}
+  })
   
-  print(paste('complexity of problem is: ', KK))
+  # Enumerate all combinations of inter time-point relationships
+  if (time_point_count > 1) {
+    inter_relationships <- lapply(1:time_point_pair_count, function(t_pair) {
+      as.matrix(expand.grid(rep(list(relationship_types), prod(MOIs[time_point_ijs[t_pair,]]))))
+    })
+    inter_count <- sapply(inter_relationships, nrow) # Numbers of inter_relationships to permute 
+  } else {
+    inter_count <- c()
+  }
   
+  # Compute the number of not-necessarily transitive relationship graphs
+  intra_count <- sapply(intra_relationships, nrow) # Numbers of intra_relationships to permute 
+  all_counts <- c(intra_count, inter_count)
+  all_perms <- as.matrix(expand.grid(sapply(all_counts, function(x) 1:x))) # Matrix of permutations
+  total_count <- prod(all_counts) # Total number of permutations
+  if (nrow(all_perms) != total_count) stop("Problem with the not-necessarily transitive RG count")
+  print(paste('number of not-necessarily transitive graphs is', total_count))
   
-  Pbar = txtProgressBar(min=1, max = KK)
-  ind = 1
-  correct_ind = 1; correct_models = list()
+  # Allocate adjacency matrices
+  adj_all <- array(NA, dim = rep(gs_count, 2), dimnames = list(gs,gs))
+  intra_adjs <- lapply(MOIs, function(MOI) array(NA, dim = rep(MOI, 2)))
   
-  # Now for the iteration with brute force...
-  for(i1 in 1:KK1){
-    for(i2 in 1:KK2){
-      for(i3 in 1:KK3){
-        for(i12 in 1:KK12){
-          for(i23 in 1:KK23){
-            for(i13 in 1:KK13){
-              # plotting progress...
-              setTxtProgressBar(Pbar, ind); ind = ind+1
-              # Lets make the sub adjacency matrices
-              Adj_T1 = matrix(rep(0, M1^2), ncol = M1)
-              Adj_T2 = matrix(rep(0, M2^2), ncol = M2)
-              Adj_T3 = matrix(rep(0, M3^2), ncol = M3)
-              
-              Adj_T1[lower.tri(Adj_T1)] = as.vector(T1models[i1,])
-              Adj_T2[lower.tri(Adj_T2)] = as.vector(T2models[i2,])
-              Adj_T3[lower.tri(Adj_T3)] = as.vector(T3models[i3,])
-              
-              Adj_T1_T2 = matrix(T12models[i12,], ncol = M1) # this has M1 cols and M2 rows
-              Adj_T2_T3 = matrix(T23models[i23,], ncol = M2) # this has M2 cols and M3 rows
-              Adj_T1_T3 = matrix(T13models[i13,], ncol = M1) # this has M1 cols and M3 rows
-              
-              Adj_all = matrix(rep(0,(M1+M2+M3)^2), ncol = M1+M2+M3)
-              Adj_all[1:M1, 1:M1] = Adj_T1
-              Adj_all[(M1+1):(M1+M2), (M1+1):(M1+M2)] = Adj_T2
-              Adj_all[(M1+M2+1):(M1+M2+M3), (M1+M2+1):(M1+M2+M3)] = Adj_T3
-              
-              Adj_all[(M1+1):(M1+M2), 1:M1] = Adj_T1_T2
-              Adj_all[(M1+M2+1):(M1+M2+M3), (M1+1):(M1+M2)] = Adj_T2_T3
-              Adj_all[(M1+M2+1):(M1+M2+M3), 1:M1] = Adj_T1_T3
-              
-              Adj_all = Adj_all + t(Adj_all)
-              colnames(Adj_all) = 1:(M1+M2+M3)
-              
-              # turn this into an igraph item
-              G1 = graph_from_adjacency_matrix(adjmatrix = Adj_all, mode='undirected', 
-                                               diag=F, weighted = 'w', add.colnames = T)
-              # set the group attributes for G1
-              G1 = set_vertex_attr(G1, "group", value = c(rep(1,M1), rep(2,M2), rep(3,M3)))
-              G1 = set_vertex_attr(G1, "label", value = 1:(M1+M2+M3))
-              
-              # test correctness and store if correct
-              if(test_correct_graph(G = G1)){
-                correct_models[[correct_ind]] = G1
-                correct_ind=correct_ind+1
-              }
-            }
-          }
-        }
+  # Create progress bar and count of transitive RGs
+  pbar = txtProgressBar(min = 1, max = total_count)
+  transitive_RGs = list()
+  transitive_i <- 1
+  
+  for(perm_i in 1:total_count) {
+    
+    setTxtProgressBar(pbar, perm_i)
+    
+    # Extract permutation indices
+    intra_perm <- all_perms[perm_i,1:time_point_count]
+    inter_perm <- all_perms[perm_i,-(1:time_point_count)]
+    
+    # Populate adj_all with intra-relationships
+    for(t in 1:time_point_count) {
+      intra_adjs[[t]][lower.tri(intra_adjs[[t]])] <- intra_relationships[[t]][intra_perm[t],]
+      adj_all[gs_per_ts[[t]], gs_per_ts[[t]]] <- intra_adjs[[t]]
+    }
+    
+    # Populate lower tri of all_adj with between time-point relationships
+    if (time_point_pair_count >= 1) {
+      for(t_pair in 1:time_point_pair_count) {
+        adj_all[gs_per_t_pairs[[t_pair]][[2]], 
+                gs_per_t_pairs[[t_pair]][[1]]] <- inter_relationships[[t_pair]][inter_perm[t_pair],]
       }
     }
+    
+    # Convert adjacency matrix into an igraph item
+    RG = igraph::graph_from_adjacency_matrix(adjmatrix = adj_all, 
+                                             mode = 'lower', 
+                                             diag = F, 
+                                             weighted = 'weight')
+    # Add a time-point attribute 
+    RG = igraph::set_vertex_attr(RG, "timepoint", value = ts)
+    
+    # Test transitivity and store if transitive
+    if (test_transitive(G = RG)) {
+      transitive_RGs[[transitive_i]] <- RG
+      transitive_i <- transitive_i + 1
+    }
   }
-  return(correct_models)
+  
+  return(transitive_RGs)
 }
