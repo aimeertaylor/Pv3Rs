@@ -4,12 +4,12 @@
 #' relationships between distinct parasite genotypes within and across
 #' infections. \code{enumerate_RGs} is limited to six or fewer genotypes among
 #' three or fewer infections because the number of graphs grows exponentially
-#' with the number of genotypes and the number of infections.
+#' with the number of genotypes and the number of infections; see examples.
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a the multiplicity of infection (MOI).
 #'
-#' @return Returns a list of relationship graphs (RGs).
+#' @return Returns a list of transitive relationship graphs (RGs).
 #'
 #'   Each RG is an igraph graph, see \code{\link[igraph]{igraph}}. The seven
 #'   character code after IGRAPH, is the first seven characters of the graph ID;
@@ -35,10 +35,26 @@
 #'   \code{generate_all_models_3Ts} and \code{generate_all_models_2Ts} at
 #'   \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 #'
+#' @section To-do:
+#' \enumerate{
+#' \item Consider using RGs_to_eval_count as the too
+#'   many RGs cut-off instead of gs_count > 6 | time_point_count > 3
+#' \item Add plot_Vivax_model example
+#' \item Read up about using save and load to preserve graph attributes; also
+#' read_graph and write_graph
+#' }
+#'
+#'
 #' @examples
-#' RGs <- enumerate_RGs(MOIs = c(1,2))
+#' MOIs <- c(1,2)
+#' RGs <- enumerate_RGs(MOIs)
 #' RGs[[1]]
 #' igraph::vertex_attr(RGs[[1]])
+#'
+#' # Compute by hand the number of not necessarily transitive graphs
+#' intra_edge_counts <- sapply(MOIs, choose, k = 2)
+#' inter_edge_count <- choose(sum(MOIs), 2) - sum(intra_edge_counts)
+#' prod(3^inter_edge_count, 2^intra_edge_counts)
 #'
 #' @export
 enumerate_RGs <- function(MOIs) {
@@ -48,8 +64,14 @@ enumerate_RGs <- function(MOIs) {
     stop("MOIs need to be whole numbers")
   }
 
+  # Compute the number of not necessarily transitive graphs by hand
+  intra_edge_counts <- sapply(MOIs, choose, k = 2)
+  inter_edge_count <- choose(sum(MOIs), 2) - sum(intra_edge_counts)
+  RGs_to_eval_count <- prod(3^inter_edge_count, 2^intra_edge_counts)
+
   # Hard code relationship types to satisfy the test_transitive function
   relationship_types <- c(stranger = 0, sibling = 0.5, clone = 1)
+  intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")]
   time_point_count <- length(MOIs) # Number of time points
   gs_count <- sum(MOIs) # Number of genotypes
 
@@ -81,7 +103,6 @@ enumerate_RGs <- function(MOIs) {
   }
 
   # Enumerate all combinations of intra time-point relationships
-  intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")]
   intra_relationships <- lapply(MOIs, function(MOI) {
     if (MOI > 1) {
       gtools::permutations(n = length(intra_relationship_types),
@@ -89,7 +110,7 @@ enumerate_RGs <- function(MOIs) {
                            v = intra_relationship_types,
                            repeats.allowed = T)
     } else {
-      matrix(0, 1, 1)
+      matrix(NA, 1, 1)
     }
   })
 
@@ -103,13 +124,15 @@ enumerate_RGs <- function(MOIs) {
     inter_count <- c()
   }
 
-  # Compute the number of not-necessarily transitive relationship graphs
+  # Compute the number of not necessarily transitive relationship graphs
   intra_count <- sapply(intra_relationships, nrow) # Numbers of intra_relationships to permute
   all_counts <- c(intra_count, inter_count)
   all_perms <- as.matrix(expand.grid(sapply(all_counts, function(x) 1:x))) # Matrix of permutations
   total_count <- prod(all_counts) # Total number of permutations
-  if (nrow(all_perms) != total_count) stop("Problem with the not-necessarily transitive RG count")
-  writeLines(paste("\nnumber of not-necessarily transitive graphs is", total_count))
+  if (nrow(all_perms) != total_count) {
+    stop("Problem with the not necessarily transitive RG count")
+  }
+  writeLines(paste("\nnumber of not necessarily transitive graphs is", total_count))
 
   # Allocate adjacency matrices
   adj_all <- array(NA, dim = rep(gs_count, 2), dimnames = list(gs,gs))

@@ -11,7 +11,7 @@ enumerate_RGs(MOIs)
 distinct parasite genotypes, a.k.a the multiplicity of infection (MOI).}
 }
 \value{
-Returns a list of relationship graphs (RGs).
+Returns a list of transitive relationship graphs (RGs).
 
 Each RG is an igraph graph, see \code{\link[igraph]{igraph}}. The seven
 character code after IGRAPH, is the first seven characters of the graph ID;
@@ -38,7 +38,7 @@ Enumerates all transitive graphs of stranger, sibling and clonal
 relationships between distinct parasite genotypes within and across
 infections. \code{enumerate_RGs} is limited to six or fewer genotypes among
 three or fewer infections because the number of graphs grows exponentially
-with the number of genotypes and the number of infections.
+with the number of genotypes and the number of infections; see examples.
 }
 \section{Provenance}{
  This function was adapted from
@@ -46,9 +46,26 @@ with the number of genotypes and the number of infections.
 \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 }
 
+\section{To-do}{
+
+\enumerate{
+\item Consider using RGs_to_eval_count as the too
+many RGs cut-off instead of gs_count > 6 | time_point_count > 3
+\item Add plot_Vivax_model example
+\item Read up about using save and load to preserve graph attributes; also
+read_graph and write_graph
+}
+}
+
 \examples{
-RGs <- enumerate_RGs(MOIs = c(1,2))
+MOIs <- c(1,2)
+RGs <- enumerate_RGs(MOIs)
 RGs[[1]]
 igraph::vertex_attr(RGs[[1]])
+
+# Compute by hand the number of not necessarily transitive graphs
+intra_edge_counts <- sapply(MOIs, choose, k = 2)
+inter_edge_count <- choose(sum(MOIs), 2) - sum(intra_edge_counts)
+prod(3^inter_edge_count, 2^intra_edge_counts)
 
 }
