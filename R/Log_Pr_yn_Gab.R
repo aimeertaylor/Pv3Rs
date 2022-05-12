@@ -1,6 +1,6 @@
 #' Internal computation function
 #'
-#' Notes copied from original
+#' Notes copied from original:
 #' MS where one or more NA are ignored when summing over m
 #' G is assumed labelled
 #' Z is a vector of alpha_terms (calculated above since not data dependent
@@ -9,12 +9,12 @@
 #'   \code{Log_Pr_yn_Gab} at
 #'   \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 
-Log_Pr_yn_Gab = function(G, log_Fs, MSs, Z, A, vertex_data_matrix){
+Log_Pr_yn_Gab <- function(G, log_Fs, MSs, Z, A, vertex_data_matrix){
 
-  M = length(MSs) # Number of microsatellites
+  M <- length(MSs) # Number of microsatellites
 
   # Check if data have zero prob given G due to clones
-  if(test_cln_incompatible(A, vertex_data_matrix)){ # If labelled G is incompatible
+  if (!test_cln_compatible(A, vertex_data_matrix)) { # If labelled G is incompatible
 
     log_Pr_yn_Gab = NA
     return(log_Pr_yn_Gab) # Function ends here

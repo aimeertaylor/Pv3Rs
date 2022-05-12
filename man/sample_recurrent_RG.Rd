@@ -42,10 +42,10 @@ Better to test transitivity on intra before whole?
 
 \examples{
 
-for(cause in c("recrudescence", "reinfection", "relapse")) {
-RG <- sample_recurrent_RG(MOI_init = 3, cause)
-plot_RG(RG)
-print(RG)
+for (cause in c("recrudescence", "reinfection", "relapse")) {
+  RG <- sample_recurrent_RG(MOI_init = 3, cause)
+  plot_RG(RG)
+  print(RG)
 }
 
 
