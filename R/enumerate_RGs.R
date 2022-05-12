@@ -1,10 +1,11 @@
-#' A function to enumerate all transitive relationship graphs (RG)
+#' Enumerate all transitive relationship graphs (RGs)
 #'
-#' Enumerates all transitive graphs of stranger, sibling and clonal
-#' relationships between distinct parasite genotypes within and across
-#' infections. \code{enumerate_RGs} is limited to six or fewer genotypes among
-#' three or fewer infections because the number of graphs grows exponentially
-#' with the number of genotypes and the number of infections; see examples.
+#' Enumerates all transitive graphs of stranger and sibling relationships
+#' between distinct parasite genotypes within infections and stranger, sibling
+#' and clonal relationships between parasite genotypes across infection/s.
+#' \code{enumerate_RGs} is limited to six or fewer genotypes among three or
+#' fewer infections because the number of graphs grows exponentially with the
+#' number of genotypes and the number of infections; see examples.
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a the multiplicity of infection (MOI).
@@ -38,8 +39,7 @@
 #' @section To-do:
 #' \enumerate{
 #' \item Consider using RGs_to_eval_count as the too
-#'   many RGs cut-off instead of gs_count > 6 | time_point_count > 3
-#' \item Add plot_Vivax_model example
+#'   many RGs cut-off instead of gs_count > 6 | infection_count > 3
 #' \item Read up about using save and load to preserve graph attributes; also
 #' read_graph and write_graph
 #' }
@@ -50,6 +50,7 @@
 #' RGs <- enumerate_RGs(MOIs)
 #' RGs[[1]]
 #' igraph::vertex_attr(RGs[[1]])
+#' for(i in 1:length(RGs)) plot_RG(RGs[[i]])
 #'
 #' # Compute by hand the number of not necessarily transitive graphs
 #' intra_edge_counts <- sapply(MOIs, choose, k = 2)
@@ -59,10 +60,8 @@
 #' @export
 enumerate_RGs <- function(MOIs) {
 
-  # Check MOIs are whole numbers (copied from ?base::integer)
-  if (!all(abs(MOIs - round(MOIs)) < .Machine$double.eps^0.5)) {
-    stop("MOIs need to be whole numbers")
-  }
+  # Check MOIs are positive whole numbers
+  if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
   # Compute the number of not necessarily transitive graphs by hand
   intra_edge_counts <- sapply(MOIs, choose, k = 2)
@@ -72,33 +71,31 @@ enumerate_RGs <- function(MOIs) {
   # Hard code relationship types to satisfy the test_transitive function
   relationship_types <- c(stranger = 0, sibling = 0.5, clone = 1)
   intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")]
-  time_point_count <- length(MOIs) # Number of time points
+  infection_count <- length(MOIs) # Number of time points
   gs_count <- sum(MOIs) # Number of genotypes
 
-  # Check if feasible to enumerate RGs
-  if (any(MOIs == 0)) stop("Zero-valued MOIs are not supported")
-  if (gs_count > 6 | time_point_count > 3) stop("Sorry, too many RGs")
+  if (gs_count > 6 | infection_count > 3) stop("Sorry, too many RGs")
   if (gs_count <= 1) stop("Sorry, no RGs")
 
   # Enumerate indices for pairs of time points, etc.
-  if (time_point_count > 1) {
-    time_point_ijs <- gtools::combinations(n = time_point_count,
+  if (infection_count > 1) {
+    infection_ijs <- gtools::combinations(n = infection_count,
                                            r = 2,
-                                           v = 1:time_point_count)
-    time_point_pair_count <- nrow(time_point_ijs) # Number of pairs of time points
+                                           v = 1:infection_count)
+    infection_pair_count <- nrow(infection_ijs) # Number of pairs of time points
   } else {
-    time_point_pair_count <- 0 # Number of pairs of time points
+    infection_pair_count <- 0 # Number of pairs of time points
   }
 
   gs <- paste0("g", 1:gs_count) # Genotype names
-  ts_per_gs <- rep(1:time_point_count, MOIs) # List time point indices per genotype
+  ts_per_gs <- rep(1:infection_count, MOIs) # List time point indices per genotype
 
   # List genotypes per time point and time point pair
   gs_per_ts <- split(gs, ts_per_gs)
-  if(time_point_pair_count >= 1){
-    gs_per_t_pairs <- lapply(1:time_point_pair_count, function(t_pair) {
-      list(gs_per_ts[[time_point_ijs[t_pair, 1]]],
-           gs_per_ts[[time_point_ijs[t_pair, 2]]])
+  if(infection_pair_count >= 1){
+    gs_per_t_pairs <- lapply(1:infection_pair_count, function(t_pair) {
+      list(gs_per_ts[[infection_ijs[t_pair, 1]]],
+           gs_per_ts[[infection_ijs[t_pair, 2]]])
     })
   }
 
@@ -115,9 +112,9 @@ enumerate_RGs <- function(MOIs) {
   })
 
   # Enumerate all combinations of inter time-point relationships
-  if (time_point_count > 1) {
-    inter_relationships <- lapply(1:time_point_pair_count, function(t_pair) {
-      as.matrix(expand.grid(rep(list(relationship_types), prod(MOIs[time_point_ijs[t_pair,]]))))
+  if (infection_count > 1) {
+    inter_relationships <- lapply(1:infection_pair_count, function(t_pair) {
+      as.matrix(expand.grid(rep(list(relationship_types), prod(MOIs[infection_ijs[t_pair,]]))))
     })
     inter_count <- sapply(inter_relationships, nrow) # Numbers of inter_relationships to permute
   } else {
@@ -148,18 +145,18 @@ enumerate_RGs <- function(MOIs) {
     setTxtProgressBar(pbar, perm_i)
 
     # Extract permutation indices
-    intra_perm <- all_perms[perm_i, 1:time_point_count]
-    inter_perm <- all_perms[perm_i, - (1:time_point_count)]
+    intra_perm <- all_perms[perm_i, 1:infection_count]
+    inter_perm <- all_perms[perm_i, - (1:infection_count)]
 
     # Populate adj_all with intra-relationships
-    for(t in 1:time_point_count) {
+    for(t in 1:infection_count) {
       intra_adjs[[t]][lower.tri(intra_adjs[[t]])] <- intra_relationships[[t]][intra_perm[t], ]
       adj_all[gs_per_ts[[t]], gs_per_ts[[t]]] <- intra_adjs[[t]]
     }
 
     # Populate lower tri of all_adj with between time-point relationships
-    if (time_point_pair_count >= 1) {
-      for (t_pair in 1:time_point_pair_count) {
+    if (infection_pair_count >= 1) {
+      for (t_pair in 1:infection_pair_count) {
         adj_all[gs_per_t_pairs[[t_pair]][[2]],
                 gs_per_t_pairs[[t_pair]][[1]]] <- inter_relationships[[t_pair]][inter_perm[t_pair], ]
       }

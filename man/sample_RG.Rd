@@ -2,7 +2,7 @@
 % Please edit documentation in R/sample_RG.R
 \name{sample_RG}
 \alias{sample_RG}
-\title{A function to sample a transitive relationship graph (RG)}
+\title{Sample a transitive relationship graph (RG)}
 \usage{
 sample_RG(MOIs)
 }
@@ -14,8 +14,9 @@ distinct parasite genotypes, a.k.a the multiplicity of infection (MOI).}
 Returns a transitive relationship graph (RG); see \code{\link{enumerate_RGs}} for details.
 }
 \description{
-Samples one transitive graph of stranger, sibling and clonal relationships
-between distinct parasite genotypes within and across infections. Unlike
+Samples one transitive graph of stranger and sibling relationships between
+distinct parasite genotypes within infections and stranger, sibling and
+clonal relationships between parasite genotypes across infection/s. Unlike
 \code{\link{enumerate_RGs}}, \code{sample_RG} is not limited to six or fewer
 genotypes among three or fewer infections, because it only generates one
 graph and thus cannot overload memory. However, for more than six genotypes
@@ -30,14 +31,10 @@ that \code{sample_RG} prints to the screen.
 \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 }
 
-\section{To-do}{
-
-Condition on an existing RG for MCMC proposal
-Add plot to examples
-}
-
 \examples{
 
-sample_RG(c(2,1,1))
+RG <- sample_RG(c(2,1,1))
+print(RG)
+plot_RG(RG)
 
 }

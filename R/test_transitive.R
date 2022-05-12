@@ -1,4 +1,4 @@
-#' A function to test if a relationship graph is transitive.
+#' Test if a relationship graph is transitive.
 #'
 #' \code{test_transitive} implements the brute-force algorithm described in the
 #' appendix of Taylor & Watson et al. Nature communications (2019). It assumes

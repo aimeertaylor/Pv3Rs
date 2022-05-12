@@ -2,7 +2,7 @@
 % Please edit documentation in R/test_transitive.R
 \name{test_transitive}
 \alias{test_transitive}
-\title{A function to test if a relationship graph is transitive.}
+\title{Test if a relationship graph is transitive.}
 \usage{
 test_transitive(RG)
 }

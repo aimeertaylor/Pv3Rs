@@ -1,7 +1,8 @@
-#' A function to sample a transitive relationship graph (RG)
+#' Sample a transitive relationship graph (RG)
 #'
-#' Samples one transitive graph of stranger, sibling and clonal relationships
-#' between distinct parasite genotypes within and across infections. Unlike
+#' Samples one transitive graph of stranger and sibling relationships between
+#' distinct parasite genotypes within infections and stranger, sibling and
+#' clonal relationships between parasite genotypes across infection/s. Unlike
 #' \code{\link{enumerate_RGs}}, \code{sample_RG} is not limited to six or fewer
 #' genotypes among three or fewer infections, because it only generates one
 #' graph and thus cannot overload memory. However, for more than six genotypes
@@ -18,21 +19,18 @@
 #'   \code{generate_random_Vivax_model} at
 #'   \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 #'
-#' @section To-do:
-#' Condition on an existing RG for MCMC proposal
-#' Add plot to examples
 #'
 #' @examples
 #'
-#' sample_RG(c(2,1,1))
+#' RG <- sample_RG(c(2,1,1))
+#' print(RG)
+#' plot_RG(RG)
 #'
 #' @export
 sample_RG = function(MOIs){
 
-  # Check MOIs are whole numbers (copied from ?base::integer)
-  if (!all(abs(MOIs - round(MOIs)) < .Machine$double.eps^0.5)) {
-    stop("MOIs need to be whole numbers")
-  }
+  # Check MOIs are positive whole numbers
+  if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
   # Compute the number of not necessarily transitive graphs
   intra_edge_counts <- sapply(MOIs, choose, k = 2)
@@ -46,32 +44,31 @@ sample_RG = function(MOIs){
   # Hard code relationship types to satisfy the test_transitive function
   relationship_types <- c(stranger = 0, sibling = 0.5, clone = 1)
   intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")]
-  time_point_count <- length(MOIs) # Number of time points
+  infection_count <- length(MOIs) # Number of time points
   gs_count <- sum(MOIs) # Number of genotypes
 
   # Check if feasible to enumerate RGs
-  if (any(MOIs == 0)) stop("Zero-valued MOIs are not supported")
   if (gs_count <= 1) stop("Sorry, no RGs")
 
   # Enumerate indices for pairs of time points, etc.
-  if (time_point_count > 1) {
-    time_point_ijs <- gtools::combinations(n = time_point_count,
+  if (infection_count > 1) {
+    infection_ijs <- gtools::combinations(n = infection_count,
                                            r = 2,
-                                           v = 1:time_point_count)
-    time_point_pair_count <- nrow(time_point_ijs) # Number of pairs of time points
+                                           v = 1:infection_count)
+    infection_pair_count <- nrow(infection_ijs) # Number of pairs of time points
   } else {
-    time_point_pair_count <- 0 # Number of pairs of time points
+    infection_pair_count <- 0 # Number of pairs of time points
   }
 
   gs <- paste0("g", 1:gs_count) # Genotype names
-  ts_per_gs <- rep(1:time_point_count, MOIs) # List time point indices per genotype
+  ts_per_gs <- rep(1:infection_count, MOIs) # List time point indices per genotype
 
   # List genotypes per time point and time point pair
   gs_per_ts <- split(gs, ts_per_gs)
-  if(time_point_pair_count >= 1){
-    gs_per_t_pairs <- lapply(1:time_point_pair_count, function(t_pair) {
-      list(gs_per_ts[[time_point_ijs[t_pair, 1]]],
-           gs_per_ts[[time_point_ijs[t_pair, 2]]])
+  if(infection_pair_count >= 1){
+    gs_per_t_pairs <- lapply(1:infection_pair_count, function(t_pair) {
+      list(gs_per_ts[[infection_ijs[t_pair, 1]]],
+           gs_per_ts[[infection_ijs[t_pair, 2]]])
     })
   }
 
@@ -88,16 +85,16 @@ sample_RG = function(MOIs){
   while (!transitive) {
 
     # Populate adj_all with intra-relationships
-    for(t in 1:time_point_count) {
+    for(t in 1:infection_count) {
       intra_relationships <- sample(intra_relationship_types, choose(MOIs[t],2), replace = T)
       intra_adjs[[t]][lower.tri(intra_adjs[[t]])] <- intra_relationships
       adj_all[gs_per_ts[[t]], gs_per_ts[[t]]] <- intra_adjs[[t]]
     }
 
     # Populate lower tri of all_adj with between time-point relationships
-    if (time_point_pair_count >= 1) {
-      for (t_pair in 1:time_point_pair_count) {
-        inter_relationship_count <- prod(MOIs[time_point_ijs[t_pair,]])
+    if (infection_pair_count >= 1) {
+      for (t_pair in 1:infection_pair_count) {
+        inter_relationship_count <- prod(MOIs[infection_ijs[t_pair,]])
         inter_relationships <- sample(relationship_types, inter_relationship_count, replace = T)
         adj_all[gs_per_t_pairs[[t_pair]][[2]],
                 gs_per_t_pairs[[t_pair]][[1]]] <- inter_relationships

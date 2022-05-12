@@ -2,7 +2,7 @@
 % Please edit documentation in R/enumerate_RGs.R
 \name{enumerate_RGs}
 \alias{enumerate_RGs}
-\title{A function to enumerate all transitive relationship graphs (RG)}
+\title{Enumerate all transitive relationship graphs (RGs)}
 \usage{
 enumerate_RGs(MOIs)
 }
@@ -34,11 +34,12 @@ relationship. Strangers have zero weight and thus there are no edges
 between them.
 }
 \description{
-Enumerates all transitive graphs of stranger, sibling and clonal
-relationships between distinct parasite genotypes within and across
-infections. \code{enumerate_RGs} is limited to six or fewer genotypes among
-three or fewer infections because the number of graphs grows exponentially
-with the number of genotypes and the number of infections; see examples.
+Enumerates all transitive graphs of stranger and sibling relationships
+between distinct parasite genotypes within infections and stranger, sibling
+and clonal relationships between parasite genotypes across infection/s.
+\code{enumerate_RGs} is limited to six or fewer genotypes among three or
+fewer infections because the number of graphs grows exponentially with the
+number of genotypes and the number of infections; see examples.
 }
 \section{Provenance}{
  This function was adapted from
@@ -50,8 +51,7 @@ with the number of genotypes and the number of infections; see examples.
 
 \enumerate{
 \item Consider using RGs_to_eval_count as the too
-many RGs cut-off instead of gs_count > 6 | time_point_count > 3
-\item Add plot_Vivax_model example
+many RGs cut-off instead of gs_count > 6 | infection_count > 3
 \item Read up about using save and load to preserve graph attributes; also
 read_graph and write_graph
 }
@@ -62,6 +62,7 @@ MOIs <- c(1,2)
 RGs <- enumerate_RGs(MOIs)
 RGs[[1]]
 igraph::vertex_attr(RGs[[1]])
+for(i in 1:length(RGs)) plot_RG(RGs[[i]])
 
 # Compute by hand the number of not necessarily transitive graphs
 intra_edge_counts <- sapply(MOIs, choose, k = 2)

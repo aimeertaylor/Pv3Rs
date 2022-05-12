@@ -1,0 +1,71 @@
+#' Plot a relationship graph (RG)
+#'
+#' This function is a wrapper around \code{\link[igraph]{plot.igraph}}, designed to group
+#' genotypes by infections, both spatially and using vertex colour. It also makes sure
+#' clonal and sibling edges are plotted differently using different line types.
+#'
+#' @param RG A relationship graph, which is an igraph graph; see
+#'   \code{\link{enumerate_RGs}}.
+#' @param edge_col A vector of edge colours corresponding to different
+#'   relationships, where 0 represents a stranger, 0.5 represents a sibling and
+#'   1 represents a clone.
+#' @param edge_lty A vector of edge line types corresponding to different
+#'   relationships, where 0 represents a stranger, 0.5 represents a sibling and
+#'   1 represents a clone.
+#' @param vertex_palette A character string specifying a RColorBrewer palette.
+#'   Overrides the default \code{palette} of \code{\link[igraph]{plot.igraph}}.
+#' @param edge.width Overrides the default \code{edge.width} of
+#'   \code{\link[igraph]{plot.igraph}}.
+#' @param ... Additional arguments to pass to \code{\link[igraph]{plot.igraph}}, e.g.
+#'   \code{edge.curved}.
+#'
+#'
+#' @section Provenance: This function was adapted from \code{plot_Vivax_model} at
+#' \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
+#'
+#' @examples
+#' RGs <- enumerate_RGs(c(1,2,1))
+#' for(i in 1:length(RGs)) plot_RG(RGs[[i]], edge.curved = 0.5)
+#'
+#' @export
+
+plot_RG = function(RG,
+                   edge_col = c("0" = "white", "0.5" = "black", "1" = "black"),
+                   edge_lty = c("0" = "solid", "0.5" = "dashed", "1" = "solid"),
+                   vertex_palette = "Set2",
+                   edge.width = 1.5,
+                   ...){
+
+
+  # Compute graph layout, grouping genotypes per infection
+  ts_per_gs <- igraph::vertex_attr(RG)$group
+  if (is.null(ts_per_gs)) stop("RG vertices need a group attribute")
+  MOIs = as.vector(table(ts_per_gs)) # extract MOIs
+  gs_count <- sum(MOIs)
+  infection_count = length(MOIs)
+  RG_layout = array(dim = c(gs_count, 2))
+  X = rbind(seq(0, 1, length.out = infection_count), MOIs)
+  z = as.numeric(rep(MOIs, MOIs) > 2)
+  my_offset = (-1)^(1:length(z))*(.2/infection_count) # offset within time point
+  RG_layout[,1] = unlist(apply(X, 2, function(x) rep(x[1], x[2]))) + my_offset*z
+  RG_layout[,2] = unlist(sapply(MOIs, function(x) {
+    if (x==1) return(0.5) else return(seq(0, 1, length.out = x))
+    }))
+
+
+  # Create infection colours for vertices
+  infection_colours <- RColorBrewer::brewer.pal(n = 8, vertex_palette)
+  if (length(infection_colours)  < infection_count) {
+    infection_colour_fun <- grDevices::colorRampPalette(infection_colours)
+    infection_colours <- infection_colour_fun(1)
+  }
+
+  # Plot the graph
+  igraph::plot.igraph(RG,
+                      layout = RG_layout,
+                      vertex.labels = igraph::vertex_attr(RG)$name,
+                      vertex.color = infection_colours[igraph::vertex_attr(RG)$group],
+                      edge.color = edge_col[as.character(igraph::edge_attr(RG)$weight)],
+                      edge.lty = edge_lty[as.character(igraph::edge_attr(RG)$weight)],
+                      ...)
+}
