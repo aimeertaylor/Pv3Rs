@@ -1,4 +1,4 @@
-#' Internal computation function
+#' Internal computation function featuring in post_prob_CLI()
 #'
 #'
 #' Notes copied from original:

@@ -1,4 +1,4 @@
-#' Internal computation function
+#' Internal computation function featuring in Log_Pr_yn_Gnb_unnormalised
 #'
 #' Notes copied from original:
 #' MS where one or more NA are ignored when summing over m
