@@ -11,7 +11,7 @@ sample_lineages_from_infinite_pop(RG)
 
 sample_lineages_from_finite_pop(
   RG,
-  pop_lineages = NULL,
+  lineage_probs = NULL,
   lineage_count = 100,
   equifrequent = TRUE,
   alpha = 1,
@@ -22,6 +22,8 @@ generate_lineages(n)
 }
 \arguments{
 \item{RG}{A relationship graph; see \code{\link{enumerate_RGs}} for details.}
+
+\item{lineage_probs}{List of population lineages and their frequencies}
 
 \item{lineage_count}{Whole number specifying the number of lineages in the
 population to sample from.}
@@ -37,6 +39,8 @@ frequncies uniformly, and \code{alpha >> 1} to sample frequencies close to
 
 \item{probs}{A probability vector specifying the lineage frequencies used
 only if \code{alpha = NULL}.}
+
+\item{n}{Number of lineages to generate.}
 }
 \description{
 The lineages of parasite genotypes are sampled from some population according to
