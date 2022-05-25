@@ -4,16 +4,21 @@
 \alias{sample_lineages}
 \alias{sample_lineages_from_infinite_pop}
 \alias{sample_lineages_from_finite_pop}
+\alias{generate_lineages}
 \title{Sample parasite lineages given a relationship graph}
 \usage{
 sample_lineages_from_infinite_pop(RG)
 
 sample_lineages_from_finite_pop(
   RG,
+  pop_lineages = NULL,
   lineage_count = 100,
   equifrequent = TRUE,
-  alpha = 1
+  alpha = 1,
+  probs = NULL
 )
+
+generate_lineages(n)
 }
 \arguments{
 \item{RG}{A relationship graph; see \code{\link{enumerate_RGs}} for details.}
@@ -29,6 +34,9 @@ distribution over lineage frequencies when \code{equifrequent = FALSE}: set
 \code{0 < alpha < 1} to sample sparse frequencies, \code{alpha = 1} to sample
 frequncies uniformly, and \code{alpha >> 1} to sample frequencies close to
 \code{1/lineage_count}.}
+
+\item{probs}{A probability vector specifying the lineage frequencies used
+only if \code{alpha = NULL}.}
 }
 \description{
 The lineages of parasite genotypes are sampled from some population according to
@@ -59,19 +67,30 @@ from the two parental lineages and clone it.
 \itemize{
 \item \code{sample_lineages_from_infinite_pop}: Sample from a infinite population
 
-This function assumes parasite genotypes are drawn from an infinitely laRGe
+This function assumes parasite genotypes are drawn from an infinitely large
 outbred population. As such, each parental lineage is unique.
 
 \item \code{sample_lineages_from_finite_pop}: Sample from a finite population
 
 This function assumes parasite genotypes are drawn from an finite
-population of 100 equifrequent lineages by default. As such,
-parental genotypes are not necessarily unique.
+population of 100 equifrequent lineages by default. As such, parental
+genotypes are not necessarily unique. Note that, by specifying a finite
+population representative of a brood of parasite genotypes versus parasite
+genotypes in the population at large, this function could be used to explore
+IBD structure following brood versus non-brood mating.
+
+\item \code{generate_lineages}: Generates n population lineages
+
+Letters represent lineages with repeats if more than 26 lineages are
+required.
 }}
 
 \section{To-do}{
 
 To speed up, could group all rc stranger clusters of size one
+
+
+either return probs (in a way that doesn't mess up sample_IP_given_RG)
 }
 
 \examples{
@@ -80,5 +99,7 @@ sample_lineages_from_infinite_pop(RG)
 
 RG <- sample_RG(3)
 sample_lineages_from_finite_pop(RG, lineage_count = 5, equifrequent = FALSE, alpha = 0.1)
+
+rev(generate_lineages(28))
 
 }

@@ -3,6 +3,7 @@
 export(compute_pr_IP_RG)
 export(enumerate_IPs)
 export(enumerate_RGs)
+export(generate_lineages)
 export(lineages_to_IP)
 export(plot_RG)
 export(sample_IP_given_RG)
