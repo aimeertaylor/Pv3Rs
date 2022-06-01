@@ -1,5 +1,3 @@
 ^Pv3Rs\.Rproj$
 ^\.Rproj\.user$
-^MyDevFiles$
-^MyDevFiles/Check_pr_IP_outbredRG\.R$
-^\./MyDevFiles/Check_meiotic_sib_relatedness\.R$
+MyDevFiles*

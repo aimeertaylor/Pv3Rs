@@ -3,8 +3,8 @@
 # Conclusion: a single inbreeding value can be used to compute the probability
 # of an IBD graph among stranger parasites if their lineages are equifrequent;
 # otherwise,
-# if lineages are not equifrequent, f underepresents the number that can be sampled
-# if relationships are not stranger, f overrepresents the number that can be sampled
+# if lineages are not equifrequent, f under-epresents the number that can be sampled
+# if relationships are not stranger, f over-represents the number that can be sampled
 # Consider writing up as an example in Pv3Rs::compute_pr_partition
 ###############################################
 
@@ -15,6 +15,10 @@ n <- 5
 rep_num <- 10 # Number of repeats for pvalues and histograms
 sim_num <- 100 # Number of simulations from which to compute frequencies
 par(mfrow = c(2,2))
+
+# Copied from https://stackoverflow.com/questions/57233914/how-to-code-elementary-symmetric-polynomials-in-r
+# Required for non-uniform frequency Birthday problem formula from Munford 1977
+sympoly <- function(k, x) sum(combn(x, k, prod))
 
 # If FALSE, compute_pr_partitions does not work; otherwise, works.
 Equifrequent_lineages <- TRUE
@@ -92,10 +96,12 @@ for(g_count in 2:6){
   # Compare with different calculations
   if(g_count < 5) { # Otherwise too combinatorially complicated
     print(c(tail(Pr_IG_RG, 1),
-            #factorial(g_count)*sympoly(g_count, rep(1/n,n)),  # Formula from Munford 1977
+            factorial(g_count)*sympoly(g_count, rep(1/n,n)),  # Formula from Munford 1977
             factorial(n)/((n^g_count)*factorial(n-g_count)))) # Assuming equal lineage frequencies
   }
 }
+
+
 
 
 
