@@ -1,6 +1,6 @@
 # Pv3Rs
 
-An R package developed to support model-based classification of the cause of recurrent *Plasmodium vivax* malaria using genetic data, i.e. the Pv3Rs:  
+An R package developed to support model-based classification using genetic data of the cause of recurrent *Plasmodium vivax* malaria, i.e. the Pv3Rs:  
 
 - Relapse 
 - Recrudescence
