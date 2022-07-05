@@ -5,7 +5,7 @@
 #' equally probable boxes). Can be used to compute the probability of IBD
 #' partitions among parasites who are all equally related to one another with
 #' relatedness f. Can also be used to inefficiently solve the birthday problem
-#' providing there are not too many balls.
+#' provided that there are not too many balls.
 #'
 #' @param k Number of balls to partition
 #' @param f Probability that two balls are in the same box

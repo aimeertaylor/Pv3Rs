@@ -41,7 +41,7 @@ sample_RG = function(MOIs){
                        RGs_to_eval_count))
   }
 
-  # Hard code relationship types to satisfy the test_transitive function
+  # Hard code relationship types to satisfy the is.transitive function
   relationship_types <- c(stranger = 0, sibling = 0.5, clone = 1)
   intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")]
   infection_count <- length(MOIs) # Number of time points
@@ -110,7 +110,7 @@ sample_RG = function(MOIs){
     RG <- igraph::set_vertex_attr(RG, "group", value = ts_per_gs)
 
     # Test transitivity and store if transitive
-    transitive <- test_transitive(RG)
+    transitive <- is.transitive(RG)
   }
   return(RG)
 }

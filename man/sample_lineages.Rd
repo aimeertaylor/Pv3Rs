@@ -2,108 +2,86 @@
 % Please edit documentation in R/sample_lineages.R
 \name{sample_lineages}
 \alias{sample_lineages}
-\alias{sample_lineages_from_infinite_pop}
-\alias{sample_lineages_from_finite_pop}
-\alias{generate_lineages}
-\title{Sample parasite lineages given a relationship graph}
+\title{Sample per-marker lineages for parasite genotypes in a relationship graph}
 \usage{
-sample_lineages_from_infinite_pop(RG)
-
-sample_lineages_from_finite_pop(
+sample_lineages(
   RG,
+  n_m,
+  outbred = F,
   lineage_probs = NULL,
-  lineage_count = 100,
+  lineage_count = 10,
   equifrequent = TRUE,
-  alpha = 1,
-  probs = NULL
+  alpha = 1
 )
-
-generate_lineages(n)
 }
 \arguments{
 \item{RG}{A relationship graph; see \code{\link{enumerate_RGs}} for details.}
 
-\item{lineage_probs}{List of population lineages and their frequencies}
+\item{n_m}{Number of markers.}
+
+\item{outbred}{Logical specifying if the parental genotypes should be sampled
+from a outbred population or not.}
+
+\item{lineage_probs}{Vector of population lineage frequencies; if named,
+names will be taken as lineages; only used if \code{outbred = T}.}
 
 \item{lineage_count}{Whole number specifying the number of lineages in the
-population to sample from.}
+population to sample from; only used if \code{outbred = T} and
+\code{lineage_probs = NULL}.}
 
 \item{equifrequent}{Logical specifying if the lineages in the population are
-equifrequent or not.}
+equifrequent or not; only used if \code{outbred = T} and \code{lineage_probs
+  = NULL}.}
 
 \item{alpha}{The concentration parameter of a symmetric Dirichlet
 distribution over lineage frequencies when \code{equifrequent = FALSE}: set
-\code{0 < alpha < 1} to sample sparse frequencies, \code{alpha = 1} to sample
-frequncies uniformly, and \code{alpha >> 1} to sample frequencies close to
-\code{1/lineage_count}.}
-
-\item{probs}{A probability vector specifying the lineage frequencies used
-only if \code{alpha = NULL}.}
-
-\item{n}{Number of lineages to generate.}
+\code{0 < alpha < 1} to sample sparse frequencies, \code{alpha = 1}
+(default) to sample frequencies uniformly, and \code{alpha >> 1} to sample
+frequencies close to \code{1/lineage_count}; only used if \code{outbred = T},
+\code{lineage_probs = NULL} and \code{lequifrequent = F}.}
 }
 \description{
-The lineages of parasite genotypes are sampled from some population according to
-their inter-genotype relationships specified in a relationship
-graph.
+For each marker, the lineages of a set of first-generation offspring parasite
+genotypes are sampled, according to their inter-genotype relationships
+specified in a relationship graph, from a set of parents sampled from a
+founder population, which can either be an infinitely large outbred
+population or a finite inbred population. If its finite inbred, lineages can
+either be equifreqent or not. Markers are treated as independent.
 }
 \details{
-Functions \code{sample_lineages_from_infinite_pop} and
-\code{sample_lineages_from_finite_pop} assume inter-genotype relationships
-are either stranger, sibling or clone and sample lineages as follows.
+\code{sample_lineages} assume inter-genotype relationships are either
+stranger, sibling or clone and samples lineages as follows. Since clonal
+lineages are drawn from two parental lineages, clones are mitotic copies of
+one-another, not the products of selfing.
 \enumerate{
 
-\item For a stranger, sample a parental lineage.
+\item For a stranger, sample per-marker lineages from two parental lineages.
 
-\item For all members of each clonal clique of the relationship graph, sample
-one parental lineage and clone it.
+\item For a clique of clones, sample per-marker lineages from two parental
+clones for one member of the group and and clone it.
 
-\item For a sibling clique of size k, sample two parental lineages and then k
-filial lineages from the parental lineages.
+\item For a clique of siblings, sample per-marker lineages from two
+parental lineages.
 
-\item For a mixed sibling and clonal clique, sample two parental lineages and
-then for all members of each clonal sub-clique, sample one filial lineage
-from the two parental lineages and clone it.
+\item For a mixed clique of siblings and clones, for each marker, from two
+parental lineages, sample a lineage for each clonal sub-clique and clone it.
 
 }
+
+When outbred = F (default), this function assumes parasite genotypes are drawn
+from an inoutbredly large outbred population. As such, each parental lineage
+is unique. When outbred = T, this function assumes parasite genotypes are
+drawn from an inoutbredly large outbred population. As such, each parental
+lineage is unique. More specifically, the function draws parasite genotypes
+from an outbred population of 100 equifrequent lineages by default. As such,
+parental genotypes are not necessarily unique. Note that, by specifying a
+outbred population representative of a brood of parasite genotypes versus
+parasite genotypes in the population at large, this function could be used to
+explore IBD structure following brood versus non-brood mating.
 }
-\section{Functions}{
-\itemize{
-\item \code{sample_lineages_from_infinite_pop}: Sample from a infinite population
-
-This function assumes parasite genotypes are drawn from an infinitely large
-outbred population. As such, each parental lineage is unique.
-
-\item \code{sample_lineages_from_finite_pop}: Sample from a finite population
-
-This function assumes parasite genotypes are drawn from an finite
-population of 100 equifrequent lineages by default. As such, parental
-genotypes are not necessarily unique. Note that, by specifying a finite
-population representative of a brood of parasite genotypes versus parasite
-genotypes in the population at large, this function could be used to explore
-IBD structure following brood versus non-brood mating.
-
-\item \code{generate_lineages}: Generates n population lineages
-
-Letters represent lineages with repeats if more than 26 lineages are
-required.
-}}
-
-\section{To-do}{
-
-To speed up, could group all rc stranger clusters of size one
-
-
-either return probs (in a way that doesn't mess up sample_IP_given_RG)
-}
-
 \examples{
 RG <- sample_RG(3)
-sample_lineages_from_infinite_pop(RG)
-
-RG <- sample_RG(3)
-sample_lineages_from_finite_pop(RG, lineage_count = 5, equifrequent = FALSE, alpha = 0.1)
-
-rev(generate_lineages(28))
+sample_lineages(RG, n_m = 5)
+sample_lineages(RG, n_m = 5, outbred = T)
 
 }

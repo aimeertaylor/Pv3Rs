@@ -9,6 +9,7 @@ plot_RG(
   edge_col = c(`0` = "white", `0.5` = "black", `1` = "black"),
   edge_lty = c(`0` = "solid", `0.5` = "dashed", `1` = "solid"),
   vertex_palette = "Set2",
+  layout_by_group = TRUE,
   edge.width = 1.5,
   ...
 )
@@ -27,6 +28,12 @@ relationships, where 0 represents a stranger, 0.5 represents a sibling and
 
 \item{vertex_palette}{A character string specifying a RColorBrewer palette.
 Overrides the default \code{palette} of \code{\link[igraph]{plot.igraph}}.}
+
+\item{layout_by_group}{A logical argument which if TRUE (default) overrides
+the default layout of \code{\link[igraph]{plot.igraph}} so that vertices
+that represent parasite genotypes from different infections are distributed
+horizontally and vertices that represent genotypes within infections are
+distributed vertically.}
 
 \item{edge.width}{Overrides the default \code{edge.width} of
 \code{\link[igraph]{plot.igraph}}.}

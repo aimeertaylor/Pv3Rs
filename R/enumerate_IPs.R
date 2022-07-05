@@ -8,11 +8,11 @@
 #'   reduced to its sum, which must be less than or equal to 11.
 #'
 #' @examples
-#' enumerate_ip(3)
+#' enumerate_IPs(3)
 #'
 #' @section To-do:
 #' Convert to use \code{\link[partitions]{setparts}} whose output takes less
-#' memory (albeit less intuitive), thereby relaxing the limit on \code{mois}.
+#' memory (albeit less intuitive), thereby relaxing the limit on \code{MOIs}.
 #'
 #' @export
 enumerate_IPs <- function(MOIs) {

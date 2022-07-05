@@ -6,16 +6,18 @@
 #' clusters precede small clusters and so that low genotype indices precede
 #' high genotype indices.
 #'
-#' @param lin_vec A character vector of parasites lineages whose names are genotype
+#' @param lin_vec A character vector of per-marker lineages whose names are parasite genotype
 #'   indices.
 #'
 #' @examples
+#' set.seed(1)
 #' RG <- sample_RG(3)
-#' lineages <- sample_lineages_from_infinite_pop(RG)
-#' lineages_to_IP(lineages)
+#' plot_RG(RG)
+#' lineages <- sample_lineages(RG, num_m = 3)
+#' apply(lineages, 2, convert_lineages_to_IP)
 #'
 #' @export
-lineages_to_IP <- function(lin_vec) {
+convert_lineages_to_IP<- function(lin_vec) {
   out <- split(names(lin_vec), lin_vec, lex.order = T)
   out <- out[names(sort(sapply(out, min)))] # Order s.t. low genotype indices precede high
   len <- sapply(out, length)

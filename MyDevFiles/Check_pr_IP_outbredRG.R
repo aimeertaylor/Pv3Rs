@@ -6,12 +6,12 @@ par(mfrow = c(2,2))
 
 # First try some large random RG
 set.seed(3)
-RG <- sample_recurrent_RG(MOI_init = 5, cause = "reinfection")
+RG <- sample_single_recurrence_RG(MOI_init = 5, cause = "reinfection")
 IPs <- enumerate_IPs(igraph::vcount(RG))
 pr_IP_RG <- sapply(IPs, compute_pr_IP_RG, RG)
-names(pr_IP_RG) <- sapply(IPs, IP_to_character)
+names(pr_IP_RG) <- sapply(IPs, convert_IP_to_string)
 # Third simulate the frequency of the IPs under the outbred simulation model
-simulated_IPs <- sapply(1:100, function(j) IP_to_character(sample_IP_given_RG(RG)))
+simulated_IPs <- sapply(1:100, function(j) convert_IP_to_string(sample_IPs_given_RG(RG)))
 simulated_IP_fr <- table(simulated_IPs)/100
 
 # Plot agreement and relationship graph
@@ -39,7 +39,7 @@ for(m in MOIs){
   RGs <- enumerate_RGs(m)
   IPs <- enumerate_IPs(m)
   pr_IP_RG <- array(0, dim = c(length(RGs), length(IPs)),
-                    dimnames = list(NULL, sapply(IPs, IP_to_character)))
+                    dimnames = list(NULL, sapply(IPs, convert_IP_to_string)))
   fr_IP_RG <- pr_IP_RG
 
   for(i in 1:length(RGs)){
@@ -49,7 +49,7 @@ for(m in MOIs){
     pr_IP_RG[i,] <- sapply(IPs, compute_pr_IP_RG, RG)
 
     # Third simulate the frequency of the IPs under the outbred simulation model
-    simulated_IPs <- sapply(1:sim_count, function(j) IP_to_character(sample_IP_given_RG(RG)))
+    simulated_IPs <- sapply(1:sim_count, function(j) convert_IP_to_string(sample_IPs_given_RG(RG)))
     simulated_IP_fr <- table(simulated_IPs)/sim_count
     fr_IP_RG[i, names(simulated_IP_fr)] <- simulated_IP_fr
   }

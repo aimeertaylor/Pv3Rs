@@ -2,7 +2,7 @@
 % Please edit documentation in R/enumerate_RGs.R
 \name{enumerate_RGs}
 \alias{enumerate_RGs}
-\title{Enumerate all transitive relationship graphs (RGs)}
+\title{Enumerate transitive relationship graphs (RGs)}
 \usage{
 enumerate_RGs(MOIs)
 }

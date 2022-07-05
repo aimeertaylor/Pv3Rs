@@ -35,7 +35,7 @@ f <- sum(lineage_probs^2) # Compute probability of being IBD
 
 for(g_count in 2:6){
 
-  # Generate relationship graph for sample_IP_given_RG
+  # Generate relationship graph for sample_IPs_given_RG
   g_names <- paste0("g", 1:g_count)
   RM <- array(0, dim = rep(g_count, 2), dimnames = list(g_names, g_names))
   RG <- igraph::graph_from_adjacency_matrix(adjmatrix = RM, mode='undirected', diag = F)
@@ -45,11 +45,11 @@ for(g_count in 2:6){
 
   sapply(partitions::listParts(g_count), compute_pr_IP_RG, RG)
 
-  # Remain Pr(IG|RG) to compare with output of sample_IP_given_RG
+  # Remain Pr(IG|RG) to compare with output of sample_IPs_given_RG
   names(Pr_IG_RG) <- sapply(names(Pr_IG_RG), function(x) {
     x <- as.numeric(strsplit(x, split = "")[[1]])
     names(x) <- paste0("g", 1:length(x))
-    IP_to_character(lineages_to_IP(x))
+    convert_IP_to_sting(convert_lineages_to_IP(x))
   })
 
   # Generate store for pvalues
@@ -61,7 +61,7 @@ for(g_count in 2:6){
   pb <- txtProgressBar(min = 0, max = rep_num, style = 3)
   for(sim_i in 1:rep_num){
     IPs <- sapply(1:100, function(i) {
-      IP_to_character(sample_IP_given_RG(RG, outbred = FALSE, lineage_probs = lineage_probs))
+      convert_IP_to_sting(sample_IPs_given_RG(RG, outbred = FALSE, lineage_probs = lineage_probs))
     })
 
     # Compute frequency of IP given RG and store

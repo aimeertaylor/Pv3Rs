@@ -15,7 +15,7 @@
 #' test_correct_graph at
 #' \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}
 #'
-test_transitive <- function(RG){
+is.transitive <- function(RG){
 
   transitive <- TRUE # Presume correct until proven incorrect
 

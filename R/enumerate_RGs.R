@@ -1,4 +1,4 @@
-#' Enumerate all transitive relationship graphs (RGs)
+#' Enumerate transitive relationship graphs (RGs)
 #'
 #' Enumerates all transitive graphs of stranger and sibling relationships
 #' between distinct parasite genotypes within infections and stranger, sibling
@@ -68,7 +68,7 @@ enumerate_RGs <- function(MOIs) {
   inter_edge_count <- choose(sum(MOIs), 2) - sum(intra_edge_counts)
   RGs_to_eval_count <- prod(3^inter_edge_count, 2^intra_edge_counts)
 
-  # Hard code relationship types to satisfy the test_transitive function
+  # Hard code relationship types to satisfy the is.transitive function
   relationship_types <- c(stranger = 0, sibling = 0.5, clone = 1)
   intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")]
   infection_count <- length(MOIs) # Number of time points
@@ -171,7 +171,7 @@ enumerate_RGs <- function(MOIs) {
     RG <- igraph::set_vertex_attr(RG, "group", value = ts_per_gs)
 
     # Test transitivity and store if transitive
-    if (test_transitive(RG)) {
+    if (is.transitive(RG)) {
       transitive_RGs[[transitive_i]] <- RG
       transitive_i <- transitive_i + 1
     }

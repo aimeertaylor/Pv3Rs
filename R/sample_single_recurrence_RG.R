@@ -6,10 +6,10 @@
 #' relationships across parasite genotypes in the initial and recurrent
 #' infections. The function requires the user to specify the multiplicity of the
 #' initial infection, \code{MOI_init}. If \code{MOI_init} is greater than 4,
-#' \code{sample_recurrent_RG} is liable to take a long time because it is
+#' \code{sample_single_recurrence_RG} is liable to take a long time because it is
 #' testing for transitivity while sampling among not necessarily transitive
 #' graphs, of which there will be many; see the message that
-#' \code{sample_recurrent RG} prints to the screen.
+#' \code{sample_single_recurrence_RG} prints to the screen.
 #'
 #' @param MOI_init The number of distinct parasite genotypes (a.k.a the
 #'   multiplicity of infection, MOI) of the initial infection.
@@ -29,14 +29,14 @@
 #' @examples
 #'
 #'for (cause in c("recrudescence", "reinfection", "relapse")) {
-#'   RG <- sample_recurrent_RG(MOI_init = 3, cause)
+#'   RG <- sample_single_recurrence_RG(MOI_init = 3, cause)
 #'   plot_RG(RG)
 #'   print(RG)
 #' }
 #'
 #'
 #' @export
-sample_recurrent_RG <- function(MOI_init, cause,
+sample_single_recurrence_RG <- function(MOI_init, cause,
                                prob_recrudesce = 0.5, beta_relapse = 1){
 
   # Check MOI is a whole number
@@ -61,7 +61,7 @@ sample_recurrent_RG <- function(MOI_init, cause,
   ts_per_gs <- rep(1:2, MOIs) # Infection indices per genotype
   gs_per_ts <- split(gs, ts_per_gs) # Genotypes per infection
 
-  # Hard code relationship types to satisfy the test_transitive function
+  # Hard code relationship types to satisfy the is.transitive function
   relationship_types <- c(stranger = 0, sibling = 0.5, clone = 1)
   intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")]
 
@@ -139,7 +139,7 @@ sample_recurrent_RG <- function(MOI_init, cause,
     RG <- igraph::set_vertex_attr(RG, "group", value = ts_per_gs)
 
     # Test transitivity and store if transitive
-    transitive <- test_transitive(RG)
+    transitive <- is.transitive(RG)
   }
 
   return(RG)

@@ -17,7 +17,7 @@ pair of balls has probability f of being in the same box (i.e. there are 1/f
 equally probable boxes). Can be used to compute the probability of IBD
 partitions among parasites who are all equally related to one another with
 relatedness f. Can also be used to inefficiently solve the birthday problem
-providing there are not too many balls.
+provided that there are not too many balls.
 }
 \examples{
 

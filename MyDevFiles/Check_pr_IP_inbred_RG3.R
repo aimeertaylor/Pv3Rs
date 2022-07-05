@@ -122,7 +122,7 @@ for(RG_i in 1:length(RGs)) {
   pb <- txtProgressBar(min = 0, max = rep_num, style = 3)
   for(sim_i in 1:rep_num){
     IPs <- sapply(1:100, function(i) {
-      IP_to_character(sample_IP_given_RG(RG, outbred = FALSE, lineage_probs = lineage_probs))
+      convert_IP_to_string(sample_IPs_given_RG(RG, outbred = FALSE, lineage_probs = lineage_probs))
     })
 
     # Compute frequency of IP given RG and store

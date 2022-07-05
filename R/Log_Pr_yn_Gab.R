@@ -14,7 +14,7 @@ Log_Pr_yn_Gab <- function(G, log_Fs, MSs, Z, A, vertex_data_matrix){
   M <- length(MSs) # Number of microsatellites
 
   # Check if data have zero prob given G due to clones
-  if (!test_cln_compatible(A, vertex_data_matrix)) { # If labelled G is incompatible
+  if (!is.clone.compatible(A, vertex_data_matrix)) { # If labelled G is incompatible
 
     log_Pr_yn_Gab = NA
     return(log_Pr_yn_Gab) # Function ends here

@@ -18,10 +18,10 @@ explicit.
 \section{To-do}{
 
 Convert to use \code{\link[partitions]{setparts}} whose output takes less
-memory (albeit less intuitive), thereby relaxing the limit on \code{mois}.
+memory (albeit less intuitive), thereby relaxing the limit on \code{MOIs}.
 }
 
 \examples{
-enumerate_ip(3)
+enumerate_IPs(3)
 
 }
