@@ -2,16 +2,16 @@
 % Please edit documentation in R/convert_lineages_to_IP.R
 \name{convert_lineages_to_IP}
 \alias{convert_lineages_to_IP}
-\title{Converts a vector of per-genotype lineages to an IBD partition.}
+\title{Converts a vector of lineages to an IBD partition.}
 \usage{
-convert_lineages_to_IP(lin_vec)
+convert_lineages_to_IP(lineages_m)
 }
 \arguments{
-\item{lin_vec}{A character vector of per-marker lineages whose names are parasite genotype
+\item{lineages_m}{For a single marker, a character vector lineages whose names are parasite genotype
 indices.}
 }
 \description{
-\code{lineage_to_IP} is copied from \code{\link[partitions]{vec_to_eq}} and
+\code{convert_lineages_to_IP} is copied from \code{\link[partitions]{vec_to_eq}} and
 modified so that the output is comparable with the output of
 \code{\link[partitions]{listParts}}. Otherwise stated, the output is ordered so that large
 clusters precede small clusters and so that low genotype indices precede
@@ -21,7 +21,7 @@ high genotype indices.
 set.seed(1)
 RG <- sample_RG(3)
 plot_RG(RG)
-lineages <- sample_lineages(RG, num_m = 3)
+lineages <- sample_lineages(RG, n_m = 3)
 apply(lineages, 2, convert_lineages_to_IP)
 
 }

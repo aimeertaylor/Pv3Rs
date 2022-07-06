@@ -19,34 +19,41 @@ multiplicity of infection, MOI) of the initial infection.}
 infection: \code{"recrudescence"}, \code{"reinfection"} or
 \code{"relapse"}.}
 
-\item{prob_recrudesce}{A probability that each genotype survives in a
-recrudescent infection.}
+\item{prob_recrudesce}{A probability that each parasite genotype survives
+in a recrudescent infection; only used if \code{cause = "recrudescence"}.}
 
-\item{beta_relapse}{A multiplicative factor that modifies the average MOI of
-a reinfection to obtain the average MOI of a relapse.}
+\item{beta_relapse}{A multiplicative factor of average MOI of a reinfection
+that describes the average MOI of a relaps: if \code{beta_relapse = 1}
+(default) reinfections and relapse have the the same average MOI,
+\code{beta_relapse > 1} relapses have a higher average MOI than
+reinfections (as might be the case for a person with a large hynpozoite
+burden in a low transmission setting), \code{beta_relapse > 1} relapses
+have a lower average MOI than reinfections (as might be the case for a
+traveller returning from a high transmission setting)}
 }
 \value{
-Returns a transitive relationship graph (RG); see \code{\link{enumerate_RGs}} for details.
+Returns a transitive relationship graph (RG); see
+\code{\link{enumerate_RGs}} for details.
 }
 \description{
 Samples one transitive graph of stranger and sibling relationships between
-distinct parasite genotypes within the initial and recurrent infections and,
+distinct parasite genotypes within an initial and a recurrent infection and,
 depending on the specified cause, stranger, sibling and/or clonal
-relationships across parasite genotypes in the initial and recurrent
-infections. The function requires the user to specify the multiplicity of the
-initial infection, \code{MOI_init}. If \code{MOI_init} is greater than 4,
-\code{sample_single_recurrence_RG} is liable to take a long time because it is
-testing for transitivity while sampling among not necessarily transitive
+relationships between parasite genotypes across the infections. The function
+requires the user to specify the multiplicity of the initial infection,
+\code{MOI_init}. If \code{MOI_init} is greater than 4,
+\code{sample_single_recurrence_RG} is liable to take a long time because it
+is testing for transitivity while sampling among not necessarily transitive
 graphs, of which there will be many; see the message that
 \code{sample_single_recurrence_RG} prints to the screen.
 }
 \section{To-do}{
 
-Better to test transitivity on intra before whole?
+Better test intra-infection transitivity before whole RG?
 }
 
 \examples{
-
+set.seed(1)
 for (cause in c("recrudescence", "reinfection", "relapse")) {
   RG <- sample_single_recurrence_RG(MOI_init = 3, cause)
   plot_RG(RG)

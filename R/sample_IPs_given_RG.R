@@ -17,7 +17,7 @@
 #'
 #' @export
 sample_IPs_given_RG <- function(RG, n_m, outbred = TRUE, ...) {
-  lineages <- sample_lineages(RG, n_m, ...)
+  lineages <- sample_lineages(RG, n_m, outbred, ...)
   IPs <- apply(lineages, 2, convert_lineages_to_IP)
   return(IPs)
 }

@@ -8,7 +8,8 @@
 #' @section Provenance: This function was adapted from
 #'   \code{Log_Pr_yn_Gab} at
 #'   \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
-
+#'
+#' @noRd
 Log_Pr_yn_Gab <- function(G, log_Fs, MSs, Z, A, vertex_data_matrix){
 
   M <- length(MSs) # Number of microsatellites

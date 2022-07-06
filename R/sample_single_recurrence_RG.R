@@ -1,13 +1,13 @@
 #' Sample a transitive relationship graph (RG) for a single recurrence
 #'
 #' Samples one transitive graph of stranger and sibling relationships between
-#' distinct parasite genotypes within the initial and recurrent infections and,
+#' distinct parasite genotypes within an initial and a recurrent infection and,
 #' depending on the specified cause, stranger, sibling and/or clonal
-#' relationships across parasite genotypes in the initial and recurrent
-#' infections. The function requires the user to specify the multiplicity of the
-#' initial infection, \code{MOI_init}. If \code{MOI_init} is greater than 4,
-#' \code{sample_single_recurrence_RG} is liable to take a long time because it is
-#' testing for transitivity while sampling among not necessarily transitive
+#' relationships between parasite genotypes across the infections. The function
+#' requires the user to specify the multiplicity of the initial infection,
+#' \code{MOI_init}. If \code{MOI_init} is greater than 4,
+#' \code{sample_single_recurrence_RG} is liable to take a long time because it
+#' is testing for transitivity while sampling among not necessarily transitive
 #' graphs, of which there will be many; see the message that
 #' \code{sample_single_recurrence_RG} prints to the screen.
 #'
@@ -16,19 +16,28 @@
 #' @param cause A character string specifying the cause of the recurrent
 #'   infection: \code{"recrudescence"}, \code{"reinfection"} or
 #'   \code{"relapse"}.
-#' @param prob_recrudesce A probability that each genotype survives in a
-#'   recrudescent infection.
-#' @param beta_relapse A multiplicative factor that modifies the average MOI of
-#'   a reinfection to obtain the average MOI of a relapse.
+#' @param prob_recrudesce A probability that each parasite genotype survives in
+#'   a recrudescent infection; only used if \code{cause = "recrudescence"}.
+#' @param beta_MOI A factor that the average initial MOI is multiplied by to get
+#'   the average MOI of the recurrence; only applies if \code{cause =
+#'   "reinfection} or \code{cause = "relapse"}. If \code{beta_MOI = 1}
+#'   (default), initial and recurrent infections have the the same average MOI.
+#'   If \code{beta_MOI > 1}, recurrences have a higher average MOI than initial
+#'   infections, as might be the case for a person with a large hypnozoite
+#'   burden who relapses following a mosquito bite in a low transmission
+#'   setting. If \code{beta_MOI > 1}, recurrences have a lower average MOI than
+#'   initial infections, as might be the case for a traveller who relapses after
+#'   returning from a high transmission setting where they were bitten.
 #'
-#' @return Returns a transitive relationship graph (RG); see \code{\link{enumerate_RGs}} for details.
+#' @return Returns a transitive relationship graph (RG); see
+#'   \code{\link{enumerate_RGs}} for details.
 #'
 #' @section To-do:
-#' Better to test transitivity on intra before whole?
+#' Better test intra-infection transitivity before whole RG?
 #'
 #' @examples
-#'
-#'for (cause in c("recrudescence", "reinfection", "relapse")) {
+#' set.seed(1)
+#' for (cause in c("recrudescence", "reinfection", "relapse")) {
 #'   RG <- sample_single_recurrence_RG(MOI_init = 3, cause)
 #'   plot_RG(RG)
 #'   print(RG)
@@ -37,7 +46,7 @@
 #'
 #' @export
 sample_single_recurrence_RG <- function(MOI_init, cause,
-                               prob_recrudesce = 0.5, beta_relapse = 1){
+                               prob_recrudesce = 0.5, beta_MOI = 1){
 
   # Check MOI is a whole number
   if (!is.wholenumber(MOI_init)) stop("MOI should be a positive integer")
@@ -46,9 +55,9 @@ sample_single_recurrence_RG <- function(MOI_init, cause,
   # Sample the MOI of the recurrent infection
   MOI_recur <- 0
   if (cause == "reinfection") {
-    while(MOI_recur < 1) MOI_recur <- rpois(n = 1, lambda = MOI_init)
+    while(MOI_recur < 1) MOI_recur <- rpois(n = 1, lambda = MOI_init * beta_MOI)
   } else if (cause == "relapse") {
-    while(MOI_recur < 1) MOI_recur <- rpois(n = 1, lambda = MOI_init * beta_relapse)
+    while(MOI_recur < 1) MOI_recur <- rpois(n = 1, lambda = MOI_init * beta_MOI)
   } else if (cause == "recrudescence") {
     while(MOI_recur < 1) MOI_recur <- rbinom(n = 1, size = MOI_init, prob = prob_recrudesce)
   }

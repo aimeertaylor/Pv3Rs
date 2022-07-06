@@ -1,6 +1,6 @@
-#' Test if a relationship graph is transitive.
+#' Internal function to test if a relationship graph is transitive.
 #'
-#' \code{test_transitive} implements the brute-force algorithm described in the
+#' \code{is.transitive} implements the brute-force algorithm described in the
 #' appendix of Taylor & Watson et al. Nature communications (2019). It assumes
 #' there are only three relationships: strangers, siblings and clones,
 #' represented by weights 0, 0.5 and 1, respectively, such that strangers are
@@ -15,6 +15,7 @@
 #' test_correct_graph at
 #' \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}
 #'
+#' @noRd
 is.transitive <- function(RG){
 
   transitive <- TRUE # Presume correct until proven incorrect

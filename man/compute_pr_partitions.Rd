@@ -21,9 +21,9 @@ provided that there are not too many balls.
 }
 \examples{
 
-compute_pr_partition(3, f = 0.5) # Agrees with IBD computations by hand
-compute_pr_partition(3, f = 1) # Agrees with IBD computations by hand
-compute_pr_partition(3, f = 0) # Agrees with IBD computations by hand
+compute_pr_partitions(3, f = 0.5)
+compute_pr_partitions(3, f = 1)
+compute_pr_partitions(3, f = 0)
 
 # Using compute_pr_partition to solve the birthday problem with...
 k <- 5 # people
@@ -33,6 +33,6 @@ days <- 365 # days in the year
 stats::pbirthday(n = k, classes = days, coincident = 2)
 
 # birthday problem computed using compute_pr_partition:
-pr_parts <- compute_pr_partition(k, f = 1/days)
+pr_parts <- compute_pr_partitions(k, f = 1/days)
 1-tail(pr_parts,1)
 }

@@ -11,7 +11,7 @@
 #' @section Provenance: This function was adapted from \code{Log_Pr_yn_Gnb_unnormalised} at
 #'   \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 #'
-
+#' @noRd
 Log_Pr_yn_Gnb_unnormalised <- function(G, Gabs, cn, Tn, log_Fs, MSs, alpha_terms){
 
   sum_cn <- sum(cn)

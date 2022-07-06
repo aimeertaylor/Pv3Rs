@@ -7,9 +7,9 @@
 sample_lineages(
   RG,
   n_m,
-  outbred = F,
-  lineage_probs = NULL,
-  lineage_count = 10,
+  outbred = TRUE,
+  lineage_freqs = NULL,
+  lineage_count = 50,
   equifrequent = TRUE,
   alpha = 1
 )
@@ -22,66 +22,68 @@ sample_lineages(
 \item{outbred}{Logical specifying if the parental genotypes should be sampled
 from a outbred population or not.}
 
-\item{lineage_probs}{Vector of population lineage frequencies; if named,
-names will be taken as lineages; only used if \code{outbred = T}.}
+\item{lineage_freqs}{Vector of founder population lineage frequencies; if named,
+names will be taken as lineages; only used if \code{outbred = FALSE}.}
 
 \item{lineage_count}{Whole number specifying the number of lineages in the
-population to sample from; only used if \code{outbred = T} and
-\code{lineage_probs = NULL}.}
+founder population; only used if \code{outbred = FALSE} and
+\code{lineage_freqs = NULL}.}
 
 \item{equifrequent}{Logical specifying if the lineages in the population are
-equifrequent or not; only used if \code{outbred = T} and \code{lineage_probs
+equifrequent or not; only used if \code{outbred = FALSE} and \code{lineage_freqs
   = NULL}.}
 
 \item{alpha}{The concentration parameter of a symmetric Dirichlet
 distribution over lineage frequencies when \code{equifrequent = FALSE}: set
 \code{0 < alpha < 1} to sample sparse frequencies, \code{alpha = 1}
 (default) to sample frequencies uniformly, and \code{alpha >> 1} to sample
-frequencies close to \code{1/lineage_count}; only used if \code{outbred = T},
-\code{lineage_probs = NULL} and \code{lequifrequent = F}.}
+frequencies close to \code{1/lineage_count}; only used if \code{outbred = FALSE},
+\code{lineage_freqs = NULL} and \code{equifrequent = FALSE}.}
 }
 \description{
-For each marker, the lineages of a set of first-generation offspring parasite
-genotypes are sampled, according to their inter-genotype relationships
-specified in a relationship graph, from a set of parents sampled from a
-founder population, which can either be an infinitely large outbred
-population or a finite inbred population. If its finite inbred, lineages can
-either be equifreqent or not. Markers are treated as independent.
+For each marker, the lineages of a set of first-generation parasite genotypes
+are sampled, according to their inter-genotype relationships specified in a
+relationship graph, from a set of parents sampled from a founder population
+(a population in which each parasite genotype is represented by a single
+lineage). The founder population can either be an infinitely
+large outbred population or a finite inbred population. If its finite,
+lineages can either be equifreqent or not. Markers are treated as
+independent.
 }
 \details{
 \code{sample_lineages} assume inter-genotype relationships are either
-stranger, sibling or clone and samples lineages as follows. Since clonal
-lineages are drawn from two parental lineages, clones are mitotic copies of
-one-another, not the products of selfing.
+stranger, sibling or clone and samples lineages as follows.
 \enumerate{
 
-\item For a stranger, sample per-marker lineages from two parental lineages.
+\item For a stranger, sample per-marker lineages from two parents.
 
-\item For a clique of clones, sample per-marker lineages from two parental
-clones for one member of the group and and clone it.
+\item For a clique of clones, sample per-marker lineages from two parents for
+one member of the clique and clone it.
 
 \item For a clique of siblings, sample per-marker lineages from two
-parental lineages.
+parents.
 
 \item For a mixed clique of siblings and clones, for each marker, from two
-parental lineages, sample a lineage for each clonal sub-clique and clone it.
+parents, sample a lineage for each clonal sub-clique and clone it.
 
 }
 
-When outbred = F (default), this function assumes parasite genotypes are drawn
-from an inoutbredly large outbred population. As such, each parental lineage
-is unique. When outbred = T, this function assumes parasite genotypes are
-drawn from an inoutbredly large outbred population. As such, each parental
-lineage is unique. More specifically, the function draws parasite genotypes
-from an outbred population of 100 equifrequent lineages by default. As such,
-parental genotypes are not necessarily unique. Note that, by specifying a
-outbred population representative of a brood of parasite genotypes versus
-parasite genotypes in the population at large, this function could be used to
-explore IBD structure following brood versus non-brood mating.
+Note that, since clonal lineages are drawn from two not necessarily identical
+parents, clones are mitotic copies of one-another, not the products of
+selfing.
+
+When \code{outbred = TRUE} (default), this function assumes parasite
+genotypes are drawn from an infinitely large outbred population. As such,
+each parental lineage is unique. When \code{outbred = FALSE}, this function
+assumes parasite genotypes are drawn from a finite inbred population. As
+such, parental genotypes are not necessarily unique. Note that, by specifying
+an inbred population representative of a brood of parasite genotypes, this
+function could be used to explore IBD structure following brood mating.
 }
 \examples{
-RG <- sample_RG(3)
+set.seed(3)
+RG <- sample_RG(c(2,1,1)); plot_RG(RG)
 sample_lineages(RG, n_m = 5)
-sample_lineages(RG, n_m = 5, outbred = T)
+sample_lineages(RG, n_m = 5, outbred = FALSE, lineage_count = 5)
 
 }

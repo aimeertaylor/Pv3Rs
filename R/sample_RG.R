@@ -1,14 +1,14 @@
 #' Sample a transitive relationship graph (RG)
 #'
 #' Samples one transitive graph of stranger and sibling relationships between
-#' distinct parasite genotypes within infections and stranger, sibling and
-#' clonal relationships between parasite genotypes across infection/s. Unlike
+#' distinct parasite genotypes within an infection and stranger, sibling and
+#' clonal relationships between parasite genotypes across infections. Unlike
 #' \code{\link{enumerate_RGs}}, \code{sample_RG} is not limited to six or fewer
 #' genotypes among three or fewer infections, because it only generates one
 #' graph and thus cannot overload memory. However, for more than six genotypes
 #' among more than three infections, it could take a long time because
 #' \code{sample_RG} is testing for transitivity while sampling among not
-#' necessarily transitive graphs, of which there will be many; see the message
+#' necessarily transitive graphs, of which there are many; see the message
 #' that \code{sample_RG} prints to the screen.
 #'
 #' @inheritParams enumerate_RGs
@@ -21,9 +21,9 @@
 #'
 #'
 #' @examples
-#'
+#' set.seed(2)
 #' RG <- sample_RG(c(2,1,1))
-#' print(RG)
+#' print(RG); igraph::as_data_frame(RG)
 #' plot_RG(RG)
 #'
 #' @export

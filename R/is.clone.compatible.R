@@ -5,7 +5,8 @@
 #' @section Provenance: This function was adapted from
 #'   \code{test_cln_incompatible} at
 #'   \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
-
+#'
+#'   @noRd
 is.clone.compatible <- function(A, vertex_data_matrix){
 
   cln_edges <- which(A == 1, arr.ind = TRUE) # Which edges are clones

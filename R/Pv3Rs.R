@@ -1,4 +1,4 @@
-#' Pv3Rs: A package for inferring \emph{Plasmodium vivax} recrudescence, reinfection, and relapse (Pv3Rs).
+#' Pv3Rs: A package for inferring \emph{Plasmodium vivax} (Pv) recrudescence, reinfection, and relapse (3Rs).
 #'
 #' This description is not yet finished; see 10.6 of https://r-pkgs.org/man.html#text-formatting.
 #'

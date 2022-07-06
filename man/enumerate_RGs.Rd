@@ -20,13 +20,13 @@ see \code{\link[igraph]{graph_id}}.
 RGs are undirected. They are weighted, except when they contain only stranger genotypes.
 
 Vertices represent parasite genotypes. Vertices are named consecutively
-from one to the total genotype count, \code{sum(MOIs)}. Vertex
-names are used to index genotypes and inter-genotype relationships. Vertex
-IDs are not used to index genotypes and their relationships because vertex
-IDs are renumbered upon application of some igraph operations, e.g.
+from one to the total genotype count, \code{sum(MOIs)}. Vertex names are
+used to index genotypes and inter-genotype relationships. Vertex IDs are
+not used to index genotypes and their relationships because vertex IDs are
+renumbered upon application of some igraph operations, e.g.
 \code{\link[igraph]{induced_subgraph}}. Genotypes are grouped into
-infections using a vertex attribute called group. The group attribute is used by XXX to
-group genotypes by infection.
+infections using a vertex attribute called group. The group attribute is
+used by \code{\link{plot_RG}} to group genotypes by infection.
 
 Edges represent sibling or clonal relationships that are differentiated by
 weight: 0.5 encodes a sibling relationship, 1 encodes a clonal
@@ -35,8 +35,8 @@ between them.
 }
 \description{
 Enumerates all transitive graphs of stranger and sibling relationships
-between distinct parasite genotypes within infections and stranger, sibling
-and clonal relationships between parasite genotypes across infection/s.
+between distinct parasite genotypes within an infection and stranger, sibling
+and clonal relationships between parasite genotypes across infections.
 \code{enumerate_RGs} is limited to six or fewer genotypes among three or
 fewer infections because the number of graphs grows exponentially with the
 number of genotypes and the number of infections; see examples.
@@ -62,7 +62,8 @@ MOIs <- c(1,2)
 RGs <- enumerate_RGs(MOIs)
 RGs[[1]]
 igraph::vertex_attr(RGs[[1]])
-for(i in 1:length(RGs)) plot_RG(RGs[[i]])
+par(mfrow = c(3,3))
+for(i in 1:length(RGs)) {plot_RG(RGs[[i]]); box()}
 
 # Compute by hand the number of not necessarily transitive graphs
 intra_edge_counts <- sapply(MOIs, choose, k = 2)

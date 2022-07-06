@@ -13,5 +13,7 @@ Check if Pr_yn_G > 0 due to a clonal edge between non-identical genotypes
  This function was adapted from
 \code{test_cln_incompatible} at
 \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
+
+@noRd
 }
 

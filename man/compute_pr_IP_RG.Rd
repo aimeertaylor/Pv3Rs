@@ -30,7 +30,7 @@ outbred population.
 n_genotypes <- 3
 RG <- sample_RG(n_genotypes)
 IPs <- partitions::listParts(n_genotypes)
-compute_pr_IP_RG(IPs[[1]], RG)
+sapply(IPs, compute_pr_IP_RG, RG = RG)
 plot_RG(RG)
 
 
@@ -40,7 +40,7 @@ plot_RG(RG)
 
 # Generate a relationship graph (RG) and enumerate IBD partitions (IPs)
 set.seed(3)
-RG <- sample_single_recurrence_RG(MOI_init = 5, cause = "reinfection")
+RG <- sample_RG(MOIs = c(2,1,1))
 IPs <- enumerate_IPs(igraph::vcount(RG))
 
 # Compute the probability of the IPs given the RG
@@ -53,20 +53,21 @@ sim_out_fr[] <- sim_in_fr[] <- 0
 
 # Compute the frequency of simulated IPs given the RG graph and
 # outbred population (well specified setting)
-simulated_out <- sapply(1:100, function(j) {
-     convert_IP_to_string(sample_IPs_given_RG(RG))})
-simulated_out_fr <- table(simulated_out)/100
+simulated_out <- sapply(1:1000, function(j) {
+     convert_IP_to_string(sample_IPs_given_RG(RG, n_m = 1, outbred = T)[[1]])})
+simulated_out_fr <- table(simulated_out)/1000
 sim_out_fr[names(simulated_out_fr)] <- simulated_out_fr
 
 # Compute the frequency of simulated IPs given the RG graph and
 # inbred population (miss specified setting))
-simulated_in <- sapply(1:100, function(j) {
-     convert_IP_to_string(sample_IPs_given_RG(RG, FALSE, lineage_count = 10))})
-simulated_in_fr <- table(simulated_in)/100
+simulated_in <- sapply(1:1000, function(j) {
+     convert_IP_to_string(sample_IPs_given_RG(RG, n_m = 1, outbred = F, lineage_count = 10)[[1]])})
+simulated_in_fr <- table(simulated_in)/1000
 sim_in_fr[names(simulated_in_fr)] <- simulated_in_fr
 
 # Plot agreement and relationship graph
 par(mfrow = c(1,2), pty = "s")
+plot_RG(RG)
 max_xy <- max(c(pr_IP_RG, sim_out_fr, sim_in_fr))
 plot(x = pr_IP_RG,
      y = as.vector(sim_out_fr[names(pr_IP_RG)]),
@@ -80,7 +81,6 @@ abline(a = 0, b = 1)
 legend("topleft", pch = c(1,4), col = c(1:2),
        legend = c("well-specified", "miss-specified"),
        cex = 0.75, inset = 0.01)
-plot_RG(RG)
 
 
 }
