@@ -20,7 +20,7 @@
 #'   a recrudescent infection; only used if \code{cause = "recrudescence"}.
 #' @param beta_MOI A factor that the average initial MOI is multiplied by to get
 #'   the average MOI of the recurrence; only applies if \code{cause =
-#'   "reinfection} or \code{cause = "relapse"}. If \code{beta_MOI = 1}
+#'   "reinfection"} or \code{cause = "relapse"}. If \code{beta_MOI = 1}
 #'   (default), initial and recurrent infections have the the same average MOI.
 #'   If \code{beta_MOI > 1}, recurrences have a higher average MOI than initial
 #'   infections, as might be the case for a person with a large hypnozoite

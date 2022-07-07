@@ -8,7 +8,7 @@ sample_single_recurrence_RG(
   MOI_init,
   cause,
   prob_recrudesce = 0.5,
-  beta_relapse = 1
+  beta_MOI = 1
 )
 }
 \arguments{
@@ -19,17 +19,19 @@ multiplicity of infection, MOI) of the initial infection.}
 infection: \code{"recrudescence"}, \code{"reinfection"} or
 \code{"relapse"}.}
 
-\item{prob_recrudesce}{A probability that each parasite genotype survives
-in a recrudescent infection; only used if \code{cause = "recrudescence"}.}
+\item{prob_recrudesce}{A probability that each parasite genotype survives in
+a recrudescent infection; only used if \code{cause = "recrudescence"}.}
 
-\item{beta_relapse}{A multiplicative factor of average MOI of a reinfection
-that describes the average MOI of a relaps: if \code{beta_relapse = 1}
-(default) reinfections and relapse have the the same average MOI,
-\code{beta_relapse > 1} relapses have a higher average MOI than
-reinfections (as might be the case for a person with a large hynpozoite
-burden in a low transmission setting), \code{beta_relapse > 1} relapses
-have a lower average MOI than reinfections (as might be the case for a
-traveller returning from a high transmission setting)}
+\item{beta_MOI}{A factor that the average initial MOI is multiplied by to get
+the average MOI of the recurrence; only applies if \code{cause =
+  "reinfection"} or \code{cause = "relapse"}. If \code{beta_MOI = 1}
+(default), initial and recurrent infections have the the same average MOI.
+If \code{beta_MOI > 1}, recurrences have a higher average MOI than initial
+infections, as might be the case for a person with a large hypnozoite
+burden who relapses following a mosquito bite in a low transmission
+setting. If \code{beta_MOI > 1}, recurrences have a lower average MOI than
+initial infections, as might be the case for a traveller who relapses after
+returning from a high transmission setting where they were bitten.}
 }
 \value{
 Returns a transitive relationship graph (RG); see
