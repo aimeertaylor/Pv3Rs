@@ -1,10 +1,11 @@
+# pre-compute set partitions
 part.list <- list()
 PART_MAX <- 10
 for(i in 1:PART_MAX) {
   part.list[[i]] <- partitions::setparts(i)
 }
 
-# Enumerate partitions indcued by clonal relationships
+# Enumerate partitions induced by clonal relationships
 enumerate_CPs <- function(MOIs) {
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
@@ -70,8 +71,9 @@ enumerate_CPs <- function(MOIs) {
 #'
 #' This alternate version of \code{enumerate_RGs} is based on generating all
 #' set partitions. This is done twice in a nested fashion: once for determining
-#' clonal relationships, once for determining sibling relationships. A list of
-#' all partitions for sets of difference sizes is pre-computed.
+#' clonal relationships, once for determining sibling relationships. Works for
+#' up to 10 genotypes. A list of all partitions for sets of sizes 1 to 10 is
+#' pre-computed.
 #' @export
 enumerate_RGs_alt <- function(MOIs) {
 

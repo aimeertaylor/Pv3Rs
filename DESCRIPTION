@@ -17,4 +17,5 @@ Imports:
     igraph,
     MCMCpack,
     partitions,
-    RColorBrewer
+    RColorBrewer,
+    rje
