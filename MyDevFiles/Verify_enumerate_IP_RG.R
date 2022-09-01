@@ -5,8 +5,12 @@
 # note enumerate_IPs_RG only works with RGs obtained from enumerate_RGs_alt,
 # does not work with RGs obtained from enumerate_RGs
 
+library(Pv3Rs)
+
 MOIs <- c(2,2)
-RGs <- enumerate_RGs_alt(MOIs)
+
+# igraph must be true for compute_pr_IP_RG to work
+RGs <- enumerate_RGs_alt(MOIs, igraph=T)
 
 # only needed for original approach
 IPs <- enumerate_IPs(sum(MOIs))
@@ -34,31 +38,33 @@ for(RG in RGs) {
     stopifnot(sum(sapply(IP_withpos, function(x) identical(x, IP))) == 1)
   }
 }
+writeLines("\nTests for correctness passed")
 
+# The following compares enumeration of RGs
 library(tictoc)
 
 # time comparison on slightly larger example, 250 RGs
 MOIs <- c(2,1,2)
 
 # original approach of enumerating RGs
-tic()
-enumerate_RGs(MOIs)
+tic("\nOriginal enumeration of RGs with MOIs = (2, 1, 2)")
+RGs_ori <- enumerate_RGs(MOIs)
 toc()
 
 # new approach of enumerating RGs
-tic()
-RGs <- enumerate_RGs_alt(MOIs)
+tic("\nNew enumeration of RGs with MOIs = (2, 1, 2)")
+RGs <- enumerate_RGs_alt(MOIs, igraph=F)
 toc()
 
 # original approach
-tic()
-for(RG in RGs) {
+tic("\nCalculating p(IBD|RG) for every IBD with original approach")
+for(RG in RGs_ori) {
   IP_prs <- sapply(IPs, compute_pr_IP_RG, RG)
 }
 toc()
 
 # new approach
-tic()
+tic("\nFinding IBDs such that p(IBD|RG) > 0 with new approach")
 for(RG in RGs) {
   enumerate_IPs_RG(RG)
 }

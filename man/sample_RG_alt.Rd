@@ -4,8 +4,18 @@
 \alias{sample_RG_alt}
 \title{Sample a transitive relationship graph, alternate version}
 \usage{
-sample_RG_alt(MOIs)
+sample_RG_alt(MOIs, igraph = T)
+}
+\arguments{
+\item{MOIs}{A numeric vector specifying, for each infection, the number of
+distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
+
+\item{igraph}{Logical for whether to return an \code{igraph} object.}
+}
+\value{
+See \code{\link{enumerate_RGs_alt}}.
 }
 \description{
-Use the techniques in enumerate_RGs_alt instead
+Uses the techniques in \code{\link{enumerate_RGs_alt}} to uniformly sample
+a relationship graph.
 }

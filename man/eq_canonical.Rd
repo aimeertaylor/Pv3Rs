@@ -2,10 +2,23 @@
 % Please edit documentation in R/helpers.R
 \name{eq_canonical}
 \alias{eq_canonical}
-\title{Convert equivalence object to canonical form (ie sort lists)}
+\title{Convert equivalence object to canonical form, i.e. each subset is sorted,
+and the subsets are presented in lexicographical order.}
 \usage{
 eq_canonical(eq)
 }
+\arguments{
+\item{eq}{A list or equivalence object representing a partition.}
+}
+\value{
+Equivalence object in canonical form.
+}
 \description{
-Convert equivalence object to canonical form (ie sort lists)
+Convert equivalence object to canonical form, i.e. each subset is sorted,
+and the subsets are presented in lexicographical order.
+}
+\examples{
+parts <- partitions::listParts(4)
+lapply(parts, eq_canonical)
+
 }

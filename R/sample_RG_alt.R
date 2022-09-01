@@ -1,8 +1,16 @@
 #' Sample a transitive relationship graph, alternate version
 #'
-#' Use the techniques in enumerate_RGs_alt instead
+#' Uses the techniques in \code{\link{enumerate_RGs_alt}} to uniformly sample
+#' a relationship graph.
+#'
+#' @param MOIs A numeric vector specifying, for each infection, the number of
+#'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
+#' @param igraph Logical for whether to return an \code{igraph} object.
+#'
+#' @return See \code{\link{enumerate_RGs_alt}}.
+#'
 #' @export
-sample_RG_alt <- function(MOIs){
+sample_RG_alt <- function(MOIs, igraph=T){
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
@@ -20,35 +28,27 @@ sample_RG_alt <- function(MOIs){
   sizes <- sapply(CP_list, function(x) ncol(part.list[[max(x)]]))
   CP <- unlist(sample(CP_list, 1, prob=sizes))
 
-  n.units <- max(CP)
-  units <- split(1:gs_count, CP)
+  n.clones <- max(CP)
+  clone.names <- paste0("c", 1:n.clones)
+  clones <- setNames(split(gs, CP), clone.names)
 
   # given clonal relationships, generate all compatible sibling relationships
-  if (n.units > 10) stop("Currently supports up to 10 genotypes")
+  if (n.clones > 10) stop("Currently supports up to 10 genotypes")
 
-  sib.parts <- part.list[[n.units]]
+  sib.parts <- part.list[[n.clones]]
   j <- sample(1:ncol(sib.parts), 1)
 
-  adj_all <- array(0, dim = rep(gs_count, 2), dimnames = list(gs,gs))
+  sib.vec <- sib.parts[,j]
+  n.sib.clones <- max(sib.vec)
+  sib.clones <- setNames(split(clone.names, sib.vec),
+                         paste0("s", 1:n.sib.clones))
 
-  n.sib.units <- max(sib.parts[,j])
-  sib.units <- split(1:n.units, sib.parts[,j])
-  for(k in 1:n.sib.units) {
-    selection <- unlist(units[sib.units[[k]]])
-    adj_all[selection, selection] <- 0.5;
-  }
-  for(u in 1:n.units) {
-    adj_all[units[[u]], units[[u]]] <- 1;
-  }
-  diag(adj_all) <- 0
+  RG <- list(clone=clones,
+             clone.vec=CP,
+             sib=sib.clones,
+             sib.vec=sib.vec)
 
-  # Convert adjacency matrix into an igraph item
-  RG <- igraph::graph_from_adjacency_matrix(adjmatrix = adj_all,
-                                            mode = "lower",
-                                            diag = F,
-                                            weighted = T)
-  # Add a time-point attribute
-  RG <- igraph::set_vertex_attr(RG, "group", value = ts_per_gs)
+  if(igraph) RG <- RG_to_igraph(RG, gs, ts_per_gs)
 
   return(RG)
 }

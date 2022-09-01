@@ -4,11 +4,30 @@
 \alias{enumerate_RGs_alt}
 \title{Enumerate transitive relationship graphs, alternate version}
 \usage{
-enumerate_RGs_alt(MOIs)
+enumerate_RGs_alt(MOIs, igraph = TRUE)
+}
+\arguments{
+\item{MOIs}{A numeric vector specifying, for each infection, the number of
+distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
+
+\item{igraph}{Logical for whether to return \code{igraph} objects.}
+}
+\value{
+If \code{igraph} is \code{FALSE}, returns a list of four attributes:
+\describe{
+\item{clone}{A list of groups of genotypes that make up the clonal units.}
+\item{clone.vec}{A numeric vector indicating the clonal membership of each genotype.}
+\item{sib}{A list of groups of clonal units that make up the sibling clusters.}
+\item{sib.vec}{A numeric vector indicating the sibling membership of each clonal unit.}
+}
+Otherwise, returns an \code{igraph} object (see \code{\link{enumerate_RGs}})
+along with these four attributes. Note that the weight matrix contains the
+same information as these four attributes.
 }
 \description{
-This alternate version of \code{enumerate_RGs} is based on generating all
+This alternate version of \code{\link{enumerate_RGs}} is based on generating all
 set partitions. This is done twice in a nested fashion: once for determining
-clonal relationships, once for determining sibling relationships. A list of
-all partitions for sets of difference sizes is pre-computed.
+clonal relationships, once for determining sibling relationships. Works for
+up to 10 genotypes. A list of all partitions for sets of sizes 1 to 10 is
+pre-computed.
 }

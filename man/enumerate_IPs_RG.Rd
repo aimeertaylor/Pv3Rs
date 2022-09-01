@@ -10,7 +10,8 @@ enumerate_IPs_RG(RG, compat = TRUE)
 \item{RG}{A relationship graph; see \code{\link{enumerate_RGs}} for details.}
 
 \item{compat}{Logical, if true, the data type of the output matches with the
-input IP of \code{\link{compute_pr_IP_RG}}}
+input IP of \code{\link{compute_pr_IP_RG}}. Otherwise, returns a list of
+IBD parititon vectors in reference to the sibling clusters.}
 }
 \description{
 The rules are (a) each IBD unit has clonal and sibling relationships only,
@@ -18,4 +19,10 @@ The rules are (a) each IBD unit has clonal and sibling relationships only,
 }
 \details{
 Note that all IBD partitions are equally likely.
+}
+\examples{
+set.seed(3)
+RG <- sample_RG_alt(c(2,1,2))
+enumerate_IPs_RG(RG)
+
 }

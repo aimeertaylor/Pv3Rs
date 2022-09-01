@@ -5,7 +5,9 @@ for(i in 1:PART_MAX) {
   part.list[[i]] <- partitions::setparts(i)
 }
 
-# Enumerate partitions induced by clonal relationships
+#' Enumerate partitions induced by clonal relationships
+#'
+#' @noRd
 enumerate_CPs <- function(MOIs) {
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
@@ -69,13 +71,30 @@ enumerate_CPs <- function(MOIs) {
 
 #' Enumerate transitive relationship graphs, alternate version
 #'
-#' This alternate version of \code{enumerate_RGs} is based on generating all
+#' This alternate version of \code{\link{enumerate_RGs}} is based on generating all
 #' set partitions. This is done twice in a nested fashion: once for determining
 #' clonal relationships, once for determining sibling relationships. Works for
 #' up to 10 genotypes. A list of all partitions for sets of sizes 1 to 10 is
 #' pre-computed.
+#'
+#' @param MOIs A numeric vector specifying, for each infection, the number of
+#'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
+#'
+#' @param igraph Logical for whether to return \code{igraph} objects.
+#'
+#' @return If \code{igraph} is \code{FALSE}, returns a list of four attributes:
+#'   \describe{
+#'     \item{clone}{A list of groups of genotypes that make up the clonal units.}
+#'     \item{clone.vec}{A numeric vector indicating the clonal membership of each genotype.}
+#'     \item{sib}{A list of groups of clonal units that make up the sibling clusters.}
+#'     \item{sib.vec}{A numeric vector indicating the sibling membership of each clonal unit.}
+#'   }
+#'   Otherwise, returns an \code{igraph} object (see \code{\link{enumerate_RGs}})
+#'   along with these four attributes. Note that the weight matrix contains the
+#'   same information as these four attributes.
+#'
 #' @export
-enumerate_RGs_alt <- function(MOIs) {
+enumerate_RGs_alt <- function(MOIs, igraph=TRUE) {
 
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
@@ -110,30 +129,16 @@ enumerate_RGs_alt <- function(MOIs) {
     sib.parts <- part.list[[n.clones]]
     n.parts <- ncol(sib.parts)
     for(j in 1:n.parts) {
-      adj_all <- array(0, dim = rep(gs_count, 2), dimnames = list(gs,gs))
+      sib.vec <- sib.parts[,j]
+      n.sib.clones <- max(sib.vec)
+      sib.clones <- setNames(split(clone.names, sib.vec),
+                             paste0("s", 1:n.sib.clones))
+      RG <- list(clone=clones,
+                 clone.vec=CP,
+                 sib=sib.clones,
+                 sib.vec=sib.vec)
 
-      n.sib.clones <- max(sib.parts[,j])
-      sib.clones <- setNames(split(clone.names, sib.parts[,j]),
-                            paste0("s", 1:n.sib.clones))
-      for(k in 1:n.sib.clones) {
-        selection <- unlist(clones[sib.clones[[k]]])
-        adj_all[selection, selection] <- 0.5;
-      }
-      for(u in 1:n.clones) {
-        adj_all[clones[[u]], clones[[u]]] <- 1;
-      }
-      diag(adj_all) <- 0
-
-      # Convert adjacency matrix into an igraph item
-      RG <- igraph::graph_from_adjacency_matrix(adjmatrix = adj_all,
-                                                mode = "lower",
-                                                diag = F,
-                                                weighted = T)
-      # Add a time-point attribute
-      RG <- igraph::set_vertex_attr(RG, "group", value = ts_per_gs)
-
-      RG$clone <- clones
-      RG$sib <- sib.clones
+      if(igraph) RG <- RG_to_igraph(RG, gs, ts_per_gs)
 
       RG_i <- RG_i + 1
       RGs[[RG_i]] <- RG
@@ -142,5 +147,5 @@ enumerate_RGs_alt <- function(MOIs) {
   }
   writeLines("")
 
-  return(RGs)
+  RGs
 }
