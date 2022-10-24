@@ -7,7 +7,7 @@
 sample_IPs_given_RG(RG, n_m, outbred = TRUE, ...)
 }
 \arguments{
-\item{RG}{A relationship graph; see \code{\link{enumerate_RG}}.}
+\item{RG}{A relationship graph; see \code{\link{enumerate_RGs}}.}
 
 \item{n_m}{Number of markers.}
 

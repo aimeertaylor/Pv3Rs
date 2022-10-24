@@ -3,7 +3,7 @@
 #' \code{sample_IPs_given_RG} is a wrapper function that converts per-marker lineages
 #' sampled by \code{\link{sample_lineages}} into per-marker IBD partitions; see enumerate_IP.
 #'
-#' @param RG A relationship graph; see \code{\link{enumerate_RG}}.
+#' @param RG A relationship graph; see \code{\link{enumerate_RGs}}.
 #' @param n_m Number of markers.
 #' @param outbred Logical specifying whether or not the parasite genotypes belong to
 #'   an outbred population or not.
