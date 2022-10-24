@@ -15,6 +15,7 @@ Imports:
     grDevices,
     gtools,
     igraph,
+    matrixStats,
     MCMCpack,
     partitions,
     RColorBrewer,
