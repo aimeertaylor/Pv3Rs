@@ -4,7 +4,7 @@
 #'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
 #' @param fs List of frequencies of each allele at each marker.
 #' @param alleles_per_m List of allele assignments for each marker (see the
-#'   \code{al.mat} parameter to \code{\link{allele.filter}}).
+#'   \code{al.mat} parameter to \code{\link{allele_filter}}).
 #' @param als_by_edge List of outputs from \code{\link{allele_filter}} for
 #'   each marker.
 #'
