@@ -104,8 +104,9 @@ allele_filter <- function(al.df) {
     for(g.j in 1:(g.i-1)) {
       g1 <- gs[g.j]
       g2 <- gs[g.i]
-      edge_name <- paste(g1, g2, sep="-")
-      allowed[[edge_name]] <- which(al.df[,g1] == al.df[,g2])
+      rows <- which(al.df[,g1] == al.df[,g2])
+      allowed[[paste(g1, g2, sep="-")]] <- rows
+      allowed[[paste(g2, g1, sep="-")]] <- rows
     }
   }
   allowed
