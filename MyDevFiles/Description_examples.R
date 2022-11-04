@@ -130,13 +130,15 @@ fmat <- rdirichlet(n.m, alphas)
 colnames(fmat) <- alleles
 fs <- setNames(lapply(1:n.m, function(x) fmat[x,]), paste0("m", 1:n.m))
 post <- compute_posterior(y, fs)
-l_ntor <- (1/9)*(2* fs$m1["T"]*fs$m2["T"]^2*fs$m3["C"] +  3*fs$m2["T"] + 1 +
-             (3/2)* fs$m1["T"]*(fs$m2["T"]^2 + fs$m2["T"])*fs$m3["C"] +
-             (1/2)* fs$m1["T"]*(fs$m2["T"]^2 + fs$m2["T"])*(fs$m3["C"] + 1) +
-             (1/2)*(fs$m1["T"] + 1)*(fs$m2["T"]^2 + fs$m2["T"])*fs$m3["C"] +
-             (1/2)*(fs$m1["T"] + 1)*(fs$m2["T"]^2 + fs$m2["T"])*(fs$m3["C"] + 1))
-i_ntor <- (1/2)*fs$m1["T"]*fs$m2["T"]*fs$m3["C"]*(3*fs$m2["T"] + 1)
-c_ntor <- (1/8)*(3*fs$m2["T"] + 1)
+l_ntor <- (1/9)*  (2* fs$m1["T"]*fs$m2["T"]^2*fs$m3["C"] +
+               (3/8)* fs$m1["T"]*(fs$m2["T"]^2 + fs$m2["T"])*fs$m3["C"] +
+               (1/8)* fs$m1["T"]*(fs$m2["T"]^2 + fs$m2["T"])*(fs$m3["C"] + 1) +
+               (1/8)*(fs$m1["T"] + 1)*(fs$m2["T"]^2 + fs$m2["T"])*fs$m3["C"] +
+               (1/8)*(fs$m1["T"] + 1)*(fs$m2["T"]^2 + fs$m2["T"])*(fs$m3["C"] + 1) +
+              (1/32)*(3*fs$m2["T"] + 1) +
+               (1/8)*(9*fs$m2["T"] + 1))
+i_ntor <- (1/8)*fs$m1["T"]*fs$m2["T"]*fs$m3["C"]*(9*fs$m2["T"] + 1)
+c_ntor <- (1/32)*(9*fs$m2["T"] + 1)
 
 dtor <- sum(c(l_ntor, i_ntor, c_ntor))
 
