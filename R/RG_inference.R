@@ -5,8 +5,6 @@
 #' @param fs List of frequencies of each allele at each marker.
 #' @param alleles_per_m List of allele assignments for each marker (see the
 #'   \code{al.mat} parameter to \code{\link{allele_filter}}).
-#' @param als_by_edge List of outputs from \code{\link{allele_filter}} for
-#'   each marker.
 #'
 #' @return List of all relationship graphs, including their log-likelihoods as
 #'   a variable under each relationship graph.
@@ -21,11 +19,10 @@
 #'                                   "D","C","C"), nrow=2, byrow=T))
 #' colnames(al_df1) <- colnames(al_df2) <- paste0("g", 1:3)
 #' alleles_per_m <- list(m1=al_df1, m2=al_df2)
-#' als_by_edge <- lapply(alleles_per_m, allele_filter)
-#' RGs <- RG_inference(MOIs, fs, alleles_per_m, als_by_edge)
+#' RGs <- RG_inference(MOIs, fs, alleles_per_m)
 #'
 #' @export
-RG_inference <- function(MOIs, fs, alleles_per_m, als_by_edge) {
+RG_inference <- function(MOIs, fs, alleles_per_m) {
   for(al.df in alleles_per_m) stopifnot(class(al.df)[1] == "data.frame")
   ms <- names(alleles_per_m)
   log_fs <- lapply(fs, log) # allele log-frequencies
@@ -57,15 +54,21 @@ RG_inference <- function(MOIs, fs, alleles_per_m, als_by_edge) {
       for(m in ms) {
         res <- IP_lookups[[m]][[IP_str]]
         if(is.null(res)) {
-          rows <- 1:a_sizes[[m]]
+          #rows <- 1:a_sizes[[m]]
           # find rows of alleles_per_m[[m]]
-          for(g_seq in IP) {
-            if(length(g_seq) > 1) {
-              for(edge in paste(head(g_seq, -1), tail(g_seq, -1), sep='-')) {
-                rows <- intersect(rows, als_by_edge[[m]][[edge]])
+          rows <- which(apply(alleles_per_m[[m]], 1, function(row) {
+            for(g_seq in IP) {
+              glen <- length(g_seq)
+              if(glen>1) {
+                allele <- row[g_seq[1]]
+                for(g in g_seq[2:glen]) {
+                  if(allele != row[g]) return(FALSE)
+                }
               }
             }
-          }
+            return(TRUE)
+          }))
+
           if(length(rows) == 0) res <- -Inf
           else {
             alleles <- as.data.frame(alleles_per_m[[m]][rows, sapply(IP, '[', 1)])

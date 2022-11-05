@@ -4,7 +4,7 @@
 \alias{RG_inference}
 \title{Computes the likelihood of all relationship graphs}
 \usage{
-RG_inference(MOIs, fs, alleles_per_m, als_by_edge)
+RG_inference(MOIs, fs, alleles_per_m)
 }
 \arguments{
 \item{MOIs}{A numeric vector specifying, for each infection, the number of
@@ -13,10 +13,7 @@ distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
 \item{fs}{List of frequencies of each allele at each marker.}
 
 \item{alleles_per_m}{List of allele assignments for each marker (see the
-\code{al.mat} parameter to \code{\link{allele.filter}}).}
-
-\item{als_by_edge}{List of outputs from \code{\link{allele_filter}} for
-each marker.}
+\code{al.mat} parameter to \code{\link{allele_filter}}).}
 }
 \value{
 List of all relationship graphs, including their log-likelihoods as
@@ -35,7 +32,6 @@ al_df2 <- as.data.frame(matrix(c("C","D","C",
                                   "D","C","C"), nrow=2, byrow=T))
 colnames(al_df1) <- colnames(al_df2) <- paste0("g", 1:3)
 alleles_per_m <- list(m1=al_df1, m2=al_df2)
-als_by_edge <- lapply(alleles_per_m, allele_filter)
-RGs <- RG_inference(MOIs, fs, alleles_per_m, als_by_edge)
+RGs <- RG_inference(MOIs, fs, alleles_per_m)
 
 }

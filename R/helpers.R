@@ -75,44 +75,6 @@ enumerate_alleles <- function(y.inf, gs.inf){
   comb_per_m
 }
 
-#' Determine allele assignments that are consistent with each IBD pair
-#'
-#' Pre-process the allele assignments such that the enumeration required to
-#' compte p(y|IBD) can be performed more efficiently. For each pair of
-#' genotypes, find the rows of allele assignments that allow the pair of
-#' genotypes to share the same allele. This function handles one marker only.
-#'
-#' @param al.df Dataframe of allele assignments (one assignment per
-#'   row) across all genotypes (columns)
-#'
-#' @return List (hash table) that maps pairs of genotypes (represented as a
-#' hyphen-separated string) to row numbers of \code{al.df} that have the
-#' pair of genotypes sharing the same allele.
-#'
-#' @examples
-#' al.df <- as.data.frame(matrix(c("A","A","A","B","B","A","B","B"), nrow=4))
-#' colnames(al.df) <- c("g1", "g2")
-#' allele_filter(al.df) # list where "g1-g2" maps to (2, 4)
-#'
-#' @export
-allele_filter <- function(al.df) {
-  stopifnot(class(al.df)[1] == "data.frame")
-  allowed <- list()
-  gs <- colnames(al.df)
-  gs_count <- length(gs)
-  for(g.i in tail(1:gs_count, -1)) {
-    for(g.j in 1:(g.i-1)) {
-      g1 <- gs[g.j]
-      g2 <- gs[g.i]
-      rows <- which(al.df[,g1] == al.df[,g2])
-      allowed[[paste(g1, g2, sep="-")]] <- rows
-      allowed[[paste(g2, g1, sep="-")]] <- rows
-    }
-  }
-  allowed
-}
-
-
 #' Find all vectors of recurrence states compatible with relationship graph
 #'
 #' @param RG Relationship graph; see \code{\link{enumerate_RGs_alt}}.

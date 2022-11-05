@@ -75,11 +75,7 @@ compute_posterior <- function(y, fs, prior=NULL, return.RG=FALSE) {
     alleles_per_inf_per_m
   )
 
-  # determine which allele assignments are viable given that two genotypes share
-  # the same allele
-  als_by_edge <- lapply(alleles_per_m, allele_filter)
-
-  RGs <- RG_inference(MOIs, fs, alleles_per_m, als_by_edge)
+  RGs <- RG_inference(MOIs, fs, alleles_per_m)
 
   # get all vectors of recurrence states
   n_rstrs <- 3^n_recur

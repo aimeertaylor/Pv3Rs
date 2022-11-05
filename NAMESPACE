@@ -2,7 +2,6 @@
 
 export(RG_inference)
 export(RG_to_igraph)
-export(allele_filter)
 export(compatible_rstrs)
 export(compute_posterior)
 export(compute_pr_IP_RG)
