@@ -29,7 +29,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
   # number of allele assignments for each marker
   a_sizes <- lapply(alleles_per_m, nrow)
   # hash tables to store p(marker m observed data|IBD)
-  IP_lookups <- setNames(lapply(ms, function(m) new.env(hash=T,
+  IP_lookups <- setNames(lapply(ms, function(m) new.env(hash=T, size=ncol(part.list[[sum(MOIs)]]),
                                                         parent=emptyenv())), ms)
   RGs <- enumerate_RGs_alt(MOIs, igraph=FALSE)
   gs <- paste0("g", 1:sum(MOIs))
@@ -56,27 +56,22 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
         if(is.null(res)) {
           #rows <- 1:a_sizes[[m]]
           # find rows of alleles_per_m[[m]]
-          rows <- which(apply(alleles_per_m[[m]], 1, function(row) {
+          logf <- log_fs[[m]]
+          logf_sums <- apply(alleles_per_m[[m]], 1, function(row) {
+            logf_sum <- 0
             for(g_seq in IP) {
-              glen <- length(g_seq)
-              if(glen>1) {
-                allele <- row[g_seq[1]]
-                for(g in g_seq[2:glen]) {
-                  if(allele != row[g]) return(FALSE)
+              repr <- NA
+              for(allele in row[g_seq]) {
+                if(!is.na(allele)) {
+                  if(is.na(repr)) repr <- allele
+                  else if(repr != allele) return(NA)
                 }
               }
+              if(!is.na(repr)) logf_sum <- logf_sum + logf[repr]
             }
-            return(TRUE)
-          }))
-
-          if(length(rows) == 0) res <- -Inf
-          else {
-            alleles <- as.data.frame(alleles_per_m[[m]][rows, sapply(IP, '[', 1)])
-            log_fs_mat <- apply(alleles, 2,
-                                function(x) log_fs[[m]][x])
-            if(is.null(dim(log_fs_mat))) res <- sum(log_fs_mat) # only one allele assignment
-            else res <- matrixStats::logSumExp(rowSums(log_fs_mat))
-          }
+            return(logf_sum)
+          })
+          res <- matrixStats::logSumExp(logf_sums, na.rm=T)
           IP_lookups[[m]][[IP_str]] <- res
         }
         IP_logps[IP_i,m] <- res

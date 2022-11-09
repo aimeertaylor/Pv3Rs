@@ -34,33 +34,33 @@ yns <- dlply(MS_pooled, 'ID')
 
 tic()
 # this is currently a matrix, is data frame better?
-Post_probs <- do.call(rbind, lapply(1:length(yns), tmp <- function(i) {
+Post_probs <- do.call(rbind, lapply(1:length(yns), function(i) {
   writeLines(paste("Individual", i, "out of", length(yns)))
   y.df <- yns[[i]]
 
   # no recurrence, skip
   if(length(unique(y.df$Episode_Identifier)) == 1) return(NULL)
-  # cases that are too complex, can change this criteria
+  # >8 genotypes considered too complex, can change this criteria
   if(nrow(y.df) > 8) return(NULL)
 
-  ynts <- dlply(y.df, 'Episode_Identifier')
-
-  # (?) only use markers for which every episode has at least 1 non-NA
-  ms <- NULL
-  for(m in MSs_all) {
-    if(all(sapply(ynts, function(ynt) !all(is.na(ynt[m]))))) {
-      ms <- c(ms, m)
-    }
-  }
-
+  # only use markers for which there is at least one NA
+  ms <- MSs_all[apply(!is.na(y.df[MSs_all]), 2, any)]
   if(length(ms) == 0) return(NULL)
 
+  ynts <- dlply(y.df, 'Episode_Identifier')
   # ensure that Episode is non-decreasing
-  stopifnot(all(order(y.df$Episode) == 1:nrow(y.df)))
+  if(!all(order(y.df$Episode) == 1:nrow(y.df))) {
+    writeLines(paste("Individual", i, "needs rows to be reordered according to infection number"))
+    return(NULL)
+  }
 
   # transform data frame format to format taken by 'compute_posterior'
   y <- lapply(ynts, function(ynt) {
-    setNames(lapply(ms, function(m) ynt[m][!is.na(ynt[m])]), ms)
+    setNames(lapply(ms, function(m) {
+      alleles <- ynt[m][!is.na(ynt[m])] # extract non-NAs
+      if(length(alleles) > 0) return(alleles)
+      return(NA) # if all are NAs, change empty vector to NA
+      }), ms)
     })
 
   post <- compute_posterior(y, Fs_Combined) # can change to Fs_random
