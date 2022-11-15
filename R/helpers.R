@@ -19,9 +19,10 @@ determine_MOIs <- function(y) {
 
 #' Find all allele assignments for genotypes within the same infection
 #'
-#' Due to permutation symmetry of intra-infection genotypes, we only one
+#' Due to permutation symmetry of intra-infection genotypes, we fix a single
 #' assignment for one of the markers whose number of alleles observed is equal
-#' to the MOI.
+#' to the MOI (consider it the anchor) and permute the rest, discarding
+#' combinations that under-represent the observed marker diversity.
 #'
 #' @param y.inf List of alleles observed across markers for genotypes within
 #'   one infection.
@@ -50,15 +51,19 @@ enumerate_alleles <- function(y.inf, gs.inf){
     }))
   }
 
-  # find marker for fixed allele assignment
+  marker_names <- names(n.uniq)
+
+  # find single marker for fixed allele assignment:
+  # must be a marker whose n.uniq = MOI
+  # arbitrarily take the first using break
   n.uniq <- sapply(y.inf, length)
   MOI <- max(n.uniq)
-  for(m.fix in names(n.uniq)) {
+  for(m.fix in marker_names) {
     if(n.uniq[m.fix] == MOI) break
   }
 
   comb_per_m <- list() # stores allele assignments for each marker
-  for(m in names(n.uniq)) {
+  for(m in marker_names) {
     if(m==m.fix) {
       comb_per_m[[m]] <- as.data.frame(t(y.inf[[m]]))
       colnames(comb_per_m[[m]]) <- gs.inf
@@ -66,7 +71,7 @@ enumerate_alleles <- function(y.inf, gs.inf){
     else {
       # get all combinations
       combs <- expand.grid(rep(list(y.inf[[m]]), MOI), stringsAsFactors=F)
-      # then filter out that are not consistent with observed data
+      # remove those inconsistent with observed data as not all alleles represented
       comb_per_m[[m]] <- combs[apply(combs, 1,
                                      function(row) length(unique(row)))==n.uniq[m],]
       colnames(comb_per_m[[m]]) <- gs.inf
