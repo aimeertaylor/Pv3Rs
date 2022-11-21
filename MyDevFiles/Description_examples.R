@@ -19,7 +19,7 @@ colnames(expect) <- causes
 testthat::expect_equal(post$marg, expect)
 
 
-# Example 2, taking common denominator 3*(fs$m1["A"] + 1))
+# Example 2
 y <- list(list(m1="A"), list(m1="A"))
 n.m <- 1
 fmat <- rdirichlet(n.m, alphas)
@@ -122,7 +122,7 @@ colnames(expect) <- causes
 testthat::expect_equal(post$marg, expect)
 
 
-# Example 9 -  wrong
+# Example 9
 y <- list(list(m1 = c("A","T"), m2 = "T", m3 = c("C", "G")),
           list(m1 = "T", m2 = "T", m3 = "C"))
 n.m <- 3

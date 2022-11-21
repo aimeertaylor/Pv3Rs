@@ -17,6 +17,12 @@ sample_RG_alt <- function(MOIs, igraph=T){
   infection_count <- length(MOIs) # Number of time points
   gs_count <- sum(MOIs) # Number of genotypes
 
+  # compute set partitions
+  part.list <- list()
+  for(i in 1:gs_count) {
+    part.list[[i]] <- partitions::setparts(i)
+  }
+
   # remove restriction for now as this method should scale better
   # if (gs_count > 6 | infection_count > 3) stop("Sorry, too many RGs")
   # if (gs_count <= 1) stop("Sorry, no RGs")

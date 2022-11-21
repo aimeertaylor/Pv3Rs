@@ -1,10 +1,3 @@
-# pre-compute set partitions
-part.list <- list()
-PART_MAX <- 10
-for(i in 1:PART_MAX) {
-  part.list[[i]] <- partitions::setparts(i)
-}
-
 #' Enumerate partitions induced by clonal relationships
 #'
 #' @noRd
@@ -101,6 +94,12 @@ enumerate_RGs_alt <- function(MOIs, igraph=TRUE) {
 
   infection_count <- length(MOIs) # Number of time points
   gs_count <- sum(MOIs) # Number of genotypes
+
+  # compute set partitions
+  part.list <- list()
+  for(i in 1:gs_count) {
+    part.list[[i]] <- partitions::setparts(i)
+  }
 
   # remove restriction for now as this method should scale better
   # if (gs_count > 6 | infection_count > 3) stop("Sorry, too many RGs")

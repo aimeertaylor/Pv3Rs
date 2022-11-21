@@ -29,7 +29,8 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
   # number of allele assignments for each marker
   a_sizes <- lapply(alleles_per_m, nrow)
   # hash tables to store p(marker m observed data|IBD)
-  IP_lookups <- setNames(lapply(ms, function(m) new.env(hash=T, size=ncol(part.list[[sum(MOIs)]]),
+  IP_lookups <- setNames(lapply(ms, function(m) new.env(hash=T,
+                                                        size=ncol(partitions::setparts(sum(MOIs))),
                                                         parent=emptyenv())), ms)
   RGs <- enumerate_RGs_alt(MOIs, igraph=FALSE)
   gs <- paste0("g", 1:sum(MOIs))
