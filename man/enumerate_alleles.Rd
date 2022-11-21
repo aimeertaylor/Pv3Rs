@@ -18,9 +18,10 @@ each dataframe is the number of genotypes. The number of rows for each
 dataframe is the number of allele assignments for that marker.
 }
 \description{
-Due to permutation symmetry of intra-infection genotypes, we only one
+Due to permutation symmetry of intra-infection genotypes, we fix a single
 assignment for one of the markers whose number of alleles observed is equal
-to the MOI.
+to the MOI (consider it the anchor) and permute the rest, discarding
+combinations that under-represent the observed marker diversity.
 }
 \examples{
 # three markers
