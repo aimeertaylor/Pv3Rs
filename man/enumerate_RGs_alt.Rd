@@ -13,21 +13,45 @@ distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
 \item{igraph}{Logical for whether to return \code{igraph} objects.}
 }
 \value{
-If \code{igraph} is \code{FALSE}, returns a list of four attributes:
+A list of relationship graphs. If \code{igraph} is \code{FALSE},
+each element is a list of four attributes:
 \describe{
-\item{clone}{A list of groups of genotypes that make up the clonal units.}
-\item{clone.vec}{A numeric vector indicating the clonal membership of each genotype.}
-\item{sib}{A list of groups of clonal units that make up the sibling clusters.}
-\item{sib.vec}{A numeric vector indicating the sibling membership of each clonal unit.}
+\item{clone}{A list of groups of genotypes that make up the clonal
+cells.}
+\item{clone.vec}{A numeric vector indicating the clonal membership of
+each genotype.}
+\item{sib}{A list of groups of clonal cells that make up the sibling
+cells.}
+\item{sib.vec}{A numeric vector indicating the sibling membership of
+each clonal cell.}
 }
-Otherwise, returns an \code{igraph} object (see \code{\link{enumerate_RGs}})
-along with these four attributes. Note that the weight matrix contains the
-same information as these four attributes.
+Otherwise, each element is an \code{igraph} object (see
+\code{\link{enumerate_RGs}}) along with these four attributes. Note that
+the weight matrix contains information equivalent to that of the four
+attributes.
 }
 \description{
-This alternate version of \code{\link{enumerate_RGs}} is based on generating all
-set partitions. This is done twice in a nested fashion: once for determining
-clonal relationships, once for determining sibling relationships. Works for
-up to 10 genotypes. A list of all partitions for sets of sizes 1 to 10 is
-pre-computed.
+A relationship graph is a complete graph on all genotypes, where each edge
+is annotated as a clone, sibling, or stranger edge. The enumerated
+relationship graphs satisfy the following constraints:
+\itemize{
+\item{The subgraph induced by the clone edges is a cluster graph.}
+\item{The subgraph induced by the clone edges and sibling edges is a cluster
+graph.}
+\item{Clone edges are only allowed for two genotypes from different
+infections.}
+}
+}
+\details{
+This alternate version of \code{\link{enumerate_RGs}} is based on generating
+set partitions. Since the clone edges induce a cluster graph, the
+information encoded by clonal relationships is equivalent to a partition of
+the genotypes. Note that genotypes from the same infection cannot belong to
+the same partition cell. Subsequent information encoded by sibling
+relationships is equivalent to further partitioning the clonal partition.
+There are no constraints when enumerating the sibling partitions. The data
+structure returned encodes each graph as a nested set partition. Each
+partition is represented in the form of a list of vectors (\code{clone} and
+\code{sib}) and as a membership vector (\code{clone.vec} and \code{sib.vec}), where each
+entry identifies the partition cell the corresponding index belongs to.
 }

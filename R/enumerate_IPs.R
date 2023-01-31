@@ -20,7 +20,7 @@ enumerate_IPs <- function(MOIs) {
   if (genotype_count > 11) stop("Too many IBD partitions to enumerate.")
   ps <- partitions::listParts(genotype_count)
 
-  IPs <- lapply(ps, function(p){
+  IPs <- lapply(ps, function(p) {
     out <- lapply(p, function(x) paste0("g", x))
     class(out) <- c(class(out), "equivalence")
     return(out)
@@ -28,5 +28,3 @@ enumerate_IPs <- function(MOIs) {
 
   return(IPs)
 }
-
-

@@ -21,5 +21,3 @@ sample_IPs_given_RG <- function(RG, n_m, outbred = TRUE, ...) {
   IPs <- apply(lineages, 2, convert_lineages_to_IP)
   return(IPs)
 }
-
-

@@ -121,7 +121,6 @@ expect <- matrix(c(c.ntor, l.ntor, i.ntor)/dtor,
 colnames(expect) <- causes
 testthat::expect_equal(post$marg, expect)
 
-
 # Example 9
 y <- list(list(m1 = c("A","T"), m2 = "T", m3 = c("C", "G")),
           list(m1 = "T", m2 = "T", m3 = "C"))

@@ -16,8 +16,7 @@
 #' \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}
 #'
 #' @noRd
-is.transitive <- function(RG){
-
+is.transitive <- function(RG) {
   transitive <- TRUE # Presume correct until proven incorrect
 
   # First check that all connected components are cliques
@@ -38,7 +37,7 @@ is.transitive <- function(RG){
       while (transitive & i <= K) { # stop searching when incorrect
         RG_sub <- igraph::induced_subgraph(graph = RG, vids = all_trios[[i]])
         score_sub <- sum(igraph::E(RG_sub)$weight) # the sum of the edges tells us if it's correct
-        if (score_sub == 2.5) transitive <- FALSE  # 2.5 is the only possible incorrect score so we reject
+        if (score_sub == 2.5) transitive <- FALSE # 2.5 is the only possible incorrect score so we reject
         i <- i + 1
       }
     }

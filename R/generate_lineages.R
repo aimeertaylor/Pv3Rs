@@ -10,8 +10,7 @@
 #'
 #' @export
 generate_lineages <- function(n) {
-
-  max_reps <- ceiling(n/length(letters))
+  max_reps <- ceiling(n / length(letters))
   lineages <- c()
   for (reps in max_reps:1) {
     new_lineages <- apply(matrix(rep(letters, each = reps), nrow = reps), 2, paste0, collapse = "")

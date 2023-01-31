@@ -7,16 +7,25 @@
 hash.IP(IP, gs)
 }
 \arguments{
-\item{IP}{List containing vectors of genotype names corresponding to IBD
-clusters.}
+\item{IP}{List containing vectors of genotype names with each vector
+corresponding to an IBD cell.}
 
 \item{gs}{Vector containing all genotype names.}
 }
 \value{
-Membership vector in string format.
+String where the integers in the IBD membership vector have been
+converted to ASCII characters.
 }
 \description{
-This is used for building a hash table for p(y at marker m|IBD). Works up to
-10 genotypes. This seems to be marginally faster than
-\code{\link{convert_IP_to_string}}.
+This is used for building a hash table for p(y at marker m|IBD). This seems
+to be marginally faster than \code{\link{convert_IP_to_string}}.
+}
+\examples{
+gs <- paste0("g", 1:3)
+IP1 <- list(c("g1", "g3"), c("g2"))
+IP2 <- list(c("g2"), c("g3", "g1"))
+hash1 <- hash.IP(IP1, gs)
+hash2 <- hash.IP(IP2, gs)
+hash1 == hash2 # TRUE, even though the order is different
+
 }

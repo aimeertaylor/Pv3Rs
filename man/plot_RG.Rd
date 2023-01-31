@@ -53,9 +53,12 @@ are plotted differently using different line types.
 }
 
 \examples{
-RGs <- enumerate_RGs(c(2,1,1))
+RGs <- enumerate_RGs(c(2, 1, 1))
 cpar <- par() # record current par before changing
-par(mfrow = c(3,4), mar = c(0.1,0.1,0.1,0.1))
-for(i in 12:23) {plot_RG(RGs[[i]], edge.curved = 0.1); box()}
+par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
+for (i in 12:23) {
+  plot_RG(RGs[[i]], edge.curved = 0.1)
+  box()
+}
 par(cpar) # reset par
 }

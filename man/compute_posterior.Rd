@@ -2,53 +2,67 @@
 % Please edit documentation in R/compute_posterior.R
 \name{compute_posterior}
 \alias{compute_posterior}
-\title{Computes the posterior distribution of recurrence states}
+\title{Compute the posterior distribution of recurrence states}
 \usage{
 compute_posterior(y, fs, prior = NULL, return.RG = FALSE)
 }
 \arguments{
-\item{y}{Observed data in the form as a list. The number of entries is the
-number of episode. Each entry is in turn a list of observed alleles
-for each marker.}
+\item{y}{Observed data in the form of a list. The number of entries is the
+number of episodes. Each entry is in turn a list of observed alleles
+for each marker, or \code{NA} if not observed.}
 
-\item{fs}{List of allele frequencies. Names of the list must match with the
-marker names in \code{y}.}
+\item{fs}{List of allele frequencies as vectors. Names of the list must
+match with the marker names in \code{y}.}
 
 \item{prior}{Matrix of prior probabilities of the recurrence states for each
-recurrent episode. Each row corresponds to an episode, and the column names
-must be C, L, and I. If prior not provided, a uniform prior will be used.}
+recurrent episode. Each row corresponds to an episode, and the column
+names must be C, L, and I. If prior not provided, a uniform prior will be
+used.}
 
-\item{return.RG}{Boolean for whether to return the relationship graphs, defaults
-to \code{FALSE}.}
+\item{return.RG}{Boolean for whether to return the relationship graphs,
+defaults to \code{FALSE}.}
 }
 \value{
 List containing:
 \describe{
 \item{marg}{Matrix of marginal posterior probabilities of the possible
-recurrence states for each recurrent episode.}
+recurrence states for each recurrent episode, one row per reinfection.}
 \item{joint}{Vector of joint posterior probabilities of each possible string
 of recurrence states.}
 \item{RGs}{List of relationship graphs with their log-likelihoods stored.
-Only returned if \code{return.RG} is \code{TRUE}.}
+Only returned if \code{return.RG} is \code{TRUE}. See
+\code{\link{enumerate_RGs_alt}}.}
 }
 }
 \description{
-Computes the posterior distribution of recurrence states
+Entry point to Bayesian inference for \emph{P. vivax} recurrence states based
+on genetic data. Specifically, this function finds the posterior
+probabilities of relapse, reinfection and recrudescence from genetic data.
 }
 \details{
-Assumptions:
+We enumerate all possible relationship graphs between genotypes, where each
+pair of genotypes may be clones, siblings, or strangers, each with a
+different level of expected genetic relatedness. The likelihood of a
+sequence of recurrence states can be determined from the likelihood of all
+relationship graphs compatible with said sequence. More details on the
+enumeration and likelihood calculation of relationship graphs
+can be found in \code{\link{enumerate_RGs_alt}} and
+\code{\link{RG_inference}} respectively.
+
+Model assumptions:
 \itemize{
-\item{No genotyping errors and missing data}
+\item{No genotyping errors or missing alleles}
 \item{Parasites are outbred}
-\item{Relationship graphs are equally likely}
-\item{Uniform prior over recurrent states}
+\item{Relationship graphs are equally likely given recurrence states}
 }
 }
 \examples{
-y <- list(list(m1=c("A","C"), m2=c("G")), list(m1=c("A"), m2=c("G","T")))
-fs <- list(m1=setNames(c(0.4, 0.6), c("A","C")),
-           m2=setNames(c(0.2, 0.8), c("G","T")))
-prior <- matrix(c(0.2, 0.3, 0.5), nrow=1)
+y <- list(list(m1 = c("A", "C"), m2 = c("G")), list(m1 = c("A"), m2 = c("G", "T")))
+fs <- list(
+  m1 = setNames(c(0.4, 0.6), c("A", "C")),
+  m2 = setNames(c(0.2, 0.8), c("G", "T"))
+)
+prior <- matrix(c(0.2, 0.3, 0.5), nrow = 1)
 post <- compute_posterior(y, fs, prior)
 post$marg
 

@@ -59,7 +59,8 @@
 #'
 #' @examples
 #' set.seed(3)
-#' RG <- sample_RG(c(2,1,1)); plot_RG(RG)
+#' RG <- sample_RG(c(2, 1, 1))
+#' plot_RG(RG)
 #' sample_lineages(RG, n_m = 5)
 #' sample_lineages(RG, n_m = 5, outbred = FALSE, lineage_count = 5)
 #'
@@ -70,7 +71,6 @@ sample_lineages <- function(RG, n_m,
                             lineage_count = 50,
                             equifrequent = TRUE,
                             alpha = 1) {
-
   # Check n_m input
   if (!is.wholenumber(n_m) | n_m < 0) {
     stop("The marker count, n_m, must be a positive whole number")
@@ -84,7 +84,7 @@ sample_lineages <- function(RG, n_m,
 
   # Generate lineages to sample
   if (outbred) {
-    lineages = generate_lineages(length(gs_per_rcs) * 2) # Two lineages per component
+    lineages <- generate_lineages(length(gs_per_rcs) * 2) # Two lineages per component
   } else {
     # If lineage_freqs are specified check and use them inc. names if named.
     if (!is.null(lineage_freqs)) {
@@ -94,7 +94,7 @@ sample_lineages <- function(RG, n_m,
       if (is.null(names(lineage_freqs))) names(lineage_freqs) <- generate_lineages(lineage_count)
     } else { # Generate lineages and their frequencies
       if (equifrequent) {
-        lineage_freqs <- rep(1/lineage_count, lineage_count)
+        lineage_freqs <- rep(1 / lineage_count, lineage_count)
       } else {
         if (alpha <= 0) stop("alpha must be positive")
         lineage_freqs <- MCMCpack::rdirichlet(1, rep(alpha, lineage_count))
@@ -110,12 +110,13 @@ sample_lineages <- function(RG, n_m,
   lineages_sampled <- c()
 
   # Generate a matrix of lineages per marker (columns) for each genotype (row)
-  lineages_per_marker <- array(NA, dim = c(genotype_count, n_m),
-                               dimnames = list(igraph::V(RG)$name, paste0("m", 1:n_m)))
+  lineages_per_marker <- array(NA,
+    dim = c(genotype_count, n_m),
+    dimnames = list(igraph::V(RG)$name, paste0("m", 1:n_m))
+  )
 
   # For each relationship component
-  for(rc_i in 1:length(gs_per_rcs)) {
-
+  for (rc_i in 1:length(gs_per_rcs)) {
     # Extract component graph
     rc <- igraph::induced_subgraph(RG, gs_per_rcs[[rc_i]])
     rc_gs <- igraph::V(rc)$name
@@ -140,18 +141,18 @@ sample_lineages <- function(RG, n_m,
       # Check stranger cluster of size one
       if (rc_size != 1) stop("stranger cluster of size > 1")
       # Sample per-marker filial lineages
-      lineages_per_marker[rc_gs,] <- sample(parents, n_m, replace = T)
+      lineages_per_marker[rc_gs, ] <- sample(parents, n_m, replace = T)
     } else if (all(rc_relationship_types == 0.5)) { # Sibling cluster
       # Check sibling cluster of size two or more
       if (rc_size < 2) stop("sibling cluster of size < 2")
       # Sample per-marker filial lineages
-      lineages_per_marker[rc_gs,] <- sample(parents, n_m * rc_size, replace = T)
+      lineages_per_marker[rc_gs, ] <- sample(parents, n_m * rc_size, replace = T)
     } else if (all(rc_relationship_types == 1)) { # Clonal cluster
       if (rc_size < 2) stop("clonal cluster of size < 2")
       # Sampler per-marker filial lineages (assumes clones are mitotic copies)
       filial_genotype <- sample(parents, n_m, replace = T)
       # Copy filial lineages
-      lineages_per_marker[rc_gs,] <- matrix(filial_genotype, ncol = n_m, nrow = rc_size, byrow = T)
+      lineages_per_marker[rc_gs, ] <- matrix(filial_genotype, ncol = n_m, nrow = rc_size, byrow = T)
     } else if (setequal(rc_relationship_types, c(0.5, 1))) { # Mixed sibling and clonal cluster
       if (rc_size < 2) stop("mixed cluster of size < 2")
       # Duplicate relationship component
@@ -161,7 +162,7 @@ sample_lineages <- function(RG, n_m,
       # Extract clonal components
       rcdC <- igraph::components(rcd)
       # For each marker
-      for(m in 1:n_m) {
+      for (m in 1:n_m) {
         # Sample one lineage per rcdC$no clonal components
         lineageC <- sample(parents, size = rcdC$no, replace = T)
         lineages_per_marker[names(rcdC$membership), m] <- lineageC[rcdC$membership] # Clone lineages and store
@@ -171,9 +172,3 @@ sample_lineages <- function(RG, n_m,
 
   return(lineages_per_marker)
 }
-
-
-
-
-
-

@@ -16,14 +16,20 @@ Vector of strings (consisting of "C", "L", "I" for recrudescence,
 relapse, reinfection respectively) compatible with relationship graph.
 }
 \description{
-Find all vectors of recurrence states compatible with relationship graph
+Finds all possible recurrence states for each recurrence compatible with the
+relationship graph, then takes the Cartesian product to get all vectors of
+recurrence states. For a recurrence to be a recrudescence, all edges between
+the recurrent infection and the immediately preceding infection must be
+clonal edges. For a recurrence to be a reinfection, all edges between the
+recurrent infection and any preceding infection must be stranger edges. All
+recurrences may possibly be relapses.
 }
 \examples{
 MOIs <- c(2, 2, 1)
-RG <- enumerate_RGs_alt(MOIs, igraph=T)[[175]]
+RG <- enumerate_RGs_alt(MOIs, igraph = T)[[175]]
 gs_per_ts <- split(paste0("g", 1:sum(MOIs)), rep(1:length(MOIs), MOIs))
-# first recurrence cannot be recrudescence, second recurrence cannot be reinfection
-plot_RG(RG, edge.curved=0.2)
+# 1st recurrence can't be recrudescence, 2nd recurrence can't be reinfection
+plot_RG(RG, edge.curved = 0.2)
 compatible_rstrs(RG, gs_per_ts) # "LL" "IL" "LC" "IC"
 
 }

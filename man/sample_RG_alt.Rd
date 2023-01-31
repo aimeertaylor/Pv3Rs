@@ -13,9 +13,21 @@ distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
 \item{igraph}{Logical for whether to return an \code{igraph} object.}
 }
 \value{
-See \code{\link{enumerate_RGs_alt}}.
+A relationship graph, i.e. one entry of the list returned by
+\code{\link{enumerate_RGs_alt}}.
 }
 \description{
 Uses the techniques in \code{\link{enumerate_RGs_alt}} to uniformly sample
-a relationship graph.
+a relationship graph. All clonal partitions are generated, and the number
+of sibling partitions consistent with each clonal partition is determined. A
+clonal partition is randomly selected with probability proportional to the
+corresponding number of sibling partitions, and a sibling partition is then
+uniformly sampled. The nested partition is equivalent to a relationship
+graph. See \code{\link{enumerate_RGs_alt}} for details on the nested
+partition representation of a relationship graph.
+}
+\examples{
+set.seed(20)
+RG <- sample_RG_alt(c(2, 2))
+
 }

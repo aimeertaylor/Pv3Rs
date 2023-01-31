@@ -30,7 +30,7 @@
 #'
 #' # Generate a relationship graph (RG) and enumerate IBD partitions (IPs)
 #' set.seed(3)
-#' RG <- sample_RG(MOIs = c(2,1,1))
+#' RG <- sample_RG(MOIs = c(2, 1, 1))
 #' IPs <- enumerate_IPs(igraph::vcount(RG))
 #'
 #' # Compute the probability of the IPs given the RG
@@ -44,38 +44,44 @@
 #' # Compute the frequency of simulated IPs given the RG graph and
 #' # outbred population (well specified setting)
 #' simulated_out <- sapply(1:1000, function(j) {
-#'      convert_IP_to_string(sample_IPs_given_RG(RG, n_m = 1, outbred = T)[[1]])})
-#' simulated_out_fr <- table(simulated_out)/1000
+#'   convert_IP_to_string(sample_IPs_given_RG(RG, n_m = 1, outbred = T)[[1]])
+#' })
+#' simulated_out_fr <- table(simulated_out) / 1000
 #' sim_out_fr[names(simulated_out_fr)] <- simulated_out_fr
 #'
 #' # Compute the frequency of simulated IPs given the RG graph and
 #' # inbred population (miss specified setting))
 #' simulated_in <- sapply(1:1000, function(j) {
-#'      convert_IP_to_string(sample_IPs_given_RG(RG, n_m = 1, outbred = F, lineage_count = 10)[[1]])})
-#' simulated_in_fr <- table(simulated_in)/1000
+#'   convert_IP_to_string(sample_IPs_given_RG(RG, n_m = 1, outbred = F, lineage_count = 10)[[1]])
+#' })
+#' simulated_in_fr <- table(simulated_in) / 1000
 #' sim_in_fr[names(simulated_in_fr)] <- simulated_in_fr
 #'
 #' # Plot agreement and relationship graph
-#' par(mfrow = c(1,2), pty = "s")
+#' par(mfrow = c(1, 2), pty = "s")
 #' plot_RG(RG)
 #' max_xy <- max(c(pr_IP_RG, sim_out_fr, sim_in_fr))
-#' plot(x = pr_IP_RG,
-#'      y = as.vector(sim_out_fr[names(pr_IP_RG)]),
-#'      xlab = "Probability", ylab = "Frequency",
-#'      xlim = c(0, max_xy + 0.1),
-#'      ylim = c(0, max_xy + 0.1),
-#'      pch = 4)
-#' points(x = pr_IP_RG,
-#' y = as.vector(sim_in_fr[names(pr_IP_RG)]), col = "red")
+#' plot(
+#'   x = pr_IP_RG,
+#'   y = as.vector(sim_out_fr[names(pr_IP_RG)]),
+#'   xlab = "Probability", ylab = "Frequency",
+#'   xlim = c(0, max_xy + 0.1),
+#'   ylim = c(0, max_xy + 0.1),
+#'   pch = 4
+#' )
+#' points(
+#'   x = pr_IP_RG,
+#'   y = as.vector(sim_in_fr[names(pr_IP_RG)]), col = "red"
+#' )
 #' abline(a = 0, b = 1)
-#' legend("topleft", pch = c(1,4), col = c(1:2),
-#'        legend = c("well-specified", "miss-specified"),
-#'        cex = 0.75, inset = 0.01)
-#'
+#' legend("topleft",
+#'   pch = c(1, 4), col = c(1:2),
+#'   legend = c("well-specified", "miss-specified"),
+#'   cex = 0.75, inset = 0.01
+#' )
 #'
 #' @export
 compute_pr_IP_RG <- function(IP, RG) {
-
   # Convert RG into a sparse matrix
   weight <- if (igraph::is.weighted(RG)) "weight" else NULL
   RG_matrix <- igraph::as_adjacency_matrix(RG, attr = weight)
@@ -85,20 +91,18 @@ compute_pr_IP_RG <- function(IP, RG) {
 
   # Compute inter-cluster non-join prob
   if (cluster_count > 1) {
-
     # Create a matrix to store inter-cluster closest relatives
     inter_cluster_matrix <- array(0, dim = rep(cluster_count, 2))
 
     # Extract the relationships between IBD clusters
-    for(i in 2:cluster_count) {
-      for(j in 1:(i-1)) {
-        inter_cluster_matrix[i,j] <- extract_closest_relative(IP[[i]], IP[[j]], RG_matrix)
+    for (i in 2:cluster_count) {
+      for (j in 1:(i - 1)) {
+        inter_cluster_matrix[i, j] <- extract_closest_relative(IP[[i]], IP[[j]], RG_matrix)
       }
     }
 
     # Compute inter-cluster non-join prob
     inter <- compute_inter_cluster_join(inter_cluster_matrix)
-
   } else {
     inter <- 1
   }
@@ -133,8 +137,7 @@ extract_closest_relative <- function(IC1, IC2, RG_matrix) {
 #'
 #' @param inter_cluster_matrix Matrix of inter-cluster closest relatives
 #' @noRd
-compute_inter_cluster_join <- function(inter_cluster_matrix){
-
+compute_inter_cluster_join <- function(inter_cluster_matrix) {
   # Return zero probability if there are any inter-cluster clones
   if (any(inter_cluster_matrix == 1)) {
     return(0)
@@ -149,7 +152,7 @@ compute_inter_cluster_join <- function(inter_cluster_matrix){
     } else {
       # Compute probabilities within sibling components
       # (probabilities across sibling components are one in an outbred population)
-      p <- (1-0.5)^sum(inter_cluster_components$csize == 2)
+      p <- (1 - 0.5)^sum(inter_cluster_components$csize == 2)
       return(p)
     }
   }

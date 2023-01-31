@@ -19,6 +19,6 @@ An \code{igraph} object along with the original variables in
 \code{RG}.
 }
 \description{
-Makes the relationship graph compatible with the output of
-\code{\link{enumerate_RGs}}.
+Makes a relationship graph object output by \code{\link{enumerate_RGs_alt}}
+compatible with the \code{igraph} output of \code{\link{enumerate_RGs}}.
 }

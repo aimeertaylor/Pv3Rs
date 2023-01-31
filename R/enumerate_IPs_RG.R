@@ -1,35 +1,49 @@
-#' Enumerate IBD partitions given RG
+#' Enumerate IBD partitions consistent with a given relationship graph
 #'
-#' The rules are (a) each IBD unit has clonal and sibling relationships only,
-#' (b) clones are IBD, (c) each sibling cluster is part of at most 2 IBD units.
+#' @details
+#' For a IBD partition to be consistent with the relationship graph given, it
+#' must satisfy the following:
+#' \itemize{
+#'   \item{genotypes within each IBD cell have clonal and sibling relationships
+#'   only,}
+#'   \item{genotypes that are clones must be in the same IBD cell,}
+#'   \item{each cluster of sibling units span at most 2 IBD cells (corresponds
+#'   to two parents).}
+#' }
 #'
 #' Note that all IBD partitions are equally likely.
 #'
-#' @param RG A relationship graph; see \code{\link{enumerate_RGs}} for details.
+#' @param RG A relationship graph; see \code{\link{enumerate_RGs_alt}} for details.
 #' @param compat Logical, if true, the data type of the output matches with the
 #' input IP of \code{\link{compute_pr_IP_RG}}. Otherwise, returns a list of
 #' IBD parititon vectors in reference to the sibling clusters.
 #'
 #' @examples
 #' set.seed(3)
-#' RG <- sample_RG_alt(c(2,1,2))
+#' RG <- sample_RG_alt(c(2, 1, 2))
 #' enumerate_IPs_RG(RG)
 #'
 #' @export
-enumerate_IPs_RG <- function(RG, compat=TRUE) {
-  # IBD partition over each sibling cluster
+enumerate_IPs_RG <- function(RG, compat = TRUE) {
+  # for each sibling cluster, `split_two` lists all ways for the cluster to
+  # be split into 1 or 2 IBD cells
   ibd_per_sib <- lapply(RG$sib, split_two)
   # take cartesian product over sibling clusters
-  ibd_list <- apply(expand.grid(ibd_per_sib, stringsAsFactors=F), 1,
-                    function(x) unname(purrr::flatten(x)))
+  ibd_list <- apply(
+    expand.grid(ibd_per_sib, stringsAsFactors = F), 1,
+    function(x) unname(purrr::flatten(x))
+  )
 
-  if(compat) {
+  if (compat) {
     # return in terms of genotypes instead
     RG.clone <- RG$clone
-    return(lapply(ibd_list, function(p) {
+    return(lapply(ibd_list, function(p) { # for each IBD cell
+      # `RG.clone[x]`` lists the genotype names for sibling unit `x`
       out <- lapply(p, function(x) unname(unlist(RG.clone[x])))
       class(out) <- c("list", "equivalence")
       out
     }))
-  } else return(ibd_list)
+  } else {
+    return(ibd_list)
+  }
 }

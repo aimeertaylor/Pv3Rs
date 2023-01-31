@@ -32,6 +32,8 @@ Fs_random <- lapply(Alpha_Posteriors, function(alpha) as.vector(rdirichlet(n=1, 
 # this dlply is taken from post_prob_CLI
 yns <- dlply(MS_pooled, 'ID')
 
+failed <- c()
+
 tic()
 # this is currently a matrix, is data frame better?
 Post_probs <- do.call(rbind, lapply(1:length(yns), function(i) {
@@ -41,16 +43,23 @@ Post_probs <- do.call(rbind, lapply(1:length(yns), function(i) {
   # no recurrence, skip
   if(length(unique(y.df$Episode_Identifier)) == 1) return(NULL)
   # >8 genotypes considered too complex, can change this criteria
-  if(nrow(y.df) > 8) return(NULL)
+  if(nrow(y.df) > 8) {
+    failed <- c(failed, i)
+    return(NULL)
+  }
 
-  # only use markers for which there is at least one NA
+  # only use markers for which there is at least one non-NA
   ms <- MSs_all[apply(!is.na(y.df[MSs_all]), 2, any)]
-  if(length(ms) == 0) return(NULL)
+  if(length(ms) == 0) {
+    failed <- c(failed, i)
+    return(NULL)
+  }
 
   ynts <- dlply(y.df, 'Episode_Identifier')
   # ensure that Episode is non-decreasing
   if(!all(order(y.df$Episode) == 1:nrow(y.df))) {
-    writeLines(paste("Individual", i, "needs rows to be reordered according to infection number"))
+    warning(paste("Individual", i, "needs rows to be reordered according to infection number"))
+    failed <- c(failed, i)
     return(NULL)
   }
 

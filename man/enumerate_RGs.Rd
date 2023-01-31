@@ -58,12 +58,15 @@ read_graph and write_graph
 }
 
 \examples{
-MOIs <- c(1,2)
+MOIs <- c(1, 2)
 RGs <- enumerate_RGs(MOIs)
 RGs[[1]]
 igraph::vertex_attr(RGs[[1]])
-par(mfrow = c(3,3))
-for(i in 1:length(RGs)) {plot_RG(RGs[[i]]); box()}
+par(mfrow = c(3, 3))
+for (i in 1:length(RGs)) {
+  plot_RG(RGs[[i]])
+  box()
+}
 
 # Compute by hand the number of not necessarily transitive graphs
 intra_edge_counts <- sapply(MOIs, choose, k = 2)

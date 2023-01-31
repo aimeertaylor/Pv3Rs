@@ -82,7 +82,8 @@ function could be used to explore IBD structure following brood mating.
 }
 \examples{
 set.seed(3)
-RG <- sample_RG(c(2,1,1)); plot_RG(RG)
+RG <- sample_RG(c(2, 1, 1))
+plot_RG(RG)
 sample_lineages(RG, n_m = 5)
 sample_lineages(RG, n_m = 5, outbred = FALSE, lineage_count = 5)
 

@@ -8,7 +8,7 @@ determine_MOIs(y)
 }
 \arguments{
 \item{y}{A sequence of lists, where each list contains the genetic data at
-each marker for one infection.}
+each marker as a vector. Each list corresponds to one infection.}
 }
 \value{
 Returns a vector of the (minimum) multiplicity of infection (MOI) for
@@ -19,8 +19,10 @@ Determine MOIs from unphased data
 }
 \examples{
 # two infections, three markers
-y <- list(list(m1=c("A","B"), m2=c("A"), m3=c("C")),
-          list(m1=c("B"), m2=c("B","C"), m3=c("A","B","C")))
+y <- list(
+  list(m1 = c("A", "B"), m2 = c("A"), m3 = c("C")),
+  list(m1 = c("B"), m2 = c("B", "C"), m3 = c("A", "B", "C"))
+)
 determine_MOIs(y) # should be c(2, 3)
 
 }

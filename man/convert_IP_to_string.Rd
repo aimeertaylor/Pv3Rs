@@ -9,11 +9,20 @@ convert_IP_to_string(IP)
 \arguments{
 \item{IP}{IBD partition}
 }
+\value{
+Returns partition as a string, with genotype names of the same
+equivalence class separated by commas listed within a pair of brackets.
+}
 \description{
-An IBD partition is an equivalence list that can be converted into a string.
+Converts a IBD partition into a character string
+}
+\details{
+An IBD partition is an equivalence list, which has a string representation
+when printed. This function returns the string representation.
 }
 \examples{
-IPs <- enumerate_IPs(3); IPs
+IPs <- enumerate_IPs(3)
+IPs
 sapply(IPs, convert_IP_to_string)
 
 }

@@ -13,9 +13,8 @@ one infection.}
 \item{gs.inf}{Vector of genotype names for genotypes within one infection.}
 }
 \value{
-List of dataframes, one for each marker. The number of columns for
-each dataframe is the number of genotypes. The number of rows for each
-dataframe is the number of allele assignments for that marker.
+List of dataframes, one for each marker. The columns correspond to
+genotypes, while the rows correspond to allele assignments for a marker.
 }
 \description{
 Due to permutation symmetry of intra-infection genotypes, we fix a single
@@ -24,8 +23,8 @@ to the MOI (consider it the anchor) and permute the rest, discarding
 combinations that under-represent the observed marker diversity.
 }
 \examples{
-# three markers
-y.inf <- list(m1=c("A","B"), m2=c("B","C","D"), m3=c("C"))
+# 3 markers
+y.inf <- list(m1 = c("A", "B"), m2 = c("B", "C", "D"), m3 = c("C"))
 enumerate_alleles(y.inf, c("g1", "g2", "g3"))
 # 6 assignments for m1 (BAA, ABA, BBA, AAB, BAB, ABB)
 # 1 assignment for m2 (accounting for permutation symmetry)

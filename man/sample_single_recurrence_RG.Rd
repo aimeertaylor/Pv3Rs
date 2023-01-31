@@ -62,5 +62,4 @@ for (cause in c("recrudescence", "reinfection", "relapse")) {
   print(RG)
 }
 
-
 }

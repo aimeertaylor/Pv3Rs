@@ -7,6 +7,15 @@
 
 library(Pv3Rs)
 
+# helper function that converts equivalence object to canonical form
+# each subset is sorted, and the subsets are presented in lexicographical order
+eq_canonical <- function(eq) {
+  inner.sorted <- lapply(eq, sort)
+  out <- unname(inner.sorted[order(sapply(inner.sorted, "[", 1))])
+  class(out) <- c(class(out), "equivalence")
+  out
+}
+
 MOIs <- c(2,2)
 
 # igraph must be true for compute_pr_IP_RG to work

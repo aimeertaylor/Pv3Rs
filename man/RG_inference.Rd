@@ -10,28 +10,41 @@ RG_inference(MOIs, fs, alleles_per_m)
 \item{MOIs}{A numeric vector specifying, for each infection, the number of
 distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
 
-\item{fs}{List of frequencies of each allele at each marker.}
+\item{fs}{List of allele frequencies as vectors. Names of the list must
+match with the marker names in \code{alleles_per_m}.}
 
-\item{alleles_per_m}{List of allele assignments for each marker (see the
-\code{al.mat} parameter to \code{\link{allele_filter}}).}
+\item{alleles_per_m}{List of allele assignments as dataframes for each
+marker. Each column corresponds to a genotype and each row corresponds to
+an allele assignment.}
 }
 \value{
-List of all relationship graphs, including their log-likelihoods as
-a variable under each relationship graph.
+List of all relationship graph objects, including their
+log-likelihoods as a variable under each object.
 }
 \description{
-Computes the likelihood of all relationship graphs
+The likelihood of a relationship graph (RG) can be decomposed over markers,
+as we assume that marker data is conditionally independent across markers
+given the RG. The likelihood of a RG for one marker is then found by
+integrating over all possible IBD (identity-by-descent) partitions that are
+consistent with the RG. The probability distribution of these IBD partitions
+are always uniform. Since different RGs may use the same IBD, the likelihood
+of IPs for each marker are stored in hash tables for improved computational
+efficiency.
 }
 \examples{
 # 1 marker, 2 infections, MOIs = 2, 1
 MOIs <- c(2, 1)
-fs <- list(m1=setNames(c(0.4, 0.6), c("A", "B")),
-           m2=setNames(c(0.2, 0.8), c("C", "D")))
-al_df1 <- as.data.frame(matrix(c("A","B","B"), nrow=1))
-al_df2 <- as.data.frame(matrix(c("C","D","C",
-                                  "D","C","C"), nrow=2, byrow=T))
+fs <- list(
+  m1 = setNames(c(0.4, 0.6), c("A", "B")),
+  m2 = setNames(c(0.2, 0.8), c("C", "D"))
+)
+al_df1 <- as.data.frame(matrix(c("A", "B", "B"), nrow = 1))
+al_df2 <- as.data.frame(matrix(c(
+  "C", "D", "C",
+  "D", "C", "C"
+), nrow = 2, byrow = T))
 colnames(al_df1) <- colnames(al_df2) <- paste0("g", 1:3)
-alleles_per_m <- list(m1=al_df1, m2=al_df2)
+alleles_per_m <- list(m1 = al_df1, m2 = al_df2)
 RGs <- RG_inference(MOIs, fs, alleles_per_m)
 
 }

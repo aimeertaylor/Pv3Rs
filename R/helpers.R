@@ -1,15 +1,17 @@
 #' Determine MOIs from unphased data
 #'
 #' @param y A sequence of lists, where each list contains the genetic data at
-#'   each marker for one infection.
+#'   each marker as a vector. Each list corresponds to one infection.
 #'
 #' @return Returns a vector of the (minimum) multiplicity of infection (MOI) for
 #'   each infection.
 #'
 #' @examples
 #' # two infections, three markers
-#' y <- list(list(m1=c("A","B"), m2=c("A"), m3=c("C")),
-#'           list(m1=c("B"), m2=c("B","C"), m3=c("A","B","C")))
+#' y <- list(
+#'   list(m1 = c("A", "B"), m2 = c("A"), m3 = c("C")),
+#'   list(m1 = c("B"), m2 = c("B", "C"), m3 = c("A", "B", "C"))
+#' )
 #' determine_MOIs(y) # should be c(2, 3)
 #'
 #' @export
@@ -28,22 +30,21 @@ determine_MOIs <- function(y) {
 #'   one infection.
 #' @param gs.inf Vector of genotype names for genotypes within one infection.
 #'
-#' @return List of dataframes, one for each marker. The number of columns for
-#'   each dataframe is the number of genotypes. The number of rows for each
-#'   dataframe is the number of allele assignments for that marker.
+#' @return List of dataframes, one for each marker. The columns correspond to
+#'   genotypes, while the rows correspond to allele assignments for a marker.
 #'
 #' @examples
-#' # three markers
-#' y.inf <- list(m1=c("A","B"), m2=c("B","C","D"), m3=c("C"))
+#' # 3 markers
+#' y.inf <- list(m1 = c("A", "B"), m2 = c("B", "C", "D"), m3 = c("C"))
 #' enumerate_alleles(y.inf, c("g1", "g2", "g3"))
 #' # 6 assignments for m1 (BAA, ABA, BBA, AAB, BAB, ABB)
 #' # 1 assignment for m2 (accounting for permutation symmetry)
 #' # 1 assignment for m3 (CCC)
 #'
 #' @export
-enumerate_alleles <- function(y.inf, gs.inf){
-  # only one genotype
-  if(length(gs.inf)==1) {
+enumerate_alleles <- function(y.inf, gs.inf) {
+  # edge case: only one genotype
+  if (length(gs.inf) == 1) {
     return(lapply(y.inf, function(x) {
       x <- as.data.frame(x)
       colnames(x) <- gs.inf
@@ -51,29 +52,29 @@ enumerate_alleles <- function(y.inf, gs.inf){
     }))
   }
 
-  marker_names <- names(n.uniq)
-
-  # find single marker for fixed allele assignment:
-  # must be a marker whose n.uniq = MOI
-  # arbitrarily take the first using break
+  marker_names <- names(y.inf)
+  # find single marker for fixed allele assignment
+  # must be a marker whose number of observed alleles = MOI
+  # arbitrarily take the first such marker to be the 'anchor' marker
   n.uniq <- sapply(y.inf, length)
   MOI <- max(n.uniq)
-  for(m.fix in marker_names) {
-    if(n.uniq[m.fix] == MOI) break
+  for (m.fix in marker_names) {
+    if (n.uniq[m.fix] == MOI) break
   }
 
   comb_per_m <- list() # stores allele assignments for each marker
-  for(m in marker_names) {
-    if(m==m.fix) {
+  for (m in marker_names) {
+    if (m == m.fix) { # only one fixed assignment for 'anchor' marker
       comb_per_m[[m]] <- as.data.frame(t(y.inf[[m]]))
       colnames(comb_per_m[[m]]) <- gs.inf
-    }
-    else {
-      # get all combinations
-      combs <- expand.grid(rep(list(y.inf[[m]]), MOI), stringsAsFactors=F)
-      # remove those inconsistent with observed data as not all alleles represented
-      comb_per_m[[m]] <- combs[apply(combs, 1,
-                                     function(row) length(unique(row)))==n.uniq[m],]
+    } else {
+      # get all combinations of allele assignments
+      combs <- expand.grid(rep(list(y.inf[[m]]), MOI), stringsAsFactors = F)
+      # remove assignments that under-represent the observed marker diversity
+      comb_per_m[[m]] <- combs[apply(
+        combs, 1,
+        function(row) length(unique(row))
+      ) == n.uniq[m], ]
       colnames(comb_per_m[[m]]) <- gs.inf
     }
   }
@@ -81,6 +82,14 @@ enumerate_alleles <- function(y.inf, gs.inf){
 }
 
 #' Find all vectors of recurrence states compatible with relationship graph
+#'
+#' Finds all possible recurrence states for each recurrence compatible with the
+#' relationship graph, then takes the Cartesian product to get all vectors of
+#' recurrence states. For a recurrence to be a recrudescence, all edges between
+#' the recurrent infection and the immediately preceding infection must be
+#' clonal edges. For a recurrence to be a reinfection, all edges between the
+#' recurrent infection and any preceding infection must be stranger edges. All
+#' recurrences may possibly be relapses.
 #'
 #' @param RG Relationship graph; see \code{\link{enumerate_RGs_alt}}.
 #' @param gs_per_ts List of vectors of genotypes for each infection.
@@ -90,152 +99,123 @@ enumerate_alleles <- function(y.inf, gs.inf){
 #'
 #' @examples
 #' MOIs <- c(2, 2, 1)
-#' RG <- enumerate_RGs_alt(MOIs, igraph=T)[[175]]
+#' RG <- enumerate_RGs_alt(MOIs, igraph = T)[[175]]
 #' gs_per_ts <- split(paste0("g", 1:sum(MOIs)), rep(1:length(MOIs), MOIs))
-#' # first recurrence cannot be recrudescence, second recurrence cannot be reinfection
-#' plot_RG(RG, edge.curved=0.2)
+#' # 1st recurrence can't be recrudescence, 2nd recurrence can't be reinfection
+#' plot_RG(RG, edge.curved = 0.2)
 #' compatible_rstrs(RG, gs_per_ts) # "LL" "IL" "LC" "IC"
 #'
 #' @export
 compatible_rstrs <- function(RG, gs_per_ts) {
   infection_count <- length(gs_per_ts)
-  n_recur <- infection_count-1
-  r_by_recur <- lapply(1:n_recur, function(x) c("L"))
+  n_recur <- infection_count - 1
+
+  # `r_by_recur` is a vector storing possible recur. states for each recurrence
+  r_by_recur <- lapply(1:n_recur, function(x) c("L")) # relapse always possible
+  # prepend clonal partition vector with 'g'
   clone.vec <- setNames(RG$clone.vec, paste0("g", 1:length(RG$clone.vec)))
   sib.vec <- RG$sib.vec
 
-  for(i in 1:n_recur) {
+  for (i in 1:n_recur) { # for each recurrence
     # can it be recrudescence
     recru <- TRUE
-    for(g2 in gs_per_ts[[i+1]]) {
-      if(!any(clone.vec[gs_per_ts[[i]]] == clone.vec[g2])) {
+    for (g2 in gs_per_ts[[i + 1]]) { # for each genotype in recurrent infection
+      if (!any(clone.vec[gs_per_ts[[i]]] == clone.vec[g2])) {
+        # cannot be recrudescence if it is not in the same clonal unit as any
+        # genotype in the immediately preceding infection
         recru <- FALSE
         break
       }
     }
-    if(recru) r_by_recur[[i]] = c(r_by_recur[[i]], "C")
+    if (recru) r_by_recur[[i]] <- c(r_by_recur[[i]], "C")
 
     # can it be reinfection
     reinf <- TRUE
-    for(g2 in gs_per_ts[[i+1]]) {
-      if(any(sib.vec[clone.vec[unlist(gs_per_ts[1:i])]] == sib.vec[clone.vec[g2]])) {
+    for (g2 in gs_per_ts[[i + 1]]) { # for each genotype in recurrent infection
+      if (any(sib.vec[clone.vec[unlist(gs_per_ts[1:i])]]
+      == sib.vec[clone.vec[g2]])) {
+        # cannot be reinfection if any genotype from the any preceding
+        # infection is in the same sibling unit
         reinf <- FALSE
         break
       }
     }
-    if(reinf) r_by_recur[[i]] = c(r_by_recur[[i]], "I")
+    if (reinf) r_by_recur[[i]] <- c(r_by_recur[[i]], "I")
   }
 
+  # take cartesian product
   do.call(paste0, expand.grid(r_by_recur))
 }
 
 #' Convert IBD partition to a unique string for hashing
 #'
-#' This is used for building a hash table for p(y at marker m|IBD). Works up to
-#' 10 genotypes. This seems to be marginally faster than
-#' \code{\link{convert_IP_to_string}}.
+#' This is used for building a hash table for p(y at marker m|IBD). This seems
+#' to be marginally faster than \code{\link{convert_IP_to_string}}.
 #'
-#' @param IP List containing vectors of genotype names corresponding to IBD
-#'   clusters.
+#' @param IP List containing vectors of genotype names with each vector
+#' corresponding to an IBD cell.
 #' @param gs Vector containing all genotype names.
 #'
-#' @return Membership vector in string format.
+#' @return String where the integers in the IBD membership vector have been
+#'   converted to ASCII characters.
+#'
+#' @examples
+#' gs <- paste0("g", 1:3)
+#' IP1 <- list(c("g1", "g3"), c("g2"))
+#' IP2 <- list(c("g2"), c("g3", "g1"))
+#' hash1 <- hash.IP(IP1, gs)
+#' hash2 <- hash.IP(IP2, gs)
+#' hash1 == hash2 # TRUE, even though the order is different
 #'
 #' @export
 hash.IP <- function(IP, gs) {
   ibd_vec <- setNames(gs, gs)
-  ibd_i <- 0
-  for(ibd_idx in order(sapply(IP, min))) {
-    for(g in IP[[ibd_idx]]) ibd_vec[g] <- ibd_i
+  ibd_i <- 1
+  # use of `order` on the 'min' genotype name of each IBD cell ensures that the
+  # for loop runs in the same order even if genotype names within an IBD cell
+  # are arranged differently
+  for (ibd_idx in order(sapply(IP, min))) {
+    for (g in IP[[ibd_idx]]) ibd_vec[g] <- ibd_i
     ibd_i <- ibd_i + 1
   }
-  paste(ibd_vec, collapse="")
+  intToUtf8(ibd_vec)
 }
 
-#' Convert equivalence object to canonical form, i.e. each subset is sorted,
-#' and the subsets are presented in lexicographical order.
+#' Partition a vector into at most two subvectors
 #'
-#' @param eq A list or equivalence object representing a partition.
-#'
-#' @return Equivalence object in canonical form.
+#' @return
+#' Given a vector with no repeats, returns a list consisting of
+#' \itemize{
+#'   \item a list that contains the original vector as its only element
+#'   \item other lists where each list contains two disjoint vectors whose
+#'     union covers the vector. All possible unordered pairs are included.
+#' }
 #'
 #' @examples
-#' parts <- partitions::listParts(4)
-#' lapply(parts, eq_canonical)
+#' gs <- paste0("g", 1:3)
+#' # 4 possibilities in total
+#' # either all genotypes in one vector (1 possibility)
+#' # or 2 genotypes in one vector and the last in one vector (3 possibilties)
+#' split_two(gs)
 #'
 #' @export
-eq_canonical <- function(eq) {
-  inner.sorted <- lapply(eq, sort)
-  out <- unname(inner.sorted[order(sapply(inner.sorted,'[',1))])
-  class(out) <- c(class(out), "equivalence")
-  out
-}
-
-#' Inverse of partitions::vec_to_eq.
-#'
-#' @noRd
-part_to_vec <- function(part, count) {
-  i <- 1
-  vec <- setNames(rep(NA, count), unlist(part))
-  for(s in part) {
-    for(num in s) {
-      vec[num] <- i
-    }
-    i <- i+1
-  }
-  return(vec)
-}
-
-#' Given a vector, return a list consisting of the vector itself and all possible
-#' pairs of disjoint subsets whose union covers the vector.
-#'
-#' @noRd
 split_two <- function(s) {
   n <- length(s)
-  if(n == 1) return(list(list(s)))
-  masks <- 2^(1:n-1)
-  c(list(list(s)),
-    lapply(seq(1,2^n-2,2), function(u) list(s[bitwAnd(u, masks)!=0],
-                                            s[bitwAnd(u, masks)==0])))
-}
-
-#' Extract information from weights matrix of an \code{igraph} object.
-#'
-#' Return a list containing (a) list of clonal units and (b) a list of sibling
-#' clusters. Each clonal unit stores a vector of genotype names. Each sibling
-#' cluster stores a vector of clonal unit names.
-#'
-#' @noRd
-igraph_to_parts <- function(RG) {
-  gs_count <- igraph::vcount(RG)
-  W <- RG[]
-
-  clone.part <- 1:gs_count
-  for(i in tail(1:gs_count, -1)) {
-    for(j in 1:(i-1)) {
-      if(W[i,j]==1) {
-        clone.part[i] <- clone.part[j]
-        break
-      }
-    }
+  # special case of one genotype only
+  if (n == 1) {
+    return(list(list(s)))
   }
-  clone.list <- split(igraph::V(RG)$name, clone.part)
-  n.clone <- length(clone.list)
-  clone.names <- paste0("c", 1:n.clone)
 
-  sib.part <- 1:n.clone
-  for(i in tail(1:n.clone, -1)) {
-    row <- W[clone.list[[i]][1]]
-    for(j in 1:(i-1)) {
-      if(row[clone.list[[j]][1]]==0.5) {
-        sib.part[i] <- sib.part[j]
-        break
-      }
-    }
-  }
-  sib.list <- split(clone.names, sib.part)
-  sib.names <- paste0("s", 1:length(sib.list))
-
-  return(list(clone=setNames(clone.list, clone.names),
-              sib=setNames(sib.list, sib.names)))
+  masks <- 2^(1:n - 1) # bitmasks 00..001, 00..010, etc.
+  c(
+    list(list(s)), # list that contains the original vector as its only element
+    lapply(seq(1, 2^n - 2, 2), function(u) { # u = odd numbers from 1 to 2^n-3
+      # 2^n - 1 is excluded as its binary representation is all 1s
+      # bits of u that are 1 go into first vector, rest go to second vector
+      list(
+        s[bitwAnd(u, masks) != 0],
+        s[bitwAnd(u, masks) == 0]
+      )
+    })
+  )
 }

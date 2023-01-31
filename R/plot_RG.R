@@ -30,42 +30,48 @@
 #' \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 #'
 #' @examples
-#' RGs <- enumerate_RGs(c(2,1,1))
+#' RGs <- enumerate_RGs(c(2, 1, 1))
 #' cpar <- par() # record current par before changing
-#' par(mfrow = c(3,4), mar = c(0.1,0.1,0.1,0.1))
-#' for(i in 12:23) {plot_RG(RGs[[i]], edge.curved = 0.1); box()}
+#' par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
+#' for (i in 12:23) {
+#'   plot_RG(RGs[[i]], edge.curved = 0.1)
+#'   box()
+#' }
 #' par(cpar) # reset par
 #' @export
 
-plot_RG = function(RG,
-                   layout_by_group = TRUE,
-                   vertex_palette = "Set2",
-                   edge_lty = c("0.5" = "dashed", "1" = "solid"),
-                   edge_col = c("0.5" = "black", "1" = "black"),
-                   edge.width = 1.5,
-                   ...){
-
+plot_RG <- function(RG,
+                    layout_by_group = TRUE,
+                    vertex_palette = "Set2",
+                    edge_lty = c("0.5" = "dashed", "1" = "solid"),
+                    edge_col = c("0.5" = "black", "1" = "black"),
+                    edge.width = 1.5,
+                    ...) {
   ts_per_gs <- igraph::vertex_attr(RG)$group
   if (is.null(ts_per_gs)) stop("RG vertices need a group attribute")
-  MOIs = as.vector(table(ts_per_gs)) # extract MOIs
-  infection_count = length(MOIs)
+  MOIs <- as.vector(table(ts_per_gs)) # extract MOIs
+  infection_count <- length(MOIs)
 
   if (layout_by_group) { # Compute graph layout, grouping genotypes per infection
     gs_count <- sum(MOIs)
-    RG_layout = array(dim = c(gs_count, 2))
-    X = rbind(seq(0, 1, length.out = infection_count), MOIs)
-    z = as.numeric(rep(MOIs, MOIs) > 2)
-    my_offset = (-1)^(1:length(z))*(.2/infection_count) # offset within time point
-    RG_layout[,1] = unlist(apply(X, 2, function(x) rep(x[1], x[2]))) + my_offset*z
-    RG_layout[,2] = unlist(sapply(MOIs, function(x) {
-      if (x==1) return(0.5) else return(seq(0, 1, length.out = x))
+    RG_layout <- array(dim = c(gs_count, 2))
+    X <- rbind(seq(0, 1, length.out = infection_count), MOIs)
+    z <- as.numeric(rep(MOIs, MOIs) > 2)
+    my_offset <- (-1)^(1:length(z)) * (.2 / infection_count) # offset within time point
+    RG_layout[, 1] <- unlist(apply(X, 2, function(x) rep(x[1], x[2]))) + my_offset * z
+    RG_layout[, 2] <- unlist(sapply(MOIs, function(x) {
+      if (x == 1) {
+        return(0.5)
+      } else {
+        return(seq(0, 1, length.out = x))
+      }
     }))
   }
 
 
   # Create infection colours for vertices
   infection_colours <- RColorBrewer::brewer.pal(n = 8, vertex_palette)
-  if (length(infection_colours)  < infection_count) {
+  if (length(infection_colours) < infection_count) {
     infection_colour_fun <- grDevices::colorRampPalette(infection_colours)
     infection_colours <- infection_colour_fun(infection_count)
   }
@@ -74,10 +80,11 @@ plot_RG = function(RG,
 
   # Plot the graph
   igraph::plot.igraph(RG,
-                      layout = if (layout_by_group) RG_layout else layout_nicely,
-                      vertex.labels = igraph::vertex_attr(RG)$name,
-                      vertex.color = infection_colours[igraph::vertex_attr(RG)$group],
-                      edge.color = edge_col[as.character(igraph::edge_attr(RG)$weight)],
-                      edge.lty = edge_lty[as.character(igraph::edge_attr(RG)$weight)],
-                      ...)
+    layout = if (layout_by_group) RG_layout else layout_nicely,
+    vertex.labels = igraph::vertex_attr(RG)$name,
+    vertex.color = infection_colours[igraph::vertex_attr(RG)$group],
+    edge.color = edge_col[as.character(igraph::edge_attr(RG)$weight)],
+    edge.lty = edge_lty[as.character(igraph::edge_attr(RG)$weight)],
+    ...
+  )
 }

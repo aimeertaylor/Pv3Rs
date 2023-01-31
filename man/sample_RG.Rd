@@ -33,8 +33,9 @@ that \code{sample_RG} prints to the screen.
 
 \examples{
 set.seed(2)
-RG <- sample_RG(c(2,1,1))
-print(RG); igraph::as_data_frame(RG)
+RG <- sample_RG(c(2, 1, 1))
+print(RG)
+igraph::as_data_frame(RG)
 plot_RG(RG)
 
 }

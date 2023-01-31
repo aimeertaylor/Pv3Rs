@@ -17,7 +17,7 @@
 #' apply(lineages, 2, convert_lineages_to_IP)
 #'
 #' @export
-convert_lineages_to_IP<- function(lineages_m) {
+convert_lineages_to_IP <- function(lineages_m) {
   out <- split(names(lineages_m), lineages_m, lex.order = T)
   out <- out[names(sort(sapply(out, min)))] # Order s.t. low genotype indices precede high
   len <- sapply(out, length)
@@ -25,6 +25,3 @@ convert_lineages_to_IP<- function(lineages_m) {
   class(out) <- c(class(out), "equivalence")
   return(out)
 }
-
-
-

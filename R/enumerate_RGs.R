@@ -46,12 +46,15 @@
 #'
 #'
 #' @examples
-#' MOIs <- c(1,2)
+#' MOIs <- c(1, 2)
 #' RGs <- enumerate_RGs(MOIs)
 #' RGs[[1]]
 #' igraph::vertex_attr(RGs[[1]])
-#' par(mfrow = c(3,3))
-#' for(i in 1:length(RGs)) {plot_RG(RGs[[i]]); box()}
+#' par(mfrow = c(3, 3))
+#' for (i in 1:length(RGs)) {
+#'   plot_RG(RGs[[i]])
+#'   box()
+#' }
 #'
 #' # Compute by hand the number of not necessarily transitive graphs
 #' intra_edge_counts <- sapply(MOIs, choose, k = 2)
@@ -60,7 +63,6 @@
 #'
 #' @export
 enumerate_RGs <- function(MOIs) {
-
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
@@ -80,9 +82,11 @@ enumerate_RGs <- function(MOIs) {
 
   # Enumerate indices for pairs of time points, etc.
   if (infection_count > 1) {
-    infection_ijs <- gtools::combinations(n = infection_count,
-                                           r = 2,
-                                           v = 1:infection_count)
+    infection_ijs <- gtools::combinations(
+      n = infection_count,
+      r = 2,
+      v = 1:infection_count
+    )
     infection_pair_count <- nrow(infection_ijs) # Number of pairs of time points
   } else {
     infection_pair_count <- 0 # Number of pairs of time points
@@ -93,20 +97,24 @@ enumerate_RGs <- function(MOIs) {
 
   # List genotypes per time point and time point pair
   gs_per_ts <- split(gs, ts_per_gs)
-  if(infection_pair_count >= 1){
+  if (infection_pair_count >= 1) {
     gs_per_t_pairs <- lapply(1:infection_pair_count, function(t_pair) {
-      list(gs_per_ts[[infection_ijs[t_pair, 1]]],
-           gs_per_ts[[infection_ijs[t_pair, 2]]])
+      list(
+        gs_per_ts[[infection_ijs[t_pair, 1]]],
+        gs_per_ts[[infection_ijs[t_pair, 2]]]
+      )
     })
   }
 
   # Enumerate all combinations of intra time-point relationships
   intra_relationships <- lapply(MOIs, function(MOI) {
     if (MOI > 1) {
-      gtools::permutations(n = length(intra_relationship_types),
-                           r = choose(MOI, 2),
-                           v = intra_relationship_types,
-                           repeats.allowed = T)
+      gtools::permutations(
+        n = length(intra_relationship_types),
+        r = choose(MOI, 2),
+        v = intra_relationship_types,
+        repeats.allowed = T
+      )
     } else {
       matrix(NA, 1, 1)
     }
@@ -115,7 +123,7 @@ enumerate_RGs <- function(MOIs) {
   # Enumerate all combinations of inter time-point relationships
   if (infection_count > 1) {
     inter_relationships <- lapply(1:infection_pair_count, function(t_pair) {
-      as.matrix(expand.grid(rep(list(relationship_types), prod(MOIs[infection_ijs[t_pair,]]))))
+      as.matrix(expand.grid(rep(list(relationship_types), prod(MOIs[infection_ijs[t_pair, ]]))))
     })
     inter_count <- sapply(inter_relationships, nrow) # Numbers of inter_relationships to permute
   } else {
@@ -133,7 +141,7 @@ enumerate_RGs <- function(MOIs) {
   writeLines(paste("\nnumber of not necessarily transitive graphs is", total_count))
 
   # Allocate adjacency matrices
-  adj_all <- array(NA, dim = rep(gs_count, 2), dimnames = list(gs,gs))
+  adj_all <- array(NA, dim = rep(gs_count, 2), dimnames = list(gs, gs))
   intra_adjs <- lapply(MOIs, function(MOI) array(NA, dim = rep(MOI, 2)))
 
   # Create progress bar and count of transitive RGs
@@ -141,16 +149,15 @@ enumerate_RGs <- function(MOIs) {
   transitive_RGs <- list()
   transitive_i <- 1
 
-  for(perm_i in 1:total_count) {
-
+  for (perm_i in 1:total_count) {
     setTxtProgressBar(pbar, perm_i)
 
     # Extract permutation indices
     intra_perm <- all_perms[perm_i, 1:infection_count]
-    inter_perm <- all_perms[perm_i, - (1:infection_count)]
+    inter_perm <- all_perms[perm_i, -(1:infection_count)]
 
     # Populate adj_all with intra-relationships
-    for(t in 1:infection_count) {
+    for (t in 1:infection_count) {
       intra_adjs[[t]][lower.tri(intra_adjs[[t]])] <- intra_relationships[[t]][intra_perm[t], ]
       adj_all[gs_per_ts[[t]], gs_per_ts[[t]]] <- intra_adjs[[t]]
     }
@@ -158,16 +165,20 @@ enumerate_RGs <- function(MOIs) {
     # Populate lower tri of all_adj with between time-point relationships
     if (infection_pair_count >= 1) {
       for (t_pair in 1:infection_pair_count) {
-        adj_all[gs_per_t_pairs[[t_pair]][[2]],
-                gs_per_t_pairs[[t_pair]][[1]]] <- inter_relationships[[t_pair]][inter_perm[t_pair], ]
+        adj_all[
+          gs_per_t_pairs[[t_pair]][[2]],
+          gs_per_t_pairs[[t_pair]][[1]]
+        ] <- inter_relationships[[t_pair]][inter_perm[t_pair], ]
       }
     }
 
     # Convert adjacency matrix into an igraph item
-    RG <- igraph::graph_from_adjacency_matrix(adjmatrix = adj_all,
-                                              mode = "lower",
-                                              diag = F,
-                                              weighted = T)
+    RG <- igraph::graph_from_adjacency_matrix(
+      adjmatrix = adj_all,
+      mode = "lower",
+      diag = F,
+      weighted = T
+    )
     # Add a time-point attribute
     RG <- igraph::set_vertex_attr(RG, "group", value = ts_per_gs)
 

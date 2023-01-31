@@ -2,27 +2,36 @@
 % Please edit documentation in R/enumerate_IPs_RG.R
 \name{enumerate_IPs_RG}
 \alias{enumerate_IPs_RG}
-\title{Enumerate IBD partitions given RG}
+\title{Enumerate IBD partitions consistent with a given relationship graph}
 \usage{
 enumerate_IPs_RG(RG, compat = TRUE)
 }
 \arguments{
-\item{RG}{A relationship graph; see \code{\link{enumerate_RGs}} for details.}
+\item{RG}{A relationship graph; see \code{\link{enumerate_RGs_alt}} for details.}
 
 \item{compat}{Logical, if true, the data type of the output matches with the
 input IP of \code{\link{compute_pr_IP_RG}}. Otherwise, returns a list of
 IBD parititon vectors in reference to the sibling clusters.}
 }
 \description{
-The rules are (a) each IBD unit has clonal and sibling relationships only,
-(b) clones are IBD, (c) each sibling cluster is part of at most 2 IBD units.
+Enumerate IBD partitions consistent with a given relationship graph
 }
 \details{
+For a IBD partition to be consistent with the relationship graph given, it
+must satisfy the following:
+\itemize{
+\item{genotypes within each IBD cell have clonal and sibling relationships
+only,}
+\item{genotypes that are clones must be in the same IBD cell,}
+\item{each cluster of sibling units span at most 2 IBD cells (corresponds
+to two parents).}
+}
+
 Note that all IBD partitions are equally likely.
 }
 \examples{
 set.seed(3)
-RG <- sample_RG_alt(c(2,1,2))
+RG <- sample_RG_alt(c(2, 1, 2))
 enumerate_IPs_RG(RG)
 
 }

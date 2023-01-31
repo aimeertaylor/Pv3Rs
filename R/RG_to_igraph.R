@@ -1,7 +1,7 @@
 #' Converts relationship graph to an \code{igraph} object
 #'
-#' Makes the relationship graph compatible with the output of
-#' \code{\link{enumerate_RGs}}.
+#' Makes a relationship graph object output by \code{\link{enumerate_RGs_alt}}
+#' compatible with the \code{igraph} output of \code{\link{enumerate_RGs}}.
 #'
 #' @param RG Relationship graph output by \code{\link{enumerate_RGs_alt}} with
 #'   \code{igraph=FALSE}.
@@ -15,26 +15,28 @@
 RG_to_igraph <- function(RG, gs, ts_per_gs) {
   gs_count <- length(gs)
 
-  n.sib.clones <- max(RG$sib.vec)
-  n.clones <- max(RG$clone.vec)
-  clones <- RG$clone
+  n.sib.clones <- max(RG$sib.vec) # number of sibling cells
+  n.clones <- max(RG$clone.vec) # number of clonal cells
+  clones <- RG$clone # clonal partition as list
 
   # make adjacent matrix
-  adj_all <- array(0, dim = rep(gs_count, 2), dimnames = list(gs,gs))
-  for(k in 1:n.sib.clones) {
+  adj_all <- array(0, dim = rep(gs_count, 2), dimnames = list(gs, gs))
+  for (k in 1:n.sib.clones) {
     selection <- unlist(clones[RG$sib[[k]]])
-    adj_all[selection, selection] <- 0.5;
+    adj_all[selection, selection] <- 0.5 # sibling and clonal edges
   }
-  for(u in 1:n.clones) {
-    adj_all[clones[[u]], clones[[u]]] <- 1;
+  for (u in 1:n.clones) {
+    adj_all[clones[[u]], clones[[u]]] <- 1 # overwrite clonal edges
   }
-  diag(adj_all) <- 0
+  diag(adj_all) <- 0 # remove self loops
 
   # Convert adjacency matrix into an igraph item
-  RG_igraph <- igraph::graph_from_adjacency_matrix(adjmatrix = adj_all,
-                                            mode = "lower",
-                                            diag = F,
-                                            weighted = T)
+  RG_igraph <- igraph::graph_from_adjacency_matrix(
+    adjmatrix = adj_all,
+    mode = "lower",
+    diag = F,
+    weighted = T
+  )
   # Add a time-point attribute
   RG_igraph <- igraph::set_vertex_attr(RG_igraph, "group", value = ts_per_gs)
 
