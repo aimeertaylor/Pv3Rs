@@ -20,8 +20,8 @@
 #'   \item{Relationship graphs are equally likely given recurrence states}
 #' }
 #'
-#' @param y Observed data in the form of a list. The number of entries is the
-#'   number of episodes. Each entry is in turn a list of observed alleles
+#' @param y Observed data in the form of a list of lists. The number of entries is the
+#'   number of episodes. Each episode is in turn a list of observed alleles
 #'   for each marker, or \code{NA} if not observed.
 #' @param fs List of allele frequencies as vectors. Names of the list must
 #'   match with the marker names in `y`.
@@ -55,6 +55,11 @@
 #'
 #' @export
 compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
+  # Check y is a list of lists
+  if (class(y) != "list" | unique(unlist(lapply(y, class))) != "list") {
+    stop("Data y must be a list of lists, even if only one marker is typed per infection")
+  }
+
   infection_count <- length(y)
   stopifnot(infection_count > 1)
 

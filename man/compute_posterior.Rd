@@ -7,8 +7,8 @@
 compute_posterior(y, fs, prior = NULL, return.RG = FALSE)
 }
 \arguments{
-\item{y}{Observed data in the form of a list. The number of entries is the
-number of episodes. Each entry is in turn a list of observed alleles
+\item{y}{Observed data in the form of a list of lists. The number of entries is the
+number of episodes. Each episode is in turn a list of observed alleles
 for each marker, or \code{NA} if not observed.}
 
 \item{fs}{List of allele frequencies as vectors. Names of the list must
