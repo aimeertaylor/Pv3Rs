@@ -1,4 +1,6 @@
 ###############################################################################
+# Examples of unwanted effect on posterior of prior on graphs
+#
 # Conclusion: the marginal probability that the first recurrence is a
 # reinfection increases as the graph grows only if there are data (example 4);
 # otherwise, it decreases (examples 1,2,3). Also, marginal probabilities of the
