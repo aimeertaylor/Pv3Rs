@@ -72,7 +72,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
         # check if there is no assignment where all of their alleles are equal
         if (!any(apply(
           assignment_df[clones], 1,
-          function(row) length(unique(row)) == 1
+          function(row) length(unique(na.omit(row))) <= 1
         ))) {
           incompatible <- TRUE
           break
