@@ -4,11 +4,11 @@
 #' is annotated as a clone, sibling, or stranger edge. The enumerated
 #' relationship graphs satisfy the following constraints:
 #' \itemize{
-#' \item{The subgraph induced by the clone edges is a cluster graph.}
-#' \item{The subgraph induced by the clone edges and sibling edges is a cluster
-#' graph.}
-#' \item{Clone edges are only allowed for two genotypes from different
-#' infections.}
+#'   \item{The subgraph induced by the clone edges is a cluster graph.}
+#'   \item{The subgraph induced by the clone edges and sibling edges is a cluster
+#'   graph.}
+#'   \item{Clone edges are only allowed for two genotypes from different
+#'   infections.}
 #' }
 #'
 #' This alternate version of \code{\link{enumerate_RGs}} is based on generating

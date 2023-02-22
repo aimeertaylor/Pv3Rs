@@ -68,8 +68,11 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   causes <- c("C", "L", "I")
 
   # use uniform prior if prior not given
-  if (is.null(prior)) prior <- matrix(rep(1 / 3, 3 * (infection_count - 1)),
-                                      ncol = 3)
+  if (is.null(prior)) {
+    prior <- matrix(rep(1 / 3, 3 * (infection_count - 1)),
+      ncol = 3
+    )
+  }
   if (is.null(colnames(prior))) colnames(prior) <- causes
 
   # For each infection we find the possible allele assignments
@@ -93,8 +96,12 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   # No need to take the Cartesian product over markers due to outbred assumption
   alleles_per_m <- Reduce( # Reduce performs below repeatedly across infections
     # returns one list of merged dataframes given two lists of dataframes
-    function(x, y) mapply(merge, x, y, MoreArgs = list(by = NULL, all = T),
-                          SIMPLIFY = F),
+    function(x, y) {
+      mapply(merge, x, y,
+        MoreArgs = list(by = NULL, all = T),
+        SIMPLIFY = F
+      )
+    },
     alleles_per_inf_per_m
   )
 
@@ -137,8 +144,10 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   # add log prior so that logp_per_rstr is log of p(y,R) = p(y|R)p(R)
   logprior <- log(prior)
   for (rstr in rstrs) {
-    logprior_rstr <- sum(sapply(1:n_recur,
-                                function(i) logprior[i, substr(rstr, i, i)]))
+    logprior_rstr <- sum(sapply(
+      1:n_recur,
+      function(i) logprior[i, substr(rstr, i, i)]
+    ))
     logp_per_rstr[rstr] <- logp_per_rstr[rstr] + logprior_rstr
   }
   # normalise p(y,R) to get posterior p(R|y)
@@ -150,9 +159,11 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   for (i in 1:n_recur) { # for each recurrence
     # split returns a list of 3 vectors, each containing indices whose
     # corresponding R has i-th recurrence being C/L/I
-    idx_list <- split(1:n_rstrs, # each int is an int representation of R
-                      # get i-th ternary digit and map to 1/2/3
-                      (1:n_rstrs - 1) %/% 3^(i - 1) %% 3 + 1)
+    idx_list <- split(
+      1:n_rstrs, # each int is an int representation of R
+      # get i-th ternary digit and map to 1/2/3
+      (1:n_rstrs - 1) %/% 3^(i - 1) %% 3 + 1
+    )
     for (j in 1:3) {
       marg[i, j] <- sum(post_per_rstr[idx_list[[j]]])
     }
