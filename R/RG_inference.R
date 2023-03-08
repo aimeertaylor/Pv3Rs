@@ -61,7 +61,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
   RG_i <- 0
   n.RG <- length(RGs)
   pbar <- txtProgressBar(min = 0, max = n.RG) # min=0 in case n.RG is 1
-  writeLines(paste("\nComputing log p(Y|RG) for", n.RG, "RGs"))
+  writeLines(paste("Computing log p(Y|RG) for", n.RG, "RGs"))
 
   for (RG in RGs) { # for each relationship graph
     # check if there is some cell of clones cannot have the same genotype

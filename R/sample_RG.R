@@ -11,6 +11,8 @@
 #' necessarily transitive graphs, of which there are many; see the message
 #' that \code{sample_RG} prints to the screen.
 #'
+#' Superseded by \code{\link{sample_RG_alt}}.
+#'
 #' @inheritParams enumerate_RGs
 #'
 #' @return Returns a transitive relationship graph (RG); see \code{\link{enumerate_RGs}} for details.

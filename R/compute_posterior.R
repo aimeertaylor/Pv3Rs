@@ -129,7 +129,7 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   RG_i <- 0
   n.RG <- length(RGs)
   pbar <- txtProgressBar(min = 0, max = n.RG)
-  writeLines("\nFinding log-likelihood of each vector of recurrent states")
+  writeLines("Finding log-likelihood of each vector of recurrent states")
   for (RG in RGs) {
     prob_RG <- exp(RG$logp) # p(y|RG)
     for (rstr in compatible_rstrs(RG, gs_per_ts)) {

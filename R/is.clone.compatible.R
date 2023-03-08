@@ -6,7 +6,7 @@
 #'   \code{test_cln_incompatible} at
 #'   \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 #'
-#'   @noRd
+#' @noRd
 is.clone.compatible <- function(A, vertex_data_matrix) {
   cln_edges <- which(A == 1, arr.ind = TRUE) # Which edges are clones
   num_cln_edges <- nrow(cln_edges) # Number of edges that are clones

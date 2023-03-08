@@ -21,6 +21,10 @@ relatedness (probability of IBD) of a given relationship is equal to its
 numeric representation, implying that parasite genotypes are sampled from an
 outbred population.
 }
+\details{
+Superseded by \code{\link{enumerate_IPs_RG}} as the probability distribution
+of IBD partitions is in fact uniform.
+}
 \examples{
 
 #################################################

@@ -14,7 +14,7 @@ gs_per_ts <- split(gs, ts_per_gs)
 # 4 possible alleles at each of 3 markers
 n_a <- 4
 n_m <- 3
-alleles <- LETTERS[1:n_a]
+alleles <- c('A', 'C', 'G', 'T')
 ms <- paste0("m", 1:n_m) # Marker names
 
 # generate an interesting relationship graph

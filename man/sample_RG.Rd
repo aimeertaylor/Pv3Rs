@@ -25,6 +25,9 @@ among more than three infections, it could take a long time because
 necessarily transitive graphs, of which there are many; see the message
 that \code{sample_RG} prints to the screen.
 }
+\details{
+Superseded by \code{\link{sample_RG_alt}}.
+}
 \section{Provenance}{
  This function was adapted from
 \code{generate_random_Vivax_model} at

@@ -41,6 +41,9 @@ and clonal relationships between parasite genotypes across infections.
 fewer infections because the number of graphs grows exponentially with the
 number of genotypes and the number of infections; see examples.
 }
+\details{
+Superseded by \code{\link{enumerate_RGs_alt}}.
+}
 \section{Provenance}{
  This function was adapted from
 \code{generate_all_models_3Ts} and \code{generate_all_models_2Ts} at

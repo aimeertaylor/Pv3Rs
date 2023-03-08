@@ -19,7 +19,7 @@ Alpha_Posteriors <- apply(MS_pooled[,MSs_all], 2, function(x, Ind_Primary){
   # prior parameter vector (iterpolates unobserved repeat lengths < xmax)
   param_vector <- array(D_weight_Prior, dim=xmax, dimnames=list(1:xmax))
   # observed data summarised as counts
-  obs_counts <-  table(x[Ind_Primary])
+  obs_counts <- table(x[Ind_Primary])
   # posterior parameter vector
   param_vector[names(obs_counts)] <-  param_vector[names(obs_counts)] + obs_counts
   return(param_vector)

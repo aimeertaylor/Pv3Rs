@@ -55,3 +55,7 @@ partition is represented in the form of a list of vectors (\code{clone} and
 \code{sib}) and as a membership vector (\code{clone.vec} and \code{sib.vec}), where each
 entry identifies the partition cell the corresponding index belongs to.
 }
+\examples{
+graphs <- enumerate_RGs_alt(c(2, 1, 2), igraph=T) # 250 graphs
+
+}

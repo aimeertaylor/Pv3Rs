@@ -6,6 +6,9 @@
 #' numeric representation, implying that parasite genotypes are sampled from an
 #' outbred population.
 #'
+#' Superseded by \code{\link{enumerate_IPs_RG}} as the probability distribution
+#' of IBD partitions is in fact uniform.
+#'
 #' @param IP An IBD partition (IP), which is a \code{partitions} equivalence object; see \code{\link[partitions]{listParts}}.
 #' @param RG A relationship graph (RG), which is an \code{igraph} graph; see \code{\link[igraph]{igraph}}.
 #'

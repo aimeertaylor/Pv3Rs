@@ -7,6 +7,8 @@
 #' fewer infections because the number of graphs grows exponentially with the
 #' number of genotypes and the number of infections; see examples.
 #'
+#' Superseded by \code{\link{enumerate_RGs_alt}}.
+#'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a the multiplicity of infection (MOI).
 #'
