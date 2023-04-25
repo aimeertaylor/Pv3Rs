@@ -56,22 +56,21 @@
 #' @export
 compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
 
-  # Check y is a list of lists
+  # Check y is a list of lists:
   if (class(y) != "list" | unique(unlist(lapply(y, class))) != "list") {
     stop("Data y must be a list of lists, even if only one marker is typed per infection")
   }
 
-  # Check frequencies sum to one
+  # Check frequencies sum to one:
   if (!all(sapply(fs, sum) == 1)) stop('For a given marker, allele frequencies must sum to one')
 
-
-  # Check allele and frequency names match:
+  # Check alleles have specified frequencies
   ms <- unique(as.vector(sapply(y, names))) # Extract marker names
   # For each marker, list allele names:
   as <- lapply(ms, function(m) unique(as.vector(unlist(sapply(y, function(yt) yt[[m]])))))
   names(as) <- ms # Name list entries by marker
-  # For each marker, check the sets of allele and frequency names are equal:
-  names_equal <- all(sapply(ms, function(m) setequal(names(fs[[m]]), as[[m]])))
+  # For each marker, check all alleles have a named frequency:
+  names_equal <- all(sapply(ms, function(m) all(as[[m]] %in% names(fs[[m]]))))
   if (!names_equal) stop("Per-marker allele and frequency names do not match")
 
 
