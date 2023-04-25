@@ -14,7 +14,7 @@ identifiable from genetic data alone (when the data suggest that recurrent paras
 both reinfection and relapse are plausible; meanwhile, when the data suggest that recurrent parasites are clones of those in the 
 preceding infection, both recrudescence and relapse are plausible). 
 
-## Installation
+## Installation 
 
 ```r
 # Install or update latest stable version of devtools from CRAN
@@ -22,4 +22,16 @@ install.packages("devtools")
 
 # Install paneljudge from GitHub 
 devtools::install_github("aimeertaylor/Pv3Rs", build_vignettes = TRUE)
+
+# Load and attach the package
+library(Pv3Rs)
+
+# View documentation inc. examples for main function
+?compute_posterior
+
+# Load the demo vignette
+vignette("demo", package = "Pv3Rs")
+
+# Lists available functions, as well as example data sets and their documentation [check]
+help(package = "Pv3Rs")
 ```
