@@ -15,9 +15,9 @@ for each marker, or \code{NA} if not observed.}
 match with the marker names in \code{y}.}
 
 \item{prior}{Matrix of prior probabilities of the recurrence states for each
-recurrent episode. Each row corresponds to an episode, and the column
-names must be C, L, and I. If prior not provided, a uniform prior will be
-used.}
+recurrent episode. Each row corresponds to an episode. The column names
+must be C, L, and I for recrudescence, relapse and reinfection
+respectively. If prior is not provided, a uniform prior will be used.}
 
 \item{return.RG}{Boolean for whether to return the relationship graphs,
 defaults to \code{FALSE}.}
@@ -62,7 +62,7 @@ fs <- list(
   m1 = setNames(c(0.4, 0.6), c("A", "C")),
   m2 = setNames(c(0.2, 0.8), c("G", "T"))
 )
-prior <- matrix(c(0.2, 0.3, 0.5), nrow = 1)
+prior <- array(c(0.2, 0.3, 0.5), dim = c(1,3), dimnames = list(NULL, c("C", "L", "I")))
 post <- compute_posterior(y, fs, prior)
 post$marg
 

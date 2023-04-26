@@ -26,9 +26,9 @@
 #' @param fs List of allele frequencies as vectors. Names of the list must
 #'   match with the marker names in `y`.
 #' @param prior Matrix of prior probabilities of the recurrence states for each
-#'    recurrent episode. Each row corresponds to an episode, and the column
-#'    names must be C, L, and I. If prior not provided, a uniform prior will be
-#'    used.
+#'   recurrent episode. Each row corresponds to an episode. The column names
+#'   must be C, L, and I for recrudescence, relapse and reinfection
+#'   respectively. If prior is not provided, a uniform prior will be used.
 #' @param return.RG Boolean for whether to return the relationship graphs,
 #'   defaults to `FALSE`.
 #'
@@ -49,7 +49,7 @@
 #'   m1 = setNames(c(0.4, 0.6), c("A", "C")),
 #'   m2 = setNames(c(0.2, 0.8), c("G", "T"))
 #' )
-#' prior <- matrix(c(0.2, 0.3, 0.5), nrow = 1)
+#' prior <- array(c(0.2, 0.3, 0.5), dim = c(1,3), dimnames = list(NULL, c("C", "L", "I")))
 #' post <- compute_posterior(y, fs, prior)
 #' post$marg
 #'
@@ -93,8 +93,11 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
     prior <- matrix(rep(1 / 3, 3 * (infection_count - 1)),
       ncol = 3
     )
+    colnames(prior) <- causes
+  } else {
+    if (!identical(colnames(prior), causes)) stop('The prior should have colnames "C", "L" and "I"')
   }
-  if (is.null(colnames(prior))) colnames(prior) <- causes
+
 
   # For each infection we find the possible allele assignments
   # Because of permutation symmetry of the genotypes within an infection, we
