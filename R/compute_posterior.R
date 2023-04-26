@@ -62,7 +62,9 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   }
 
   # Check frequencies sum to one:
-  if (!all(sapply(fs, sum) == 1)) stop('For a given marker, allele frequencies must sum to one')
+  if (!all(abs(1 - round(sapply(fs, sum))) < .Machine$double.eps^0.5)) {
+    stop('For a given marker, allele frequencies must sum to one')
+  }
 
   # Check all alleles have a named frequency
   ms <- unique(as.vector(sapply(y, names))) # Extract marker names
