@@ -72,7 +72,7 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   as <- lapply(ms, function(m) unique(as.vector(unlist(sapply(y, function(yt) yt[[m]])))))
   names(as) <- ms # Name list entries by marker
   # For each marker, check all alleles have a named frequency:
-  all_got <- all(sapply(ms, function(m) all(as[[m]] %in% names(fs[[m]]))))
+  all_got <- all(sapply(ms, function(m) all(as[[m]][!is.na(as[[m]])] %in% names(fs[[m]]))))
   if (!all_got) stop("Not all alleles have a named frequency")
 
 
