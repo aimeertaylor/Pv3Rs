@@ -57,13 +57,45 @@ Model assumptions:
 }
 }
 \examples{
-y <- list(list(m1 = c("A", "C"), m2 = c("G")), list(m1 = c("A"), m2 = c("G", "T")))
+# Data on an enrollment episode and a recurrence:
+y <- list(list(m1 = c("A", "C"), m2 = c("G", "T")), list(m1 = "A", m2 = "G"))
+
+# Allele frequencies:
 fs <- list(
   m1 = setNames(c(0.4, 0.6), c("A", "C")),
   m2 = setNames(c(0.2, 0.8), c("G", "T"))
 )
-prior <- array(c(0.2, 0.3, 0.5), dim = c(1,3), dimnames = list(NULL, c("C", "L", "I")))
-post <- compute_posterior(y, fs, prior)
-post$marg
+
+# Compute posterior probabilities using default uniform prior, note that
+# since there is only one recurrence, the marginal probabilities are the same
+# as the joint probabilities:
+compute_posterior(y, fs)
+
+
+
+#===============================================================================
+# compute_posterior() returns the prior when there are either no data whatsoever
+# or no recurrent data
+#===============================================================================
+
+# Allele frequencies:
+fs <- list(m1 = setNames(c(0.25, 0.75), c("A", "Other")))
+
+# Data on an enrollment episode and two recurrences:
+ys_no_data_whatsoever <- list(list(m1 = NA), list(m1 = NA), list(m1 = NA))
+ys_no_recurrent_data <- list(list(m1 = "A"), list(m1 = NA), list(m1 = NA))
+
+# Prior on two recurrences:
+prior <- array(c(0.4,0.4,0.2,0.6,0.4,0), dim = c(2,3),
+               dimnames = list(NULL, c("C", "L", "I")))
+
+# Compute posterior probabilities:
+post3Rs_no_data_whatsover <- compute_posterior(ys_no_data_whatsoever, fs, prior)
+post3Rs_no_recurrent_data <- compute_posterior(ys_no_recurrent_data, fs, prior)
+
+# Compare prior with posterior marginal probabilities:
+prior
+post3Rs_no_data_whatsover$marg
+post3Rs_no_recurrent_data$marg
 
 }
