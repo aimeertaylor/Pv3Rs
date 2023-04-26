@@ -7,12 +7,17 @@
 compute_posterior(y, fs, prior = NULL, return.RG = FALSE)
 }
 \arguments{
-\item{y}{Observed data in the form of a list of lists. The number of entries is the
-number of episodes. Each episode is in turn a list of observed alleles
-for each marker, or \code{NA} if not observed.}
+\item{y}{Observed data in the form of a list of lists. The number of entries
+is the number of episodes. Each episode is in turn a list of observed
+alleles for each marker, or \code{NA} if not observed. For a given marker,
+alleles are modeled as categorical random variables. As such, allele names
+are arbitrary, but must correspond with frequency names (see examples
+below). The same names can be used for alleles belonging to different
+markers. As such, frequencies must be specified per allele name per marker.}
 
-\item{fs}{List of allele frequencies as vectors. Names of the list must
-match with the marker names in \code{y}.}
+\item{fs}{List of allele frequencies as vectors. Names of the list must match
+with the marker names in \code{y}. Within lists (i.e., for each marker),
+frequencies must be specified per allele name.}
 
 \item{prior}{Matrix of prior probabilities of the recurrence states for each
 recurrent episode. Each row corresponds to an episode. The column names
@@ -57,6 +62,11 @@ Model assumptions:
 }
 }
 \examples{
+
+# ==============================================================================
+# Example where alleles are named using letters
+# ==============================================================================
+
 # Data on an enrollment episode and a recurrence:
 y <- list(list(m1 = c("A", "C"), m2 = c("G", "T")), list(m1 = "A", m2 = "G"))
 
@@ -69,7 +79,25 @@ fs <- list(
 # Compute posterior probabilities using default uniform prior, note that
 # since there is only one recurrence, the marginal probabilities are the same
 # as the joint probabilities:
-compute_posterior(y, fs)
+post <- compute_posterior(y, fs); post
+
+
+
+# ==============================================================================
+# Example where alleles are given numeric names: 1, 2, 3, 4, 5
+# ==============================================================================
+
+# Allele frequencies with numeric names
+fs <- list(m1=c('1'=0.78, '2'=0.14, '3'=0.07, '4'=0.005, '5' = 0.005),
+           m2=c('1'=0.27, '2'=0.35, '3'=0.38),
+           m3=c('1'=0.55, '2'=0.45))
+
+Data:
+y <- list(list(m1=c('3','2'), m2=c('1','3'), m3=c('1','2')),
+          list(m1=c('1','4'), m2=c('1','2'), m3=c('1','2')),
+          list(m1=c('1','5'), m2=c('2','3'), m3=c('1')))
+
+post <- compute_posterior(y, fs); post
 
 
 
@@ -97,5 +125,50 @@ post3Rs_no_recurrent_data <- compute_posterior(ys_no_recurrent_data, fs, prior)
 prior
 post3Rs_no_data_whatsover$marg
 post3Rs_no_recurrent_data$marg
+
+
+#===============================================================================
+# Example of small but undesirable effect on posterior of prior on graphs:
+# the marginal # probability that the first recurrence is a recrudescence
+# increases as the # number of recurrences increases even though only the first
+# recurrence has # data (also see vignette [to-do - base on
+# MyDevFiles/Graph_prior_bias_examples.R])
+#===============================================================================
+
+# Allele frequencies:
+fs <- list(m1 = setNames(c(0.25, 1-0.25), c("A", "Other")))
+
+# Data for different scenarios; scenarios where the number of recurrences
+# increases but only the first recurrence has data
+ys <- list(list(list(m1 = "A"), list(m1 = "A")), # 1 recurrence
+            list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA)), # 2 recurrences
+            list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA)), # etc.
+            list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
+
+# Compute posterior probabilities and extract marginal probabilities:
+results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
+
+# Extract results for the first recurrence only:
+first_recur <- sapply(results, function(result) result[1,])
+
+# Plot 2D simplex
+n_recur <- max(sapply(ys, length)-1)
+pardefault <- par()
+par(mar = c(0,0,0,0))
+plot_simplex(v_labels = rownames(first_recur))
+
+# Project probabilities onto 2D simplex coordinates
+xy <- apply(first_recur, 2, project2D)
+
+# Plot divergence from one recurrence to four:
+arrows(x0 = xy["x", 1], x1 = xy["x", n_recur],
+       y0 = xy["y", 1], y1 = xy["y", n_recur],
+       length = 0.05, col = "red")
+
+# Plot a point for each recurrence from one to four:
+points(x = xy["x", ], y = xy["y", ], pch = ".")
+
+# Restore plotting margins
+par(mar = pardefault$mar)
 
 }
