@@ -4,19 +4,20 @@
 \alias{plot_simplex}
 \title{Plots a 2D simplex}
 \usage{
-plot_simplex(v_labels)
+plot_simplex(v_labels = NULL)
 }
 \arguments{
-\item{v_labels}{A vector of labels with which to annotate vertices. If NULL,
-vertices are not annotated.}
+\item{v_labels}{A vector of labels with which to annotate vertices clockwise
+from the bottom left vertex. If NULL (default), vertices are not annotated.}
 }
 \description{
 Plots a 2D simplex, a triangle with unit sides centered at the origin, to
-which marginal posterior probabilities of the 3Rs can be added.
+which marginal posterior probabilities of the 3Rs can be added; see
+\code{\link[=project2D]{project2D()}} and examples below.
 }
 \examples{
 # Plot 2D simplex
-plot_simplex(v_labels = c("(1,0,0)", "(0,0,1)", "(0,1,0)"))
+plot_simplex()
 
 # ==============================================================================
 # Given data on an enrollment episode and a recurrence,
@@ -44,6 +45,9 @@ xy_prior <- project2D(as.vector(prior))
 
 # Project marginal posterior probabilities onto x and y coordinates:
 xy_post <- project2D(as.vector(post$marg))
+
+# Plot simplex
+plot_simplex(colnames(post$marg))
 
 # Plot the deviation of the posterior from the prior
 arrows(x0 = xy_prior["x"], x1 = xy_post["x"],

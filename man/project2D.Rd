@@ -11,7 +11,9 @@ project2D(v)
 }
 \value{
 A numeric vector of two coordinates that can be used to plot the
-probability vector on the origin-centered 2D simplex.
+probability vector \code{v} on the origin-centered 2D simplex (see \code{\link[=plot_simplex]{plot_simplex()}}), where the left,
+top, and right vertices of the simplex correspond with the first, second
+and third entries of \code{v} respectively.
 }
 \description{
 Project three probabilities that sum to one (e.g., the marginal probabilities
