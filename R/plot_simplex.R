@@ -4,12 +4,25 @@
 #' which marginal posterior probabilities of the 3Rs can be added; see
 #' [project2D()] and examples below.
 #'
-#' @param v_labels A vector of labels with which to annotate vertices clockwise
-#'   from the bottom left vertex. If NULL (default), vertices are not annotated.
+#' @param v_labels A vector of labels with which to annotate vertices
+#'   anticlockwise from the top vertex. If NULL (default), vertices are not
+#'   annotated.
 #'
 #' @examples
 #' # Plot 2D simplex
 #' plot_simplex()
+#'
+#' xy <- project2D(v = c("C" = 1, "L" = 0, "I" = 0))
+#' points(x = xy["x"], xy["y"], pch = "C")
+#' text(x = xy["x"], xy["y"], labels = "(1,0,0)")
+#'
+#' xy <- project2D(v = c("C" = 0, "L" = 1, "I" = 0))
+#' points(x = xy["x"], xy["y"], pch = "L")
+#' text(x = xy["x"], xy["y"], labels = "(0,1,0)")
+#'
+#' xy <- project2D(v = c("C" = 0, "L" = 0, "I" = 1))
+#' points(x = xy["x"], xy["y"], pch = "I")
+#' text(x = xy["x"], xy["y"], labels = "(0,0,1)")
 #'
 #' # ==============================================================================
 #' # Given data on an enrollment episode and a recurrence,
@@ -62,7 +75,7 @@ plot_simplex <- function(v_labels = NULL) {
 
   # Annotate vertices:
   if (!is.null(v_labels)) {
-    text(x = c(-0.5, 0, 0.5), y = c(-k, r, -k), labels = v_labels, pos = c(1,3,1))
+    text(x = c(0, -0.5, 0.5), y = c(r, -k, -k), labels = v_labels, pos = c(3,1,1))
   }
 
 }
@@ -76,8 +89,8 @@ plot_simplex <- function(v_labels = NULL) {
 #'
 #' @param v A numeric vector of three probabilities that sum to one.
 #' @return A numeric vector of two coordinates that can be used to plot the
-#'   probability vector `v` on the origin-centered 2D simplex (see [plot_simplex()]), where the left,
-#'   top, and right vertices of the simplex correspond with the first, second
+#'   probability vector `v` on the origin-centered 2D simplex (see [plot_simplex()]), where the top,
+#'   left, and right vertices of the simplex correspond with the first, second
 #'   and third entries of `v` respectively.
 #' @examples
 #' project2D(v = c(0.75,0.20,0.05))
