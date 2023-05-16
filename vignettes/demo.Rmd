@@ -23,28 +23,24 @@ library(Pv3Rs)
 <!-- adapted from Inference_example_ICL_3212.R -->
 ## Synthetic example
 
-We first look at an synthetic example with 3 markers (named `m1`,`m2`,`m3`) and 4 episodes, with known allele frequencies. 
+We first look at an synthetic example with 3 markers (named `m1`,`m2`,`m3`) and three episodes, with known allele frequencies. 
 ```{r}
-y <- list(list(m1=c('C','G','T'), m2=c('A','C'), m3=c('C','G','T')),
-          list(m1=c('C','T'), m2=c('A'), m3=c('A','C')),
-          list(m1=c('T'), m2=c('A'), m3=c('A')),
-          list(m1=c('G','T'), m2=c('A'), m3=c('C','T')))
+y <- list(enroll = list(m1=c('C','G','T'), m2=c('A','C'), m3=c('C','G','T')),
+          recur1 = list(m1=c('C','T'), m2=c('A'), m3=c('A','C')),
+          recur2 = list(m1=c('T'), m2=c('A'), m3=c('A')))
 fs <- list(m1=c(A=0.27, C=0.35, G=0.18, T=0.20),
            m2=c(A=0.78, C=0.14, G=0.07, T=0.01),
            m3=c(A=0.21, C=0.45, G=0.26, T=0.08))
 ```
-Given the number of alleles observed during each episode, the most parsimonious explanation is that there are 3, 2, 1, 2 genotypes across the 4 episodes respectively. When performing inference on the recurrence states, the bulk of the computational time lies in computing the log-likelihood of each possible relationship graph over the 8 genotypes.
+Given the number of alleles observed during each episode, the most parsimonious explanation is that there are three, two, and one genotypes across the three episodes respectively. When performing inference on the recurrence states, the bulk of the computational time lies in computing the log-likelihood of each possible relationship graph over the six genotypes.
 ```{r, cache=TRUE}
 post <- compute_posterior(y, fs, return.RG=TRUE)
 ```
-Note that we did not specify the prior, so a uniform prior across all 3 recurrence states is assumed by default. We set `return.RG=TRUE` for relationship graphs to be returned. This is by default `FALSE` to conserve memory.
+Note that we did not specify the prior, so a uniform prior across all three recurrence states is assumed by default. We set `return.RG=TRUE` for relationship graphs to be returned. This is by default `FALSE` to conserve memory.
 
 The marginal posterior probabilities of each recurrence state is stored in `post$marg`:
 ```{r}
-for(i in 1:3) {
-  writeLines(paste("Recurrence", i))
-  print(post$marg[i,])
-}
+post$marg
 ```
 We can access the joint posterior through `post$joint`. Here, we find the most likely sequence of recurrence states:
 ```{r}
@@ -54,11 +50,13 @@ The log-likelihoods of each relationship graph is also returned in the output. H
 ```{r}
 RG <- post$RGs[[which.max(sapply(post$RGs, function(RG) RG$logp))]]
 # default genotype names
-gs <- paste0("g", 1:8)
-ts_per_gs <- c(1, 1, 1, 2, 2, 3, 4, 4)
+gs <- paste0("g", 1:6)
+ts_per_gs <- c(1, 1, 1, 2, 2, 3)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
 ```
+
+In this example, the most likely sequence is incompatible with the most likely relationship graph.
 
 <!-- adapted from Inference_example_ICL_3212.R -->
 ## Microsatellite data
@@ -85,6 +83,7 @@ Alpha_Posteriors <- apply(MS_pooled[,MSs_all], 2, function(x, Ind_Primary){
 # use posterior mean as Empirical Bayes estimate
 Fs_Combined <- sapply(Alpha_Posteriors, function(x){x/sum(x)})
 ```
+
 We group rows of the full dataset by patient ID, and filter out cases that are not currently suitable for inference
 ```{r, results="hold"}
 library(plyr)
