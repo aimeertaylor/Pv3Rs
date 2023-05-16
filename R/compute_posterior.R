@@ -21,12 +21,13 @@
 #' }
 #'
 #' @param y Observed data in the form of a list of lists. The number of entries
-#'   is the number of episodes. Each episode is in turn a list of observed
-#'   alleles for each marker, or \code{NA} if not observed. For a given marker,
-#'   alleles are modeled as categorical random variables. As such, allele names
-#'   are arbitrary, but must correspond with frequency names (see examples
-#'   below). The same names can be used for alleles belonging to different
-#'   markers. As such, frequencies must be specified per allele name per marker.
+#'   is the number of episodes, which may or may not be named. Each episode is
+#'   in turn a list of observed alleles for each marker, which must be named, or
+#'   \code{NA} if not observed. For a given marker, alleles are modeled as
+#'   categorical random variables. As such, allele names are arbitrary, but must
+#'   correspond with frequency names (see examples below). The same names can be
+#'   used for alleles belonging to different markers. As such, frequencies must
+#'   be specified per named allele per named marker.
 #' @param fs List of allele frequencies as vectors. Names of the list must match
 #'   with the marker names in `y`. Within lists (i.e., for each marker),
 #'   frequencies must be specified per allele name.
@@ -55,12 +56,13 @@
 #' # ==============================================================================
 #'
 #' # Data on an enrollment episode and a recurrence:
-#' y <- list(list(m1 = c("A", "C"), m2 = c("G", "T")), list(m1 = "A", m2 = "G"))
+#' y <- list(episode0 = list(marker1 = c("A", "C"), marker2 = c("G", "T")),
+#'           episode1 = list(marker1 = "A", marker2 = "G"))
 #'
 #' # Allele frequencies:
 #' fs <- list(
-#'   m1 = setNames(c(0.4, 0.6), c("A", "C")),
-#'   m2 = setNames(c(0.2, 0.8), c("G", "T"))
+#'   marker1 = setNames(c(0.4, 0.6), c("A", "C")),
+#'   marker2 = setNames(c(0.2, 0.8), c("G", "T"))
 #' )
 #'
 #' # Compute posterior probabilities using default uniform prior, note that
@@ -79,10 +81,10 @@
 #'            m2=c('1'=0.27, '2'=0.35, '3'=0.38),
 #'            m3=c('1'=0.55, '2'=0.45))
 #'
-#' Data:
-#' y <- list(list(m1=c('3','2'), m2=c('1','3'), m3=c('1','2')),
-#'           list(m1=c('1','4'), m2=c('1','2'), m3=c('1','2')),
-#'           list(m1=c('1','5'), m2=c('2','3'), m3=c('1')))
+#' # Data:
+#' y <- list(enroll = list(m1=c('3','2'), m2=c('1','3'), m3=c('1','2')),
+#'           recur1 = list(m1=c('1','4'), m2=c('1','2'), m3=c('1','2')),
+#'           recur2 = list(m1=c('1','5'), m2=c('2','3'), m3=c('1')))
 #'
 #' post <- compute_posterior(y, fs); post
 #'
@@ -116,9 +118,9 @@
 #'
 #' #===============================================================================
 #' # Example of small but undesirable effect on posterior of prior on graphs:
-#' # the marginal # probability that the first recurrence is a recrudescence
-#' # increases as the # number of recurrences increases even though only the first
-#' # recurrence has # data (also see vignette [to-do - base on
+#' # the marginal probability that the first recurrence is a recrudescence
+#' # increases as the number of recurrences increases even though only the first
+#' # recurrence has data (also see vignette [to-do - base on
 #' # MyDevFiles/Graph_prior_bias_examples.R])
 #' #===============================================================================
 #'
@@ -127,10 +129,10 @@
 #'
 #' # Data for different scenarios; scenarios where the number of recurrences
 #' # increases but only the first recurrence has data
-#' ys <- list(list(list(m1 = "A"), list(m1 = "A")), # 1 recurrence
-#'             list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA)), # 2 recurrences
-#'             list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA)), # etc.
-#'             list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
+#' ys <- list(y1 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A")),
+#'            y2 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA)),
+#'            y3 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA)),
+#'            y4 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA), recur4 = list(m1 = NA)))
 #'
 #' # Compute posterior probabilities and extract marginal probabilities:
 #' results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
