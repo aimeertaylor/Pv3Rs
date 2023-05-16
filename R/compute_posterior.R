@@ -181,7 +181,7 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   }
 
   # Check priors sum to one
-  if (is.null(prior)) {
+  if (!is.null(prior)) {
     if (!all(abs(1 - rowSums(prior)) < .Machine$double.eps^0.5)) {
       stop('Prior probabilities for a given recurrence must sum to one')
     }
