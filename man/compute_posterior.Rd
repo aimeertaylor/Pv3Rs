@@ -114,16 +114,15 @@ post <- compute_posterior(y, fs); post
 fs <- list(m1 = setNames(c(0.25, 0.75), c("A", "Other")))
 
 # Data on an enrollment episode and two recurrences:
-ys_no_data_whatsoever <- list(list(m1 = NA), list(m1 = NA), list(m1 = NA))
-ys_no_recurrent_data <- list(list(m1 = "A"), list(m1 = NA), list(m1 = NA))
+y_no_data_whatsoever <- list(list(m1 = NA), list(m1 = NA), list(m1 = NA))
+y_no_recurrent_data <- list(list(m1 = "A"), list(m1 = NA), list(m1 = NA))
 
 # Prior on two recurrences:
-prior <- array(c(0.4,0.4,0.2,0.6,0.4,0), dim = c(2,3),
-               dimnames = list(NULL, c("C", "L", "I")))
+prior <- array(c(0.4,0.4,0.2,0.6,0.4,0), dim = c(2,3), dimnames = list(NULL, c("C", "L", "I")))
 
 # Compute posterior probabilities:
-post3Rs_no_data_whatsover <- compute_posterior(ys_no_data_whatsoever, fs, prior)
-post3Rs_no_recurrent_data <- compute_posterior(ys_no_recurrent_data, fs, prior)
+post3Rs_no_data_whatsover <- compute_posterior(y_no_data_whatsoever, fs, prior)
+post3Rs_no_recurrent_data <- compute_posterior(y_no_recurrent_data, fs, prior)
 
 # Compare prior with posterior marginal probabilities:
 prior
@@ -131,12 +130,11 @@ post3Rs_no_data_whatsover$marg
 post3Rs_no_recurrent_data$marg
 
 
-# Episode info is ordered chronologically; specified names are not used:
-ys_no_data <- list(bla = list(m1 = NA), blabla = list(m1 = NA), blablabla = list(m1 = NA))
-prior <- array(c(0.4,0.4,0.2,0.7,0.3,0), dim = c(2,3),
-               dimnames = list(c("blablabla", "bla"), c("C", "L", "I")))
+# Episode info should be ordered chronologically; specified names do not override order:
+y <- list(enroll = list(m1 = NA), recur1 = list(m1 = NA), recur2 = list(m1 = NA))
+prior <- array(c(0.2,0.7,0.2,0.3,0.6,0), dim = c(2,3), dimnames = list(c("recur2", "recur1"), c("C", "L", "I")))
+compute_posterior(y, fs, prior)
 prior
-compute_posterior(ys_no_data, fs, prior)
 
 #===============================================================================
 # Example of small but undesirable effect on posterior of prior on graphs:
