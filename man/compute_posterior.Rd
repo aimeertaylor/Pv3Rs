@@ -8,22 +8,24 @@ compute_posterior(y, fs, prior = NULL, return.RG = FALSE)
 }
 \arguments{
 \item{y}{Observed data in the form of a list of lists. The number of entries
-is the number of episodes, which may or may not be named. Each episode is
-in turn a list of observed alleles for each marker, which must be named, or
-\code{NA} if not observed. For a given marker, alleles are modeled as
-categorical random variables. As such, allele names are arbitrary, but must
-correspond with frequency names (see examples below). The same names can be
-used for alleles belonging to different markers. As such, frequencies must
-be specified per named allele per named marker.}
+is the number of episodes in chronological order. Episode names can be
+specified, but they are not used. Each episode is in turn a list of
+observed alleles for each marker, which must be named, or \code{NA} if not
+observed. For a given marker, alleles are modeled as categorical random
+variables. As such, allele names are arbitrary, but must correspond with
+frequency names (see examples below). The same names can be used for
+alleles belonging to different markers. As such, frequencies must be
+specified per named allele per named marker.}
 
 \item{fs}{List of allele frequencies as vectors. Names of the list must match
 with the marker names in \code{y}. Within lists (i.e., for each marker),
 frequencies must be specified per allele name.}
 
 \item{prior}{Matrix of prior probabilities of the recurrence states for each
-recurrent episode. Each row corresponds to an episode. The column names
-must be C, L, and I for recrudescence, relapse and reinfection
-respectively. If prior is not provided, a uniform prior will be used.}
+recurrent episode. Each row corresponds to an episode in chronological
+order. The column names must be C, L, and I for recrudescence, relapse and
+reinfection respectively. Row names can be specified by they are not used.
+If prior is not provided, a uniform prior will be used.}
 
 \item{return.RG}{Boolean for whether to return the relationship graphs,
 defaults to \code{FALSE}.}
@@ -128,6 +130,13 @@ prior
 post3Rs_no_data_whatsover$marg
 post3Rs_no_recurrent_data$marg
 
+
+# Episode info is ordered chronologically; specified names are not used:
+ys_no_data <- list(bla = list(m1 = NA), blabla = list(m1 = NA), blablabla = list(m1 = NA))
+prior <- array(c(0.4,0.4,0.2,0.7,0.3,0), dim = c(2,3),
+               dimnames = list(c("blablabla", "bla"), c("C", "L", "I")))
+prior
+compute_posterior(ys_no_data, fs, prior)
 
 #===============================================================================
 # Example of small but undesirable effect on posterior of prior on graphs:
