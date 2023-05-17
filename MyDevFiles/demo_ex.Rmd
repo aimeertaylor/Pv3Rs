@@ -1,0 +1,205 @@
+---
+title: "Pv3R Usage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Pv3R Usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+```{r setup}
+library(Pv3Rs)
+```
+
+<!-- adapted from Inference_example_ICL_3212.R -->
+## Synthetic example
+
+We first look at an synthetic example with 3 markers (named `m1`,`m2`,`m3`) and three episodes, with known allele frequencies. 
+```{r}
+y <- list(enroll = list(m1=c('C','G','T'), m2=c('A','C'), m3=c('C','G','T')),
+          recur1 = list(m1=c('C','T'), m2=c('A'), m3=c('A','C')),
+          recur2 = list(m1=c('T'), m2=c('A'), m3=c('A')))
+fs <- list(m1=c(A=0.27, C=0.35, G=0.18, T=0.20),
+           m2=c(A=0.78, C=0.14, G=0.07, T=0.01),
+           m3=c(A=0.21, C=0.45, G=0.26, T=0.08))
+```
+Given the number of alleles observed during each episode, the most parsimonious explanation is that there are three, two, and one genotypes across the three episodes respectively. When performing inference on the recurrence states, the bulk of the computational time lies in computing the log-likelihood of each possible relationship graph over the six genotypes.
+```{r, cache=TRUE}
+post <- compute_posterior(y, fs, return.RG=TRUE)
+```
+Note that we did not specify the prior, so a uniform prior across all three recurrence states is assumed by default. We set `return.RG=TRUE` for relationship graphs to be returned. This is by default `FALSE` to conserve memory.
+
+The marginal posterior probabilities of each recurrence state is stored in `post$marg`:
+```{r}
+post$marg
+```
+We can access the joint posterior through `post$joint`. Here, we find the most likely sequence of recurrence states:
+```{r}
+post$joint[which.max(post$joint)]
+```
+The log-likelihoods of each relationship graph is also returned in the output. Here, we plot the most likely relationship graph:
+
+```{r}
+RG <- post$RGs[[which.max(sapply(post$RGs, function(RG) RG$logp))]]
+# default genotype names
+gs <- paste0("g", 1:6)
+ts_per_gs <- c(1, 1, 1, 2, 2, 3)
+par(mar = c(0.5, 0.5, 0.5, 0.5))
+plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
+```
+In this example, the most likely sequence is incompatible with the most likely relationship graph, and also the following four of five (is this due to the prior problem?): 
+
+```{r}
+ps <- sort.int(exp(sapply(post$RGs, function(RG) RG$logp)), 
+               decreasing = T, index.return = T)
+plot(ps$x[ps$x > 0]); abline(h = 5e-7, lty = "dashed")
+
+# default genotype names
+gs <- paste0("g", 1:6)
+ts_per_gs <- c(1, 1, 1, 2, 2, 3)
+par(mar = c(0.5, 0.5, 0.5, 0.5))
+RGs_ids <- head(ps$ix, 6)
+for(i in RGs_ids){
+  RG <- post$RGs[[i]]
+  plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
+}
+```
+Is this due to the prior problem? 
+
+```{r}
+# Allele frequencies:
+fs <- list(m1 = setNames(c(0.25, 1-0.25), c("A", "Other")))
+
+# Data for different scenarios; scenarios where the number of recurrences
+# increases but only the first recurrence has data
+ys <- list(y1 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A")),
+           y6 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), 
+                     recur3 = list(m1 = NA), recur4 = list(m1 = NA), recur5 = list(m1 = NA), 
+                     recur6 = list(m1 = NA)))
+
+results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
+
+# Extract results for the first recurrence only:
+first_recur <- sapply(results, function(result) result[1,])
+
+# Plot 2D simplex
+n_recur <- max(sapply(ys, length)-1)
+pardefault <- par()
+par(mar = c(0,0,0,0))
+plot_simplex(v_labels = rownames(first_recur))
+
+# Project probabilities onto 2D simplex coordinates
+xy <- apply(first_recur, 2, project2D)
+
+# Plot divergence from one recurrence to four:
+arrows(x0 = xy["x", 1], x1 = xy["x", n_recur],
+       y0 = xy["y", 1], y1 = xy["y", n_recur],
+       length = 0.05, col = "red")
+
+```
+
+<!-- adapted from Inference_example_ICL_3212.R -->
+## Microsatellite data
+
+Next, we apply our methods to microsatellite data, which is available [here](https://github.com/jwatowatson/RecurrentVivax/blob/master/RData/GeneticModel/MS_data_PooledAnalysis.RData).
+```{r}
+load('../data/MS_data_PooledAnalysis.RData')
+MSs_all <- tail(names(MS_pooled), 8) # marker names
+head(MS_pooled, 10) # first 10 rows
+```
+For this example, we use a Empirical Bayes estimate of allele frequencies inferred from the observed alleles.
+```{r}
+D_weight_Prior <- 1 # uniform Dirichlet prior for allele frequencies
+Alpha_Posteriors <- apply(MS_pooled[,MSs_all], 2, function(x, Ind_Primary){
+  xmax <-  max(x,na.rm=T) # number of possible alleles for this marker
+  # prior concentration parameters
+  param_vector <- array(D_weight_Prior, dim=xmax, dimnames=list(1:xmax))
+  # observed data summarised as counts
+  obs_counts <- table(x[Ind_Primary])
+  # posterior concentration parameters
+  param_vector[names(obs_counts)] <-  param_vector[names(obs_counts)] + obs_counts
+  return(param_vector)
+})
+# use posterior mean as Empirical Bayes estimate
+Fs_Combined <- sapply(Alpha_Posteriors, function(x){x/sum(x)})
+```
+
+We group rows of the full dataset by patient ID, and filter out cases that are not currently suitable for inference
+```{r, results="hold"}
+library(plyr)
+y.dfs <- dlply(MS_pooled, 'ID')
+no_recur <- c()
+too_many_genos <- c()
+na_only <- c()
+wrong_order <- c()
+suitable <- c()
+
+for(i in 1:length(y.dfs)) {
+  y.df <- y.dfs[[i]]
+  
+  # no recurrence, skip
+  if(length(unique(y.df$Episode_Identifier)) == 1) {
+    no_recur <- c(no_recur, i)
+    next
+  }
+  
+  # >8 genotypes considered too complex
+  if(nrow(y.df) > 8) {
+    too_many_genos <- c(too_many_genos, i)
+    next
+  }
+  
+  # only use markers for which there is at least one non-NA
+  ms <- MSs_all[apply(!is.na(y.df[MSs_all]), 2, any)]
+  if(length(ms) == 0) {
+    na_only <- c(na_only, i)
+    next
+  }
+  
+  # ensure that Episode is non-decreasing
+  if(!all(order(y.df$Episode) == 1:nrow(y.df))) {
+    wrong_order <- c(wrong_order, i)
+    next
+  }
+  
+  suitable <- c(suitable, i)
+}
+writeLines(paste("No recurrences:", length(no_recur)))
+writeLines(paste("More than 8 genotypes (too complex):", length(too_many_genos)))
+writeLines(paste("NAs only:", length(na_only)))
+writeLines(paste("Episode numbers not in increasing order:", length(wrong_order)))
+writeLines(paste("Can proceed with inference:", length(suitable)))
+```
+Using a uniform prior over recurrence states, we perform inference on the recurrence states for the first 5 cases:
+```{r}
+results <- list()
+for(i in suitable[1:5]) {
+  y.df <- y.dfs[[i]]
+  patient.id <- names(y.dfs)[i]
+  writeLines(paste("ID:", patient.id))
+
+  # only use markers for which there is at least one non-NA
+  ms <- MSs_all[apply(!is.na(y.df[MSs_all]), 2, any)]
+
+  # transform data frame format to format taken by 'compute_posterior'
+  y.by.episode <- dlply(y.df, 'Episode_Identifier')
+  y <- lapply(y.by.episode, function(episode) {
+    setNames(lapply(ms, function(m) {
+      alleles <- episode[m][!is.na(episode[m])] # extract non-NAs
+      if(length(alleles) > 0) return(alleles)
+      return(NA) # if all are NAs, change empty vector to NA
+      }), ms)
+    })
+
+  results[[patient.id]] <- compute_posterior(y, Fs_Combined)
+}
+```
