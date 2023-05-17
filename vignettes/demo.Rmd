@@ -46,7 +46,7 @@ We can access the joint posterior through `post$joint`. Here, we find the most l
 ```{r}
 post$joint[which.max(post$joint)]
 ```
-The log-likelihoods of each relationship graph is also returned in the output. Here, we plot the most likely relationship graph:
+The log-likelihoods of each relationship graph is also returned in the output. Here, we plot the relationship graph for which the data are most likely:
 ```{r}
 RG <- post$RGs[[which.max(sapply(post$RGs, function(RG) RG$logp))]]
 # default genotype names
@@ -54,9 +54,52 @@ gs <- paste0("g", 1:6)
 ts_per_gs <- c(1, 1, 1, 2, 2, 3)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
+seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
 ```
 
-In this example, the most likely sequence is incompatible with the most likely relationship graph.
+In this example, the most likely recurrence-state sequence given the data is incompatible with the graph for which the data are most likely (the graph for which the data are most likely is compatible with `r seqs_comp_MLE_RG`). This apparent inconsistency can be understood as follows. It is not due to bias induced by the uniform prior on graphs (see `?compute_posterior` examples). Indeed, when data from the first recurrence are analysed alone, the most probable cause of recurrence is reinfection, but the graph for which the data are most likely is incompatible with reinfection. 
+
+Although sequences `r seqs_comp_MLE_RG` are associated with the graph for which the data are most likely, they are also associated with many graphs for which the data are unlikely or impossible under the model. Meanwhile, the most likely sequence `r names(post$joint[which.max(post$joint)])` is associated with fewer graphs, over which the average conditional probability of the data is larger (see histograms below). The average conditional probability given graphs compatible with a specific sequence is equal to the probability of the data given said sequence (the likelihood of a sequence) because the probability of a graph given a sequence is uniform over graphs compatible with said sequence. Moreover, in the current case where the prior on sequences is uniform, the likelihood is proportional to the prior and the maximum posterior estimate is equal to the maximum likelihood estimate (see scatter plot below). 
+
+```{r, fig.height=10, fig.width=7}
+# Extract sequences
+seqs <- names(post$joint)
+
+# Extract likelihoods
+prob_data_given_graph <- exp(sapply(post$RGs, function(RG) RG$logp))
+
+# For each graph, extract compatible sequences and store in a list
+gs_per_ts <- split(gs, ts_per_gs)
+seq_per_RG_list <- lapply(post$RGs, compatible_rstrs, gs_per_ts)
+
+# For each sequence, return TRUE if graph ID compatible 
+seq_per_RG_matx <- sapply(seqs, function(seq) sapply(seq_per_RG_list, function(x) seq %in% x))
+
+# For each sequence with non-zero posterior probability, plot histogram of likelihoods
+poss_seqs <- names(sort(post$joint[post$joint > 0], decreasing = T))
+likelihoods <- array(0, dim = c(1, length(post$joint)), dimnames = list(NULL, names(post$joint)))
+
+par(mfrow = c(3, 2))
+ML <- max(prob_data_given_graph)
+xlims <- range(prob_data_given_graph)
+for(poss_seq in poss_seqs) {
+  hist(prob_data_given_graph[seq_per_RG_matx[,poss_seq]], breaks = 100, 
+       xlim = xlims, xlab = "Likelihood", col = "cornflowerblue", border = "cornflowerblue", 
+       main = sprintf("%s (compatible with %s relationship graphs)", poss_seq, 
+                      sum(seq_per_RG_matx[,poss_seq])))
+  likelihoods[1,poss_seq] <- mean(prob_data_given_graph[seq_per_RG_matx[,poss_seq]])
+  abline(v = likelihoods[1,poss_seq], col = "blue")
+}
+```
+
+```{r, fig.height=5, fig.width=7}
+par(mfrow = c(1, 1))
+plot(y = post$joint, x = likelihoods[1,], ylab = "Posterior", xlab = "Likelihood")
+lmfit <- lm(post$joint ~ likelihoods[1,])
+abline(a = 0, b = lmfit$coefficients[2], col = "blue")
+text(y = post$joint[post$joint > 0], x = likelihoods[1,post$joint > 0], pos = 1, 
+     labels = names(post$joint[post$joint >0]))
+```
 
 <!-- adapted from Inference_example_ICL_3212.R -->
 ## Microsatellite data
