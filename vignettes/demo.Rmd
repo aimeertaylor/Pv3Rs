@@ -110,19 +110,20 @@ load('../data/MS_data_PooledAnalysis.RData')
 MSs_all <- tail(names(MS_pooled), 8) # marker names
 head(MS_pooled, 10) # first 10 rows
 ```
-For this example, we use a Empirical Bayes estimate of allele frequencies inferred from the observed alleles.
+For this example, we use a Empirical Bayes estimate of allele frequencies inferred from the alleles observed in the enrolment episodes.
 ```{r}
 D_weight_Prior <- 1 # uniform Dirichlet prior for allele frequencies
-Alpha_Posteriors <- apply(MS_pooled[,MSs_all], 2, function(x, Ind_Primary){
+ind_enrol = which(MS_pooled$Episode==1) # Indices of enrolment episodes
+Alpha_Posteriors <- apply(MS_pooled[,MSs_all], 2, function(x, ind_enrol){
   xmax <-  max(x,na.rm=T) # number of possible alleles for this marker
   # prior concentration parameters
   param_vector <- array(D_weight_Prior, dim=xmax, dimnames=list(1:xmax))
   # observed data summarised as counts
-  obs_counts <- table(x[Ind_Primary])
+  obs_counts <- table(x[ind_enrol])
   # posterior concentration parameters
   param_vector[names(obs_counts)] <-  param_vector[names(obs_counts)] + obs_counts
   return(param_vector)
-})
+}, ind_enrol)
 # use posterior mean as Empirical Bayes estimate
 Fs_Combined <- sapply(Alpha_Posteriors, function(x){x/sum(x)})
 ```
