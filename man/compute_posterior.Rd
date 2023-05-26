@@ -68,20 +68,20 @@ Model assumptions:
 \code{NA}s. However, to avoid estimates based entirely on the weakly
 informative nature of multiple per-marker allele calls (see example below and
 \code{vignette("missing_data", "Pv3Rs")} for more details), we recommend against generating
-estimates for recurrences that have no paired data due to missingness (see XXX
-\code{vignette("demo", "Pv3Rs")}).
+estimates for recurrences that have no paired data due to missingness (see
+Microsatellite data example in
+\code{\link{vignette("demo", "Pv3Rs")}}).
 }
 \examples{
 
 # ===========================================================================
 # Example where alleles are named arbitrarily
 # ===========================================================================
-
 # Data on an enrolment episode and a recurrence:
 y <- list(episode0 = list(marker1 = c("Tinky Winky", "Dipsy"),
                           marker2 = c("Laa-Laa", "Po")),
           episode1 = list(marker1 = "Tinky Winky",
-                          marker2 = "Dipsy"))
+                          marker2 = "Laa-Laa"))
 
 # Allele frequencies:
 fs <- list(
@@ -92,14 +92,13 @@ fs <- list(
 # Compute posterior probabilities using default uniform prior, note that
 # since there is only one recurrence, the marginal probabilities are the same
 # as the joint probabilities:
-post <- compute_posterior(y, fs); post
+compute_posterior(y, fs)
 
 
 
 # ===========================================================================
 # Example where alleles are given numeric names: 1, 2, 3, 4, 5
 # ===========================================================================
-
 # Allele frequencies with numeric names
 fs <- list(m1=c('1'=0.78, '2'=0.14, '3'=0.07, '4'=0.005, '5' = 0.005),
            m2=c('1'=0.27, '2'=0.35, '3'=0.38),
@@ -125,8 +124,8 @@ prior <- array(c(0.2,0.7,0.2,0.3,0.6,0), dim = c(2,3),
                dimnames = list(c("recur1", "recur2"), c("C", "L", "I")))
 
 # The first prior row named "recur1" is returned for the first recurrence
-# despite it being named "recur2" and the the second prior row named "recur2" is
-# returned for the second recurrence despite it being named "recur1":
+# despite it being named "recur2" and the the second prior row named "recur2"
+# is returned for the second recurrence despite it being named "recur1":
 compute_posterior(y, fs, prior)
 prior
 
@@ -134,13 +133,12 @@ prior
 
 #============================================================================
 # compute_posterior() returns the prior when there are no data. However, the
-# prior will be re-weighted if \code{NA}s encode MOIs that are incompatible
-# with recrudescence. (Recrudescing parasites are clones of parasites in the
-# preceding blood-stage infection. As such, under the model, which assumes no
-# de novo mutations, genotyping errors or undetected alleles, recrudescence
+# prior will be re-weighted if NAs encode MOIs that are incompatible with
+# recrudescence. (Recrudescing parasites are clones of parasites in the
+# preceding blood-stage infection. The Pv3R model assumes no within-host
+# mutations, genotyping errors or undetected alleles. As such, recrudescence
 # is incompatible with an MOI increase relative to the preceding infection.)
 #============================================================================
-
 # Allele frequencies:
 fs <- list(m1 = setNames(c(0.25, 0.75), c("A", "Other")))
 
@@ -154,8 +152,8 @@ y_no_data_MOIs121 <- list(enrol = list(m1 = NA),
                           recur2 = list(m1 = NA))
 
 # Compute posterior probabilities:
-post3Rs_no_data_MOIs111 <- compute_posterior(y_no_data_MOIs111, fs, prior)
-post3Rs_no_data_MOIs121 <- compute_posterior(y_no_data_MOIs121, fs, prior)
+post3Rs_no_data_MOIs111 <- compute_posterior(y_no_data_MOIs111, fs)
+post3Rs_no_data_MOIs121 <- compute_posterior(y_no_data_MOIs121, fs)
 
 # Returns the default prior since MOIs 111 are compatible with all 3R
 # sequences:
@@ -167,15 +165,14 @@ post3Rs_no_data_MOIs121
 
 
 
-#=====
-=======================================================================
+#============================================================================
 # Example demonstrating the weakly informative nature of multiple per-marker
-# allele calls; see `vignette("missing_data", "Pv3Rs")` for more details.
-#==========================================================================
+# allele calls; see vignette("missing_data", "Pv3Rs") for more details.
+#============================================================================
 fs = list(m1 = c('1' = 0.5, '2' = 0.5))
 y <- list(enrol = list(m1 = c('1', '2')), recur = list(m1 = NA))
 
-# `compute_posterior()` does not return the prior despite there being no
+# compute_posterior() does not return the prior despite there being no
 # recurrent data:
 compute_posterior(y, fs)
 
@@ -188,7 +185,6 @@ compute_posterior(y, fs)
 # recurrence has data (also see vignette [to-do - base on
 # MyDevFiles/Graph_prior_bias_examples.R])
 #============================================================================
-
 # Allele frequencies:
 fs <- list(m1 = setNames(c(0.25, 1-0.25), c("A", "Other")))
 
