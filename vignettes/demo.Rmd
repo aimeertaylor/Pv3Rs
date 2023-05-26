@@ -13,7 +13,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ```{r setup}
@@ -131,11 +130,12 @@ Fs_Combined <- sapply(Alpha_Posteriors, function(x){x/sum(x)})
 We group rows of the full dataset by patient ID, and filter out cases that are not currently suitable for inference
 ```{r, results="hold"}
 library(plyr)
-y.dfs <- dlply(MS_pooled, 'ID')
+y.dfs <- plyr::dlply(MS_pooled, 'ID')
 no_recur <- c()
 too_many_genos <- c()
 na_only <- c()
 wrong_order <- c()
+no_common <- c() # Discard patient if any one episode lacks inter-episode data 
 suitable <- c()
 
 for(i in 1:length(y.dfs)) {
@@ -166,12 +166,41 @@ for(i in 1:length(y.dfs)) {
     next
   }
   
+  # Ensure for all episodes there are inter-episode data on at least one common marker
+  y_by_episode <- plyr::dlply(y.df, 'Episode') # Group data by episode
+  
+  # Check there's at least one common marker with inter-episode data per episode 
+  some_common_per_epi <- sapply(names(y_by_episode), function(epi) {
+    
+    other_epis <- setdiff(names(y_by_episode), epi) # Other episode names
+    
+    some_common <- any(sapply(MSs_all, function(ms){
+      
+      # Are the alleles at marker ms in epi all NAs? 
+      per_marker_epi_data_all_na <- all(is.na(y_by_episode[[epi]][ms]))
+      
+      # Are the alleles at marker ms in the other episodes all NAs? 
+      per_marker_other_epis_data_all_na <- all(sapply(other_epis, function(other_epi) {
+        all(is.na(y_by_episode[[other_epi]][ms]))}))
+      
+      return(!per_marker_epi_data_all_na & !per_marker_other_epis_data_all_na) 
+    })) 
+    
+    return(some_common)
+  })
+  
+  if (!all(some_common_per_epi)) {
+    no_common <- c(no_common, i)
+    next
+  }
+    
   suitable <- c(suitable, i)
 }
 writeLines(paste("No recurrences:", length(no_recur)))
 writeLines(paste("More than 8 genotypes (too complex):", length(too_many_genos)))
 writeLines(paste("NAs only:", length(na_only)))
 writeLines(paste("Episode numbers not in increasing order:", length(wrong_order)))
+writeLines(paste("Not all episodes have inter-episode data:", length(no_common)))
 writeLines(paste("Can proceed with inference:", length(suitable)))
 ```
 Using a uniform prior over recurrence states, we perform inference on the recurrence states for the first 5 cases:
@@ -181,20 +210,20 @@ for(i in suitable[1:5]) {
   y.df <- y.dfs[[i]]
   patient.id <- names(y.dfs)[i]
   writeLines(paste("ID:", patient.id))
-
+  
   # only use markers for which there is at least one non-NA
   ms <- MSs_all[apply(!is.na(y.df[MSs_all]), 2, any)]
-
-  # transform data frame format to format taken by 'compute_posterior'
-  y.by.episode <- dlply(y.df, 'Episode_Identifier')
+  
+  # transform data frame format to format taken by compute_posterior()
+  y.by.episode <- plyr:: dlply(y.df, 'Episode_Identifier')
   y <- lapply(y.by.episode, function(episode) {
     setNames(lapply(ms, function(m) {
       alleles <- episode[m][!is.na(episode[m])] # extract non-NAs
       if(length(alleles) > 0) return(alleles)
       return(NA) # if all are NAs, change empty vector to NA
-      }), ms)
-    })
-
+    }), ms)
+  })
+  
   results[[patient.id]] <- compute_posterior(y, Fs_Combined)
 }
 ```
