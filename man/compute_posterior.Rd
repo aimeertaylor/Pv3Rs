@@ -69,8 +69,7 @@ Model assumptions:
 informative nature of multiple per-marker allele calls (see example below and
 \code{vignette("missing_data", "Pv3Rs")} for more details), we recommend against generating
 estimates for recurrences that have no paired data due to missingness (see
-Microsatellite data example in
-\code{\link{vignette("demo", "Pv3Rs")}}).
+Microsatellite data example in \code{vignette("demo", "Pv3Rs")}).
 }
 \examples{
 
@@ -116,10 +115,11 @@ compute_posterior(y, fs)
 # ===========================================================================
 # Example demonstrating the cosmetic-only nature of episode names. Due to the
 # cosmetic-only nature of episode names, input info (episode data and prior)
-# and output results should be chronologically ordered and interpreted,
-# respectively.
+# and output results should be chronologically ordered and interpreted.
 # ===========================================================================
-y <- list(enrol = list(m1 = NA), recur2 = list(m1 = NA), recur1 = list(m1 = NA))
+y <- list(enrol = list(m1 = NA),
+          recur2 = list(m1 = NA),
+          recur1 = list(m1 = NA))
 prior <- array(c(0.2,0.7,0.2,0.3,0.6,0), dim = c(2,3),
                dimnames = list(c("recur1", "recur2"), c("C", "L", "I")))
 
@@ -179,10 +179,10 @@ compute_posterior(y, fs)
 
 
 #============================================================================
-# Example of small but undesirable effect on posterior of prior on graphs:
-# the marginal probability that the first recurrence is a recrudescence
-# increases as the number of recurrences increases even though only the first
-# recurrence has data (also see vignette [to-do - base on
+# Example of the small but undesirable effect on the posterior of prior on
+# graphs: the marginal probability that the first recurrence is a
+# recrudescence increases as the number of recurrences increases even though
+# only the first recurrence has data (also see vignette [to-do - base on
 # MyDevFiles/Graph_prior_bias_examples.R])
 #============================================================================
 # Allele frequencies:

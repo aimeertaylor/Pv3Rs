@@ -74,7 +74,7 @@ Due to the transitive nature of relationship graphs, multiple per-marker allele 
 
 ### Homoallelic per-marker call
 
-A multiple homoallelic per-marker allele call favours relationship graphs that have a intra-episode sibling edge and can thus accommodate intra-episode identity-by-descent (IBD). Among the nine relationship graphs of the following example, all of which are compatible with relapse, four have an intra-episode sibling edge. Among the two relationship graphs compatible with reinfection, one has a intra-episode sibling edge. Since $\frac{1}{2} > \frac{4}{9}$ and relationship graphs are modelled as equally likely given a recurrent state, reinfection is favoured disproportionally. The imbalance is amplified when observed alleles are very rare, because rare alleles are unlikely identical by chance. Conversely, the imbalance is mitigated when observed alleles are very common, because common alleles are liable to be identical by chance. 
+A multiple homoallelic per-marker allele call favours relationship graphs that have a intra-episode sibling edge and can thus accommodate intra-episode identity-by-descent (IBD). Among the nine relationship graphs of the following two examples, all of which are compatible with relapse, four have an intra-episode sibling edge. Among the two relationship graphs compatible with reinfection, one has a intra-episode sibling edge. Since $\frac{1}{2} > \frac{4}{9}$ and relationship graphs are modelled as equally likely given a recurrent state, reinfection is favoured disproportionally. The imbalance is amplified when observed alleles are very rare, because rare alleles are unlikely identical by chance. Conversely, the imbalance is mitigated when observed alleles are very common, because common alleles are liable to be identical by chance. 
 ```{r}
 y <- list(enrol = list(m1 = NA), recur = list(m1 = c('1', '1')))
 
@@ -101,7 +101,7 @@ compute_posterior(y, fs = list(m1=c('1' = 0.00001, '2' = 0.9999)))$marg
 
 ## Uninformative allelic data 
 
-If there are no informative intra-episode data and no inter-episode data on a common marker, compute_posterior returns the prior, which in this case is re-weighted to the exclusion of recrudescence: 
+If there are no informative intra-episode data and no inter-episode data on a common marker, compute_posterior returns the prior, which in the following example is re-weighted to the exclusion of recrudescence: 
 
 ```{r}
 y <- list(enrol = list(m1 = '1', m2 = NA), 
