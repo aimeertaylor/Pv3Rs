@@ -1,0 +1,111 @@
+---
+title: "missing_data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{missing_data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Pv3R model supports missing data. However, before generating estimates based
+on incomplete data, we recommend reading this vignette, which demonstrates two
+model-features associated with missing data:
+
+1) NA counts are informative because they encode MOIs that inform
+on recrudescence. 
+
+2) Multiple per-marker allele observations are informative
+because relationship graphs are transitive.
+
+
+```{r setup}
+library(Pv3Rs)
+```
+
+```{r}
+# Some allele frequencies with numeric names
+fs <- list(m1=c('1' = 0.78, 'Other'= 1-0.78), 
+           m2=c('1' = 0.27, 'Other' = 1-0.27))
+```
+
+## Informative NAs
+
+Recrudescing parasites are clones of parasites in the preceding blood-stage infection. At present, the Pv3R model does not account for with-host mutations, genotyping errors or undetected alleles. As such, recrudescence is incompatible with an MOI increase relative to the preceding infection.  
+
+For a given episode, the Pv3R model sets the MOI equal to the maximum per-marker allele count. Repeat NA values are counted. As such, repeat NA values encode MOI values. 
+
+`compute_posterior()` returns the prior when MOI values are compatible with recrudescence: 
+
+```{r}
+# NAs impose MOIs of one and two on the first and second episode, respectively
+y_21 <- list(enrol = list(m1 = c(NA, NA)), recur = list(m1 = NA))
+
+compute_posterior(y_21, fs)$marg
+```
+
+The prior is re-weighted when MOI values are incompatible with one or more recrudescence: 
+
+```{r}
+y_12 <- list(enrol = list(m1 = NA), recur = list(m1 = c(NA, NA)))
+
+# The prior is re-weighted to the exclusion of recrudescence: 
+compute_posterior(y_12, fs)$marg
+```
+
+```{r}
+y_121 <- list(enrol = list(m1 = NA), recur = list(m1 = c(NA, NA)), recur = list(ms = NA))
+
+# The prior is re-weighted to the exclusion of 3R sequences with a recrudescence
+# at the first recurrence:
+compute_posterior(y_121, fs)
+```
+
+## Informative multiple per-marker allele observations
+
+Due to the transitive nature of relationship graphs, multiple per-marker allele observations are informative, even in the absence of recurrent data. This is illustrated using two examples, both of which have been made recrudescence-incompatible to facilitate interpretation. 
+
+### Homoallelic per-marker call
+
+A multiple homoallelic per-marker allele call favours relationship graphs that have a intra-episode sibling edge and can thus accommodate intra-episode identity-by-descent (IBD). Among the nine relationship graphs of the following example, all of which are compatible with relapse, four have an intra-episode sibling edge. Among the two relationship graphs compatible with reinfection, one has a intra-episode sibling edge. Since $\frac{1}{2} > \frac{4}{9}$ and relationship graphs are modelled as equally likely given a recurrent state, reinfection is favoured disproportionally. The imbalance is amplified when observed alleles are very rare, because rare alleles are unlikely identical by chance. Conversely, the imbalance is mitigated when observed alleles are very common, because common alleles are liable to be identical by chance. 
+```{r}
+y <- list(enrol = list(m1 = NA), recur = list(m1 = c('1', '1')))
+
+compute_posterior(y, fs = list(m1=c('1'= 0.5, 'Other' = 0.5)))$marg
+
+compute_posterior(y, fs = list(m1=c('1'= 0.0001, 'Other' = 0.9999)))$marg
+
+compute_posterior(y, fs = list(m1=c('1'= 0.9999, 'Other' = 0.0001)))$marg
+```
+
+### Heteroallelic per-marker call
+
+A heteroallelic per-marker allele call is incompatible with IBD. As such, the sums over IBD partitions of the four relationship graphs with the intra-episode sibling edge are incomplete. Since four of nine relationship graphs are compatible with relapse and one of two relationship graphs is compatible with reinfection, and since relationship graphs are equally likely given a recurrent state, reinfection is disfavoured disproportionally. Different allele frequencies have no impact since different alleles are incompatible with IBD regardless of their frequencies: 
+```{r}
+y <- list(enrol = list(m1 = NA), recur = list(m1 = c('1', '2')))
+
+compute_posterior(y, fs = list(m1=c('1' = 0.5, '2' = 0.5)))$marg
+
+compute_posterior(y, fs = list(m1=c('1' = 0.99999, '2' = 0.0001)))$marg
+
+compute_posterior(y, fs = list(m1=c('1' = 0.00001, '2' = 0.9999)))$marg
+```
+
+
+## Uninformative allelic data 
+
+If there are no informative intra-episode data and no inter-episode data on a common marker, compute_posterior returns the prior, which in this case is re-weighted to the exclusion of recrudescence: 
+
+```{r}
+y <- list(enrol = list(m1 = '1', m2 = NA), 
+          recur1 = list(m1 = NA, m2 = c('1', NA)))
+
+compute_posterior(y, fs)$marg
+```
