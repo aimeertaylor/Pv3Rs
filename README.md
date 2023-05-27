@@ -10,7 +10,7 @@ An R package developed to support model-based classification, using genetic data
 
 ### Unstable state: 
 
-The R package is currently under development and thus it is liable to contain many errors. A model around which it is being developed is documented in the preprint [1], which is a continuation of [2]. 
+The R package is currently under development and thus liable to contain many errors. A model around which it is being developed is documented in the preprint [1], which is a continuation of [2]. 
 
 [1] [Taylor, Foo & White, 2022](https://www.medrxiv.org/content/10.1101/2022.11.23.22282669v1)
 
@@ -30,7 +30,7 @@ preceding infection, both recrudescence and relapse are plausible).
 3) Relationship graphs are equally likely given recurrence states. 
 4) Parasites are outbred. 
 
-Repeat NA values are included in per-marker allele counts. As such, they could be use to encode MOI estimates based on external data. That said, ideally, markers used for recurrent-state inference should be as diverse as markers used for MOI inference.   
+Repeat NA values are included in per-marker allele counts to facilitate model checking. They could be used to encode MOI estimates based on external data. We have not explored fully the ramifications of doing so, however. In any case, markers used for recurrent-state inference ought to be as diverse as markers used for MOI inference.   
 
 We recommend a sensitivity analysis to explore the impact of genotyping errors. For example, one could compare recurrent state estimates across modified data sets, where data sets are based on the observed data modified *in silico* assuming different error rates and models. 
 
