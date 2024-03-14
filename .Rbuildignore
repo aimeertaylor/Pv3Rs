@@ -1,3 +1,4 @@
 ^Pv3Rs\.Rproj$
 ^\.Rproj\.user$
 MyDevFiles*
+^data-raw$
