@@ -1,3 +1,5 @@
+# NOTE: from deprecated model
+
 ###############################################
 # Model checking
 # Conclusion: a single inbreeding value can be used to compute the probability

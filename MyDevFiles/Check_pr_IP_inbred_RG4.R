@@ -1,3 +1,5 @@
+# NOTE: from deprecated model
+
 ################################################################################
 # This script could be converted into the equivalent of Check_pr_IP_inbred_RG3.R
 # It contains probabilities that were validated in IG_RG4_model_checking.R,

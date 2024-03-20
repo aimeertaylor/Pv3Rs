@@ -1,3 +1,5 @@
+# NOTE: from deprecated model
+
 # Script written to check if expected relatedness is 1/3 between meiotic products
 set.seed(1)
 

@@ -1,3 +1,5 @@
+# NOTE: from deprecated model
+
 # Compare the probabilities of IBD partitions given RG and an outbred population
 # and the frequencies of IBD partitions sampled given RG and an outbred population
 # outbred population

@@ -1,3 +1,5 @@
+# Verifies the examples presented in https://doi.org/10.1101/2022.11.23.22282669
+
 library(Pv3Rs)
 library(gtools) # for rdirichlet
 

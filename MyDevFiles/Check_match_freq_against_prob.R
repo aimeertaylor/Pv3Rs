@@ -1,3 +1,5 @@
+# NOTE: from deprecated model
+
 # Check match frequency given sampled lineages is equal to match
 # probability given lineage frequencies
 
