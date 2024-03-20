@@ -15,20 +15,35 @@
 #'
 #' Model assumptions:
 #' \itemize{
-#'   \item{No genotyping errors or missing alleles}
+#'   \item{No within-host mutations, genotyping errors, undetected alleles}
 #'   \item{Parasites are outbred}
 #'   \item{Relationship graphs are equally likely given recurrence states}
 #' }
 #'
-#' @param y Observed data in the form of a list of lists. The number of entries is the
-#'   number of episodes. Each episode is in turn a list of observed alleles
-#'   for each marker, or \code{NA} if not observed.
-#' @param fs List of allele frequencies as vectors. Names of the list must
-#'   match with the marker names in `y`.
+#' \code{compute_posterior} supports missing data, which should be encoded as
+#' \code{NA}s. However, to avoid estimates based entirely on the weakly
+#' informative nature of multiple per-marker allele calls (see example below and
+#' `vignette("missing_data", "Pv3Rs")` for more details), we recommend against generating
+#' estimates for recurrences that have no paired data due to missingness (see
+#' Microsatellite data example in `vignette("demo", "Pv3Rs")`).
+#'
+#' @param y Observed data in the form of a list of lists. The number of entries
+#'   is the number of episodes in chronological order. Episode names can be
+#'   specified, but they are not used. Each episode is in turn a list of
+#'   observed alleles for each marker, which must be named, or \code{NA} if not
+#'   observed. For a given marker, alleles are modeled as categorical random
+#'   variables. As such, allele names are arbitrary, but must correspond with
+#'   frequency names (see examples below). The same names can be used for
+#'   alleles belonging to different markers. As such, frequencies must be
+#'   specified per named allele per named marker.
+#' @param fs List of allele frequencies as vectors. Names of the list must match
+#'   with the marker names in `y`. Within lists (i.e., for each marker),
+#'   frequencies must be specified per allele name.
 #' @param prior Matrix of prior probabilities of the recurrence states for each
-#'    recurrent episode. Each row corresponds to an episode, and the column
-#'    names must be C, L, and I. If prior not provided, a uniform prior will be
-#'    used.
+#'   recurrent episode. Each row corresponds to an episode in chronological
+#'   order. The column names must be C, L, and I for recrudescence, relapse and
+#'   reinfection respectively. Row names can be specified by they are not used.
+#'   If prior is not provided, a uniform prior will be used.
 #' @param return.RG Boolean for whether to return the relationship graphs,
 #'   defaults to `FALSE`.
 #'
@@ -44,21 +59,185 @@
 #'   }
 #'
 #' @examples
-#' y <- list(list(m1 = c("A", "C"), m2 = c("G")), list(m1 = c("A"), m2 = c("G", "T")))
+#'
+#' # ===========================================================================
+#' # Example where alleles are named arbitrarily
+#' # ===========================================================================
+#' # Data on an enrolment episode and a recurrence:
+#' y <- list(episode0 = list(marker1 = c("Tinky Winky", "Dipsy"),
+#'                           marker2 = c("Laa-Laa", "Po")),
+#'           episode1 = list(marker1 = "Tinky Winky",
+#'                           marker2 = "Laa-Laa"))
+#'
+#' # Allele frequencies:
 #' fs <- list(
-#'   m1 = setNames(c(0.4, 0.6), c("A", "C")),
-#'   m2 = setNames(c(0.2, 0.8), c("G", "T"))
+#'   marker1 = setNames(c(0.4, 0.6), c("Tinky Winky", "Dipsy")),
+#'   marker2 = setNames(c(0.2, 0.8), c("Laa-Laa", "Po"))
 #' )
-#' prior <- matrix(c(0.2, 0.3, 0.5), nrow = 1)
-#' post <- compute_posterior(y, fs, prior)
-#' post$marg
+#'
+#' # Compute posterior probabilities using default uniform prior, note that
+#' # since there is only one recurrence, the marginal probabilities are the same
+#' # as the joint probabilities:
+#' compute_posterior(y, fs)
+#'
+#'
+#'
+#' # ===========================================================================
+#' # Example where alleles are given numeric names: 1, 2, 3, 4, 5
+#' # ===========================================================================
+#' # Allele frequencies with numeric names
+#' fs <- list(m1=c('1'=0.78, '2'=0.14, '3'=0.07, '4'=0.005, '5' = 0.005),
+#'            m2=c('1'=0.27, '2'=0.35, '3'=0.38),
+#'            m3=c('1'=0.55, '2'=0.45))
+#'
+#' # Data:
+#' y <- list(enrol = list(m1=c('3','2'), m2=c('1','3'), m3=c('1','2')),
+#'           recur1 = list(m1=c('1','4'), m2=c('1','2'), m3=c('1','2')),
+#'           recur2 = list(m1=c('1','5'), m2=c('2','3'), m3=c('1')))
+#'
+#' compute_posterior(y, fs)
+#'
+#'
+#'
+#' # ===========================================================================
+#' # Example demonstrating the cosmetic-only nature of episode names. Due to the
+#' # cosmetic-only nature of episode names, input info (episode data and prior)
+#' # and output results should be chronologically ordered and interpreted.
+#' # ===========================================================================
+#' y <- list(enrol = list(m1 = NA),
+#'           recur2 = list(m1 = NA),
+#'           recur1 = list(m1 = NA))
+#' prior <- array(c(0.2,0.7,0.2,0.3,0.6,0), dim = c(2,3),
+#'                dimnames = list(c("recur1", "recur2"), c("C", "L", "I")))
+#'
+#' # The first prior row named "recur1" is returned for the first recurrence
+#' # despite it being named "recur2" and the the second prior row named "recur2"
+#' # is returned for the second recurrence despite it being named "recur1":
+#' compute_posterior(y, fs, prior)
+#' prior
+#'
+#'
+#'
+#' #============================================================================
+#' # compute_posterior() returns the prior when there are no data. However, the
+#' # prior will be re-weighted if NAs encode MOIs that are incompatible with
+#' # recrudescence. (Recrudescing parasites are clones of parasites in the
+#' # preceding blood-stage infection. The Pv3R model assumes no within-host
+#' # mutations, genotyping errors or undetected alleles. As such, recrudescence
+#' # is incompatible with an MOI increase relative to the preceding infection.)
+#' #============================================================================
+#' # Allele frequencies:
+#' fs <- list(m1 = setNames(c(0.25, 0.75), c("A", "Other")))
+#'
+#' # Data on an enrolment episode and two recurrences:
+#' y_no_data_MOIs111 <- list(enrol = list(m1 = NA),
+#'                           recur1 = list(m1 = NA),
+#'                           recur2 = list(m1 = NA))
+#'
+#' y_no_data_MOIs121 <- list(enrol = list(m1 = NA),
+#'                           recur1 = list(m1 = c(NA, NA)),
+#'                           recur2 = list(m1 = NA))
+#'
+#' # Compute posterior probabilities:
+#' post3Rs_no_data_MOIs111 <- compute_posterior(y_no_data_MOIs111, fs)
+#' post3Rs_no_data_MOIs121 <- compute_posterior(y_no_data_MOIs121, fs)
+#'
+#' # Returns the default prior since MOIs 111 are compatible with all 3R
+#' # sequences:
+#' post3Rs_no_data_MOIs111
+#'
+#' # Returns the default prior re-weighted to the exclusion of 3R sequences with
+#' # a recrudescence at the first recurrence:
+#' post3Rs_no_data_MOIs121
+#'
+#'
+#'
+#' #============================================================================
+#' # Example demonstrating the weakly informative nature of multiple per-marker
+#' # allele calls; see vignette("missing_data", "Pv3Rs") for more details.
+#' #============================================================================
+#' fs = list(m1 = c('1' = 0.5, '2' = 0.5))
+#' y <- list(enrol = list(m1 = c('1', '2')), recur = list(m1 = NA))
+#'
+#' # compute_posterior() does not return the prior despite there being no
+#' # recurrent data:
+#' compute_posterior(y, fs)
+#'
+#'
+#'
+#' #============================================================================
+#' # Example of the small but undesirable effect on the posterior of prior on
+#' # graphs: the marginal probability that the first recurrence is a
+#' # recrudescence increases as the number of recurrences increases even though
+#' # only the first recurrence has data (also see vignette [to-do - base on
+#' # MyDevFiles/Graph_prior_bias_examples.R])
+#' #============================================================================
+#' # Allele frequencies:
+#' fs <- list(m1 = setNames(c(0.25, 1-0.25), c("A", "Other")))
+#'
+#' # Data for different scenarios; scenarios where the number of recurrences
+#' # increases but only the first recurrence has data
+#' ys <- list(y1 = list(enrol = list(m1 = "A"), recur1 = list(m1 = "A")),
+#'            y2 = list(enrol = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA)),
+#'            y3 = list(enrol = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA)),
+#'            y4 = list(enrol = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA), recur4 = list(m1 = NA)))
+#'
+#' # Compute posterior probabilities and extract marginal probabilities:
+#' results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
+#'
+#' # Extract results for the first recurrence only:
+#' first_recur <- sapply(results, function(result) result[1,])
+#'
+#' # Plot 2D simplex
+#' n_recur <- max(sapply(ys, length)-1)
+#' pardefault <- par()
+#' par(mar = c(0,0,0,0))
+#' plot_simplex(v_labels = rownames(first_recur))
+#'
+#' # Project probabilities onto 2D simplex coordinates
+#' xy <- apply(first_recur, 2, project2D)
+#'
+#' # Plot divergence from one recurrence to four:
+#' arrows(x0 = xy["x", 1], x1 = xy["x", n_recur],
+#'        y0 = xy["y", 1], y1 = xy["y", n_recur],
+#'        length = 0.05, col = "red")
+#'
+#' # Plot a point for each recurrence from one to four:
+#' points(x = xy["x", ], y = xy["y", ], pch = ".")
+#'
+#' # Restore plotting margins
+#' par(mar = pardefault$mar)
 #'
 #' @export
 compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
-  # Check y is a list of lists
+
+  # Check y is a list of lists:
   if (class(y) != "list" | unique(unlist(lapply(y, class))) != "list") {
     stop("Data y must be a list of lists, even if only one marker is typed per infection")
   }
+
+  # Check frequencies sum to one:
+  if (!all(abs(1 - round(sapply(fs, sum))) < .Machine$double.eps^0.5)) {
+    stop('For a given marker, allele frequencies must sum to one')
+  }
+
+  # Check priors sum to one
+  if (!is.null(prior)) {
+    if (!all(abs(1 - rowSums(prior)) < .Machine$double.eps^0.5)) {
+      stop('Prior probabilities for a given recurrence must sum to one')
+    }
+  }
+
+
+  # Check all alleles have a named frequency
+  ms <- unique(as.vector(sapply(y, names))) # Extract marker names
+  # For each marker, list allele names:
+  as <- lapply(ms, function(m) unique(as.vector(unlist(sapply(y, function(yt) yt[[m]])))))
+  names(as) <- ms # Name list entries by marker
+  # For each marker, check all alleles have a named frequency:
+  all_got <- all(sapply(ms, function(m) all(as[[m]][!is.na(as[[m]])] %in% names(fs[[m]]))))
+  if (!all_got) stop("Not all alleles have a named frequency")
+
 
   infection_count <- length(y)
   stopifnot(infection_count > 1)
@@ -77,8 +256,11 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
     prior <- matrix(rep(1 / 3, 3 * (infection_count - 1)),
       ncol = 3
     )
+    colnames(prior) <- causes
+  } else {
+    if (!identical(colnames(prior), causes)) stop('The prior should have colnames "C", "L" and "I"')
   }
-  if (is.null(colnames(prior))) colnames(prior) <- causes
+
 
   # For each infection we find the possible allele assignments
   # Because of permutation symmetry of the genotypes within an infection, we
