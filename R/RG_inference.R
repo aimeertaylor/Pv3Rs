@@ -41,6 +41,10 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
   # check that allele assignments are given as data frames
   for (al.df in alleles_per_m) stopifnot(class(al.df)[1] == "data.frame")
 
+  if(sum(MOIs) > 10) warning(
+    "Total MOI > 10 may lead to high memory use", immediate=T
+  )
+
   ms <- names(alleles_per_m) # marker names
   log_fs <- lapply(fs, log) # allele log-frequencies
   # number of allele assignments for each marker
@@ -50,11 +54,11 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
   IP_lookups <- setNames(lapply(ms, function(m) {
     new.env(
       hash = T,
-      size = ncol(partitions::setparts(sum(MOIs))),
+      size = multicool::Bell(sum(MOIs)),
       parent = emptyenv()
     )
   }), ms)
-  # enumeratae all relationship graphs
+  # enumerate all relationship graphs
   RGs <- enumerate_RGs_alt(MOIs, igraph = FALSE)
   gs <- paste0("g", 1:sum(MOIs)) # genotype names
 

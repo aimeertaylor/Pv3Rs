@@ -52,6 +52,10 @@ enumerate_RGs_alt <- function(MOIs, igraph = TRUE) {
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
+  if(sum(MOIs) > 10) warning(
+    "Total MOI > 10 may lead to high memory use", immediate=T
+  )
+
   infection_count <- length(MOIs) # Number of time points
   gs_count <- sum(MOIs) # Number of genotypes
 

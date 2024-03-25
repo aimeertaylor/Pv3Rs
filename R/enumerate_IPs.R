@@ -11,14 +11,15 @@
 #' enumerate_IPs(3)
 #'
 #' @section To-do:
-#' Convert to use \code{\link[partitions]{setparts}} whose output takes less
-#' memory (albeit less intuitive), thereby relaxing the limit on \code{MOIs}.
+#' Convert to use \code{\link[partitions]{setparts}} whose output format takes
+#' less memory, such that larger \code{MOI}s can be dealt with.
 #'
 #' @export
 enumerate_IPs <- function(MOIs) {
   genotype_count <- sum(MOIs)
-  if (genotype_count > 11) stop("Too many IBD partitions to enumerate.")
-  ps <- partitions::listParts(genotype_count)
+  # previously hard coded a hard limit, now removed
+  # if (genotype_count > 11) stop("Too many IBD partitions to enumerate.")
+  ps <- cached_listparts(genotype_count)
 
   IPs <- lapply(ps, function(p) {
     out <- lapply(p, function(x) paste0("g", x))

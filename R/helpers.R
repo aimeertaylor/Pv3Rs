@@ -149,8 +149,7 @@ compatible_rstrs <- function(RG, gs_per_ts) {
 
 #' Convert IBD partition to a unique string for hashing
 #'
-#' This is used for building a hash table for p(y at marker m|IBD). This seems
-#' to be marginally faster than \code{\link{convert_IP_to_string}}.
+#' This is used for building a hash table for p(y at marker m|IBD).
 #'
 #' @param IP List containing vectors of genotype names with each vector
 #' corresponding to an IBD cell.

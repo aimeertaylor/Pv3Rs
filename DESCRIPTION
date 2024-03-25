@@ -17,6 +17,7 @@ Imports:
     igraph,
     matrixStats,
     MCMCpack,
+    multicool,
     partitions,
     RColorBrewer
 Suggests: 
