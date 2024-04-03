@@ -1,13 +1,16 @@
 library(Pv3Rs)
 library(MCMCpack) # for rdirichlet
+set.seed(1)
 
-p <- runif(1, min=0, max=0.1) # rare allele that suggests initial genotypes are siblings
-q <- runif(1, min=0, max=0.001) # very rare allele that suggests all genotypes are siblings
+p <- runif(1, min=0, max=0.1) # sample rare allele that suggests initial genotypes are siblings
+q <- runif(1, min=0, max=0.001) # sample very rare allele that suggests all genotypes are siblings
 
 y <- list(
   init=list(m1=c("A","B"), m2=c("P"), m3=c("Q")),
   recur=list(m1=c("C"), m2=c("notP"), m3=c("Q"))
 )
+
+plot_data(ys = list(pid1 = y)) # Plot the data
 
 fs <- list(
   #note: m1 allele freqs do not affect the posterior
@@ -16,10 +19,11 @@ fs <- list(
   m3=c(Q=q, notQ=1-q)
 )
 
-post <- compute_posterior(y, fs)
+post <- compute_posterior(y, fs) # Compute posterior state probabilities
 
 # posterior odds of relapse to reinfection
-print(post$marg[,"L"] / post$marg[,"I"])
+writeLines(sprintf("Odds of relapse to reinfection: %s",
+                   round(post$marg[,"L"] / post$marg[,"I"], 4)))
 
 # for all values of p and q, these odds are bounded between 2/9 (as p->0)
 # and 4/9 (as p->1, q->0)
