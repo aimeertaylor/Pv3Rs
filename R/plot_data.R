@@ -69,10 +69,11 @@ plot_data = function(ys,
 
   # Name episodes if unnamed or not uniquely named
   if (is.null(episode_names) | !identical(unique(episode_names), episode_names)) {
-    lapply(patient_names, function(patient_name) {
+    ys <- sapply(patient_names, function(patient_name) {
       y <- ys[[patient_name]]
-      names(y) <- paste0(patient_name, 1:length(y))
-    })
+      names(y) <- paste(patient_name, 1:length(y), sep = "_")
+      return(y)
+    }, USE.NAMES = T, simplify = F)
   }
 
   # Extract patient and episode unique identifiers
