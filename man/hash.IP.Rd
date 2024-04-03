@@ -17,8 +17,7 @@ String where the integers in the IBD membership vector have been
 converted to ASCII characters.
 }
 \description{
-This is used for building a hash table for p(y at marker m|IBD). This seems
-to be marginally faster than \code{\link{convert_IP_to_string}}.
+This is used for building a hash table for p(y at marker m|IBD).
 }
 \examples{
 gs <- paste0("g", 1:3)

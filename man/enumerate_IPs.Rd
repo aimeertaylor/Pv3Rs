@@ -17,8 +17,8 @@ explicit.
 }
 \section{To-do}{
 
-Convert to use \code{\link[partitions]{setparts}} whose output takes less
-memory (albeit less intuitive), thereby relaxing the limit on \code{MOIs}.
+Convert to use \code{\link[partitions]{setparts}} whose output format takes
+less memory, such that larger \code{MOI}s can be dealt with.
 }
 
 \examples{
