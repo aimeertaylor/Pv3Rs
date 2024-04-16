@@ -1,78 +1,143 @@
 # ==============================================================================
 # aside: underflow / overflow problems with large marker counts
 # aside: how to plot a graph for a real sample where gs and ts_per_gs are unknown? - record
+# Hypothesis: something to do with where the rare alleles
+# Edge case: conc_param = 1, 50 markers
+# Correct answer with the wrong reasoning.
+
+
+# For different numbers of markers, different concentration parameters, over X repeats
+# To-do: plot RGs
+# Process llikeRGs
 # ==============================================================================
+rm(list = ls())
 library(MCMCpack) # For rdirichlet
 set.seed(1)
 
-for(n_markers in c(3, 5, 10, 50)) { # Number of markers
-  markers <- paste0("m", 1:n_markers) # Marker names
-  alleles <- letters # Alleles
-  n_alleles <- length(alleles) # Number of alleles per marker
+c_params <- c(1,100,1000) # rep(1/n_alleles, n_alleles)
+n_markers <- c(10,30,50,70)
+n_repeats <- 10
 
-  # Sample allele frequencies
-  fs <- sapply(markers, function(m) {
-    setNames(rdirichlet(1, alpha = rep(1, n_alleles)), alleles)
-  }, USE.NAMES = TRUE, simplify = FALSE)
+ys <- list()
+ys_store <- list()
+posteriors <- list()
+posteriors_store <- list()
+fs_store <- list()
 
-  # Sample parental genotypes
-  parent1 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
-  parent2 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
-  parent3 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
+for(c in c_params) {
+  for(m in n_markers) {
 
-  # Sample filial genotypes
-  child12 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
-  child23 <-  sapply(markers, function(t) sample(c(parent2[[t]], parent3[[t]]), 1), simplify = F)
-  child13 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent3[[t]]), 1), simplify = F)
+    markers <- paste0("m", 1:m) # Marker names
+    alleles <- letters # Alleles
+    n_alleles <- length(alleles) # Number of alleles per marker
 
-  # Format genotypes for plot_data
-  gs <- list(parent1 = list(parent1),
-             parent2 = list(parent2),
-             parent3 = list(parent3),
-             child12 = list(child12),
-             child13 = list(child13),
-             child23 = list(child23))
+    # Sample allele frequencies
+    fs <- sapply(markers, function(m) {
+      fs_unnamed <- rdirichlet(1, alpha = rep(c, n_alleles))
+      setNames(fs_unnamed, alleles)
+    }, USE.NAMES = TRUE, simplify = FALSE)
 
-  # Plot genotypes
-  # plot_data(gs, fs = fs, marker_alleles = lapply(fs, names), marker_annotate = F)
+    for(i in 1:n_repeats) {
 
-  # Make parasite infections and then list of per-marker list of observed alleles
-  initial <- rbind(unlist(child12), unlist(child13))
-  relapse <- rbind(unlist(child23))
-  y1 <- list(initial = apply(initial, 2, unique, simplify = F),
-             relapse = apply(relapse, 2, unique, simplify = F))
+      # Sample parental genotypes
+      parent1 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
+      parent2 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
+      parent3 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
 
-  initial <- rbind(unlist(child12), unlist(child13))
-  relapse <- rbind(unlist(child13), unlist(child23))
-  y2 <- list(initial = apply(initial, 2, unique, simplify = F),
-             relapse = apply(relapse, 2, unique, simplify = F))
+      # Sample children genotypes (ensure all different, s.t. we can focus on a subset of RGs)
+      anyclones <- TRUE
+      while (anyclones) {
+        child12 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
+        child13 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent3[[t]]), 1), simplify = F)
+        child23 <-  sapply(markers, function(t) sample(c(parent2[[t]], parent3[[t]]), 1), simplify = F)
+        anyclones <- any(identical(child12, child13),
+                         identical(child12, child23),
+                         identical(child13, child23))
+      }
 
-  # Plot data
-  ys <- list(y1 = y1, y2 = y2)
-  plot_data(ys, fs = fs, marker_alleles = lapply(fs, names), marker_annotate = F)
+      # Make parasite infection (incompatible with recrudescence)
+      initial <- rbind(unlist(child12))
+      relapse <- rbind(unlist(child13), unlist(child23))
+      y <- list(initial = apply(initial, 2, unique, simplify = F),
+                relapse = apply(relapse, 2, unique, simplify = F))
 
-  # Compute posteriors
-  post1 <- compute_posterior(y1, fs, return.RG = TRUE)
-  post2 <- compute_posterior(y2, fs, return.RG = TRUE)
+      # Store the data
+      ys[[i]] <- y
 
-  # Marginal posterior probabilities
-  print(post1$marg[,c("L", "I")])
-  print(post2$marg[,c("L", "I")])
-
-  # Plot most likely graph
-  par(mar = c(0.5, 0.5, 0.5, 0.5), mfrow = c(2,1))
-
-  RGlogp <- sapply(post2$RGs, function(RG) RG$logp) # log likelihoods of graphs
-  RG <- post2$RGs[[which.max(RGlogp)]]
-  gs <- paste0("g", 1:4)
-  ts_per_gs <- c(1,1,2,2)
-  plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
-  seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
-
-  RGlogp <- sapply(post1$RGs, function(RG) RG$logp) # log likelihoods of graphs
-  RG <- post1$RGs[[which.max(RGlogp)]]
-  gs <- paste0("g", 1:3)
-  ts_per_gs <- c(1,1,2)
-  plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
-  seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
+      # Compute posterior
+      posteriors[[i]] <- compute_posterior(y, fs, return.RG = TRUE)
+    }
+    posteriors_store[[as.character(c)]][[as.character(m)]] <- posteriors
+    ys_store[[as.character(c)]][[as.character(m)]] <- ys
+    fs_store[[as.character(c)]][[as.character(m)]] <- fs
+  }
 }
+
+
+# Extract probability of relapse
+post_L <- sapply(posteriors_store, function(X) {
+  sapply(X, function(XX) {
+    sapply(XX, function(XXX) XXX$marg[,"L"])
+  }, simplify = F)
+}, simplify = F)
+
+# Plots posterior relapse probabilities
+par(mfrow = c(length(c_params),1))
+for(c in c_params){
+  plot(NULL, xlim = range(n_markers)+c(-10,10), ylim = c(0,1),
+       xaxt = "n", bty = "n", panel.first = grid(nx = NA, ny = NULL),
+       ylab = "Posterior relapse probability",
+       xlab = "Number of markers (with added jitter)",
+       main = sprintf("Concentration parameter: %s", c))
+  axis(side = 1, at = n_markers)
+  for(m in n_markers) {
+    points(y = post_L[[as.character(c)]][[as.character(m)]],
+           x = jitter(rep(m, n_repeats), amount = 5), pch = 4)
+  }
+}
+
+
+
+#===============================================================================
+# Extract graphs (i.e., discard logp)
+justRGs <- sapply(posteriors_store, function(X) {
+  sapply(X, function(XX) {
+    sapply(XX, function(post) {
+      sapply(post$RGs, function(RG) c(RG$clone, RG$sib))
+    }, simplify = F)
+  }, simplify = F)
+}, simplify = F)
+
+
+# Check all the graphs are returned in the same order
+justRG <- justRGs[[1]][[1]][[1]]
+RGcheck <- sapply(n_markers, function(m) {
+  sapply(c_params, function(c) {
+    sapply(2:n_repeats, function(i) {
+      identical(justRG, justRGs[[as.character(c)]][[as.character(m)]][[i]])
+    })
+  })
+})
+
+if (!all(RGcheck)) stop("graphs not returned in the same order")
+
+# Extract probability of the data given the graph (check)
+llikeRGs <- sapply(posteriors_store, function(X) {
+  sapply(X, function(XX) {
+    sapply(XX, function(post) {
+      sapply(post$RGs, function(RG) RG$logp)
+    }, simplify = F)
+  }, simplify = F)
+}, simplify = F)
+
+
+# Plot data
+for(c in c_params){
+  for(m in n_markers){
+    ys <- ys_store[[as.character(c)]][[as.character(m)]]
+    names(ys) <- 1:n_repeats
+    plot_data(ys, fs = fs_store[[as.character(c)]][[as.character(m)]], marker_annotate = F)
+  }
+}
+
+
