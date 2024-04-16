@@ -14,9 +14,9 @@ rm(list = ls())
 library(MCMCpack) # For rdirichlet
 set.seed(1)
 
-c_params <- c(1,100,1000) # rep(1/n_alleles, n_alleles)
+c_params <- c(1,10,1000) # rep(1/n_alleles, n_alleles)
 n_markers <- c(10,30,50,70)
-n_repeats <- 10
+n_repeats <- 15
 
 ys <- list()
 ys_store <- list()
@@ -33,16 +33,23 @@ for(c in c_params) {
 
     # Sample allele frequencies
     fs <- sapply(markers, function(m) {
-      fs_unnamed <- rdirichlet(1, alpha = rep(c, n_alleles))
+      if(c > 999) {
+        fs_unnamed <- rep(1/n_alleles, n_alleles)
+      } else {
+        fs_unnamed <- rdirichlet(1, alpha = rep(c, n_alleles))
+      }
       setNames(fs_unnamed, alleles)
     }, USE.NAMES = TRUE, simplify = FALSE)
 
     for(i in 1:n_repeats) {
 
       # Sample parental genotypes
-      parent1 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
-      parent2 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
-      parent3 <- sapply(markers, function(t) sample(alleles, 1), simplify = F)
+      parent1 <- sapply(markers, function(t) {
+        sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
+      parent2 <- sapply(markers, function(t) {
+        sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
+      parent3 <- sapply(markers, function(t) {
+        sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
 
       # Sample children genotypes (ensure all different, s.t. we can focus on a subset of RGs)
       anyclones <- TRUE
@@ -133,7 +140,7 @@ llikeRGs <- sapply(posteriors_store, function(X) {
 
 # Plot data
 for(c in c_params){
-  for(m in n_markers){
+  for(m in 10){ #n_markers){
     ys <- ys_store[[as.character(c)]][[as.character(m)]]
     names(ys) <- 1:n_repeats
     plot_data(ys, fs = fs_store[[as.character(c)]][[as.character(m)]], marker_annotate = F)
