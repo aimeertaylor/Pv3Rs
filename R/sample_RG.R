@@ -18,10 +18,10 @@
 #'
 #' @examples
 #' set.seed(20)
-#' RG <- sample_RG_alt(c(2, 2))
+#' RG <- sample_RG(c(2, 2))
 #'
 #' @export
-sample_RG_alt <- function(MOIs, igraph = T) {
+sample_RG <- function(MOIs, igraph = T) {
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 

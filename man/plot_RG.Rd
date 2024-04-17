@@ -16,7 +16,7 @@ plot_RG(
 }
 \arguments{
 \item{RG}{A relationship graph, which is an \code{igraph} graph; see
-\code{\link{enumerate_RGs}}.}
+\code{\link{enumerate_RGs_prev}}.}
 
 \item{layout_by_group}{A logical argument which if TRUE (default) overrides
 the default layout of \code{\link[igraph]{plot.igraph}} so that vertices
@@ -53,7 +53,7 @@ are plotted differently using different line types.
 }
 
 \examples{
-RGs <- enumerate_RGs(c(2, 1, 1))
+RGs <- enumerate_RGs_prev(c(2, 1, 1))
 cpar <- par() # record current par before changing
 par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
 for (i in 12:23) {

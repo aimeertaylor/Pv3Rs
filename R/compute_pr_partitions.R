@@ -26,6 +26,8 @@
 #' # birthday problem computed using compute_pr_partition:
 #' pr_parts <- compute_pr_partitions(k, f = 1 / days)
 #' 1 - tail(pr_parts, 1)
+#'
+#' @export
 compute_pr_partitions <- function(k, f) {
   # Enumerate partitions
   Ps <- partitions::setparts(x = k)

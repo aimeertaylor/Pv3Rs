@@ -3,15 +3,15 @@
 #' Samples one transitive graph of stranger and sibling relationships between
 #' distinct parasite genotypes within an infection and stranger, sibling and
 #' clonal relationships between parasite genotypes across infections. Unlike
-#' \code{\link{enumerate_RGs_prev}}, \code{sample_RG} is not limited to six or fewer
+#' \code{\link{enumerate_RGs_prev}}, \code{sample_RG_prev} is not limited to six or fewer
 #' genotypes among three or fewer infections, because it only generates one
 #' graph and thus cannot overload memory. However, for more than six genotypes
 #' among more than three infections, it could take a long time because
-#' \code{sample_RG} is testing for transitivity while sampling among not
+#' \code{sample_RG_prev} is testing for transitivity while sampling among not
 #' necessarily transitive graphs, of which there are many; see the message
-#' that \code{sample_RG} prints to the screen.
+#' that \code{sample_RG_prev} prints to the screen.
 #'
-#' Superseded by \code{\link{sample_RG_alt}}.
+#' Superseded by \code{\link{sample_RG}}.
 #'
 #' @inheritParams enumerate_RGs_prev
 #'
@@ -24,13 +24,11 @@
 #'
 #' @examples
 #' set.seed(2)
-#' RG <- sample_RG(c(2, 1, 1))
+#' RG <- sample_RG_prev(c(2, 1, 1))
 #' print(RG)
 #' igraph::as_data_frame(RG)
 #' plot_RG(RG)
-#'
-#' @export
-sample_RG <- function(MOIs) {
+sample_RG_prev <- function(MOIs) {
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 

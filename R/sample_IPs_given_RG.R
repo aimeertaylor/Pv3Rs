@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' set.seed(1)
-#' RG <- sample_RG(3)
+#' RG <- sample_RG_prev(3)
 #' sample_IPs_given_RG(RG, n_m = 3)
 #'
 #' @export

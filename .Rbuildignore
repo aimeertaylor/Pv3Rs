@@ -2,3 +2,20 @@
 ^\.Rproj\.user$
 MyDevFiles*
 ^data-raw$
+
+# Deprecated files from previous implementation (Aimee)
+R/compute_pr_IP_RG.R
+R/compute_pr_partitions.R
+R/convert_IP_to_string.R
+R/convert_lineages_to_IP.R
+R/enumerate_IPs.R
+R/enumerate_RGs_prev.R
+R/generate_lineages.R
+R/is.clone.compatible.R
+R/is.transitive.R
+R/Log_Pr_yn_Gab_unnormalised.R
+R/Log_Pr_yn_Gab.R
+R/sample_IPs_given_RG.R
+R/sample_lineages.R
+R/sample_RG_prev.R
+R/sample_single_recurrence_RG.R

@@ -62,8 +62,6 @@
 #' intra_edge_counts <- sapply(MOIs, choose, k = 2)
 #' inter_edge_count <- choose(sum(MOIs), 2) - sum(intra_edge_counts)
 #' prod(3^inter_edge_count, 2^intra_edge_counts)
-#'
-#' @export
 enumerate_RGs_prev <- function(MOIs) {
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")

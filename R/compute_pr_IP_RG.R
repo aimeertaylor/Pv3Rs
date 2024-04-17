@@ -21,7 +21,7 @@
 #' #################################################
 #'
 #' n_genotypes <- 3
-#' RG <- sample_RG(n_genotypes)
+#' RG <- sample_RG_prev(n_genotypes)
 #' IPs <- partitions::listParts(n_genotypes)
 #' sapply(IPs, compute_pr_IP_RG, RG = RG)
 #' plot_RG(RG)
@@ -33,7 +33,7 @@
 #'
 #' # Generate a relationship graph (RG) and enumerate IBD partitions (IPs)
 #' set.seed(3)
-#' RG <- sample_RG(MOIs = c(2, 1, 1))
+#' RG <- sample_RG_prev(MOIs = c(2, 1, 1))
 #' IPs <- enumerate_IPs(igraph::vcount(RG))
 #'
 #' # Compute the probability of the IPs given the RG

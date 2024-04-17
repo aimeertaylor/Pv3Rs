@@ -2,43 +2,32 @@
 % Please edit documentation in R/sample_RG.R
 \name{sample_RG}
 \alias{sample_RG}
-\title{Sample a transitive relationship graph (RG)}
+\title{Sample a transitive relationship graph, alternate version}
 \usage{
-sample_RG(MOIs)
+sample_RG(MOIs, igraph = T)
 }
 \arguments{
 \item{MOIs}{A numeric vector specifying, for each infection, the number of
-distinct parasite genotypes, a.k.a the multiplicity of infection (MOI).}
+distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
+
+\item{igraph}{Logical for whether to return an \code{igraph} object.}
 }
 \value{
-Returns a transitive relationship graph (RG); see \code{\link{enumerate_RGs}} for details.
+A relationship graph, i.e. one entry of the list returned by
+\code{\link{enumerate_RGs}}.
 }
 \description{
-Samples one transitive graph of stranger and sibling relationships between
-distinct parasite genotypes within an infection and stranger, sibling and
-clonal relationships between parasite genotypes across infections. Unlike
-\code{\link{enumerate_RGs}}, \code{sample_RG} is not limited to six or fewer
-genotypes among three or fewer infections, because it only generates one
-graph and thus cannot overload memory. However, for more than six genotypes
-among more than three infections, it could take a long time because
-\code{sample_RG} is testing for transitivity while sampling among not
-necessarily transitive graphs, of which there are many; see the message
-that \code{sample_RG} prints to the screen.
+Uses the techniques in \code{\link{enumerate_RGs}} to uniformly sample
+a relationship graph. All clonal partitions are generated, and the number
+of sibling partitions consistent with each clonal partition is determined. A
+clonal partition is randomly selected with probability proportional to the
+corresponding number of sibling partitions, and a sibling partition is then
+uniformly sampled. The nested partition is equivalent to a relationship
+graph. See \code{\link{enumerate_RGs}} for details on the nested
+partition representation of a relationship graph.
 }
-\details{
-Superseded by \code{\link{sample_RG_alt}}.
-}
-\section{Provenance}{
- This function was adapted from
-\code{generate_random_Vivax_model} at
-\url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
-}
-
 \examples{
-set.seed(2)
-RG <- sample_RG(c(2, 1, 1))
-print(RG)
-igraph::as_data_frame(RG)
-plot_RG(RG)
+set.seed(20)
+RG <- sample_RG(c(2, 2))
 
 }

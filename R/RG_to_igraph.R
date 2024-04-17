@@ -13,7 +13,7 @@
 #'
 #' @examples
 #' set.seed(20)
-#' RG <- sample_RG_alt(c(2, 2))
+#' RG <- sample_RG(c(2, 2))
 #' RG <- RG_to_igraph(RG, c("g1", "g2"), c(1, 1, 2, 2))
 #'
 #' @export

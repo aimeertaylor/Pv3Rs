@@ -39,7 +39,7 @@ recurrence states for each recurrent episode, one row per reinfection.}
 of recurrence states.}
 \item{RGs}{List of relationship graphs with their log-likelihoods stored.
 Only returned if \code{return.RG} is \code{TRUE}. See
-\code{\link{enumerate_RGs_alt}}.}
+\code{\link{enumerate_RGs}}.}
 }
 }
 \description{
@@ -54,7 +54,7 @@ different level of expected genetic relatedness. The likelihood of a
 sequence of recurrence states can be determined from the likelihood of all
 relationship graphs compatible with said sequence. More details on the
 enumeration and likelihood calculation of relationship graphs
-can be found in \code{\link{enumerate_RGs_alt}} and
+can be found in \code{\link{enumerate_RGs}} and
 \code{\link{RG_inference}} respectively.
 
 Model assumptions:

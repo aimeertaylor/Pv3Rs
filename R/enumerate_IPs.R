@@ -19,7 +19,7 @@ enumerate_IPs <- function(MOIs) {
   genotype_count <- sum(MOIs)
   # previously hard coded a hard limit, now removed
   # if (genotype_count > 11) stop("Too many IBD partitions to enumerate.")
-  ps <- cached_listparts(genotype_count)
+  ps <- partitions::listParts(genotype_count)
 
   IPs <- lapply(ps, function(p) {
     out <- lapply(p, function(x) paste0("g", x))
