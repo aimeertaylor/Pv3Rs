@@ -47,8 +47,6 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
 
   ms <- names(alleles_per_m) # marker names
   log_fs <- lapply(fs, log) # allele log-frequencies
-  # number of allele assignments for each marker
-  a_sizes <- lapply(alleles_per_m, nrow)
 
   # hash tables to store p(marker m observed data | IBD partition)
   IP_lookups <- setNames(lapply(ms, function(m) {

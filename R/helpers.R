@@ -24,10 +24,11 @@ determine_MOIs <- function(y) {
 #' Due to permutation symmetry of intra-infection genotypes, we fix a single
 #' assignment for one of the markers whose number of alleles observed is equal
 #' to the MOI (consider it the anchor) and permute the rest, discarding
-#' combinations that under-represent the observed marker diversity.
+#' combinations that under-represent the observed marker diversity. Note that
+#' this function is not tested for input with repeated alleles.
 #'
-#' @param y.inf List of alleles observed across markers for genotypes within
-#'   one infection.
+#' @param y.inf List of unique alleles observed across markers for genotypes within
+#'   one infection. Repeated alleles will lead to overcounting the assignments.
 #' @param gs.inf Vector of genotype names for genotypes within one infection.
 #'
 #' @return List of dataframes, one for each marker. The columns correspond to
