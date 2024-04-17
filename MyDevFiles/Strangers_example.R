@@ -12,9 +12,9 @@
 # ==============================================================================
 rm(list = ls())
 library(MCMCpack) # For rdirichlet
-set.seed(2)
+set.seed(1)
 
-c_params <- c(0.5,1,10,1000) # rep(1/n_alleles, n_alleles)
+c_params <- c(1,10,1000) # rep(1/n_alleles, n_alleles)
 n_markers <- c(10,30,50,70)
 n_repeats <- 15
 
@@ -44,27 +44,16 @@ for(c in c_params) {
     for(i in 1:n_repeats) {
 
       # Sample parental genotypes
-      parent1 <- sapply(markers, function(t) {
+      genotype1 <- sapply(markers, function(t) {
         sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-      parent2 <- sapply(markers, function(t) {
+      genotype2 <- sapply(markers, function(t) {
         sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-      parent3 <- sapply(markers, function(t) { # More rare
-        sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
-
-      # Sample children genotypes (ensure all different, s.t. we can focus on a subset of RGs)
-      anyclones <- TRUE
-      while (anyclones) {
-        child12 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
-        child13 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent3[[t]]), 1), simplify = F)
-        child23 <-  sapply(markers, function(t) sample(c(parent2[[t]], parent3[[t]]), 1), simplify = F)
-        anyclones <- any(identical(child12, child13),
-                         identical(child12, child23),
-                         identical(child13, child23))
-      }
+      genotype3 <- sapply(markers, function(t) {
+        sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
 
       # Make parasite infection (incompatible with recrudescence)
-      initial <- rbind(unlist(child12))
-      relapse <- rbind(unlist(child13), unlist(child23))
+      initial <- rbind(unlist(genotype1))
+      relapse <- rbind(unlist(genotype2), unlist(genotype3))
       y <- list(initial = apply(initial, 2, unique, simplify = F),
                 relapse = apply(relapse, 2, unique, simplify = F))
 
@@ -138,13 +127,13 @@ llikeRGs <- sapply(posteriors_store, function(X) {
 }, simplify = F)
 
 
-# # Plot data
-# for(c in c_params){
-#   for(m in 10){ #n_markers){
-#     ys <- ys_store[[as.character(c)]][[as.character(m)]]
-#     names(ys) <- 1:n_repeats
-#     plot_data(ys, fs = fs_store[[as.character(c)]][[as.character(m)]], marker_annotate = F)
-#   }
-# }
+# Plot data
+for(c in c_params){
+  for(m in 10){ #n_markers){
+    ys <- ys_store[[as.character(c)]][[as.character(m)]]
+    names(ys) <- 1:n_repeats
+    plot_data(ys, fs = fs_store[[as.character(c)]][[as.character(m)]], marker_annotate = F)
+  }
+}
 
 
