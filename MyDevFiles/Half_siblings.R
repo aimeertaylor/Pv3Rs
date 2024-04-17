@@ -10,14 +10,14 @@ y <- list(
   recur=list(m1=c("C"), m2=c("notP"), m3=c("Q"))
 )
 
-plot_data(ys = list(pid1 = y)) # Plot the data
-
 fs <- list(
   #note: m1 allele freqs do not affect the posterior
   m1=setNames(rdirichlet(1, rep(1,3))[1,], c("A","B","C")),
   m2=c(P=p, notP=1-p),
   m3=c(Q=q, notQ=1-q)
 )
+
+plot_data(ys = list(pid1 = y), fs = fs) # Plot the data
 
 post <- compute_posterior(y, fs) # Compute posterior state probabilities
 
@@ -44,6 +44,7 @@ print(odds_func(p, q))
 ps <- 0:0.001:1
 qs <- 0:0.001:1
 odds <- outer(ps, qs, odds_func)
+par(mar=c(5, 4, 4, 2))
 filled.contour(odds, color = function(x) heat.colors(x),
                plot.title=title(main="Post. odds of relapse:reinfection",
                                 xlab="p", ylab="q")

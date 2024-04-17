@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' set.seed(1)
-#' RG <- sample_RG(3)
+#' RG <- sample_RG_prev(3)
 #' plot_RG(RG)
 #' lineages <- sample_lineages(RG, n_m = 3)
 #' apply(lineages, 2, convert_lineages_to_IP)

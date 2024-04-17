@@ -10,7 +10,7 @@
 #' sequence of recurrence states can be determined from the likelihood of all
 #' relationship graphs compatible with said sequence. More details on the
 #' enumeration and likelihood calculation of relationship graphs
-#' can be found in \code{\link{enumerate_RGs_alt}} and
+#' can be found in \code{\link{enumerate_RGs}} and
 #' \code{\link{RG_inference}} respectively.
 #'
 #' Model assumptions:
@@ -62,7 +62,7 @@
 #'       of recurrence states.}
 #'     \item{RGs}{List of relationship graphs with their log-likelihoods stored.
 #'       Only returned if `return.RG` is `TRUE`. See
-#'       \code{\link{enumerate_RGs_alt}}.}
+#'       \code{\link{enumerate_RGs}}.}
 #'   }
 #'
 #' @examples
@@ -319,8 +319,10 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   n.RG <- length(RGs)
   pbar <- txtProgressBar(min = 0, max = n.RG)
   writeLines("Finding log-likelihood of each vector of recurrent states")
+  max.logp <- max(sapply(RGs, "[[", "logp"))
   for (RG in RGs) {
-    prob_RG <- exp(RG$logp) # p(y|RG)
+    # subtract maximum to avoid underflow
+    prob_RG <- exp(RG$logp - max.logp) # p(y|RG)
     for (rstr in compatible_rstrs(RG, gs_per_ts)) {
       n_rg_per_rstr[rstr] <- n_rg_per_rstr[rstr] + 1
       logp_sum_per_rstr[rstr] <- log(exp(logp_sum_per_rstr[rstr]) + prob_RG)

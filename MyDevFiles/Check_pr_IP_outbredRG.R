@@ -38,7 +38,7 @@ MOIs <- lapply(MOIs, function(x) x[x>0])
 
 for(m in MOIs){
 
-  RGs <- enumerate_RGs(m)
+  RGs <- enumerate_RGs_prev(m)
   IPs <- enumerate_IPs(m)
   pr_IP_RG <- array(0, dim = c(length(RGs), length(IPs)),
                     dimnames = list(NULL, sapply(IPs, convert_IP_to_string)))

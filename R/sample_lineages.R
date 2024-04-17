@@ -38,7 +38,7 @@
 #' an inbred population representative of a brood of parasite genotypes, this
 #' function could be used to explore IBD structure following brood mating.
 #'
-#' @param RG A relationship graph; see \code{\link{enumerate_RGs}} for details.
+#' @param RG A relationship graph; see \code{\link{enumerate_RGs_prev}} for details.
 #' @param n_m Number of markers.
 #' @param outbred Logical specifying if the parental genotypes should be sampled
 #'   from a outbred population or not.
@@ -59,7 +59,7 @@
 #'
 #' @examples
 #' set.seed(3)
-#' RG <- sample_RG(c(2, 1, 1))
+#' RG <- sample_RG_prev(c(2, 1, 1))
 #' plot_RG(RG)
 #' sample_lineages(RG, n_m = 5)
 #' sample_lineages(RG, n_m = 5, outbred = FALSE, lineage_count = 5)

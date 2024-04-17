@@ -9,7 +9,7 @@
 #' among cliques of size three, an edge weight sum of 2.5 is indicative of a
 #' intransitive clone + clone + sibling trio.
 #'
-#' @param RG A relationship graph; see \code{\link{enumerate_RGs}}.
+#' @param RG A relationship graph; see \code{\link{enumerate_RGs_prev}}.
 #'
 #' @section Provenance: This function was adapted from
 #' test_correct_graph at

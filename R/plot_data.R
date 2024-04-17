@@ -14,22 +14,20 @@
 #' given marker has more than 12 alleles. The names of the alleles are printed
 #' on top of their colours if marker_annotate.
 #'
-#' @param ys A nested list of per-patient, per-episode, per-marker allelic data.
-#'   Specifically, a per-patient list of a per-episode list of a per-marker list
-#'   of character vectors of observed alleles.
-#' @param fs A per-marker list of numeric vectors of allele frequencies. If NULL
-#'   (default), for a given marker, each allele is represented equally in the
-#'   marker legend. If specified, legend areas are proportional to allele
-#'   frequencies; i.e., common alleles have relatively large legend areas, and
-#'   rare alleles have relatively small legend areas.
-#' @param marker_alleles A per-marker list of character vectors of all possible
-#'   alleles. If NULL (default), only the alleles present in the data are
-#'   represented in the legend. Because the colour scheme is adaptive (see
-#'   introduction), the same allele will have a different colour in a plot of an
-#'   alternative data list if more or fewer alleles are observed at the given
-#'   marker across the alternative data list. Specify marker_alleles to fix the
-#'   colour of a given allele across plots of different data list, thereby
-#'   facilitating cross-comparison.
+#'@param ys A nested list of per-patient, per-episode, per-marker allelic data.
+#'  Specifically, a per-patient list of a per-episode list of a per-marker list
+#'  of character vectors of observed alleles.
+#'@param fs A per-marker list of numeric vectors of allele frequencies. If NULL
+#'  (default), for a given marker, only the alleles present in the data are
+#'  represented in the legend, and each allele is represented equally. Because
+#'  the colour scheme is adaptive (see introduction), the same allele will have
+#'  a different colour in a plot of an alternative data list if more or fewer
+#'  alleles are observed at the given marker across the alternative data list.
+#'  If fs is specified, all possible alleles are represented and legend areas
+#'  are proportional to allele frequencies; i.e., common alleles have relatively
+#'  large legend areas, and rare alleles have relatively small legend areas.
+#'  Specify fs to fix the colour of a given allele across plots of different
+#'  data lists, thereby facilitating cross-comparison.
 #'@param marker_annotate Logical. If true (default), the names of the alleles
 #'  are printed on top of their colours in the legend.
 #'
@@ -44,13 +42,12 @@
 #' # Demonstrating the adaptive nature of the colour scheme:
 #' ys <- ys_VHX_BPD["VHX_52"] # A single patient with
 #' plot_data(ys) # Legend adapts to alleles detected in VHX_52 only
-#' plot_data(ys, fs = fs_VHX_BPD, marker_alleles = lapply(fs_VHX_BPD, names))
+#' plot_data(ys, fs = fs_VHX_BPD)
 #'
 #'
 #' @export
 plot_data = function(ys,
                      fs = NULL,
-                     marker_alleles = NULL,
                      marker_annotate = TRUE){
 
   # Function to create ramped colours based on "Paired" brewer.pal
@@ -95,10 +92,11 @@ plot_data = function(ys,
   })
   names(marker_alleles_in_data) <- markers_in_data
 
-  if (is.null(marker_alleles)) {
+  if (is.null(fs)) {
     markers <- markers_in_data
     marker_alleles <- marker_alleles_in_data
   } else {
+    marker_alleles = lapply(fs, names)
     markers <- names(marker_alleles)
     markers_agree <- all(markers_in_data %in% markers)
     alleles_agree <- all(sapply(markers, function(marker) all(marker_alleles_in_data[[marker]] %in% marker_alleles[[marker]])))

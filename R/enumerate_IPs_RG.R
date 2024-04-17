@@ -13,14 +13,14 @@
 #'
 #' Note that all IBD partitions are equally likely.
 #'
-#' @param RG A relationship graph; see \code{\link{enumerate_RGs_alt}} for details.
-#' @param compat Logical, if true, the data type of the output matches with the
-#' input IP of \code{\link{compute_pr_IP_RG}}. Otherwise, returns a list of
-#' IBD parititon vectors in reference to the sibling clusters.
+#' @param RG A relationship graph; see \code{\link{enumerate_RGs}} for details.
+#' @param compat Logical, if true, a list of \code{partitions} equivalence
+#' objects are returned. Otherwise, returns a list of IBD parititon vectors in
+#' reference to the sibling clusters.
 #'
 #' @examples
 #' set.seed(3)
-#' RG <- sample_RG_alt(c(2, 1, 2))
+#' RG <- sample_RG(c(2, 1, 2))
 #' enumerate_IPs_RG(RG)
 #'
 #' @export

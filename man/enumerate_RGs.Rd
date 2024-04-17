@@ -2,78 +2,60 @@
 % Please edit documentation in R/enumerate_RGs.R
 \name{enumerate_RGs}
 \alias{enumerate_RGs}
-\title{Enumerate transitive relationship graphs (RGs)}
+\title{Enumerate transitive relationship graphs, alternate version}
 \usage{
-enumerate_RGs(MOIs)
+enumerate_RGs(MOIs, igraph = TRUE)
 }
 \arguments{
 \item{MOIs}{A numeric vector specifying, for each infection, the number of
-distinct parasite genotypes, a.k.a the multiplicity of infection (MOI).}
+distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
+
+\item{igraph}{Logical for whether to return \code{igraph} objects.}
 }
 \value{
-Returns a list of transitive relationship graphs (RGs).
-
-Each RG is an igraph graph, see \code{\link[igraph]{igraph}}. The seven
-character code after IGRAPH, is the first seven characters of the graph ID;
-see \code{\link[igraph]{graph_id}}.
-
-RGs are undirected. They are weighted, except when they contain only stranger genotypes.
-
-Vertices represent parasite genotypes. Vertices are named consecutively
-from one to the total genotype count, \code{sum(MOIs)}. Vertex names are
-used to index genotypes and inter-genotype relationships. Vertex IDs are
-not used to index genotypes and their relationships because vertex IDs are
-renumbered upon application of some igraph operations, e.g.
-\code{\link[igraph]{induced_subgraph}}. Genotypes are grouped into
-infections using a vertex attribute called group. The group attribute is
-used by \code{\link{plot_RG}} to group genotypes by infection.
-
-Edges represent sibling or clonal relationships that are differentiated by
-weight: 0.5 encodes a sibling relationship, 1 encodes a clonal
-relationship. Strangers have zero weight and thus there are no edges
-between them.
+A list of relationship graphs. If \code{igraph} is \code{FALSE},
+each element is a list of four attributes:
+\describe{
+\item{clone}{A list of groups of genotypes that make up the clonal
+cells.}
+\item{clone.vec}{A numeric vector indicating the clonal membership of
+each genotype.}
+\item{sib}{A list of groups of clonal cells that make up the sibling
+cells.}
+\item{sib.vec}{A numeric vector indicating the sibling membership of
+each clonal cell.}
+}
+Otherwise, each element is an \code{igraph} object (see
+\code{\link{enumerate_RGs_prev}}) along with these four attributes. Note that
+the weight matrix contains information equivalent to that of the four
+attributes.
 }
 \description{
-Enumerates all transitive graphs of stranger and sibling relationships
-between distinct parasite genotypes within an infection and stranger, sibling
-and clonal relationships between parasite genotypes across infections.
-\code{enumerate_RGs} is limited to six or fewer genotypes among three or
-fewer infections because the number of graphs grows exponentially with the
-number of genotypes and the number of infections; see examples.
+A relationship graph is a complete graph on all genotypes, where each edge
+is annotated as a clone, sibling, or stranger edge. The enumerated
+relationship graphs satisfy the following constraints:
+\itemize{
+\item{The subgraph induced by the clone edges is a cluster graph.}
+\item{The subgraph induced by the clone edges and sibling edges is a cluster
+graph.}
+\item{Clone edges are only allowed for two genotypes from different
+infections.}
+}
 }
 \details{
-Superseded by \code{\link{enumerate_RGs_alt}}.
+This alternate version of \code{\link{enumerate_RGs_prev}} is based on generating
+set partitions. Since the clone edges induce a cluster graph, the
+information encoded by clonal relationships is equivalent to a partition of
+the genotypes. Note that genotypes from the same infection cannot belong to
+the same partition cell. Subsequent information encoded by sibling
+relationships is equivalent to further partitioning the clonal partition.
+There are no constraints when enumerating the sibling partitions. The data
+structure returned encodes each graph as a nested set partition. Each
+partition is represented in the form of a list of vectors (\code{clone} and
+\code{sib}) and as a membership vector (\code{clone.vec} and \code{sib.vec}), where each
+entry identifies the partition cell the corresponding index belongs to.
 }
-\section{Provenance}{
- This function was adapted from
-\code{generate_all_models_3Ts} and \code{generate_all_models_2Ts} at
-\url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
-}
-
-\section{To-do}{
-
-\enumerate{
-\item Consider using RGs_to_eval_count as the too
-many RGs cut-off instead of gs_count > 6 | infection_count > 3
-\item Read up about using save and load to preserve graph attributes; also
-read_graph and write_graph
-}
-}
-
 \examples{
-MOIs <- c(1, 2)
-RGs <- enumerate_RGs(MOIs)
-RGs[[1]]
-igraph::vertex_attr(RGs[[1]])
-par(mfrow = c(3, 3))
-for (i in 1:length(RGs)) {
-  plot_RG(RGs[[i]])
-  box()
-}
-
-# Compute by hand the number of not necessarily transitive graphs
-intra_edge_counts <- sapply(MOIs, choose, k = 2)
-inter_edge_count <- choose(sum(MOIs), 2) - sum(intra_edge_counts)
-prod(3^inter_edge_count, 2^intra_edge_counts)
+graphs <- enumerate_RGs(c(2, 1, 2), igraph=T) # 250 graphs
 
 }

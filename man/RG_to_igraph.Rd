@@ -7,7 +7,7 @@
 RG_to_igraph(RG, gs, ts_per_gs)
 }
 \arguments{
-\item{RG}{Relationship graph output by \code{\link{enumerate_RGs_alt}} with
+\item{RG}{Relationship graph output by \code{\link{enumerate_RGs}} with
 \code{igraph=FALSE}.}
 
 \item{gs}{Vector of genotype names.}
@@ -19,12 +19,12 @@ An \code{igraph} object along with the original variables in
 \code{RG}.
 }
 \description{
-Makes a relationship graph object output by \code{\link{enumerate_RGs_alt}}
-compatible with the \code{igraph} output of \code{\link{enumerate_RGs}}.
+Makes a relationship graph object output by \code{\link{enumerate_RGs}}
+compatible with the \code{igraph} output of \code{\link{enumerate_RGs_prev}}.
 }
 \examples{
 set.seed(20)
-RG <- sample_RG_alt(c(2, 2))
+RG <- sample_RG(c(2, 2))
 RG <- RG_to_igraph(RG, c("g1", "g2"), c(1, 1, 2, 2))
 
 }

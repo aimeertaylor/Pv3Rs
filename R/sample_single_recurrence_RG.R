@@ -30,7 +30,7 @@
 #'   returning from a high transmission setting where they were bitten.
 #'
 #' @return Returns a transitive relationship graph (RG); see
-#'   \code{\link{enumerate_RGs}} for details.
+#'   \code{\link{enumerate_RGs_prev}} for details.
 #'
 #' @section To-do:
 #' Better test intra-infection transitivity before whole RG?

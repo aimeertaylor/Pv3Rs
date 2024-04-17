@@ -19,7 +19,6 @@ knitr::opts_chunk$set(echo = TRUE)
 library(Pv3Rs)
 ```
 
-<!-- adapted from Inference_example_ICL_3212.R -->
 ## Synthetic example
 
 We first look at an synthetic example with 3 markers (named `m1`,`m2`,`m3`) and three episodes, with known allele frequencies. 
@@ -100,7 +99,6 @@ text(y = post$joint[post$joint > 0], x = likelihoods[1,post$joint > 0], pos = 1,
      labels = names(post$joint[post$joint >0]))
 ```
 
-<!-- adapted from Inference_example_ICL_3212.R -->
 ## Microsatellite data
 
 Next, we apply our methods to microsatellite data, which is available [here](https://github.com/jwatowatson/RecurrentVivax/blob/master/RData/GeneticModel/MS_data_PooledAnalysis.RData).

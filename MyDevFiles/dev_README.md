@@ -13,7 +13,7 @@ Aimee to describe
 - `MS_data_demo_to_sort.R`
 - `ToSortPostMaternity.R`
 
-## Files from developing current model (removed)
+## Files from developing current implementation (removed)
 
 Demo a synthetic example with MOI = 8, now in vignettes/demo.Rmd
 - `Inference_example_ICL_3212.R`
@@ -22,10 +22,10 @@ Demo a synthetic example with MOI = 8, now in vignettes/demo.Rmd
 Demo a microsatellite example, now in vignettes/demo.Rmd
 - `MS_data_demo.R`
 
-Compare new model against previous model
+Compare current implementation against previous implementation
 - `Verify_enumerate_IP_RG.R`
 
-## Files from previous model (to remove)
+## Files from previous implementation (to remove)
 
 - `Check_match_freq_against_prob.R`
 - `Check_meiotic_sib_relatedness.R`

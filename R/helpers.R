@@ -92,7 +92,7 @@ enumerate_alleles <- function(y.inf, gs.inf) {
 #' recurrent infection and any preceding infection must be stranger edges. All
 #' recurrences may possibly be relapses.
 #'
-#' @param RG Relationship graph; see \code{\link{enumerate_RGs_alt}}.
+#' @param RG Relationship graph; see \code{\link{enumerate_RGs}}.
 #' @param gs_per_ts List of vectors of genotypes for each infection.
 #'
 #' @return Vector of strings (consisting of "C", "L", "I" for recrudescence,
@@ -100,7 +100,7 @@ enumerate_alleles <- function(y.inf, gs.inf) {
 #'
 #' @examples
 #' MOIs <- c(2, 2, 1)
-#' RG <- enumerate_RGs_alt(MOIs, igraph = T)[[175]]
+#' RG <- enumerate_RGs(MOIs, igraph = T)[[175]]
 #' gs_per_ts <- split(paste0("g", 1:sum(MOIs)), rep(1:length(MOIs), MOIs))
 #' # 1st recurrence can't be recrudescence, 2nd recurrence can't be reinfection
 #' plot_RG(RG, edge.curved = 0.2)

@@ -7,7 +7,7 @@
 compatible_rstrs(RG, gs_per_ts)
 }
 \arguments{
-\item{RG}{Relationship graph; see \code{\link{enumerate_RGs_alt}}.}
+\item{RG}{Relationship graph; see \code{\link{enumerate_RGs}}.}
 
 \item{gs_per_ts}{List of vectors of genotypes for each infection.}
 }
@@ -26,7 +26,7 @@ recurrences may possibly be relapses.
 }
 \examples{
 MOIs <- c(2, 2, 1)
-RG <- enumerate_RGs_alt(MOIs, igraph = T)[[175]]
+RG <- enumerate_RGs(MOIs, igraph = T)[[175]]
 gs_per_ts <- split(paste0("g", 1:sum(MOIs)), rep(1:length(MOIs), MOIs))
 # 1st recurrence can't be recrudescence, 2nd recurrence can't be reinfection
 plot_RG(RG, edge.curved = 0.2)

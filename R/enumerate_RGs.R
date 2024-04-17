@@ -1,196 +1,209 @@
-#' Enumerate transitive relationship graphs (RGs)
+#' Enumerate transitive relationship graphs, alternate version
 #'
-#' Enumerates all transitive graphs of stranger and sibling relationships
-#' between distinct parasite genotypes within an infection and stranger, sibling
-#' and clonal relationships between parasite genotypes across infections.
-#' \code{enumerate_RGs} is limited to six or fewer genotypes among three or
-#' fewer infections because the number of graphs grows exponentially with the
-#' number of genotypes and the number of infections; see examples.
+#' A relationship graph is a complete graph on all genotypes, where each edge
+#' is annotated as a clone, sibling, or stranger edge. The enumerated
+#' relationship graphs satisfy the following constraints:
+#' \itemize{
+#'   \item{The subgraph induced by the clone edges is a cluster graph.}
+#'   \item{The subgraph induced by the clone edges and sibling edges is a cluster
+#'   graph.}
+#'   \item{Clone edges are only allowed for two genotypes from different
+#'   infections.}
+#' }
 #'
-#' Superseded by \code{\link{enumerate_RGs_alt}}.
+#' This alternate version of \code{\link{enumerate_RGs_prev}} is based on generating
+#' set partitions. Since the clone edges induce a cluster graph, the
+#' information encoded by clonal relationships is equivalent to a partition of
+#' the genotypes. Note that genotypes from the same infection cannot belong to
+#' the same partition cell. Subsequent information encoded by sibling
+#' relationships is equivalent to further partitioning the clonal partition.
+#' There are no constraints when enumerating the sibling partitions. The data
+#' structure returned encodes each graph as a nested set partition. Each
+#' partition is represented in the form of a list of vectors (`clone` and
+#' `sib`) and as a membership vector (`clone.vec` and `sib.vec`), where each
+#' entry identifies the partition cell the corresponding index belongs to.
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
-#'   distinct parasite genotypes, a.k.a the multiplicity of infection (MOI).
+#'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
+#' @param igraph Logical for whether to return \code{igraph} objects.
 #'
-#' @return Returns a list of transitive relationship graphs (RGs).
-#'
-#'   Each RG is an igraph graph, see \code{\link[igraph]{igraph}}. The seven
-#'   character code after IGRAPH, is the first seven characters of the graph ID;
-#'   see \code{\link[igraph]{graph_id}}.
-#'
-#'   RGs are undirected. They are weighted, except when they contain only stranger genotypes.
-#'
-#'   Vertices represent parasite genotypes. Vertices are named consecutively
-#'   from one to the total genotype count, \code{sum(MOIs)}. Vertex names are
-#'   used to index genotypes and inter-genotype relationships. Vertex IDs are
-#'   not used to index genotypes and their relationships because vertex IDs are
-#'   renumbered upon application of some igraph operations, e.g.
-#'   \code{\link[igraph]{induced_subgraph}}. Genotypes are grouped into
-#'   infections using a vertex attribute called group. The group attribute is
-#'   used by \code{\link{plot_RG}} to group genotypes by infection.
-#'
-#'   Edges represent sibling or clonal relationships that are differentiated by
-#'   weight: 0.5 encodes a sibling relationship, 1 encodes a clonal
-#'   relationship. Strangers have zero weight and thus there are no edges
-#'   between them.
-#'
-#' @section Provenance: This function was adapted from
-#'   \code{generate_all_models_3Ts} and \code{generate_all_models_2Ts} at
-#'   \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
-#'
-#' @section To-do:
-#' \enumerate{
-#' \item Consider using RGs_to_eval_count as the too
-#'   many RGs cut-off instead of gs_count > 6 | infection_count > 3
-#' \item Read up about using save and load to preserve graph attributes; also
-#' read_graph and write_graph
-#' }
-#'
+#' @return A list of relationship graphs. If \code{igraph} is \code{FALSE},
+#' each element is a list of four attributes:
+#'   \describe{
+#'     \item{clone}{A list of groups of genotypes that make up the clonal
+#'     cells.}
+#'     \item{clone.vec}{A numeric vector indicating the clonal membership of
+#'     each genotype.}
+#'     \item{sib}{A list of groups of clonal cells that make up the sibling
+#'     cells.}
+#'     \item{sib.vec}{A numeric vector indicating the sibling membership of
+#'     each clonal cell.}
+#'   }
+#'   Otherwise, each element is an \code{igraph} object (see
+#'   \code{\link{enumerate_RGs_prev}}) along with these four attributes. Note that
+#'   the weight matrix contains information equivalent to that of the four
+#'   attributes.
 #'
 #' @examples
-#' MOIs <- c(1, 2)
-#' RGs <- enumerate_RGs(MOIs)
-#' RGs[[1]]
-#' igraph::vertex_attr(RGs[[1]])
-#' par(mfrow = c(3, 3))
-#' for (i in 1:length(RGs)) {
-#'   plot_RG(RGs[[i]])
-#'   box()
-#' }
-#'
-#' # Compute by hand the number of not necessarily transitive graphs
-#' intra_edge_counts <- sapply(MOIs, choose, k = 2)
-#' inter_edge_count <- choose(sum(MOIs), 2) - sum(intra_edge_counts)
-#' prod(3^inter_edge_count, 2^intra_edge_counts)
+#' graphs <- enumerate_RGs(c(2, 1, 2), igraph=T) # 250 graphs
 #'
 #' @export
-enumerate_RGs <- function(MOIs) {
+enumerate_RGs <- function(MOIs, igraph = TRUE) {
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
-  # Compute the number of not necessarily transitive graphs by hand
-  intra_edge_counts <- sapply(MOIs, choose, k = 2)
-  inter_edge_count <- choose(sum(MOIs), 2) - sum(intra_edge_counts)
-  RGs_to_eval_count <- prod(3^inter_edge_count, 2^intra_edge_counts)
+  if(sum(MOIs) > 10) warning(
+    "Total MOI > 10 may lead to high memory use", immediate=T
+  )
 
-  # Hard code relationship types to satisfy the is.transitive function
-  relationship_types <- c(stranger = 0, sibling = 0.5, clone = 1)
-  intra_relationship_types <- relationship_types[setdiff(names(relationship_types), "clone")]
   infection_count <- length(MOIs) # Number of time points
   gs_count <- sum(MOIs) # Number of genotypes
 
-  if (gs_count > 6 | infection_count > 3) stop("Sorry, too many RGs")
-  if (gs_count <= 1) stop("Sorry, no RGs")
-
-  # Enumerate indices for pairs of time points, etc.
-  if (infection_count > 1) {
-    infection_ijs <- gtools::combinations(
-      n = infection_count,
-      r = 2,
-      v = 1:infection_count
-    )
-    infection_pair_count <- nrow(infection_ijs) # Number of pairs of time points
-  } else {
-    infection_pair_count <- 0 # Number of pairs of time points
+  # compute set partitions
+  part.list <- list()
+  for (i in 1:gs_count) {
+    part.list[[i]] <- partitions::setparts(i)
   }
 
   gs <- paste0("g", 1:gs_count) # Genotype names
-  ts_per_gs <- rep(1:infection_count, MOIs) # List time point indices per genotype
+  ts_per_gs <- rep(1:infection_count, MOIs)
 
-  # List genotypes per time point and time point pair
-  gs_per_ts <- split(gs, ts_per_gs)
-  if (infection_pair_count >= 1) {
-    gs_per_t_pairs <- lapply(1:infection_pair_count, function(t_pair) {
-      list(
-        gs_per_ts[[infection_ijs[t_pair, 1]]],
-        gs_per_ts[[infection_ijs[t_pair, 2]]]
+  # get clonal partitions, accounting for no intra-infection clones
+  CP_list <- enumerate_CPs(MOIs)
+
+  RG_i <- 0
+  RGs <- list() # list of relationship graphs
+
+  # Count number of valid graphs and create progress bar
+  n.RG <- sum(sapply(CP_list, function(x) ncol(part.list[[max(x)]])))
+  pbar <- txtProgressBar(min = 0, max = n.RG) # min=0 in case n.RG is 1
+  writeLines(paste("Number of valid graphs is", n.RG))
+
+  for (CP in CP_list) { # for each clonal partition (membership vector)
+    n.clones <- max(CP) # number of clonal cells
+    clone.names <- paste0("c", 1:n.clones)
+    # list of vectors of genotype names by clonal cell
+    clones <- setNames(split(gs, CP), clone.names)
+
+    # given clonal relationships, generate all compatible sibling relationships
+    # sibling partitions are all set partitions of the clonal cells
+    sib.parts <- part.list[[n.clones]]
+    n.parts <- ncol(sib.parts) # number of possible partitions
+    for (j in 1:n.parts) { # for each sibling partition
+      sib.vec <- sib.parts[, j] # membership vector
+      n.sib.clones <- max(sib.vec) # number of sibling cells
+      sib.clones <- setNames(
+        split(clone.names, sib.vec),
+        paste0("s", 1:n.sib.clones)
+      ) # list of vectors of clonal cell names by sibling cell
+      RG <- list(
+        clone = clones,
+        clone.vec = CP,
+        sib = sib.clones,
+        sib.vec = sib.vec
       )
-    })
-  }
 
-  # Enumerate all combinations of intra time-point relationships
-  intra_relationships <- lapply(MOIs, function(MOI) {
-    if (MOI > 1) {
-      gtools::permutations(
-        n = length(intra_relationship_types),
-        r = choose(MOI, 2),
-        v = intra_relationship_types,
-        repeats.allowed = T
-      )
-    } else {
-      matrix(NA, 1, 1)
+      if (igraph) RG <- RG_to_igraph(RG, gs, ts_per_gs)
+
+      RG_i <- RG_i + 1
+      RGs[[RG_i]] <- RG
+      setTxtProgressBar(pbar, RG_i)
     }
-  })
+  }
+  writeLines("")
 
-  # Enumerate all combinations of inter time-point relationships
-  if (infection_count > 1) {
-    inter_relationships <- lapply(1:infection_pair_count, function(t_pair) {
-      as.matrix(expand.grid(rep(list(relationship_types), prod(MOIs[infection_ijs[t_pair, ]]))))
-    })
-    inter_count <- sapply(inter_relationships, nrow) # Numbers of inter_relationships to permute
-  } else {
-    inter_count <- c()
+  RGs
+}
+
+#' Enumerate partitions induced by clonal relationships
+#'
+#' A clonal partition is a partition of genotypes where a pair of genotypes of
+#' the same partition cell have a clonal relationship. Genotypes from the same
+#' infection cannot be clones. This code enumerates all clonal partitions,
+#' accounting for this intra-infection restriction.
+#'
+#' @param MOIs A numeric vector specifying, for each infection, the number of
+#'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
+#'
+#' @return A list of all possible partitions, where each partition is encoded
+#' as a membership vector, which indices (genotype names) with the same entry
+#' corresponding to genotypes being int he same partition cell.
+#'
+#' @examples
+#' enumerate_CPs(c(2, 2))
+#'
+#' @export
+enumerate_CPs <- function(MOIs) {
+  if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
+
+  infection_count <- length(MOIs) # Number of time points
+  gs_count <- sum(MOIs) # Number of genotypes
+
+  ts_per_gs <- rep(1:infection_count, MOIs)
+  gstarts <- head(c(1, cumsum(MOIs) + 1), -1) # first genotype of each infection
+
+  # find all possible clonal relationships
+  # initialise with lexicographically 'smallest' possible clone partition
+  CP_init <- unlist(lapply(MOIs, function(x) 1:x))
+  CP_part <- CP_init
+  # prefix_max stores max element of each prefix of CP_part (excl current index)
+  prefix_max <- rep(0, gs_count)
+  # initialise prefix_max
+  for (i in 1:gs_count) {
+    if (i == 1) next
+    prefix_max[i] <- max(prefix_max[i - 1], CP_part[i - 1])
   }
 
-  # Compute the number of not necessarily transitive relationship graphs
-  intra_count <- sapply(intra_relationships, nrow) # Numbers of intra_relationships to permute
-  all_counts <- c(intra_count, inter_count)
-  all_perms <- as.matrix(expand.grid(sapply(all_counts, function(x) 1:x))) # Matrix of permutations
-  total_count <- prod(all_counts) # Total number of permutations
-  if (nrow(all_perms) != total_count) {
-    stop("Problem with the not necessarily transitive RG count")
-  }
-  writeLines(paste("\nnumber of not necessarily transitive graphs is", total_count))
-
-  # Allocate adjacency matrices
-  adj_all <- array(NA, dim = rep(gs_count, 2), dimnames = list(gs, gs))
-  intra_adjs <- lapply(MOIs, function(MOI) array(NA, dim = rep(MOI, 2)))
-
-  # Create progress bar and count of transitive RGs
-  pbar <- txtProgressBar(min = 1, max = total_count)
-  transitive_RGs <- list()
-  transitive_i <- 1
-
-  for (perm_i in 1:total_count) {
-    setTxtProgressBar(pbar, perm_i)
-
-    # Extract permutation indices
-    intra_perm <- all_perms[perm_i, 1:infection_count]
-    inter_perm <- all_perms[perm_i, -(1:infection_count)]
-
-    # Populate adj_all with intra-relationships
-    for (t in 1:infection_count) {
-      intra_adjs[[t]][lower.tri(intra_adjs[[t]])] <- intra_relationships[[t]][intra_perm[t], ]
-      adj_all[gs_per_ts[[t]], gs_per_ts[[t]]] <- intra_adjs[[t]]
-    }
-
-    # Populate lower tri of all_adj with between time-point relationships
-    if (infection_pair_count >= 1) {
-      for (t_pair in 1:infection_pair_count) {
-        adj_all[
-          gs_per_t_pairs[[t_pair]][[2]],
-          gs_per_t_pairs[[t_pair]][[1]]
-        ] <- inter_relationships[[t_pair]][inter_perm[t_pair], ]
+  CP_list <- list(CP_part)
+  CP_i <- 1
+  while (CP_part[gs_count] != gs_count) { # last partition is 1 2 .. gs_count
+    # find genotype to increment membership entry
+    for (i in gs_count:1) {
+      if (CP_part[i] <= prefix_max[i]) {
+        # some entry before i is already equal to CP_part[i], can increment
+        break
       }
     }
 
-    # Convert adjacency matrix into an igraph item
-    RG <- igraph::graph_from_adjacency_matrix(
-      adjmatrix = adj_all,
-      mode = "lower",
-      diag = F,
-      weighted = T
-    )
-    # Add a time-point attribute
-    RG <- igraph::set_vertex_attr(RG, "group", value = ts_per_gs)
+    start_i <- i
+    infection <- ts_per_gs[i]
+    # clonal cells that are disallowed due to no intra-infection clones
+    avoid <- head(CP_part[gstarts[infection]:i], -1)
 
-    # Test transitivity and store if transitive
-    if (is.transitive(RG)) {
-      transitive_RGs[[transitive_i]] <- RG
-      transitive_i <- transitive_i + 1
+    # try candidate values for new value of CP_part[i]
+    candidate <- CP_part[i] + 1
+    first <- TRUE
+    # this loop also updates CP_part[i] for i > start_i until end of infection
+    while (i <= gs_count & ts_per_gs[i] == infection) {
+      # while in curr infection, account for the intra-infection restriction
+      while (candidate %in% avoid) {
+        candidate <- candidate + 1
+      }
+      CP_part[i] <- candidate
+      if (first) {
+        # new cell for genotype start_i also disallowed for remaining genotypes
+        avoid <- c(avoid, candidate)
+        candidate <- 1 # reset candidate for lexicographically closest partition
+        first <- FALSE
+      } else {
+        candidate <- candidate + 1
+      }
+      i <- i + 1 # next genotype
     }
-  }
 
-  writeLines(paste("\nnumber of transitive graphs is", length(transitive_RGs)))
-  return(transitive_RGs)
+    # subsequent infections
+    if (i <= gs_count) {
+      # complete with lexicographically 'smallest' possible clone partition
+      CP_part[i:gs_count] <- CP_init[i:gs_count]
+    }
+
+    # update prefix maximums for entries where CP_part was updated
+    for (j in (start_i + 1):gs_count) {
+      prefix_max[j] <- max(prefix_max[j - 1], CP_part[j - 1])
+    }
+
+    CP_i <- CP_i + 1
+    CP_list[[CP_i]] <- CP_part
+  }
+  return(CP_list)
 }
