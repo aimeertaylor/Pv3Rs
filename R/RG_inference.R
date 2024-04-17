@@ -59,7 +59,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
     )
   }), ms)
   # enumerate all relationship graphs
-  RGs <- enumerate_RGs_alt(MOIs, igraph = FALSE)
+  RGs <- enumerate_RGs(MOIs, igraph = FALSE)
   gs <- paste0("g", 1:sum(MOIs)) # genotype names
 
   RG_i <- 0

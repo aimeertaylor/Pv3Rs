@@ -10,7 +10,7 @@
 #' sequence of recurrence states can be determined from the likelihood of all
 #' relationship graphs compatible with said sequence. More details on the
 #' enumeration and likelihood calculation of relationship graphs
-#' can be found in \code{\link{enumerate_RGs_alt}} and
+#' can be found in \code{\link{enumerate_RGs}} and
 #' \code{\link{RG_inference}} respectively.
 #'
 #' Model assumptions:
@@ -55,7 +55,7 @@
 #'       of recurrence states.}
 #'     \item{RGs}{List of relationship graphs with their log-likelihoods stored.
 #'       Only returned if `return.RG` is `TRUE`. See
-#'       \code{\link{enumerate_RGs_alt}}.}
+#'       \code{\link{enumerate_RGs}}.}
 #'   }
 #'
 #' @examples
