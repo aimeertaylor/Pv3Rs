@@ -28,7 +28,7 @@ f <- sum(lineage_probs^2) # Compute probability of being IBD
 g_count <- 3
 
 # Generate all RGs compatible with three vertices across infections
-RGs <- enumerate_RGs(c(1,1,1))
+RGs <- enumerate_RGs_prev(c(1,1,1))
 IPs <- enumerate_IPs(c(1,1,1))
 
 # Plot RGs

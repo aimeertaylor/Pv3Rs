@@ -8,7 +8,7 @@
 #' are plotted differently using different line types.
 #'
 #' @param RG A relationship graph, which is an \code{igraph} graph; see
-#'   \code{\link{enumerate_RGs}}.
+#'   \code{\link{enumerate_RGs_prev}}.
 #' @param edge_col A vector of edge colours corresponding to different
 #'   relationships, where 0.5 represents a sibling and 1 represents a clone.
 #' @param edge_lty A vector of edge line types corresponding to different
@@ -30,7 +30,7 @@
 #' \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 #'
 #' @examples
-#' RGs <- enumerate_RGs(c(2, 1, 1))
+#' RGs <- enumerate_RGs_prev(c(2, 1, 1))
 #' cpar <- par() # record current par before changing
 #' par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
 #' for (i in 12:23) {
