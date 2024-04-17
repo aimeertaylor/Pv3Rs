@@ -3,7 +3,7 @@
 MyDevFiles*
 ^data-raw$
 
-# Deprecated files from previous implementation (Aimee)
+# Deprecated files from previous implementation
 R/compute_pr_IP_RG.R
 R/compute_pr_partitions.R
 R/convert_IP_to_string.R

@@ -44,6 +44,7 @@ print(odds_func(p, q))
 ps <- 0:0.001:1
 qs <- 0:0.001:1
 odds <- outer(ps, qs, odds_func)
+par(mar=c(5, 4, 4, 2))
 filled.contour(odds, color = function(x) heat.colors(x),
                plot.title=title(main="Post. odds of relapse:reinfection",
                                 xlab="p", ylab="q")
