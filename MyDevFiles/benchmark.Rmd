@@ -59,7 +59,7 @@ sim_data <- function(MOIs, n_m, n_a) {
 
 ## Runtime vs number of markers
 
-We expect the runtime of `compute_posterior` to scale linearly with the number of markers due to the likelihood decomposition ([[1]](#1), Section 3.4). We simulate genetic data spanning across 2 episodes both with MOI 2, and vary the number of markers between $50, 100, \cdots, 400$. Each marker is assumed to have 8 possible alleles.
+We expect the runtime of `compute_posterior` to scale linearly with the number of markers due to the likelihood decomposition ([[1]](#ref1), Section 3.4). We simulate genetic data spanning across 2 episodes both with MOI 2, and vary the number of markers between $50, 100, \cdots, 400$. Each marker is assumed to have 8 possible alleles.
 
 ```{r, cache=TRUE}
 set.seed(1)
@@ -148,6 +148,7 @@ for (MOIs in MOIs_comb) {
   toc()
 }
 ```
+
 ```{r, fig.width=2.1, fig.height=1.8}
 min_time <- min(sapply(time_by_MOI, min))
 max_time <- max(sapply(time_by_MOI, max))
@@ -172,15 +173,11 @@ for(i in 1:n) {
 }
 ```
 
-Empirically, the runtime (note the log scale) has roughly exponentially scaling with respect to the total MOI. It is difficult to conclude an exact growth rate due to the small range of the total MOI. Given a fixed total MOI, the runtime is slightly shorter (see printed output of total runtime) if the maximum MOI is larger. This can be explained by the following observations:
-* A larger maximum MOI leads to more pairs of genotypes that cannot be clones. This leads to less valid relationship graphs to enumerate.
-* Allele assignment for the largest MOI is always fixed. A smaller minimum MOI leads to less allele assignment possibilities to be considered.
+Empirically, the runtime (note the log scale) has roughly exponentially scaling with respect to the total MOI. It is difficult to conclude an exact growth rate due to the small range of the total MOI. Given a fixed total MOI, the runtime is slightly shorter (see printed output of total runtime) if the maximum MOI is larger. This can be explained by the following observations: \* A larger maximum MOI leads to more pairs of genotypes that cannot be clones. This leads to less valid relationship graphs to enumerate. \* Allele assignment for the largest MOI is always fixed. A smaller minimum MOI leads to less allele assignment possibilities to be considered.
 
 ## Runtime vs number of episodes
 
-Here we investigate two separate cases:
-* increasing the number of episodes with 1 genotype per episode, and
-* increasing the number of episodes with a fixed total MOI.
+Here we investigate two separate cases: \* increasing the number of episodes with 1 genotype per episode, and \* increasing the number of episodes with a fixed total MOI.
 
 ### 1 genotype per episode
 
@@ -302,6 +299,6 @@ for(epi in 2:maxepi) {
 
 With the total MOI fixed, the runtime does not increase as drastically with the number of episodes. However, more episodes still lead to more valid relationship graphs as there are less pairs of intra-episode genotypes which cannot be clones, explaining the increase in runtime.
 
-## References
-<a id="1">[1]</a> 
-Taylor AR, Foo YS, White MT. (2022). Plasmodium vivax relapse, reinfection and recrudescence estimation using genetic data. medRxiv preprint medRxiv:2022.11.23.22282669. [https://doi.org/10.1101/2022.11.23.22282669](https://doi.org/10.1101/2022.11.23.22282669)
+## References 
+
+<a id="ref1">[1]</a> Taylor AR, Foo YS, White MT. (2022). Plasmodium vivax relapse, reinfection and recrudescence estimation using genetic data. medRxiv preprint medRxiv:2022.11.23.22282669. <https://doi.org/10.1101/2022.11.23.22282669>
