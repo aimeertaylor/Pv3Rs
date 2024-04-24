@@ -173,11 +173,19 @@ for(i in 1:n) {
 }
 ```
 
-Empirically, the runtime (note the log scale) has roughly exponentially scaling with respect to the total MOI. It is difficult to conclude an exact growth rate due to the small range of the total MOI. Given a fixed total MOI, the runtime is slightly shorter (see printed output of total runtime) if the maximum MOI is larger. This can be explained by the following observations: \* A larger maximum MOI leads to more pairs of genotypes that cannot be clones. This leads to less valid relationship graphs to enumerate. \* Allele assignment for the largest MOI is always fixed. A smaller minimum MOI leads to less allele assignment possibilities to be considered.
+Empirically, the runtime (note the log scale) has roughly exponentially scaling with respect to the total MOI. It is difficult to conclude an exact growth rate due to the small range of the total MOI. Given a fixed total MOI, the runtime is slightly shorter (see printed output of total runtime) if the maximum MOI is larger. This can be explained by the following observations:
+
+* A larger maximum MOI leads to more pairs of genotypes that cannot be clones. This leads to less valid relationship graphs to enumerate.
+
+* Allele assignment for the largest MOI is always fixed. A smaller minimum MOI leads to less allele assignment possibilities to be considered.
 
 ## Runtime vs number of episodes
 
-Here we investigate two separate cases: \* increasing the number of episodes with 1 genotype per episode, and \* increasing the number of episodes with a fixed total MOI.
+Here we investigate two separate cases:
+
+* increasing the number of episodes with 1 genotype per episode, and
+
+* increasing the number of episodes with a fixed total MOI.
 
 ### 1 genotype per episode
 
