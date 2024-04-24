@@ -1,0 +1,307 @@
+---
+title: "Benchmarking Pv3Rs"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Benchmarking Pv3Rs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_chunk$set(echo=TRUE)
+knitr::opts_chunk$set(dpi=300)
+```
+
+In this document, we investigate the runtime scaling of the `Pv3Rs`' main function, `compute_posterior`, with respect to the number of markers, the MOIs, and the number of episodes.
+
+## Setup
+
+```{r message=FALSE}
+library(Pv3Rs)
+library(tictoc)
+library(MCMCpack)
+
+# simulate allele frequencies for one marker
+sim_fs_single <- function(n_a) {
+  alleles <- letters[1:n_a] # n_a <= 26
+  fs_unnamed <- as.vector(rdirichlet(1, alpha = rep(1, n_a)))
+  setNames(fs_unnamed, alleles)
+}
+
+# simulate allele frequencies for multiple markers
+# assumes each marker has the same number of alleles
+sim_fs <- function(n_m, n_a) {
+  markers <- paste0("m", 1:n_m) # marker names
+  n_a_vec <- setNames(rep(n_a, n_m), markers)
+  lapply(n_a_vec, sim_fs_single)
+}
+
+# simulate data for one marker, one episode
+# sample without replacement to match desired MOI, so must have length(fs) >= MOI
+sim_data_single <- function(fs_single, MOI) {
+  sample(names(fs_single), MOI, prob=fs_single)
+}
+
+# simulate data for all markers, all episodes
+sim_data <- function(MOIs, n_m, n_a) {
+  fs <- sim_fs(n_m, n_a)
+  y <- lapply(
+    MOIs,
+    function(MOI) lapply(fs, sim_data_single, MOI) # sample data for one episode
+  )
+  return(list(y=y, fs=fs))
+}
+```
+
+## Runtime vs number of markers
+
+We expect the runtime of `compute_posterior` to scale linearly with the number of markers due to the likelihood decomposition ([[1]](#1), Section 3.4). We simulate genetic data spanning across 2 episodes both with MOI 2, and vary the number of markers between $50, 100, \cdots, 400$. Each marker is assumed to have 8 possible alleles.
+
+```{r, cache=TRUE}
+set.seed(1)
+n_markers <- 50*(1:8)
+n_a <- 8
+MOIs <- c(2, 2)
+n_rep <- 30
+
+data_by_m <- list()
+for (n_m in n_markers) {
+  data_by_m[[as.character(n_m)]] <- lapply(
+    1:n_rep,
+    function(x) sim_data(MOIs, n_m, n_a)
+  )
+}
+
+time_by_m <- list()
+for (n_m in n_markers) {
+  tic(msg = paste0("Running n_m=", n_m))
+  time_by_m[[as.character(n_m)]] <- sapply(
+    data_by_m[[as.character(n_m)]],
+    function(data) {
+      tic("")
+      invisible(capture.output(compute_posterior(data$y, data$fs))) # disable output
+      res <- toc(quiet=TRUE)
+      res$toc - res$tic
+    }
+  )
+  toc()
+}
+```
+
+```{r, fig.width=2, fig.height=1.6}
+max_time <- max(sapply(time_by_m, max))
+par(cex=0.4, mar=c(5, 4.5, 2, 1))
+plot(
+  NULL, type="n", 
+  xlim=c(0, 420), 
+  ylim=c(0, max_time*1.05),
+  xlab="Number of markers",
+  ylab="Runtime (s)"
+)
+for(n_m in n_markers) {
+  points(rep(n_m, n_rep), time_by_m[[as.character(n_m)]], pch=20)
+}
+```
+
+## Runtime vs MOIs
+
+As the number of MOIs increase, the runtime increases due to having more possibilities for allele assignment and more valid relationship graphs. We simulate genetic data consisting of 1 marker (8 alleles), spanning 2 episodes of various MOI combinations.
+
+```{r, cache=TRUE}
+set.seed(1)
+n_m <- 1
+n_a <- 8
+MOIs_comb <- list()
+for(MOItot in 3:7) {
+  for(MOI1 in (MOItot-1):1) {
+    MOI2 <- MOItot-MOI1
+    if(MOI1 >= MOI2) MOIs_comb <- c(MOIs_comb, list(c(MOI1, MOI2)))
+  }
+}
+n_rep <- 30
+
+data_by_MOI <- list()
+for (MOIs in MOIs_comb) {
+  data_by_MOI[[paste(MOIs, collapse=",")]] <- lapply(
+    1:n_rep,
+    function(x) sim_data(MOIs, n_m, n_a)
+  )
+}
+
+time_by_MOI <- list()
+for (MOIs in MOIs_comb) {
+  MOIstr <- paste(MOIs, collapse=",")
+  tic(msg = paste0("Running MOI=", MOIstr))
+  time_by_MOI[[MOIstr]] <- sapply(
+    data_by_MOI[[MOIstr]],
+    function(data) {
+      tic("")
+      invisible(capture.output(compute_posterior(data$y, data$fs))) # disable output
+      res <- toc(quiet=TRUE)
+      res$toc - res$tic
+    }
+  )
+  toc()
+}
+```
+```{r, fig.width=2.1, fig.height=1.8}
+min_time <- min(sapply(time_by_MOI, min))
+max_time <- max(sapply(time_by_MOI, max))
+n <- length(MOIs_comb)
+
+par(cex=0.4, cex.axis=0.8, mar=c(5, 4.5, 2, 1))
+plot(
+  1, 1, type="n", 
+  xlim=c(0.5, n+0.5), 
+  ylim=c(min_time*0.5, max_time*2),
+  xlab="MOIs",
+  ylab="Runtime (s)",
+  xaxt='n', log="y",
+)
+axis(
+  side=1, at=1:n,
+  sapply(MOIs_comb, paste, collapse=",")
+)
+
+for(i in 1:n) {
+  points(rep(i, n_rep), time_by_MOI[[i]], pch=20)
+}
+```
+
+Empirically, the runtime (note the log scale) has roughly exponentially scaling with respect to the total MOI. It is difficult to conclude an exact growth rate due to the small range of the total MOI. Given a fixed total MOI, the runtime is slightly shorter (see printed output of total runtime) if the maximum MOI is larger. This can be explained by the following observations:
+* A larger maximum MOI leads to more pairs of genotypes that cannot be clones. This leads to less valid relationship graphs to enumerate.
+* Allele assignment for the largest MOI is always fixed. A smaller minimum MOI leads to less allele assignment possibilities to be considered.
+
+## Runtime vs number of episodes
+
+Here we investigate two separate cases:
+* increasing the number of episodes with 1 genotype per episode, and
+* increasing the number of episodes with a fixed total MOI.
+
+### 1 genotype per episode
+
+We simulate genetic data consisting of 1 marker (8 alleles), with 1 genotype per episode for various numbers of episodes.
+
+```{r, cache=TRUE}
+set.seed(1)
+n_m <- 1
+n_a <- 8
+n_epis <- 2:7
+n_rep <- 30
+
+data_by_epi <- list()
+for (epi in n_epis) {
+  data_by_epi[[as.character(epi)]] <- lapply(
+    1:n_rep,
+    function(x) sim_data(rep(1, epi), n_m, n_a)
+  )
+}
+
+time_by_epi <- list()
+for (epi in n_epis) {
+  tic(msg = paste0("Running epi=", epi))
+  time_by_epi[[as.character(epi)]] <- sapply(
+    data_by_epi[[as.character(epi)]],
+    function(data) {
+      tic("")
+      invisible(capture.output(compute_posterior(data$y, data$fs))) # disable output
+      res <- toc(quiet=TRUE)
+      res$toc - res$tic
+    }
+  )
+  toc()
+}
+```
+
+```{r, fig.width=2, fig.height=1.6}
+min_time <- min(sapply(time_by_epi, min))
+max_time <- max(sapply(time_by_epi, max))
+
+par(cex=0.4, mar=c(5, 4.5, 2, 1))
+plot(
+  1, 1, type="n", 
+  xlim=c(1.5, 7.5), 
+  ylim=c(min_time*0.5, max_time*2),
+  xlab="Number of episodes",
+  ylab="Runtime (s)",
+  xaxt='n', log="y",
+)
+
+for(epi in n_epis) {
+  points(rep(epi, n_rep), time_by_epi[[as.character(epi)]], pch=20)
+}
+```
+
+With one genotype per episode, the runtime (note the log scale) scales super-exponentially with respect to the number of episodes (or equivalently, the total MOI). This is expected as the number of relationship graphs with $n$ genotypes is lower bounded by the $n$-th Bell number $B_n$, and it is known that $\log B_n$ scales roughly as $O(n\log n)$.
+
+### Fixed total MOI
+
+We simulate genetic data consisting of 1 marker (8 alleles), for various numbers of episodes with a fixed total MOI of 7. See printed output below for the sequence of MOIs considered.
+
+```{r, cache=TRUE}
+set.seed(1)
+n_m <- 1
+n_a <- 8
+maxepi <- 7 # fixed total MOI
+n_rep <- 30
+
+MOI_fix_comb <- list()
+for(epi in 2:maxepi) {
+  m <- maxepi %/% epi
+  rem <- maxepi %% epi
+  MOI_fix_comb <- c(MOI_fix_comb, list(c(rep(m+1, rem), rep(m, epi-rem))))
+}
+
+data_by_MOI_fix <- list()
+for (MOIs in MOI_fix_comb) {
+  data_by_MOI_fix[[paste(MOIs, collapse=",")]] <- lapply(
+    1:n_rep,
+    function(x) sim_data(MOIs, n_m, n_a)
+  )
+}
+
+time_by_MOI_fix <- list()
+for (MOIs in MOI_fix_comb) {
+  MOIstr <- paste(MOIs, collapse=",")
+  tic(msg = paste0("Running MOI=", MOIstr))
+  time_by_MOI_fix[[MOIstr]] <- sapply(
+    data_by_MOI_fix[[MOIstr]],
+    function(data) {
+      tic("")
+      invisible(capture.output(compute_posterior(data$y, data$fs))) # disable output
+      res <- toc(quiet=TRUE)
+      res$toc - res$tic
+    }
+  )
+  toc()
+}
+```
+
+```{r, fig.width=2, fig.height=1.6}
+min_time <- min(sapply(time_by_MOI_fix, min))
+max_time <- max(sapply(time_by_MOI_fix, max))
+
+par(cex=0.4, mar=c(5, 4.5, 2, 1))
+plot(
+  1, 1, type="n", 
+  xlim=c(1.5, maxepi + 0.5), 
+  ylim=c(0, max_time*1.05),
+  xlab="Number of episodes",
+  ylab="Runtime (s)",
+  xaxt='n',
+)
+
+for(epi in 2:maxepi) {
+  points(rep(epi, n_rep), time_by_MOI_fix[[epi-1]], pch=20)
+}
+```
+
+With the total MOI fixed, the runtime does not increase as drastically with the number of episodes. However, more episodes still lead to more valid relationship graphs as there are less pairs of intra-episode genotypes which cannot be clones, explaining the increase in runtime.
+
+## References
+<a id="1">[1]</a> 
+Taylor AR, Foo YS, White MT. (2022). Plasmodium vivax relapse, reinfection and recrudescence estimation using genetic data. medRxiv preprint medRxiv:2022.11.23.22282669. [https://doi.org/10.1101/2022.11.23.22282669](https://doi.org/10.1101/2022.11.23.22282669)
