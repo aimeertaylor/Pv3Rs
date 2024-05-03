@@ -226,6 +226,9 @@ plot_data = function(ys,
         At <- Breaks[-length(Breaks)] + diff(Breaks)/2
       }
     }
+    if (any(diff(Breaks) < .Machine$double.eps)) {
+      stop("Some near-zero frequencies: set fs to NULL to enable plotting")
+    }
     matrix_to_plot[is.na(matrix_to_plot)] <- 0
     if (marker_annotate) {
       Labels <- marker_alleles[[marker]]
