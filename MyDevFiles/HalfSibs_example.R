@@ -1,113 +1,20 @@
-# ==============================================================================
-# aside: underflow / overflow problems with large marker counts
-# aside: how to plot a graph for a real sample where gs and ts_per_gs are unknown? - record
-# Hypothesis: something to do with where the rare alleles
-# Edge case: conc_param = 1, 50 markers
-# Correct answer with the wrong reasoning.
-
-
-# For different numbers of markers, different concentration parameters, over X repeats
-# To-do: plot RGs
-# Process llikeRGs
+# For different numbers of markers, and different Dirichlet concentration parameters, over X repeats
+# Migrant pathological example
 # ==============================================================================
 rm(list = ls())
-library(MCMCpack) # For rdirichlet
-set.seed(2)
+par_default <- par()
+load("./data/Half_siblings.rda")
 
-c_params <- c(0.5,1,10,1000) # rep(1/n_alleles, n_alleles)
-n_markers <- c(10,30,50,70)
-n_repeats <- 15
+attach(Half_siblings[["rare_enrich_FALSE"]])
 
-ys <- list()
-ys_store <- list()
-posteriors <- list()
-posteriors_store <- list()
-fs_store <- list()
-
-for(c in c_params) {
-  for(m in n_markers) {
-
-    markers <- paste0("m", 1:m) # Marker names
-    alleles <- letters # Alleles
-    n_alleles <- length(alleles) # Number of alleles per marker
-
-    # Sample allele frequencies
-    fs <- sapply(markers, function(m) {
-      if(c > 999) {
-        fs_unnamed <- rep(1/n_alleles, n_alleles)
-      } else {
-        fs_unnamed <- rdirichlet(1, alpha = rep(c, n_alleles))
-      }
-      setNames(fs_unnamed, alleles)
-    }, USE.NAMES = TRUE, simplify = FALSE)
-
-    for(i in 1:n_repeats) {
-
-      # Sample parental genotypes
-      parent1 <- sapply(markers, function(t) {
-        sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-      parent2 <- sapply(markers, function(t) {
-        sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-      parent3 <- sapply(markers, function(t) { # More rare
-        sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
-
-      # Sample children genotypes (ensure all different, s.t. we can focus on a subset of RGs)
-      anyclones <- TRUE
-      while (anyclones) {
-        child12 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
-        child13 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent3[[t]]), 1), simplify = F)
-        child23 <-  sapply(markers, function(t) sample(c(parent2[[t]], parent3[[t]]), 1), simplify = F)
-        anyclones <- any(identical(child12, child13),
-                         identical(child12, child23),
-                         identical(child13, child23))
-      }
-
-      # Make parasite infection (incompatible with recrudescence)
-      initial <- rbind(unlist(child12))
-      relapse <- rbind(unlist(child13), unlist(child23))
-      y <- list(initial = apply(initial, 2, unique, simplify = F),
-                relapse = apply(relapse, 2, unique, simplify = F))
-
-      # Store the data
-      ys[[i]] <- y
-
-      # Compute posterior
-      posteriors[[i]] <- compute_posterior(y, fs, return.RG = TRUE)
-    }
-    posteriors_store[[as.character(c)]][[as.character(m)]] <- posteriors
-    ys_store[[as.character(c)]][[as.character(m)]] <- ys
-    fs_store[[as.character(c)]][[as.character(m)]] <- fs
-  }
-}
-
-
-# Extract probability of relapse
-post_L <- sapply(posteriors_store, function(X) {
-  sapply(X, function(XX) {
-    sapply(XX, function(XXX) XXX$marg[,"L"])
-  }, simplify = F)
-}, simplify = F)
-
-# Plots posterior relapse probabilities
-par(mfrow = c(length(c_params),1))
-for(c in c_params){
-  plot(NULL, xlim = range(n_markers)+c(-10,10), ylim = c(0,1),
-       xaxt = "n", bty = "n", panel.first = grid(nx = NA, ny = NULL),
-       ylab = "Posterior relapse probability",
-       xlab = "Number of markers (with added jitter)",
-       main = sprintf("Concentration parameter: %s", c))
-  axis(side = 1, at = n_markers)
-  for(m in n_markers) {
-    points(y = post_L[[as.character(c)]][[as.character(m)]],
-           x = jitter(rep(m, n_repeats), amount = 5), pch = 4)
-  }
-}
-
-
+c_params <- names(ys_store)
+n_markers <- as.numeric(names(ys_store[[1]]))
+n_repeats <- length(ys_store[[1]][[1]])
 
 #===============================================================================
-# Extract graphs (i.e., discard logp)
-justRGs <- sapply(posteriors_store, function(X) {
+# Aside: check graphs are all ordered the same [to-do: make into a unit test]
+# Extract graph summary (i.e., discard logp)
+justRGs <- sapply(ps_store, function(X) {
   sapply(X, function(XX) {
     sapply(XX, function(post) {
       sapply(post$RGs, function(RG) c(RG$clone, RG$sib))
@@ -127,9 +34,22 @@ RGcheck <- sapply(n_markers, function(m) {
 })
 
 if (!all(RGcheck)) stop("graphs not returned in the same order")
+#===============================================================================
+
+# Extract probability of relapse
+post_L <- sapply(ps_store, function(X) {
+  sapply(X, function(XX) {
+    sapply(XX, function(XXX) XXX$marg[,"L"])
+  }, simplify = F)
+}, simplify = F)
+
+# Extract exceedance proportion
+prop_L <- sapply(post_L, function(post_L_c) {
+  sapply(post_L_c, function(post_L_c_m) mean(post_L_c_m > 0.5))
+})
 
 # Extract probability of the data given the graph (check)
-llikeRGs <- sapply(posteriors_store, function(X) {
+llikeRGs <- sapply(ps_store, function(X) {
   sapply(X, function(XX) {
     sapply(XX, function(post) {
       sapply(post$RGs, function(RG) RG$logp)
@@ -138,13 +58,96 @@ llikeRGs <- sapply(posteriors_store, function(X) {
 }, simplify = F)
 
 
-# # Plot data
-# for(c in c_params){
-#   for(m in 10){ #n_markers){
-#     ys <- ys_store[[as.character(c)]][[as.character(m)]]
-#     names(ys) <- 1:n_repeats
-#     plot_data(ys, fs = fs_store[[as.character(c)]][[as.character(m)]], marker_annotate = F)
-#   }
-# }
+# Plots posterior relapse probabilities
+par(mfrow = c(4,1))
+for(c in c_params){
+  plot(NULL, xlim = range(n_markers)+c(-10,10), ylim = c(0,1),
+       xaxt = "n", bty = "n", panel.first = grid(nx = NA, ny = NULL),
+       ylab = "Posterior relapse probability",
+       xlab = "Number of markers (with added jitter)",
+       main = sprintf("Concentration parameter: %s", c))
+  axis(side = 1, at = n_markers)
+  for(m in n_markers) {
+    points(y = post_L[[as.character(c)]][[as.character(m)]],
+           x = jitter(rep(m, n_repeats), amount = 5), pch = 4)
+  }
+}
 
+# Plot exceedance proportion
+par(par_default)
+fields::image.plot(prop_L, axes = FALSE,
+                   ylab = "Dirchlet concentration parameter",
+                   xlab = "Number of markers",
+                   main = "Posterior relapse probability 0.5 exceedence proportion",
+                   col = RColorBrewer::brewer.pal(n = 11, "RdBu"),
+                   breaks = seq(0,1,length.out = 12))
+axis(at = seq(0,1,length.out = length(n_markers)),
+     side = 1, line = -0.5,
+     labels = n_markers,
+     cex.axis = 1, tick = F)
+axis(at = seq(0,1,length.out = length(c_params)),
+     side = 2, line = -0.5, las = 1,
+     labels = c_params,
+     cex.axis = 1, tick = F)
+
+
+
+
+# Re-order colours to graph type
+graph_cols <- RColorBrewer::brewer.pal(n = 9, "Paired")[c(7,5,8,9,6,4,3,1,2)]
+
+# Plot graphs
+par(mfrow = c(3,3))
+for(g in c(8,9,6,7,2,5,4,1,3)) { # Re-order graphs
+  ps <- ps_store[[1]][[1]][[1]]
+  RG <- ps$RGs[[g]]
+  gs <- paste0("g", 1:3)
+  ts_per_gs <- c(1, 2, 2)
+  par(mar = c(0.5, 0.5, 0.5, 0.5))
+  igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
+  igraphRG <- igraph::set_vertex_attr(igraphRG, "name", value = NA) # Remove genotype names
+  plot_RG(RG =  igraphRG, vertex_palette = "Greys", labels = NA)
+  box(col = graph_cols[g], lwd = 3)
+}
+
+
+# For each m, c combination, plot the graph likelihood and data
+for(c in c_params){
+  for(m in n_markers){
+
+    par(mfrow = c(4,4)) # Assumes n_repeats = 16
+    for(i in 1:n_repeats) {
+      x <- llikeRGs[[as.character(c)]][[as.character(m)]][[i]]
+      x[x == -Inf] <- NA # Mask -Inf
+      x <- x - min(x, na.rm = T) # Re-scale before exponentiating (otherwise all 0)
+      x <- exp(x)/sum(exp(x), na.rm = T) # Exponentiate and normalise
+      pie(x[!is.na(x)], col = graph_cols[!is.na(x)], labels = NA, border = NA)
+      symbols(x = 0, y = 0, circles = c(0.25), inches = FALSE, bg = "white", fg = "white", add = TRUE)
+      text(x = 0, y = 0, labels = round(post_L[[as.character(c)]][[as.character(m)]][[i]], 2))
+    }
+    mtext(text = sprintf("concentration %s, marker count %s", c, m), side = 1, cex = 0.5, line = -1)
+
+  }
+}
+
+# Plot data
+for(c in c_params) {
+  ys <- ys_store[[as.character(c)]][["10"]]
+  names(ys) <- 1:n_repeats
+  fs = fs_store[[as.character(c)]][["10"]]
+
+  # For small concentration frequencies, some allele frequencies are liable to
+  # be near zero. If some allele frequencies are near zero, add an arbitrary
+  # small value to all frequencies, to over-ride error.
+  fs_no_small <- sapply(fs, function(x) {
+    if (any(x < 0.001)) {
+      z <- x + 0.001
+      names(z) <- names(x)
+      return(z)
+    } else {
+      return(x)
+    }}, simplify = F)
+
+  plot_data(ys, fs = fs_no_small, marker_annotate = FALSE)
+}
 
