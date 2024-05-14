@@ -7,13 +7,14 @@
 rm(list = ls())
 library(MCMCpack) # For rdirichlet
 library(tictoc) # For timing
-set.seed(2)
+set.seed(1)
 
 c_params <- c(0.1, 1, 10, 100) # Dirichlet concentration parameter
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
 n_markers <- c(10, 50, 100, 150) # Number of makers
-n_alleles <- 5 # Number of alleles per marker (marker cardinality)
-n_repeats <- 16 # Number of simulations per c_param, n_marker combination
+n_alleles <- 3 # Number of alleles per marker (marker cardinality)
+n_repeats <- 10 # Number of simulations per c_param, n_marker combination
+rs_store <- list() # r for rare enrichment
 
 tictoc::tic()
 # If rare_enrich = TRUE, draw rare alleles with high probability for one of the parent (could
@@ -26,7 +27,6 @@ for(rare_enrich in c(TRUE, FALSE)) {
   ys_store <- list() # y for data
   ps_store <- list() # p for posterior
   fs_store <- list() # f for frequency
-  rs_store <- list() # r for rare enrichment
 
   for(c in c_params) {
     for(m in n_markers) {
@@ -68,16 +68,14 @@ for(rare_enrich in c(TRUE, FALSE)) {
         }
 
 
-        # Sample children genotypes (ensure no clones)
-        anyclones <- TRUE
+        # Sample children genotypes independently (ensure no intra-clones)
+        clones <- TRUE
         counter <- 0
-        while (anyclones) {
+        while (clones) {
           child12 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
           child13 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent3[[t]]), 1), simplify = F)
           child23 <-  sapply(markers, function(t) sample(c(parent2[[t]], parent3[[t]]), 1), simplify = F)
-          anyclones <- any(identical(child12, child13),
-                           identical(child12, child23),
-                           identical(child13, child23))
+          clones <- identical(child13, child23)
           counter <- counter + 1
           print(counter)
         }
@@ -102,8 +100,8 @@ for(rare_enrich in c(TRUE, FALSE)) {
   }
 
   rs_store[[sprintf("rare_enrich_%s", rare_enrich)]] <- list(ys_store = ys_store,
-                                                            ps_store = ps_store,
-                                                            fs_store = fs_store)
+                                                             ps_store = ps_store,
+                                                             fs_store = fs_store)
 }
 tictoc::toc()
 
