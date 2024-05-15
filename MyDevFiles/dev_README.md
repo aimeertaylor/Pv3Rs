@@ -6,8 +6,10 @@ Verify the examples in https://doi.org/10.1101/2022.11.23.22282669
 Examples of unwanted effects due to uniform distribution over graphs
 - `Graph_prior_bias_examples.R`
 
-Example of half siblings
-- `Half_siblings.R`
+Example of half siblings (not yet described)
+- `Half_siblings_YF.R` (`Half_siblings.R` renamed)
+- `Half_siblings_AT.R` (Aimee's attempt to understand how the frequency of a relapse classification tends to one with the number of markers despite the inter-to-intra match ratio converging to some fixed value with the number of markers). 
+- `Half_siblings_simulation.R
 
 Aimee to describe
 - `MS_data_demo_to_sort.R`

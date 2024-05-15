@@ -2,16 +2,18 @@
 # This script contains
 #
 # 1) The trajectory of the posterior relapse probability upon the addition of an
-# inter- versus intra-match upon a base of all different plus all match
+# inter- versus intra-match upon a base of all different plus all match (3
+# markers max)
 #
 # 2) Posterior relapse probabilities as a function of the intra- versus
 # inter-match allele frequencies for an example with one intra and two
-# inter-matches
+# inter-matches, as well as one all different plus one all match (5 markers)
 #
-# 3) Posterior relapse probabilities for examples with all 27 and 8 ways for
-# children alleles to be drawn give 3 and 2 parental alleles to draw from
+# 3) Posterior relapse probabilities for examples with all 27 ways for children
+# alleles to be drawn given 3 parental alleles from which to draw, each
+# represented at a different marker (27 markers)
 ################################################################################
-
+rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack) # for rdirichlet
 set.seed(2) # for rdirichlet
@@ -182,7 +184,7 @@ postL_function <- function(fs, p, q, prob_only = FALSE, odds_only = FALSE) {
   rg3.2 <- (1/32)*(d+1)*p*(q+1)*(1-q)*q^2
   rg4.2 <- (1/32)*(d+1)*p*(q+1)*(1-q)*q^2
 
-  Like_L <- (1/9) * (2*(rg1 +rg2) +rg3.1 +rg4.1 +rg3.2 +rg4.2)
+  Like_L <- (1/9) * (2*(rg1 +rg2) + rg3.1 + rg4.1 + rg3.2 + rg4.2)
   Like_I <- (1/2) * (2*(rg1 +rg2))
 
   post_L = Like_L / (Like_L + Like_I)
@@ -213,13 +215,13 @@ fields::image.plot(outer(ps, qs, postL_function, fs = fs, prob_only = TRUE),
                    col = RColorBrewer::brewer.pal(n = 10, "RdBu"),
                    breaks = seq(0,1,length.out = 11))
 
-abline(v = p, h = q); postL_function(fs, p, q) # Something odd about colours
+abline(v = p, h = q); postL_function(fs, p, q)
 
 
 
 #===============================================================================
-# Posterior relapse probabilities for examples with all 27 and 8 ways for
-# children alleles to be drawn give 3 and 2 parental alleles to draw from
+# Posterior relapse probabilities for example with all 27 ways for children
+# alleles to be drawn given 3 parental alleles to draw from
 #
 # If there are three distinct parental alleles for children to draw from, there
 # are 27 ways for children alleles to be drawn (see below), among which 6/27
@@ -227,18 +229,15 @@ abline(v = p, h = q); postL_function(fs, p, q) # Something odd about colours
 # in inter episode matches (suggestive of relapse).
 #
 # If there are two distinct parental alleles for children to draw from, there
-# are 8 ways for children alleles to be drawn (see below), among which 2/8
-# result in intra episode matches (suggestive of reinfection), and 4/8 result in
-# inter episode matches (suggestive of relapse).
+# are 8 ways for children alleles to be drawn, among which 2/8 result in intra
+# episode matches (suggestive of reinfection), and 4/8 result in inter episode
+# matches (suggestive of relapse).
 #
 # Despite more ways to match inter versus intra alleles, the posterior
 # probability of relapse versus reinfection when all ways are represented
 # depends on the allele frequencies, which in turn depend heavily on the
 # concentration parameter when marker cardinality is low.
 #===============================================================================
-library(Pv3Rs)
-library(MCMCpack)
-set.seed(2)
 
 # Function to draw allele frequencies
 fs_function <- function(c = NULL, allele_count) {
@@ -249,34 +248,6 @@ fs_function <- function(c = NULL, allele_count) {
   }
   return(p)
 }
-
-# Example data assuming there are two parental alleles to choose from:
-y2 <- list(
-  init=list(
-    m1="A",  # All match
-    m2="B",  # All match
-    #
-    m3="A",  # Intra match
-    m4="B",  # Intra match
-    #
-    m5="A",  # Inter match
-    m6="A",  # Inter match
-    m7="B",  # Inter match
-    m8="B"), # Inter match
-  #
-  recur=list(
-    m1="A",
-    m2="B",
-    #
-    m3="B",
-    m4="A",
-    #
-    m5=c("A","B"),
-    m6=c("B","A"),
-    m7=c("A","B"),
-    m8=c("B","A")
-  )
-)
 
 # Example assuming there are three parental alleles to choose from:
 y3 <- list(
@@ -365,14 +336,6 @@ for(allele_count in allele_counts) {
   }
 }
 
-# Compute posteriors
-Two_alleles <- sapply(as.character(allele_counts), function(allele_count) {
-  sapply(as.character(conc_params), function(conc_param) {
-    fs <- fs_store[[allele_count]][[conc_param]] # Unpack frequencies
-    post2 <- compute_posterior(y2, fs[1:8]) # Compute posterior state probabilities
-    return(post2$marg[,"L"])  # Unpack posterior relapse probability
-  })
-})
 
 # Compute posteriors
 Three_alleles <- sapply(as.character(allele_counts)[-1], function(allele_count) {
@@ -384,7 +347,6 @@ Three_alleles <- sapply(as.character(allele_counts)[-1], function(allele_count) 
 })
 
 
-Two_alleles
 Three_alleles
 
 
