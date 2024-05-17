@@ -8,63 +8,179 @@
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
 load("../data/Half_siblings.rda")
-attached <- search() # Check no Half_siblings alread attached
-if(any(grepl("Half_sibling", attached))) stop("Detach half sibling data")
+attached <- search() # Check no Half_siblings already attached
+if(any(grepl("Half_sibling", attached))) detach(Half_siblings)
+attach(Half_siblings)
+c_params <- names(ys_store)
+n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))
+n_repeats <- length(ys_store[[1]][[1]])
+cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
+cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
+pdf(file = "./Half_siblings_simulation.pdf", width = 7, height = 7)
 
-for(x in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
+# ==============================================================================
+# Function to summarise the locus type of the data (assumes three genotypes)
+# ==============================================================================
+locus_type_summary <- function (y, m) {
 
-  attach(Half_siblings[[x]])
-  par(par_default)
-  c_params <- names(ys_store)
-  n_markers <- as.numeric(names(ys_store[[1]]))
-  n_repeats <- length(ys_store[[1]][[1]])
+  y0 <- y[[1]][[m]]
+  y1 <- y[[2]][[m]]
 
-  #===============================================================================
-  # Aside: check graphs are all ordered the same [to-do: make into a unit test]
-  # Extract graph summary (i.e., discard logp)
-  justRGs <- sapply(ps_store, function(X) {
-    sapply(X, function(XX) {
-      sapply(XX, function(post) {
+  if (length(intersect(y0, y1)) == 0) {
+    if (length(union(y0,y1)) == 3) {
+      return("All diff.")
+    } else {
+      return("Intra-match")
+    }
+  } else {
+    if (setequal(y0, y1)) {
+      return("All match")
+    } else {
+      return("Inter-match")
+    }
+  }
+}
+
+# ==============================================================================
+# Process results generated given equifrequent alleles, parents from a single
+# population, and all marker counts from one onwards.
+# ==============================================================================
+# Compute summary statistics of the data: locus types
+locus_types <- sapply(1:n_repeats, function(i) {
+  y <- ys_store[[as.character(tail(c_params, 1))]][["rare_enrich_FALSE"]][[i]]
+  y_summary <- sapply(names(y[[1]]), locus_type_summary, y = y)
+})
+
+# Compute summary statistics of the data: locus type proportions
+locus_types_props <- sapply(1:n_repeats, function(i) {
+  types <- c("All diff.", "All match", "Intra-match", "Inter-match")
+  exp_locus_type_props <- setNames(rep(0,4), types)
+  sapply(1:max(n_markers), function(m) {
+   x <- table(locus_types[1:m, i])/m
+   exp_locus_type_props[names(x)] <- x
+   return(exp_locus_type_props)
+   })
+}, simplify = F)
+
+# Generate all possible half sib alleles (n_alleles available upon attach)
+halfsib_alleles <- generate_halfsib_alleles(n_alleles)
+
+# Format into a list to pass to locus_type_summary
+halfsib_y <- list(init = as.list(halfsib_alleles[,1]),
+                  recur = apply(halfsib_alleles[,2:3], 1, unique))
+
+# Generate locus types
+halfsib_locus_types <- sapply(1:nrow(halfsib_alleles),
+                              locus_type_summary, y = halfsib_y)
+
+# Compute locus type proportions
+exp_locus_type_props <- table(halfsib_locus_types)/nrow(halfsib_alleles)
+
+
+# ==============================================================================
+# Plot results generated given equifrequent alleles, parents from a single
+# population, and all marker counts from one onwards.
+# ==============================================================================
+layout(mat = matrix(c(1,2,3,4,4,4), ncol = 2)) # Layout for plots
+
+# Plot the posterior relapse probability trajectories
+plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1,
+     xlab = "Marker count", ylab = "Posterior relapse probability")
+abline(h = 2/11, lty = "dashed"); text(x = max(n_markers), y = 2/11, labels = "2/11", pos = 3)
+legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, horiz = TRUE, bty = "n")
+for(i in 1:n_repeats){
+  lines(x = 1:max(n_markers), y = ps_store_all_ms[[as.character(i)]], col = cols[i], lwd = 2)
+}
+
+# Plot inter-to-intra-match ratio
+plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,2), bty = "n", las = 1,
+     xlab = "Marker count", ylab = "Intra-to-inter match ratio")
+abline(h = exp_locus_type_props["Intra-match"]/exp_locus_type_props["Inter-match"], lty = "dashed")
+for(i in 1:n_repeats){
+  ratio <- locus_types_props[[i]]["Intra-match", ]/locus_types_props[[i]]["Inter-match", ]
+  lines(x = 1:max(n_markers), y = ratio, col = cols[i], lwd = 2)
+}
+
+# Plot all match to all different ratio
+plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,2), bty = "n", las = 1,
+     xlab = "Marker count", ylab = "All match to all diff. ratio")
+abline(h = exp_locus_type_props["All diff."]/exp_locus_type_props["All match"], lty = "dashed")
+for(i in 1:n_repeats){
+  ratio <- locus_types_props[[i]]["All diff.", ]/locus_types_props[[i]]["All match", ]
+  lines(x = 1:150, y = ratio, col = cols[i], lwd = 2)
+}
+
+# Plot locus type proportion given all markers
+locus_types_all <- apply(locus_types, 2, function(x) table(x)/length(x))
+dotchart(t(locus_types_all), color = cols, pch = 20, pt.cex = 1.5, cex = 0.75)
+title(main = sprintf("Type proportion after %s markers", max(n_markers)))
+segments(x0 = exp_locus_type_props["All diff."],
+         x1 = exp_locus_type_props["All diff."],
+         y0 = 37, y1 = 46, lty = "dashed")
+segments(x0 = exp_locus_type_props["All match"],
+         x1 = exp_locus_type_props["All match"],
+         y0 = 25, y1 = 34, lty = "dashed")
+segments(x0 = exp_locus_type_props["Inter-match"],
+         x1 = exp_locus_type_props["Inter-match"],
+         y0 = 13, y1 = 22, lty = "dashed")
+segments(x0 = exp_locus_type_props["Intra-match"],
+         x1 = exp_locus_type_props["Intra-match"],
+         y0 = 1, y1 = 10, lty = "dashed")
+
+
+# ==============================================================================
+# Process results results for different allele frequency types, for a migrant
+# parent (rare_enrich TRUE) as well as parents from a single population, and for
+# different marker counts
+# ==============================================================================
+# Aside: check graphs are all ordered the same [make into a unit test?]
+# Extract graph summary (i.e., discard logp)
+justRGs <- sapply(ps_store, function(X) {
+  sapply(X, function(XX) {
+    sapply(XX, function(XXX) {
+      sapply(XXX, function(post) {
         sapply(post$RGs, function(RG) c(RG$clone, RG$sib))
       }, simplify = F)
     }, simplify = F)
   }, simplify = F)
+}, simplify = F)
 
 
-  # Check all the graphs are returned in the same order
-  justRG <- justRGs[[1]][[1]][[1]]
-  RGcheck <- sapply(n_markers, function(m) {
-    sapply(c_params, function(c) {
+# Check all the graphs are returned in the same order
+justRG <- justRGs[[1]][[1]][[1]][[1]]
+RGcheck <- sapply(c_params, function(c) {
+  sapply(c(TRUE, FALSE), function(rare_enrich) {
       sapply(2:n_repeats, function(i) {
-        identical(justRG, justRGs[[as.character(c)]][[as.character(m)]][[i]])
+        sapply(n_markers, function(m) {
+        identical(justRG, justRGs[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]][[as.character(m)]])
       })
     })
   })
+})
 
-  if (!all(RGcheck)) stop("graphs not returned in the same order")
-  #===============================================================================
+if (!all(RGcheck)) stop("graphs not returned in the same order")
+
+#-------------------------------------------------------------------------------
+# Loop over migrant and non-migrant scenarios
+#-------------------------------------------------------------------------------
+for(rare_enrich in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
 
   # Extract probability of relapse
   post_L <- sapply(ps_store, function(X) {
-    sapply(X, function(XX) {
-      sapply(XX, function(XXX) XXX$marg[,"L"])
-    }, simplify = F)
+    sapply(X[[rare_enrich]], function(XX) sapply(XX, function(post) post$marg[,"L"]))
   }, simplify = F)
 
   # Extract exceedance proportion
   prop_L <- sapply(post_L, function(post_L_c) {
-    sapply(post_L_c, function(post_L_c_m) mean(post_L_c_m > 0.5))
+    apply(post_L_c, 1, function(post_L_c_m) mean(post_L_c_m > 0.5))
   })
 
-  # Extract probability of the data given the graph (check)
+  # Extract probability of the data given the relationship graph
   llikeRGs <- sapply(ps_store, function(X) {
-    sapply(X, function(XX) {
-      sapply(XX, function(post) {
-        sapply(post$RGs, function(RG) RG$logp)
-      }, simplify = F)
+    sapply(X[[rare_enrich]], function(XX) {
+      sapply(XX, function(post) sapply(post$RGs, function(RG) RG$logp))
     }, simplify = F)
   }, simplify = F)
-
 
   # Plots posterior relapse probabilities
   par(mfrow = c(4,1))
@@ -75,9 +191,11 @@ for(x in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
          xlab = "Number of markers (with added jitter)",
          main = sprintf("Concentration parameter: %s", c))
     axis(side = 1, at = n_markers)
-    for(m in n_markers) {
-      points(y = post_L[[as.character(c)]][[as.character(m)]],
-             x = jitter(rep(m, n_repeats), amount = 5), pch = 4)
+    for(i in 1:n_repeats) {
+      lines(y = post_L[[as.character(c)]][,i], x = n_markers,
+            lwd = 1.5, col = cols_light[i], pch = 20)
+      points(y = post_L[[as.character(c)]][,i], x = n_markers,
+            lwd = 1.5, col = cols[i], pch = 20)
     }
   }
 
@@ -104,7 +222,7 @@ for(x in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
   # Plot graphs
   par(mfrow = c(3,3))
   for(g in c(8,9,6,7,2,5,4,1,3)) { # Re-order graphs
-    ps <- ps_store[[1]][[1]][[1]]
+    ps <- ps_store[[1]][[1]][[1]][[1]]
     RG <- ps$RGs[[g]]
     gs <- paste0("g", 1:3)
     ts_per_gs <- c(1, 2, 2)
@@ -117,44 +235,44 @@ for(x in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
 
   # For each m, c combination, plot the graph likelihood and data
   for(c in c_params){
-    par(mfcol = c(n_repeats,length(n_markers)), mar = c(0,0,0,0)) # Assumes n_repeats = 16
+    par(mfcol = c(n_repeats,length(n_markers)), mar = c(0,0,0,0))
     for(m in n_markers){
       for(i in 1:n_repeats) {
-        x <- llikeRGs[[as.character(c)]][[as.character(m)]][[i]]
+        x <- llikeRGs[[as.character(c)]][[i]][,as.character(m)]
         x[x == -Inf] <- NA # Mask -Inf
         x <- x - min(x, na.rm = T) # Re-scale before exponentiating (otherwise all 0)
         x <- exp(x)/sum(exp(x), na.rm = T) # Exponentiate and normalise
         pie(x[!is.na(x)], col = graph_cols[!is.na(x)], labels = NA, border = NA)
         symbols(x = 0, y = 0, circles = c(0.25), inches = FALSE, bg = "white", fg = "white", add = TRUE)
-        mtext(text = round(post_L[[as.character(c)]][[as.character(m)]][[i]], 2),
-              side = 4, line = -4, las = 1, cex = 0.5)
+        text(label = round(post_L[[as.character(c)]][as.character(m),i], 2), x = 0, y = 0, cex = 0.5)
       }
       mtext(text = sprintf("concentration %s, marker count %s", c, m), side = 1, cex = 0.5, line = -1)
     }
   }
 
-  # Plot data
-  for(c in c_params) {
-    ys <- ys_store[[as.character(c)]][[as.character(n_markers[1])]]
-    names(ys) <- 1:n_repeats
-    fs = fs_store[[as.character(c)]][[as.character(n_markers[1])]]
+  # # Plot data
+  # for(c in c_params) {
+  #   ys <- ys_store[[as.character(c)]][[rare_enrich]]
+  #   names(ys) <- 1:n_repeats
+  #   fs = fs_store[[as.character(c)]]
+  #
+  #   # For small concentration frequencies, some allele frequencies are liable to
+  #   # be near zero. If some allele frequencies are near zero, add an arbitrary
+  #   # small value to all frequencies, to over-ride error.
+  #   fs_no_small <- sapply(fs, function(x) {
+  #     if (any(x < 0.001)) {
+  #       z <- x + 0.001
+  #       names(z) <- names(x)
+  #       return(z)
+  #     } else {
+  #       return(x)
+  #     }}, simplify = F)
+  #
+  #   plot_data(ys, fs = fs_no_small, marker_annotate = FALSE)
+  # }
 
-    # For small concentration frequencies, some allele frequencies are liable to
-    # be near zero. If some allele frequencies are near zero, add an arbitrary
-    # small value to all frequencies, to over-ride error.
-    fs_no_small <- sapply(fs, function(x) {
-      if (any(x < 0.001)) {
-        z <- x + 0.001
-        names(z) <- names(x)
-        return(z)
-      } else {
-        return(x)
-      }}, simplify = F)
-
-    plot_data(ys, fs = fs_no_small, marker_annotate = FALSE)
-  }
-
-  detach(Half_siblings[[x]])
   par(par_default)
 }
 
+detach("Half_siblings")
+dev.off()

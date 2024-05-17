@@ -9,14 +9,14 @@
 # inter-match allele frequencies for an example with one intra and two
 # inter-matches, as well as one all different plus one all match (5 markers)
 #
-# 3) Posterior relapse probabilities for examples with all 27 ways for children
-# alleles to be drawn given 3 parental alleles from which to draw, each
-# represented at a different marker (27 markers)
+# 3) Posterior relapse probabilities for examples with all ways for children
+# alleles to be drawn from parental alleles given different marker cardinalities
+# assuming equifrequent alleles
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack) # for rdirichlet
-set.seed(2) # for rdirichlet
+set.seed(2) # for reproducibility
 
 # ==============================================================================
 # Example showing the trajectory of the posterior relapse probability upon the
@@ -220,134 +220,50 @@ abline(v = p, h = q); postL_function(fs, p, q)
 
 
 #===============================================================================
-# Posterior relapse probabilities for example with all 27 ways for children
-# alleles to be drawn given 3 parental alleles to draw from
-#
-# If there are three distinct parental alleles for children to draw from, there
-# are 27 ways for children alleles to be drawn (see below), among which 6/27
-# result in intra episode matches (suggestive of reinfection), and 12/27 result
-# in inter episode matches (suggestive of relapse).
-#
-# If there are two distinct parental alleles for children to draw from, there
-# are 8 ways for children alleles to be drawn, among which 2/8 result in intra
-# episode matches (suggestive of reinfection), and 4/8 result in inter episode
-# matches (suggestive of relapse).
-#
-# Despite more ways to match inter versus intra alleles, the posterior
-# probability of relapse versus reinfection when all ways are represented
-# depends on the allele frequencies, which in turn depend heavily on the
-# concentration parameter when marker cardinality is low.
+# Posterior relapse probabilities for data in which of all ways to draw alleles
+# for a trio of half siblings are represented assuming equifrequent alleles.
+# Marker cardinality impacts the All different to All match ratio but not the
+# intra-to-inter match ratio. Half siblings cannot be all different if markers
+# are biallelic.
 #===============================================================================
-
-# Function to draw allele frequencies
-fs_function <- function(c = NULL, allele_count) {
-  if (is.na(c)) { # If no concentration parameter
-    p <- rep(1/allele_count, allele_count)
-  } else {
-    p <- rdirichlet(1, alpha = rep(c, allele_count))
-  }
-  return(p)
-}
-
-# Example assuming there are three parental alleles to choose from:
-y3 <- list(
-  init=list(
-    m1="A", # All different
-    m2="B", # All different
-    m3="C", # All different
-    m4="A", # All different
-    m5="B", # All different
-    m6="C", # All different
-    #
-    m7="A", # All match
-    m8="B", # All match
-    m9="C", # All match
-    #
-    m10="A", # Intra match
-    m11="A", # Intra match
-    m12="B", # Intra match
-    m13="B", # Intra match
-    m14="C", # Intra match
-    m15="C", # Intra match
-    #
-    m16="A", # Inter match
-    m17="A", # Inter match
-    m18="B", # Inter match
-    m19="B", # Inter match
-    m20="C", # Inter match
-    m21="C", # Inter match
-    m22="A", # Inter match
-    m23="A", # Inter match
-    m24="B", # Inter match
-    m25="B", # Inter match
-    m26="C", # Inter match
-    m27="C"), # Inter match
-  #
-  recur=list(
-    m1=c("B","C"),
-    m2=c("A","C"),
-    m3=c("A","B"),
-    m4=c("B","C"),
-    m5=c("A","C"),
-    m6=c("A","B"),
-    #
-    m7="A",
-    m8="B",
-    m9="C",
-    #
-    m10="B",
-    m11="C",
-    m12="A",
-    m13="C",
-    m14="A",
-    m15="B",
-    #
-    m16=c("A","B"),
-    m17=c("A","C"),
-    m18=c("B","A"),
-    m19=c("B","C"),
-    m20=c("C","A"),
-    m21=c("C","B"),
-    m22=c("A","B"),
-    m23=c("A","C"),
-    m24=c("B","A"),
-    m25=c("B","C"),
-    m26=c("C","A"),
-    m27=c("C","B")
-  )
-)
-
-plot_data(ys = list(pid1 = y3), fs = NULL, marker_annotate = F)
 allele_counts <- c(2,3,4,5) # Cardinality of marker
-conc_params <- c(0.1, 1, 1000) # Concentration parameter of allele frequency distribution
-fs_store <- list()
+exp_locus_type_props <- c("All diff." = NA,
+                          "All match" = NA,
+                          "Intra-match" = NA,
+                          "Inter-match" = NA)
 
-# Generate frequencies
-for(allele_count in allele_counts) {
-  for(conc_param in conc_params) {
+# Does cardinality matter to proportions
+sapply(allele_counts, function(allele_count){
 
-    # Draw frequencies
-    fs <- sapply(paste0("m", 1:27),
-                 function(x) setNames(fs_function(conc_param, allele_count), LETTERS[1:allele_count]),
-                 simplify = F)
+  # Generate alleles
+  halfsib_alleles <- generate_halfsib_alleles(allele_count)
+  row.names(halfsib_alleles) <- paste0("m", 1:nrow(halfsib_alleles))
 
-    # Store frequencies
-    fs_store[[as.character(allele_count)]][[as.character(conc_param)]] <- fs
-  }
-}
+  # Format into a list to pass to locus_type_summary
+  halfsib_y <- list(init = as.list(halfsib_alleles[,1]),
+                    recur = apply(halfsib_alleles[,2:3], 1, unique))
 
+  # Generate locus types
+  halfsib_locus_types <- sapply(1:nrow(halfsib_alleles), locus_type_summary, y = halfsib_y)
 
-# Compute posteriors
-Three_alleles <- sapply(as.character(allele_counts)[-1], function(allele_count) {
-  sapply(as.character(conc_params), function(conc_param) {
-    fs <- fs_store[[allele_count]][[conc_param]] # Unpack frequencies
-    post3 <- compute_posterior(y3, fs) # Compute posterior state probabilities
-    return(post3$marg[,"L"]) # Unpack posterior relapse probability
-  })
+  # Compute locus type proportions
+  x <- table(halfsib_locus_types)/nrow(halfsib_alleles)
+  exp_locus_type_props[names(x)] <- x
+
+  # Draw frequencies
+  fs <- sapply(row.names(halfsib_alleles), function(m){
+    setNames(rep(1/allele_count, allele_count), LETTERS[1:allele_count])
+  }, simplify = F)
+
+  # Compute posterior state probabilities
+  post <- compute_posterior(halfsib_y, fs)
+
+  # Unpack posterior relapse probability
+  return(c(exp_locus_type_props,
+           marker_count = nrow(halfsib_alleles),
+           posterior_relapse_pr = post$marg[,"L"]))
 })
 
-
-Three_alleles
 
 
 
