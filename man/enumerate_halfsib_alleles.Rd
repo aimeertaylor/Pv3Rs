@@ -2,7 +2,7 @@
 % Please edit documentation in R/enumerate_halfsib_alleles.R
 \name{enumerate_halfsib_alleles}
 \alias{enumerate_halfsib_alleles}
-\title{Enumerate all allelic draws for three half siblings}
+\title{List all allelic draws for three half siblings}
 \usage{
 enumerate_halfsib_alleles(n_alleles)
 }
@@ -17,7 +17,7 @@ letters of the latin alphabet.
 }
 \description{
 Given a specified number of alleles for a single marker,
-\code{generate_halfsib_alleles()} enumerates all the possible ways three half
+\code{generate_halfsib_alleles()} enumerates all the ways three half
 siblings can draw alleles from their respective parents by firstly
 enumerating all allelic combinations for the parents, and by secondly
 enumerating all the inheritable combinations for the children.

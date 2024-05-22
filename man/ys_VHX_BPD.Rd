@@ -19,7 +19,10 @@ a vector of observed alleles (repeat lengths). For example:
 }
 }
 \source{
-\url{https://github.com/jwatowatson/RecurrentVivax/blob/master/RData/GeneticModel/MS_data_PooledAnalysis.RData}
+\itemize{
+\item \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/RData/GeneticModel/MS_data_PooledAnalysis.RData}
+\item \url{https://github.com/aimeertaylor/Pv3Rs/blob/main/data-raw/ys_VHX_BPD.R}
+}
 }
 \usage{
 ys_VHX_BPD
