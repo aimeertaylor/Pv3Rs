@@ -7,7 +7,9 @@
 compute_posterior(y, fs, prior = NULL, return.RG = FALSE)
 }
 \arguments{
-\item{y}{Observed data in the form of a list of lists. The number of entries
+\item{y}{Observed data in the form of a list of lists. Alleles should be
+provided as a set of distinct alleles for each infection (per marker).
+The number of entries
 is the number of episodes in chronological order. Episode names can be
 specified, but they are not used. Each episode is in turn a list of
 observed alleles for each marker, which must be named, or \code{NA} if not
@@ -67,9 +69,14 @@ Model assumptions:
 \code{compute_posterior} supports missing data, which should be encoded as
 \code{NA}s. However, to avoid estimates based entirely on the weakly
 informative nature of multiple per-marker allele calls (see example below and
-\code{vignette("missing_data", "Pv3Rs")} for more details), we recommend against generating
-estimates for recurrences that have no paired data due to missingness (see
-Microsatellite data example in \code{vignette("demo", "Pv3Rs")}).
+\code{vignette("missing_data", "Pv3Rs")} for more details), we recommend against
+generating estimates for recurrences that have no paired data due to
+missingness (see Microsatellite data example in \code{vignette("demo", "Pv3Rs")}).
+
+The data input expects each list of alleles (for an infection) to consist of
+a set of distinct alleles. Providing the function with a multiset of alleles
+may lead to undefined behaviour. Note that the function will automatically
+produce all assignments with repeated alleles.
 }
 \examples{
 

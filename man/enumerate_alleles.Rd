@@ -7,8 +7,8 @@
 enumerate_alleles(y.inf, gs.inf)
 }
 \arguments{
-\item{y.inf}{List of alleles observed across markers for genotypes within
-one infection.}
+\item{y.inf}{List of unique alleles observed across markers for genotypes within
+one infection. Repeated alleles will lead to overcounting the assignments.}
 
 \item{gs.inf}{Vector of genotype names for genotypes within one infection.}
 }
@@ -20,7 +20,8 @@ genotypes, while the rows correspond to allele assignments for a marker.
 Due to permutation symmetry of intra-infection genotypes, we fix a single
 assignment for one of the markers whose number of alleles observed is equal
 to the MOI (consider it the anchor) and permute the rest, discarding
-combinations that under-represent the observed marker diversity.
+combinations that under-represent the observed marker diversity. Note that
+this function is not tested for input with repeated alleles.
 }
 \examples{
 # 3 markers

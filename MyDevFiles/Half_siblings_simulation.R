@@ -63,7 +63,7 @@ locus_types_props <- sapply(1:n_repeats, function(i) {
 }, simplify = F)
 
 # Generate all possible half sib alleles (n_alleles available upon attach)
-halfsib_alleles <- generate_halfsib_alleles(n_alleles)
+halfsib_alleles <- enumerate_halfsib_alleles(n_alleles)
 
 # Format into a list to pass to locus_type_summary
 halfsib_y <- list(init = as.list(halfsib_alleles[,1]),

@@ -1,7 +1,28 @@
-# ==============================================================================
-# Function to generate alleles for three half sibs by enumeration (naive)
-# ==============================================================================
-generate_halfsib_alleles <- function(n_alleles){
+#' List all allelic draws for three half siblings
+#'
+#' Given a specified number of alleles for a single marker,
+#' `generate_halfsib_alleles()` enumerates all the ways three half
+#' siblings can draw alleles from their respective parents by firstly
+#' enumerating all allelic combinations for the parents, and by secondly
+#' enumerating all the inheritable combinations for the children.
+#'
+#' @param n_alleles Positive whole number specifying a per-marker number of
+#'   alleles, otherwise known as marker cardinality.
+#'
+#' @returns A character matrix. Each column is an individual. Each row is a
+#'   possible allelic draw. Alleles are represented by the first `n_alleles`
+#'   letters of the latin alphabet.
+#' @examples
+#' generate_halfsib_alleles(3)
+#'
+#' @export
+enumerate_halfsib_alleles <- function(n_alleles){
+
+
+  # Check positive integer
+  if(!(n_alleles > 0 & is.wholenumber(n_alleles))) {
+    stop ("n_alleles should be a positive wholenumber")
+  }
 
   # Per-marker alphabet
   alleles <- LETTERS[1:n_alleles]
@@ -22,6 +43,9 @@ generate_halfsib_alleles <- function(n_alleles){
   child_alleles <- do.call(rbind, apply(child_parents, 1, function(ps) {
     parental_alleles[,ps]
   }, simplify = F))
+
+  # Rename
+  colnames(child_alleles) <- paste("Half sibling", 1:3)
 
   # End of function
   return(child_alleles)

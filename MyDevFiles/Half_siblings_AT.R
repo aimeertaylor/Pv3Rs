@@ -236,7 +236,7 @@ exp_locus_type_props <- c("All diff." = NA,
 sapply(allele_counts, function(allele_count){
 
   # Generate alleles
-  halfsib_alleles <- generate_halfsib_alleles(allele_count)
+  halfsib_alleles <- enumerate_halfsib_alleles(allele_count)
   row.names(halfsib_alleles) <- paste0("m", 1:nrow(halfsib_alleles))
 
   # Format into a list to pass to locus_type_summary
