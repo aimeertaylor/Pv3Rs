@@ -1,8 +1,8 @@
-#' Test if x contains integer numbers.
+#' Test if x is an integer number.
 #'
-#' Internal function copied from \code{\link[base]{integer}}. It is differs from
-#' \code{\link[base]{is.integer}} because tests if x is an integer type, not an
-#' integer number.
+#' Internal function copied from [base::integer()]. It is differs from
+#' [base::is.integer()] because [base::is.integer()] tests if x is an integer
+#' type (for compatibility with C and Fortran code).
 #'
 #' @noRd
 is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
