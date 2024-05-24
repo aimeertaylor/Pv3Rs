@@ -16,30 +16,7 @@ n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))
 n_repeats <- length(ys_store[[1]][[1]])
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
-pdf(file = "./Half_siblings_simulation.pdf", width = 7, height = 7)
-
-# ==============================================================================
-# Function to summarise the locus type of the data (assumes three genotypes)
-# ==============================================================================
-locus_type_summary <- function (y, m) {
-
-  y0 <- y[[1]][[m]]
-  y1 <- y[[2]][[m]]
-
-  if (length(intersect(y0, y1)) == 0) {
-    if (length(union(y0,y1)) == 3) {
-      return("All diff.")
-    } else {
-      return("Intra-match")
-    }
-  } else {
-    if (setequal(y0, y1)) {
-      return("All match")
-    } else {
-      return("Inter-match")
-    }
-  }
-}
+#pdf(file = "./Half_siblings_simulation.pdf", width = 7, height = 7)
 
 # ==============================================================================
 # Process results generated given equifrequent alleles, parents from a single
@@ -48,7 +25,7 @@ locus_type_summary <- function (y, m) {
 # Compute summary statistics of the data: locus types
 locus_types <- sapply(1:n_repeats, function(i) {
   y <- ys_store[[as.character(tail(c_params, 1))]][["rare_enrich_FALSE"]][[i]]
-  y_summary <- sapply(names(y[[1]]), locus_type_summary, y = y)
+  y_summary <- locus_type_summary(y)
 })
 
 # Compute summary statistics of the data: locus type proportions
@@ -70,8 +47,7 @@ halfsib_y <- list(init = as.list(halfsib_alleles[,1]),
                   recur = apply(halfsib_alleles[,2:3], 1, unique))
 
 # Generate locus types
-halfsib_locus_types <- sapply(1:nrow(halfsib_alleles),
-                              locus_type_summary, y = halfsib_y)
+halfsib_locus_types <- locus_type_summary(y = halfsib_y)
 
 # Compute locus type proportions
 exp_locus_type_props <- table(halfsib_locus_types)/nrow(halfsib_alleles)
@@ -275,4 +251,4 @@ for(rare_enrich in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
 }
 
 detach("Half_siblings")
-dev.off()
+#dev.off()

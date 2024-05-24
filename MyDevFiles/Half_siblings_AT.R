@@ -233,7 +233,9 @@ exp_locus_type_props <- c("All diff." = NA,
                           "Inter-match" = NA)
 
 # Does cardinality matter to proportions
-sapply(allele_counts, function(allele_count){
+sapply(as.character(allele_counts), function(allele_count){
+
+  allele_count <- as.numeric(allele_count)
 
   # Generate alleles
   halfsib_alleles <- enumerate_halfsib_alleles(allele_count)
@@ -244,7 +246,7 @@ sapply(allele_counts, function(allele_count){
                     recur = apply(halfsib_alleles[,2:3], 1, unique))
 
   # Generate locus types
-  halfsib_locus_types <- sapply(1:nrow(halfsib_alleles), locus_type_summary, y = halfsib_y)
+  halfsib_locus_types <- locus_type_summary(y = halfsib_y)
 
   # Compute locus type proportions
   x <- table(halfsib_locus_types)/nrow(halfsib_alleles)
@@ -263,7 +265,5 @@ sapply(allele_counts, function(allele_count){
            marker_count = nrow(halfsib_alleles),
            posterior_relapse_pr = post$marg[,"L"]))
 })
-
-
 
 
