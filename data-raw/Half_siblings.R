@@ -62,7 +62,8 @@ for(c in c_params) {
 
       print(paste(c,rare_enrich,i))
 
-      # Sample parental genotypes (ensure no clones and thus always same RGs)
+      # Sample parental genotypes
+      # (ensure no clones and thus always the same no. of vertices in RGs)
       anyclones <- TRUE
       while (anyclones) {
         parent1 <- sapply(all_markers, function(t) {
@@ -79,8 +80,8 @@ for(c in c_params) {
         }
 
         anyclones <- any(identical(parent1[1:m_min_clone], parent2[1:m_min_clone]),
-                         identical(parent1[1:m_min_clone], parent2[1:m_min_clone]),
-                         identical(parent1[1:m_min_clone], parent2[1:m_min_clone]))
+                         identical(parent1[1:m_min_clone], parent3[1:m_min_clone]),
+                         identical(parent2[1:m_min_clone], parent3[1:m_min_clone]))
       }
 
       # Sample children genotypes independently (ensure no intra-clones)
