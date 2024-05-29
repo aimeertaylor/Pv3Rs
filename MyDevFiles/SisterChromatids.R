@@ -11,7 +11,7 @@ rm(list = ls()) # For cleanliness
 set.seed(1) # For reproducibility
 
 chr_length <- 20 # Length of the chromosome
-n_recom_events <- # Number of recombination events
+n_recom_events <- 2 # Number of independent recombination events
 
 # Sample parents
 parentA <- sample(c(0,1), replace = T, size = chr_length)
