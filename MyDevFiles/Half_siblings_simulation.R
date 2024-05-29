@@ -7,16 +7,17 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-load("../data/Half_siblings.rda")
+SiblingType <- "ParentChildLike_siblings" # "Half" "ParentChildLike" "Meiotic"
+load(sprintf("../data/%s.rda", SiblingType))
 attached <- search() # Check no Half_siblings already attached
-if(any(grepl("Half_sibling", attached))) detach(Half_siblings)
-attach(Half_siblings)
+if(any(grepl("siblings", attached))) detach(ParentChildLike_siblings)
+attach(ParentChildLike_siblings)
 c_params <- names(ys_store)
 n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))
 n_repeats <- length(ys_store[[1]][[1]])
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
-#pdf(file = "./Half_siblings_simulation.pdf", width = 7, height = 7)
+#pdf(file = sprintf("./%s_siblings_simulation.pdf", SiblingType), width = 7, height = 7)
 
 # ==============================================================================
 # Process results generated given equifrequent alleles, parents from a single
@@ -57,7 +58,7 @@ exp_locus_type_props <- table(halfsib_locus_types)/nrow(halfsib_alleles)
 # Plot results generated given equifrequent alleles, parents from a single
 # population, and all marker counts from one onwards.
 # ==============================================================================
-layout(mat = matrix(c(1,2,3,4,4,4), ncol = 2)) # Layout for plots
+#layout(mat = matrix(c(1,2,3,4,4,4), ncol = 2)) # Layout for plots
 
 # Plot the posterior relapse probability trajectories
 plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1,
@@ -250,5 +251,5 @@ for(rare_enrich in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
   par(par_default)
 }
 
-detach("Half_siblings")
+detach("Siblings")
 #dev.off()
