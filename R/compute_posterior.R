@@ -9,9 +9,8 @@
 #' different level of expected genetic relatedness. The likelihood of a
 #' sequence of recurrence states can be determined from the likelihood of all
 #' relationship graphs compatible with said sequence. More details on the
-#' enumeration and likelihood calculation of relationship graphs
-#' can be found in \code{\link{enumerate_RGs}} and
-#' \code{\link{RG_inference}} respectively.
+#' enumeration and likelihood calculation of relationship graphs can be found in
+#' \code{\link{enumerate_RGs}} and \code{\link{RG_inference}} respectively.
 #'
 #' Model assumptions:
 #' \itemize{
