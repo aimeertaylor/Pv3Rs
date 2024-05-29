@@ -76,8 +76,8 @@ enumerate_RGs <- function(MOIs, igraph = TRUE) {
 
   # Count number of valid graphs and create progress bar
   n.RG <- sum(sapply(CP_list, function(x) ncol(part.list[[max(x)]])))
-  pbar <- txtProgressBar(min = 0, max = n.RG) # min=0 in case n.RG is 1
-  writeLines(paste("Number of valid graphs is", n.RG))
+  pbar <- msg_progress_bar(n.RG)
+  message(paste("Number of valid graphs is", n.RG))
 
   for (CP in CP_list) { # for each clonal partition (membership vector)
     n.clones <- max(CP) # number of clonal cells
@@ -107,10 +107,9 @@ enumerate_RGs <- function(MOIs, igraph = TRUE) {
 
       RG_i <- RG_i + 1
       RGs[[RG_i]] <- RG
-      setTxtProgressBar(pbar, RG_i)
+      pbar$increment()
     }
   }
-  writeLines("")
 
   RGs
 }

@@ -76,7 +76,7 @@ sample_single_recurrence_RG <- function(MOI_init, cause,
   if (cause == "relapse") {
     RGs_to_eval_count <- prod(3^inter_edge_count, 2^intra_edge_counts)
     if (RGs_to_eval_count > 1000) {
-      writeLines(sprintf(
+      message(sprintf(
         "\nThis might take a while: sampling among %s not necessarily transitive RGs",
         RGs_to_eval_count
       ))
@@ -84,7 +84,7 @@ sample_single_recurrence_RG <- function(MOI_init, cause,
   } else {
     RGs_to_eval_count <- prod(2^intra_edge_counts)
     if (RGs_to_eval_count > 1000) {
-      writeLines(sprintf(
+      message(sprintf(
         "\nThis might take a while: sampling among %s not necessarily transitive RGs",
         RGs_to_eval_count
       ))

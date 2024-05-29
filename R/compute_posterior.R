@@ -316,8 +316,8 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   # for each RG, add p(y|RG) for recurrence states where RG is compatible
   RG_i <- 0
   n.RG <- length(RGs)
-  pbar <- txtProgressBar(min = 0, max = n.RG)
-  writeLines("Finding log-likelihood of each vector of recurrent states")
+  pbar <- msg_progress_bar(n.RG)
+  message("Finding log-likelihood of each vector of recurrent states")
   max.logp <- max(sapply(RGs, "[[", "logp"))
   for (RG in RGs) {
     # subtract maximum to avoid underflow
@@ -327,9 +327,9 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
       logp_sum_per_rstr[rstr] <- log(exp(logp_sum_per_rstr[rstr]) + prob_RG)
     }
     RG_i <- RG_i + 1
-    setTxtProgressBar(pbar, RG_i)
+    pbar$increment()
   }
-  writeLines("\n")
+  message("")
 
   # logp_per_rstr is now log of p(y|R) = sum of p(y|RG)*p(RG|R)
   # assume p(RG|R) is uniform

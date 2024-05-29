@@ -62,8 +62,8 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
 
   RG_i <- 0
   n.RG <- length(RGs)
-  pbar <- txtProgressBar(min = 0, max = n.RG) # min=0 in case n.RG is 1
-  writeLines(paste("Computing log p(Y|RG) for", n.RG, "RGs"))
+  pbar <- msg_progress_bar(n.RG)
+  message(paste("Computing log p(Y|RG) for", n.RG, "RGs"))
 
   for (RG in RGs) { # for each relationship graph
     # check if there is some cell of clones cannot have the same genotype
@@ -85,7 +85,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
     # set logp to -Inf in case of any clonal edges that are impossible
     if (incompatible) {
       RG_i <- RG_i + 1
-      setTxtProgressBar(pbar, RG_i)
+      pbar$increment()
       RGs[[RG_i]]$logp <- -Inf
       next
     }
@@ -137,12 +137,11 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
     }
 
     RG_i <- RG_i + 1
-    setTxtProgressBar(pbar, RG_i)
+    pbar$increment()
 
     # p(y | RG) = sum of p(y | IP) p(IP | RG), where p(IP | RG) is uniform
     RGs[[RG_i]]$logp <- (sum(matrixStats::colLogSumExps(IP_logps))
     - length(ms) * log(n.IPs))
   }
-  writeLines("")
   RGs
 }
