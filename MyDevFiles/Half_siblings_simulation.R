@@ -72,7 +72,7 @@ for(i in 1:n_repeats){
 # Plot inter-to-intra-match ratio
 plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,2), bty = "n", las = 1,
      xlab = "Marker count", ylab = "Intra-to-inter match ratio")
-abline(h = exp_locus_type_props["Intra-match"]/exp_locus_type_props["Inter-match"], lty = "dashed")
+abline(h = 0.5*log2(5/2), lty = "dashed")
 for(i in 1:n_repeats){
   ratio <- locus_types_props[[i]]["Intra-match", ]/locus_types_props[[i]]["Inter-match", ]
   lines(x = 1:max(n_markers), y = ratio, col = cols[i], lwd = 2)
