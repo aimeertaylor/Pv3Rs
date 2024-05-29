@@ -205,8 +205,8 @@ postL_function(fs, p, q)
 
 # Plot posterior relapse probability as a function of the intra- versus
 # inter-match allele frequency
-ps <- seq(0,1,0.005)
-qs <- seq(0.001,1,0.005)
+ps <- seq(0,1,0.005) # Intra
+qs <- seq(0.001,1,0.005) # Inter
 
 fields::image.plot(outer(ps, qs, postL_function, fs = fs, prob_only = TRUE),
                    ylab = "Inter-match allele frequency",
@@ -216,6 +216,9 @@ fields::image.plot(outer(ps, qs, postL_function, fs = fs, prob_only = TRUE),
                    breaks = seq(0,1,length.out = 11))
 
 abline(v = p, h = q); postL_function(fs, p, q)
+
+
+lines(y = 0.5*log2(5/2)*qs, x = qs)
 
 
 
