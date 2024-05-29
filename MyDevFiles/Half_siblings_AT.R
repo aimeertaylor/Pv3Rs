@@ -218,8 +218,6 @@ fields::image.plot(outer(ps, qs, postL_function, fs = fs, prob_only = TRUE),
 abline(v = p, h = q); postL_function(fs, p, q)
 
 
-lines(y = 0.5*log2(5/2)*qs, x = qs)
-
 
 
 #===============================================================================
