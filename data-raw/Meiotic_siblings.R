@@ -15,6 +15,7 @@ library(tictoc) # For timing
 seed <- 1 # For reproducibility
 c_params <- c(0.1, 1, 10, 100) # Dirichlet concentration parameter
 n_markers <- c(10, 50, 100, 150) # Number of makers
+max_n_markers <- max(n_markers)
 n_repeats <- 10 # Number of simulations per c_param, n_marker combination
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
 n_alleles <- 3 # Number of alleles per marker (marker cardinality)
@@ -32,7 +33,7 @@ ps_store_all_ms <- list() # all_ms for all marker counts
 # Set the seed, name markers and get alleles
 #===============================================================================
 set.seed(seed) # Set the seed
-all_markers <- paste0("m", 1:max(n_markers)) # Marker names
+all_markers <- paste0("m", 1:max_n_markers) # Marker names
 alleles <- letters[1:n_alleles] # Alleles
 
 #===============================================================================
@@ -68,15 +69,51 @@ for(c in c_params) {
         anyclones <- any(identical(parent1[1:m_min_clone], parent2[1:m_min_clone]))
       }
 
-      # Sample children genotypes independently (ensure no intra-clones)
+
+      # Map the markers to chromosomes. Assume equal sized chromosomes; okay if
+      # later we assume an equal number of crossovers per chromosome
+      chrs <- round(seq(0.51, 14.5, length.out = max_n_markers))
+      marker_per_chr <- table(chrs)
+
+      # Per chromosome parent1 segment length for recombinant chromatids one and two
+      c1_p1_segment_length <- sapply(marker_per_chr, sample, size = 1)
+      c2_p1_segment_length <- sapply(marker_per_chr, sample, size = 1)
+
+      # Crossover for chromatid one
+      c1 <- do.call(c, sapply(1:14, function(i) {
+          x <- rep(2, marker_per_chr[i])
+          x[1:c1_p1_segment_length[i]] <- 1
+          return(x)
+      }))
+
+      # Crossover for chromatid two
+      c2 <- do.call(c, sapply(1:14, function(i) {
+        x <- rep(2, marker_per_chr[i])
+        x[1:c2_p1_segment_length[i]] <- 1
+        return(x)
+      }))
+
+      # Complements of c1 and c2
+      c3 <- abs(c1-2) + 1
+      c4 <- abs(c2-2) + 1
+
+      # Check complements
+      if (!all(c(c1+c3, c2+c4) == 3)) {
+        stop ("recombinant chromatids not complementary")
+      }
+
+      # Independent orientation +++++++++++ This is where I've got to +++++++++++++
+      recomb_chromatid_ids <- sapply(1:14, function(chr) sample(x = 1:4, size = 4))
+
+      # Sample children genotypes dependently
       clones <- TRUE
       while (clones) {
 
         # Crossing over
         # Assume both pairs of homologous chromosomes crosses over
-        A1 <- sample(0:1, replace = T, size = max(n_markers)) + 1
+        A1 <- sample(0:1, replace = T, size = 14) + 1
         B1 <- abs(A1-1) + 1
-        A2 <- sample(0:1, replace = T, size = max(n_markers)) + 1
+        A2 <- sample(0:1, replace = T, size = 14) + 1
         B2 <- abs(A2-1) + 1
 
         # Independent orientation of chromosomes
