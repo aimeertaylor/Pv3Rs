@@ -18,8 +18,8 @@ n_markers <- c(10, 50, 100, 150) # Number of makers
 max_n_markers <- max(n_markers)
 n_repeats <- 10 # Number of simulations per c_param, n_marker combination
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
-n_alleles <- 3 # Number of alleles per marker (marker cardinality)
-m_min_clone <- 4 # Minimum number of markers for which clone is disallowed
+n_alleles <- 4 # Number of alleles per marker (marker cardinality)
+m_min_clone <- 4 # Minimum number of markers from one for which clone is disallowed
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -35,6 +35,11 @@ ps_store_all_ms <- list() # all_ms for all marker counts
 set.seed(seed) # Set the seed
 all_markers <- paste0("m", 1:max_n_markers) # Marker names
 alleles <- letters[1:n_alleles] # Alleles
+
+# Map the markers to chromosomes. Assume equal sized chromosomes; okay if
+# later we assume an equal number of crossovers per chromosome
+chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
+markers_per_chr <- table(chrs_per_marker)
 
 #===============================================================================
 # Generate data
@@ -53,42 +58,36 @@ for(c in c_params) {
   }, USE.NAMES = TRUE, simplify = FALSE)
   fs_store[[as.character(c)]] <- fs
 
-
     for(i in 1:n_repeats) {
 
-      print(paste(c,rare_enrich,i))
+      print(paste(c,i))
 
       # Sample parental genotypes
       # (ensure no clones and thus always the same no. of vertices in RGs)
-      anyclones <- TRUE
-      while (anyclones) {
+      clones <- TRUE
+      while (clones) {
         parent1 <- sapply(all_markers, function(t) {
           sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
         parent2 <- sapply(all_markers, function(t) {
           sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-        anyclones <- any(identical(parent1[1:m_min_clone], parent2[1:m_min_clone]))
+        clones <- identical(parent1[1:m_min_clone], parent2[1:m_min_clone])
       }
-
-
-      # Map the markers to chromosomes. Assume equal sized chromosomes; okay if
-      # later we assume an equal number of crossovers per chromosome
-      chrs <- round(seq(0.51, 14.5, length.out = max_n_markers))
-      marker_per_chr <- table(chrs)
+      parents <- cbind(parent1, parent2)
 
       # Per chromosome parent1 segment length for recombinant chromatids one and two
-      c1_p1_segment_length <- sapply(marker_per_chr, sample, size = 1)
-      c2_p1_segment_length <- sapply(marker_per_chr, sample, size = 1)
+      c1_p1_segment_length <- sapply(markers_per_chr, sample, size = 1)
+      c2_p1_segment_length <- sapply(markers_per_chr, sample, size = 1)
 
-      # Crossover for chromatid one
-      c1 <- do.call(c, sapply(1:14, function(i) {
-          x <- rep(2, marker_per_chr[i])
+      # Parent allocation for chromatid one after crossover
+      c1 <- do.call("c", sapply(1:14, function(i) {
+          x <- rep(2, markers_per_chr[i])
           x[1:c1_p1_segment_length[i]] <- 1
           return(x)
       }))
 
-      # Crossover for chromatid two
-      c2 <- do.call(c, sapply(1:14, function(i) {
-        x <- rep(2, marker_per_chr[i])
+      # Parent allocation for chromatid two after crossover
+      c2 <- do.call("c", sapply(1:14, function(i) {
+        x <- rep(2, markers_per_chr[i])
         x[1:c2_p1_segment_length[i]] <- 1
         return(x)
       }))
@@ -102,39 +101,32 @@ for(c in c_params) {
         stop ("recombinant chromatids not complementary")
       }
 
-      # Independent orientation +++++++++++ This is where I've got to +++++++++++++
+      # Parent allocation for chromatid bundle pre independent orientation
+      cs_pre <- cbind(c1,c2,c3,c4)
+
+      # Independent orientation
       recomb_chromatid_ids <- sapply(1:14, function(chr) sample(x = 1:4, size = 4))
 
-      # Sample children genotypes dependently
-      clones <- TRUE
-      while (clones) {
+      # Parent allocation for chromatid bundle post independent orientation
+      cs <- sapply(1:4, function(i) {
+        c_ind <- recomb_chromatid_ids[i,]
+        do.call("c", sapply(1:14, function(j) {
+          m_ind <- which(chrs_per_marker == j)
+          cs_pre[m_ind,c_ind[j]]
+        }))
+      })
 
-        # Crossing over
-        # Assume both pairs of homologous chromosomes crosses over
-        A1 <- sample(0:1, replace = T, size = 14) + 1
-        B1 <- abs(A1-1) + 1
-        A2 <- sample(0:1, replace = T, size = 14) + 1
-        B2 <- abs(A2-1) + 1
-
-        # Independent orientation of chromosomes
-        # ++++++++++++++++++++
-        # This is where I'm at: need to map tp 150 markers
-        sapply(1:14, function(i) sample(1:4, size = 4))
-
-
-        if (!all(rowSums(cbind(x, x_c)) == 3)) stop("Not complementary")
-
-        child1 <- sapply(all_markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
-        child1c <-  sapply(all_markers, function(t) sample(c(parent1[[t]], parent3[[t]]), 1), simplify = F)
-        child2 <-  sapply(all_markers, function(t) sample(c(parent2[[t]], parent3[[t]]), 1), simplify = F)
-        child2c
-
-        clones <- identical(child13[1:m_min_clone], child23[1:m_min_clone])
-      }
+      # Child genotypes
+      children <- sapply(1:max_n_markers, function(i) {
+        sapply(1:4, function(j) {
+          parents[i,cs[i,j]]
+        })
+      })
+      colnames(children) <- all_markers
 
       # Make parasite infection and data
-      initial <- rbind(unlist(child12))
-      relapse <- rbind(unlist(child13), unlist(child23)) # MOI recurrence > initial
+      initial <- rbind(unlist(children[1,]), unlist(children[2,]), unlist(children[3,]))
+      relapse <- rbind(unlist(children[4,])) # MOI initial > relapse
       y <- list(initial = apply(initial, 2, unique, simplify = F),
                 relapse = apply(relapse, 2, unique, simplify = F))
 
@@ -147,19 +139,18 @@ for(c in c_params) {
 tictoc::toc()
 
 #===============================================================================
-# Generate results for different allele frequency types, for a migrant parent
-# (rare_enrich TRUE) as well as parents from a single population, and for
+# Generate results for different allele frequency types, and for
 # different marker counts
 #===============================================================================
 tictoc::tic()
 for(c in c_params) {
   fs <- fs_store[[as.character(c)]]
     for(i in 1:n_repeats){
-      y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
+      y_all_markers <- ys_store[[as.character(c)]][[i]]
       for(m in n_markers){
         y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
         ps <- compute_posterior(y, fs, return.RG = TRUE)
-        ps_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[as.character(i)]][[as.character(m)]] <- ps
+        ps_store[[as.character(c)]][[as.character(i)]][[as.character(m)]] <- ps
       }
     }
   }
@@ -170,11 +161,10 @@ tictoc::toc()
 # population, and for all marker counts from one onwards.
 #===============================================================================
 c <- 100 # For uniform allele frequencies only
-rare_enrich <- FALSE # For parents from the same population
 fs <- fs_store[[as.character(c)]] # Extract frequencies
 tictoc::tic()
 for(i in 1:n_repeats){
-  y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
+  y_all_markers <- ys_store[[as.character(c)]][[i]]
   # compute posterior relapse probabilities for all marker counts from one onwards
   for(m in 1:max(n_markers)){
     y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
@@ -188,7 +178,7 @@ tictoc::toc()
 #===============================================================================
 # Bundle data, results and magic numbers
 #===============================================================================
-Mieotic_siblings <- list(fs_store = fs_store,
+Meiotic_siblings <- list(fs_store = fs_store,
                       ys_store = ys_store,
                       ps_store = ps_store,
                       ps_store_all_ms = ps_store_all_ms,
@@ -201,4 +191,4 @@ Mieotic_siblings <- list(fs_store = fs_store,
 #===============================================================================
 # Save Half_siblings as exported data
 #===============================================================================
-usethis::use_data(Mieotic_siblings, overwrite = TRUE)
+usethis::use_data(Meiotic_siblings, overwrite = TRUE)
