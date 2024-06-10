@@ -19,8 +19,7 @@ cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
 #pdf(file = "./Meiotic_siblings_simulation.pdf", width = 7, height = 7)
 
 # ==============================================================================
-# Plot results generated given equifrequent alleles and all marker counts from
-# one onwards.
+# Plot results generated given equifrequent alleles across all marker counts
 # ==============================================================================
 # Plot the posterior relapse probability trajectories
 plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1, xaxt = "n",
@@ -28,14 +27,13 @@ plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1, xaxt =
 axis(side = 1, at = seq(0, max(n_markers), 10))
 #legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, horiz = TRUE, bty = "n")
 for(i in 1:n_repeats){
-  lines(x = 1:max(n_markers),
+  lines(x = min(n_markers):max(n_markers),
         y = ps_store_all_ms[[as.character(i)]], col = cols[i], lwd = 2)
 }
 
 # ==============================================================================
-# Process results results for different allele frequency types, for a migrant
-# parent (rare_enrich TRUE) as well as parents from a single population, and for
-# different marker counts
+# Process results results for different allele frequency types and for different
+# marker counts
 # ==============================================================================
 # Aside: check graphs are all ordered the same [make into a unit test?]
 # Extract graph summary (i.e., discard logp)
@@ -49,7 +47,7 @@ justRGs <- sapply(ps_store, function(X) {
 
 
 # Check all the graphs are returned in the same order
-justRG <- justRGs[[1]][[1]][[1]]
+justRG <- justRGs[[2]][[1]][[1]]
 RGcheck <- sapply(c_params, function(c) {
   sapply(2:n_repeats, function(i) {
     sapply(n_markers, function(m) {
@@ -145,7 +143,6 @@ for(c in c_params){
     mtext(text = sprintf("concentration %s, marker count %s", c, m), side = 1, cex = 0.5, line = -1)
   }
 }
-
 
 #  par(par_default)
 detach("Meiotics_siblings")

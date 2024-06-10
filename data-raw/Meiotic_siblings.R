@@ -12,14 +12,14 @@ library(tictoc) # For timing
 #===============================================================================
 # Magic numbers
 #===============================================================================
-seed <- 1 # For reproducibility
-c_params <- c(0.1, 1, 10, 100) # Dirichlet concentration parameter
+seed <- 2 # For reproducibility
+c_params <- c(0.1, 1, 100) # Dirichlet concentration parameter
 n_markers <- c(10, 50, 100, 150) # Number of makers
 max_n_markers <- max(n_markers)
-n_repeats <- 10 # Number of simulations per c_param, n_marker combination
+n_repeats <- 5 # Number of simulations per c_param, n_marker combination
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
 n_alleles <- 4 # Number of alleles per marker (marker cardinality)
-m_min_clone <- 4 # Minimum number of markers from one for which clone is disallowed
+min_n_markers <- min(n_markers) # Size of minimum marker subset for which clones are disallowed
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -33,8 +33,18 @@ ps_store_all_ms <- list() # all_ms for all marker counts
 # Set the seed, name markers and get alleles
 #===============================================================================
 set.seed(seed) # Set the seed
-all_markers <- paste0("m", 1:max_n_markers) # Marker names
 alleles <- letters[1:n_alleles] # Alleles
+all_markers <- paste0("m", 1:max_n_markers) # Marker names
+min_marker_subset <- sample(all_markers, min_n_markers, replace = FALSE)
+
+# Create progressive marker subsets, randomly sampled over chromosomes
+marker_subsets <- list()
+marker_subsets[[as.character(min_n_markers)]] <- min_marker_subset
+for(m in min_n_markers:(max_n_markers-1)) {
+  markers_thusfar <- marker_subsets[[as.character(m)]]
+  marker_to_add <- sample(setdiff(all_markers, markers_thusfar), 1)
+  marker_subsets[[as.character(m+1)]] <- c(markers_thusfar, marker_to_add)
+ }
 
 # Map the markers to chromosomes. Assume equal sized chromosomes; okay if
 # later we assume an equal number of crossovers per chromosome
@@ -64,16 +74,19 @@ for(c in c_params) {
 
       # Sample parental genotypes
       # (ensure no clones and thus always the same no. of vertices in RGs)
-      clones <- TRUE
-      while (clones) {
+      parental_clones <- TRUE
+      while (parental_clones) {
         parent1 <- sapply(all_markers, function(t) {
           sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
         parent2 <- sapply(all_markers, function(t) {
           sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-        clones <- identical(parent1[1:m_min_clone], parent2[1:m_min_clone])
+        parental_clones <- identical(parent1[min_marker_subset], parent2[min_marker_subset])
       }
       parents <- cbind(parent1, parent2)
 
+      # Note condition on sufficient diversity
+      children_clones <- TRUE
+      while (children_clones) {
       # Per chromosome parent1 segment length for recombinant chromatids one and two
       c1_p1_segment_length <- sapply(markers_per_chr, sample, size = 1)
       c2_p1_segment_length <- sapply(markers_per_chr, sample, size = 1)
@@ -124,22 +137,24 @@ for(c in c_params) {
       })
       colnames(children) <- all_markers
 
+      # Check diversity among children in the first few markers
+      children_clones <- nrow(unique(children[,min_marker_subset])) < 4
+      }
+
       # Make parasite infection and data
-      initial <- rbind(unlist(children[1,]), unlist(children[2,]), unlist(children[3,]))
-      relapse <- rbind(unlist(children[4,])) # MOI initial > relapse
+      initial <- rbind(unlist(children[1,]),unlist(children[2,]),unlist(children[4,]))
+      relapse <- rbind(unlist(children[3,])) # MOI initial > relapse
       y <- list(initial = apply(initial, 2, unique, simplify = F),
                 relapse = apply(relapse, 2, unique, simplify = F))
 
       # Store the data
       ys_store[[as.character(c)]][[i]] <- y
-
-
   }
 }
 tictoc::toc()
 
 #===============================================================================
-# Generate results for different allele frequency types, and for
+# Generate results for different allele frequency types and for
 # different marker counts
 #===============================================================================
 tictoc::tic()
@@ -148,7 +163,8 @@ for(c in c_params) {
     for(i in 1:n_repeats){
       y_all_markers <- ys_store[[as.character(c)]][[i]]
       for(m in n_markers){
-        y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
+        marker_subset <- marker_subsets[[as.character(m)]]
+        y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
         ps <- compute_posterior(y, fs, return.RG = TRUE)
         ps_store[[as.character(c)]][[as.character(i)]][[as.character(m)]] <- ps
       }
@@ -157,8 +173,7 @@ for(c in c_params) {
 tictoc::toc()
 
 #===============================================================================
-# Generate results for equifrequent alleles, for parents from a single
-# population, and for all marker counts from one onwards.
+# Generate results for equifrequent alleles and for all markers progressively
 #===============================================================================
 c <- 100 # For uniform allele frequencies only
 fs <- fs_store[[as.character(c)]] # Extract frequencies
@@ -166,7 +181,8 @@ tictoc::tic()
 for(i in 1:n_repeats){
   y_all_markers <- ys_store[[as.character(c)]][[i]]
   # compute posterior relapse probabilities for all marker counts from one onwards
-  for(m in 1:max(n_markers)){
+  for(m in min_n_markers:max_n_markers){
+    marker_subset <- marker_subsets[[as.character(m)]]
     y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
     ps <- compute_posterior(y, fs)
     ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
@@ -184,7 +200,7 @@ Meiotic_siblings <- list(fs_store = fs_store,
                       ps_store_all_ms = ps_store_all_ms,
                       c_cutoff = c_cutoff,
                       n_alleles = n_alleles,
-                      m_min_clone = m_min_clone,
+                      min_n_markers = min_n_markers,
                       seed = seed)
 
 
