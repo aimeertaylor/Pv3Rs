@@ -11,12 +11,16 @@ load(sprintf("../data/Meiotic_siblings.rda"))
 attached <- search() # Check no Half_siblings already attached
 if(any(grepl("siblings", attached))) detach(Meiotic_siblings)
 attach(Meiotic_siblings)
+n_repeats <- length(ys_store[[1]][[1]])
+MOIs_per_infection <- names(ys_store[[1]])
 c_params <- names(ys_store)
-n_markers <- as.numeric(names(ps_store[[1]][[1]]))
-n_repeats <- length(ys_store[[1]])
+n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
-#pdf(file = "./Meiotic_siblings_simulation.pdf", width = 7, height = 7)
+example_y <- ys_store[[1]][[1]]
+example_MOIs <- determine_MOIs(example_y)
+ts_per_gs <- rep(1:length(example_y), example_MOIs)
+
 
 # ==============================================================================
 # Plot results generated given equifrequent alleles across all marker counts
@@ -25,11 +29,18 @@ cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
 plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1, xaxt = "n",
      xlab = "Marker count", ylab = "Posterior relapse probability")
 axis(side = 1, at = seq(0, max(n_markers), 10))
+
 #legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, horiz = TRUE, bty = "n")
-for(i in 1:n_repeats){
-  lines(x = min(n_markers):max(n_markers),
-        y = ps_store_all_ms[[as.character(i)]], col = cols[i], lwd = 2)
+for(MOIs in MOIs_per_infection) {
+  LTY = ifelse(MOIs == "2_1", 1, 2)
+  for(i in 1:n_repeats){
+    lines(x = min(n_markers):max(n_markers),
+          y = ps_store_all_ms[[MOIs]][[as.character(i)]], col = cols[i], lwd = 2, lty = LTY)
+  }
 }
+
+# +++++++++++++++++ This is where I am at
+
 
 # ==============================================================================
 # Process results results for different allele frequency types and for different
@@ -113,6 +124,7 @@ for(c in c_params){
 # Re-order colours to graph type
 graph_cols <- RColorBrewer::brewer.pal(n = 9, "Paired")[c(7,5,8,9,6,4,3,1,2)]
 
+
 # Plot graphs
 par(mfrow = c(3,3))
 for(g in c(8,9,6,7,2,5,4,1,3)) { # Re-order graphs
@@ -144,6 +156,5 @@ for(c in c_params){
   }
 }
 
-#  par(par_default)
 detach("Meiotics_siblings")
-#dev.off()
+
