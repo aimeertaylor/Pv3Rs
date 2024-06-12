@@ -112,14 +112,15 @@ tictoc::toc()
 # different marker counts
 #===============================================================================
 tictoc::tic()
-for(c in c_params) {
-  fs <- fs_store[[as.character(c)]]
-  for(rare_enrich in c(TRUE, FALSE)) {
-    for(i in 1:n_repeats){
+for(i in 1:n_repeats){
+  print(i)
+  for(c in c_params) {
+    fs <- fs_store[[as.character(c)]]
+    for(rare_enrich in c(TRUE, FALSE)) {
       y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
       for(m in n_markers){
         y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
-        ps <- compute_posterior(y, fs, return.RG = TRUE)
+        ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
         ps_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[as.character(i)]][[as.character(m)]] <- ps
       }
     }
@@ -136,11 +137,12 @@ rare_enrich <- FALSE # For parents from the same population
 fs <- fs_store[[as.character(c)]] # Extract frequencies
 tictoc::tic()
 for(i in 1:n_repeats){
+  print(i)
   y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
   # compute posterior relapse probabilities for all marker counts from one onward
   for(m in 1:max(n_markers)){
     y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
-    ps <- compute_posterior(y, fs)
+    ps <- suppressMessages(compute_posterior(y, fs))
     ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
   }
 }

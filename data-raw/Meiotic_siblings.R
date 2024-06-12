@@ -172,15 +172,16 @@ tictoc::toc()
 # different marker counts
 #===============================================================================
 tictoc::tic()
-for(c in c_params) {
-  fs <- fs_store[[as.character(c)]]
-  for(i in 1:n_repeats){
+for(i in 1:n_repeats){
+  print(i)
+  for(c in c_params) {
+    fs <- fs_store[[as.character(c)]]
     for(MOIs in MOIs_per_infection) {
       y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[i]]
       for(m in n_markers){
         marker_subset <- marker_subsets[[as.character(m)]]
         y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
-        ps <- compute_posterior(y, fs, return.RG = TRUE)
+        ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
         ps_store[[as.character(c)]][[MOIs]][[as.character(i)]][[as.character(m)]] <- ps
       }
     }
@@ -195,13 +196,14 @@ c <- 100 # For uniform allele frequencies only
 fs <- fs_store[[as.character(c)]] # Extract frequencies
 tictoc::tic()
 for(i in 1:n_repeats){
+  print(i)
   for(MOIs in MOIs_per_infection) {
     y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[i]]
     # compute posterior relapse probabilities for all marker counts from one onwards
     for(m in min_n_markers:max_n_markers){
       marker_subset <- marker_subsets[[as.character(m)]]
       y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
-      ps <- compute_posterior(y, fs)
+      ps <- suppressMessages(compute_posterior(y, fs))
       ps_store_all_ms[[MOIs]][[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
     }
   }

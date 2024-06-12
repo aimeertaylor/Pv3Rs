@@ -70,7 +70,7 @@ for(c in c_params) {
       ys[[i]] <- y
 
       # Compute posterior
-      posteriors[[i]] <- compute_posterior(y, fs, return.RG = TRUE)
+      posteriors[[i]] <- compute_posterior(y, fs, return.RG=TRUE, return.logp=TRUE)
     }
     posteriors_store[[as.character(c)]][[as.character(m)]] <- posteriors
     ys_store[[as.character(c)]][[as.character(m)]] <- ys
