@@ -85,61 +85,24 @@ for(c in c_params) {
     }
     parents <- cbind(parent1, parent2)
 
+
     # Note condition on sufficient diversity
     children_clones <- TRUE
     while (children_clones) {
-      # Per chromosome parent1 segment length for recombinant chromatids one and two
-      c1_p1_segment_length <- sapply(markers_per_chr, sample, size = 1)
-      c2_p1_segment_length <- sapply(markers_per_chr, sample, size = 1)
 
-      # Parent allocation for chromatid one after crossover
-      c1 <- do.call("c", sapply(1:14, function(i) {
-        x <- rep(2, markers_per_chr[i])
-        x[1:c1_p1_segment_length[i]] <- 1
-        return(x)
-      }))
+    # Sample parental allocations
+    cs <- recombine_parent_ids(markers_per_chr)
 
-      # Parent allocation for chromatid two after crossover
-      c2 <- do.call("c", sapply(1:14, function(i) {
-        x <- rep(2, markers_per_chr[i])
-        x[1:c2_p1_segment_length[i]] <- 1
-        return(x)
-      }))
-
-      # Complements of c1 and c2
-      c3 <- abs(c1-2) + 1
-      c4 <- abs(c2-2) + 1
-
-      # Check complements
-      if (!all(c(c1+c3, c2+c4) == 3)) {
-        stop ("recombinant chromatids not complementary")
-      }
-
-      # Parent allocation for chromatid bundle pre independent orientation
-      cs_pre <- cbind(c1,c2,c3,c4)
-
-      # Independent orientation
-      recomb_chromatid_ids <- sapply(1:14, function(chr) sample(x = 1:4, size = 4))
-
-      # Parent allocation for chromatid bundle post independent orientation
-      cs <- sapply(1:4, function(i) {
-        c_ind <- recomb_chromatid_ids[i,]
-        do.call("c", sapply(1:14, function(j) {
-          m_ind <- which(chrs_per_marker == j)
-          cs_pre[m_ind,c_ind[j]]
-        }))
+    # Construct children genotypes from parental allocations
+    children <- sapply(1:max_n_markers, function(i) {
+      sapply(1:4, function(j) {
+        parents[i,cs[i,j]]
       })
+    })
+    colnames(children) <- all_markers
 
-      # Child genotypes
-      children <- sapply(1:max_n_markers, function(i) {
-        sapply(1:4, function(j) {
-          parents[i,cs[i,j]]
-        })
-      })
-      colnames(children) <- all_markers
-
-      # Check diversity among children in the first few markers
-      children_clones <- nrow(unique(children[,min_marker_subset])) < 4
+    # Check diversity among children in the first few markers
+    children_clones <- nrow(unique(children[,min_marker_subset])) < 4
     }
 
     # For different numbers of genotypes per infection
