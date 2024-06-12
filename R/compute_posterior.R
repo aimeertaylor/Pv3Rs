@@ -3,6 +3,8 @@
 #' Entry point to Bayesian inference for \emph{P. vivax} recurrence states based
 #' on genetic data. Specifically, this function finds the posterior
 #' probabilities of relapse, reinfection and recrudescence from genetic data.
+#' Please note that the progress bar does not necessarily increment at a uniform
+#' rate, and may sometimes appear to be stuck while the code is still running.
 #'
 #' We enumerate all possible relationship graphs between genotypes, where each
 #' pair of genotypes may be clones, siblings, or strangers, each with a
@@ -52,6 +54,12 @@
 #'   If prior is not provided, a uniform prior will be used.
 #' @param return.RG Boolean for whether to return the relationship graphs,
 #'   defaults to `FALSE`.
+#' @param return.logp Boolean for whether to return the log-likelihood for each
+#'   relationship graph, defaults to `FALSE`. Setting this to `FALSE` allows
+#'   for permutation symmetries to be exploited to save computational time, see
+#'   \code{\link{enumerate_alleles}}. Setting this to `TRUE` will result in
+#'   longer runtimes, especially in the case of a larger multiplicity of
+#'   infection.
 #'
 #' @return List containing:
 #'   \describe{
@@ -215,8 +223,9 @@
 #' par(mar = pardefault$mar)
 #'
 #' @export
-compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
-
+compute_posterior <- function(
+    y, fs, prior = NULL, return.RG = FALSE, return.logp = FALSE
+) {
   # Check y is a list of lists:
   if (class(y) != "list" | unique(unlist(lapply(y, class))) != "list") {
     stop("Data y must be a list of lists, even if only one marker is typed per infection")
@@ -278,8 +287,7 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
     1:infection_count,
     function(t) { # for each infection
       enumerate_alleles(
-        y[[t]],
-        gs_per_ts[[t]]
+        y[[t]], gs_per_ts[[t]], !return.logp
       )
     }
   )
@@ -367,6 +375,13 @@ compute_posterior <- function(y, fs, prior = NULL, return.RG = FALSE) {
   rownames(marg) <- names(y)[-1] # drop first infection (not reinfection)
 
   result <- list(marg = marg, joint = post_per_rstr)
-  if (return.RG) result$RGs <- RGs
+  if (return.RG) {
+    if (!return.logp) {
+      for(i in 1:n.RG) {
+        RGs[[i]]$logp <- NA
+      }
+    }
+    result$RGs <- RGs
+  }
   result
 }

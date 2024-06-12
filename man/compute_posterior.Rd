@@ -4,7 +4,7 @@
 \alias{compute_posterior}
 \title{Compute the posterior distribution of recurrence states}
 \usage{
-compute_posterior(y, fs, prior = NULL, return.RG = FALSE)
+compute_posterior(y, fs, prior = NULL, return.RG = FALSE, return.logp = FALSE)
 }
 \arguments{
 \item{y}{Observed data in the form of a list of lists. Alleles should be
@@ -31,6 +31,13 @@ If prior is not provided, a uniform prior will be used.}
 
 \item{return.RG}{Boolean for whether to return the relationship graphs,
 defaults to \code{FALSE}.}
+
+\item{return.logp}{Boolean for whether to return the log-likelihood for each
+relationship graph, defaults to \code{FALSE}. Setting this to \code{FALSE} allows
+for permutation symmetries to be exploited to save computational time, see
+\code{\link{enumerate_alleles}}. Setting this to \code{TRUE} will result in
+longer runtimes, especially in the case of a larger multiplicity of
+infection.}
 }
 \value{
 List containing:
@@ -48,6 +55,8 @@ Only returned if \code{return.RG} is \code{TRUE}. See
 Entry point to Bayesian inference for \emph{P. vivax} recurrence states based
 on genetic data. Specifically, this function finds the posterior
 probabilities of relapse, reinfection and recrudescence from genetic data.
+Please note that the progress bar does not necessarily increment at a uniform
+rate, and may sometimes appear to be stuck while the code is still running.
 }
 \details{
 We enumerate all possible relationship graphs between genotypes, where each

@@ -4,7 +4,7 @@
 \alias{enumerate_alleles}
 \title{Find all allele assignments for genotypes within the same infection}
 \usage{
-enumerate_alleles(y.inf, gs.inf)
+enumerate_alleles(y.inf, gs.inf, use.sym = TRUE)
 }
 \arguments{
 \item{y.inf}{List of unique alleles observed across markers for genotypes
@@ -12,17 +12,21 @@ within one infection. Repeated alleles will lead to overcounting the
 assignments.}
 
 \item{gs.inf}{Vector of genotype names for genotypes within one infection.}
+
+\item{use.sym}{Boolean for permutation symmetry is exploited as a
+computational shortcut. Due to permutation symmetry of intra-infection
+genotypes, we can fix a single assignment for one of the markers whose
+number of alleles observed is equal to the MOI (consider it the anchor)
+and permute the rest, discarding combinations that under-represent the
+observed marker diversity. The default behaviour is to use this symmetry
+such that less assignments have to be considered.}
 }
 \value{
 List of dataframes, one for each marker. The columns correspond to
 genotypes, while the rows correspond to allele assignments for a marker.
 }
 \description{
-Due to permutation symmetry of intra-infection genotypes, we fix a single
-assignment for one of the markers whose number of alleles observed is equal
-to the MOI (consider it the anchor) and permute the rest, discarding
-combinations that under-represent the observed marker diversity. Note that
-this function is not tested for input with repeated alleles.
+Note that this function is not tested for input with repeated alleles.
 }
 \examples{
 # 3 markers

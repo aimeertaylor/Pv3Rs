@@ -32,7 +32,7 @@ fs <- list(m1=c(A=0.27, C=0.35, G=0.18, T=0.20),
 ```
 Given the number of alleles observed during each episode, the most parsimonious explanation is that there are three, two, and one genotypes across the three episodes respectively. When performing inference on the recurrence states, the bulk of the computational time lies in computing the log-likelihood of each possible relationship graph over the six genotypes.
 ```{r, cache=TRUE}
-post <- compute_posterior(y, fs, return.RG=TRUE)
+post <- compute_posterior(y, fs, return.RG=TRUE, return.logp=TRUE)
 ```
 Note that we did not specify the prior, so a uniform prior across all three recurrence states is assumed by default. We set `return.RG=TRUE` for relationship graphs to be returned. This is by default `FALSE` to conserve memory.
 
@@ -49,7 +49,7 @@ The log-likelihoods of each relationship graph is also returned in the output. H
 RG <- post$RGs[[which.max(sapply(post$RGs, function(RG) RG$logp))]]
 # default genotype names
 gs <- paste0("g", 1:6)
-ts_per_gs <- c(1, 1, 1, 2, 2, 3)
+ts_per_gs <- rep(1:length(y), determine_MOIs(y))
 par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
 seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
