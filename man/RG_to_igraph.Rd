@@ -12,7 +12,8 @@ RG_to_igraph(RG, gs, ts_per_gs)
 
 \item{gs}{Vector of genotype names.}
 
-\item{ts_per_gs}{Vector of infection numbers for each genotype.}
+\item{ts_per_gs}{Vector of infection numbers for each genotype. This can be
+inferred from the data \code{y} using \code{rep(1:length(y), determine_MOIs(y))}.}
 }
 \value{
 An \code{igraph} object along with the original variables in

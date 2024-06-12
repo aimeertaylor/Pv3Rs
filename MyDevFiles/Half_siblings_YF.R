@@ -28,15 +28,7 @@ writeLines(sprintf("Odds of relapse to reinfection: %s",
 # for all values of p and q, these odds are bounded between 2/9 (as p->0)
 # and 4/9 (as p->1, q->0)
 
-# desired behaviour: a rare Q allele ought to suggest that all genotypes are
-#                    siblings, leading to a posterior that favours relapse
-
-# observed outcome: even in the upper bound, reinfection is still more likely
-
-# extension: adding more markers like m2 can decrease the lower bound to 0,
-#            but adding more markers like m3 does not increase the upper bound
-
-# odds can be analytically verified
+# odds can be analytically verified, see half_siblings.tex for detail
 odds_func <- function(p, q) 2/9 * (1 + p*(1+q)/4 / ((1+p)*(1+q)/8 + p*q))
 print(odds_func(p, q))
 

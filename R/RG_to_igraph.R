@@ -6,7 +6,8 @@
 #' @param RG Relationship graph output by \code{\link{enumerate_RGs}} with
 #'   \code{igraph=FALSE}.
 #' @param gs Vector of genotype names.
-#' @param ts_per_gs Vector of infection numbers for each genotype.
+#' @param ts_per_gs Vector of infection numbers for each genotype. This can be
+#'   inferred from the data `y` using `rep(1:length(y), determine_MOIs(y))`.
 #'
 #' @return An \code{igraph} object along with the original variables in
 #'   \code{RG}.
