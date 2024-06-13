@@ -10,7 +10,7 @@ locus_type_summary(y)
 \item{y}{A list of lists for two episodes; see \code{\link[=compute_posterior]{compute_posterior()}} for more
 details.}
 
-\item{m}{A postive whole number indexing a marker.}
+\item{m}{A positive whole number indexing a marker.}
 }
 \value{
 A vector of strings summarising the data at each locus.
@@ -24,7 +24,7 @@ A function to summarise the data at each locus as one of four types:
 \item All match (all genotypes have the same allele).
 \item All diff. (all genotypes have a different allele).
 \item Intra-match (some intra-episode genotypes have the same allele)
-\item Intra-match (some inter-episode genotypes have the same allele).
+\item Inter-match (some inter-episode genotypes have the same allele).
 
 The number of apparent genotypes is the sum of the per-episode MOIs. When
 the total number of apparent genotypes exceeds 3, "Intra-match" excludes
@@ -39,5 +39,5 @@ y <- list(
   list(m1 = c("B"), m2 = c("B", "C"), m3 = c("A", "B", "C", "D"))
 )
 
-locus_type_summary
+locus_type_summary(y)
 }

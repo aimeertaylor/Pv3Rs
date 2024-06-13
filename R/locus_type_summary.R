@@ -5,7 +5,7 @@
 #' * All match (all genotypes have the same allele).
 #' * All diff. (all genotypes have a different allele).
 #' * Intra-match (some intra-episode genotypes have the same allele)
-#' * Intra-match (some inter-episode genotypes have the same allele).
+#' * Inter-match (some inter-episode genotypes have the same allele).
 #'
 #'   The number of apparent genotypes is the sum of the per-episode MOIs. When
 #'   the total number of apparent genotypes exceeds 3, "Intra-match" excludes
@@ -14,7 +14,7 @@
 #'
 #' @param y A list of lists for two episodes; see [compute_posterior()] for more
 #'   details.
-#' @param m A postive whole number indexing a marker.
+#' @param m A positive whole number indexing a marker.
 #' @return A vector of strings summarising the data at each locus.
 #'
 #' @examples
@@ -24,7 +24,7 @@
 #'   list(m1 = c("B"), m2 = c("B", "C"), m3 = c("A", "B", "C", "D"))
 #' )
 #'
-#' locus_type_summary
+#' locus_type_summary(y)
 #' @export
 locus_type_summary <- function (y) {
 
@@ -39,6 +39,7 @@ locus_type_summary <- function (y) {
   markers <- 1:length(y[[1]])
 
   marker_types <- sapply(markers, function(m) {
+
     y0 <- y[[1]][[m]]
     y1 <- y[[2]][[m]]
 
