@@ -16,7 +16,6 @@ n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
 
-
 # ==============================================================================
 # Plot results generated given equifrequent alleles across all marker counts
 # ==============================================================================
@@ -49,18 +48,20 @@ post_L <- sapply(ps_store, function(X) {
 }, simplify = F)
 
 # Plots posterior relapse probabilities
-for(MOIs in MOIs_per_infection) {
-  par(mfrow = c(3,1))
-  for(c in c_params){
-    plot(NULL, xlim = range(n_markers)+c(-10,10), ylim = c(0,1),
-         xaxt = "n", bty = "n", panel.first = grid(nx = NA, ny = NULL),
-         ylab = "Posterior relapse probability",
-         xlab = "Number of markers",
-         main = sprintf("Concentration parameter: %s", c))
-    axis(side = 1, at = n_markers)
+
+par(mfrow = c(3,1))
+for(c in c_params){
+  plot(NULL, xlim = range(n_markers)+c(-10,10), ylim = c(0,1),
+       xaxt = "n", bty = "n", panel.first = grid(nx = NA, ny = NULL),
+       ylab = "Posterior relapse probability",
+       xlab = "Number of markers",
+       main = sprintf("Concentration parameter: %s", c))
+  axis(side = 1, at = n_markers)
+  for(MOIs in MOIs_per_infection) {
     for(i in 1:n_repeats) {
       lines(y = post_L[[as.character(c)]][[MOIs]][,i], x = n_markers,
-            lwd = 1.5, col = cols_light[i], pch = 20)
+            lwd = 1.5, col = cols_light[i], pch = 20,
+            lty = ifelse(MOIs == "2_1", 1, 2))
       points(y = post_L[[as.character(c)]][[MOIs]][,i], x = n_markers,
              lwd = 1.5, col = cols[i], pch = 20)
     }
@@ -134,8 +135,8 @@ for(c in 100){ # Just focus on one since concentration parameter has little bear
         x <- exp(x)/sum(exp(x), na.rm = T) # Exponentiate and normalise
         pie(x[!is.na(x)], col = graph_cols[!is.na(x)], labels = NA, border = NA)
         symbols(x = 0, y = 0, circles = c(0.25), inches = FALSE,
-                bg = "white", fg = cols[i], add = TRUE, lwd = 2)
-        text(label = round(post_L[[as.character(c)]][[MOIs]][as.character(m),i], 2), x = 0, y = 0, cex = 0.5)
+                bg = "white", fg = cols[i], add = TRUE, lwd = 2, lty = ifelse(MOIs == "2_1", 1, 2))
+        text(label = round(post_L[[as.character(c)]][[MOIs]][as.character(m),i], 2), x = 0, y = 0, cex = 0.75)
       }
       mtext(text = sprintf("concentration %s, marker count %s", c, m), side = 1, cex = 0.5, line = -1)
     }
