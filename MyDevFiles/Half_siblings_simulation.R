@@ -7,14 +7,16 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-SiblingType <- "ParentChildLike_siblings" # "Half" "ParentChildLike" "Meiotic"
+SiblingType <- "Half_siblings" # "Half" "ParentChildLike" "Meiotic"
 load(sprintf("../data/%s.rda", SiblingType))
 attached <- search() # Check no Half_siblings already attached
-if(any(grepl("siblings", attached))) detach(ParentChildLike_siblings)
-attach(ParentChildLike_siblings)
+if(any(grepl("siblings", attached))) stop("Stop and detach")
+
+attach(Half_siblings)
 c_params <- names(ys_store)
 n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))
 n_repeats <- length(ys_store[[1]][[1]])
+if (n_repeats != 10) stop("Plots assume 10 repeats")
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
 #pdf(file = sprintf("./%s_siblings_simulation.pdf", SiblingType), width = 7, height = 7)
@@ -44,8 +46,8 @@ locus_types_props <- sapply(1:n_repeats, function(i) {
 halfsib_alleles <- enumerate_halfsib_alleles(n_alleles)
 
 # Format into a list to pass to locus_type_summary
-halfsib_y <- list(init = as.list(halfsib_alleles[,1]),
-                  recur = apply(halfsib_alleles[,2:3], 1, unique))
+halfsib_y <- list(init = apply(halfsib_alleles[,1:2], 1, unique),
+                  recur = as.list(halfsib_alleles[,3]))
 
 # Generate locus types
 halfsib_locus_types <- locus_type_summary(y = halfsib_y)
@@ -58,7 +60,7 @@ exp_locus_type_props <- table(halfsib_locus_types)/nrow(halfsib_alleles)
 # Plot results generated given equifrequent alleles, parents from a single
 # population, and all marker counts from one onwards.
 # ==============================================================================
-#layout(mat = matrix(c(1,2,3,4,4,4), ncol = 2)) # Layout for plots
+layout(mat = matrix(c(1,2,3,4,4,4), ncol = 2)) # Layout for plots
 
 # Plot the posterior relapse probability trajectories
 plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1,
@@ -136,6 +138,10 @@ RGcheck <- sapply(c_params, function(c) {
 })
 
 if (!all(RGcheck)) stop("graphs not returned in the same order")
+example_y <- ys_store[[1]][[1]][[1]]
+example_MOIs <- determine_MOIs(example_y)
+ts_per_gs <- rep(1:length(example_y), example_MOIs)
+gs <- paste0("g", 1:sum(example_MOIs))
 
 #-------------------------------------------------------------------------------
 # Loop over migrant and non-migrant scenarios
@@ -201,8 +207,6 @@ for(rare_enrich in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
   for(g in c(8,9,6,7,2,5,4,1,3)) { # Re-order graphs
     ps <- ps_store[[1]][[1]][[1]][[1]]
     RG <- ps$RGs[[g]]
-    gs <- paste0("g", 1:3)
-    ts_per_gs <- c(1, 2, 2)
     par(mar = c(0.5, 0.5, 0.5, 0.5))
     igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
     igraphRG <- igraph::set_vertex_attr(igraphRG, "name", value = NA) # Remove genotype names
@@ -251,5 +255,5 @@ for(rare_enrich in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
   par(par_default)
 }
 
-detach("Siblings")
+detach("Half_siblings")
 #dev.off()

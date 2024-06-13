@@ -15,9 +15,9 @@ library(tictoc) # For timing
 seed <- 1 # For reproducibility
 c_params <- c(0.1, 1, 10, 100) # Dirichlet concentration parameter
 n_markers <- c(10, 50, 100, 150) # Number of makers
-n_repeats <- 5 # Number of simulations per c_param, n_marker combination
+n_repeats <- 10 # Number of simulations per c_param, n_marker combination
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
-n_alleles <- 3 # Number of alleles per marker (marker cardinality)
+n_alleles <- 5 # Number of alleles per marker (marker cardinality)
 
 #===============================================================================
 # Stores for data, frequencies & results
