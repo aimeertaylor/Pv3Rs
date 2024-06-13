@@ -28,7 +28,7 @@ axis(side = 1, at = seq(0, max(n_markers), 10))
 for(MOIs in MOIs_per_infection) {
   LTY = ifelse(MOIs == "2_1", 1, 2)
   for(i in 1:n_repeats){
-    lines(x = min(n_markers):max(n_markers),
+    lines(x = 1:max(n_markers),
           y = ps_store_all_ms[[MOIs]][[as.character(i)]], col = cols[i], lwd = 2, lty = LTY)
   }
 }
