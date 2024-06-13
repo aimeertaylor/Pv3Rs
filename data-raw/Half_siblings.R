@@ -15,10 +15,9 @@ library(tictoc) # For timing
 seed <- 1 # For reproducibility
 c_params <- c(0.1, 1, 10, 100) # Dirichlet concentration parameter
 n_markers <- c(10, 50, 100, 150) # Number of makers
-n_repeats <- 10 # Number of simulations per c_param, n_marker combination
+n_repeats <- 5 # Number of simulations per c_param, n_marker combination
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
 n_alleles <- 3 # Number of alleles per marker (marker cardinality)
-m_min_clone <- 4 # Minimum number of markers for which clone is disallowed
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -32,8 +31,30 @@ ps_store_all_ms <- list() # all_ms for all marker counts
 # Set the seed, name markers and get alleles
 #===============================================================================
 set.seed(seed) # Set the seed
-all_markers <- paste0("m", 1:max(n_markers)) # Marker names
+max_n_markers <- max(n_markers)
+min_n_markers <- min(n_markers) # Size of marker subset for which clones are disallowed
+all_markers <- paste0("m", 1:max_n_markers) # Marker names
 alleles <- letters[1:n_alleles] # Alleles
+min_marker_subset <- sample(all_markers, min_n_markers, replace = FALSE)
+
+# Create progressive marker subsets, randomly sampled over chromosomes
+marker_subsets <- list()
+marker_subsets[[1]] <- sample(min_marker_subset, 1)
+for(m in 2:min_n_markers){
+  markers_thusfar <- marker_subsets[[m-1]]
+  marker_to_add <- sample(setdiff(min_marker_subset, markers_thusfar), 1)
+  marker_subsets[[m]] <- c(markers_thusfar, marker_to_add)
+}
+for(m in min_n_markers:(max_n_markers-1)) {
+  markers_thusfar <- marker_subsets[[m]]
+  marker_to_add <- sample(setdiff(all_markers, markers_thusfar), 1)
+  marker_subsets[[m+1]] <- c(markers_thusfar, marker_to_add)
+}
+
+# Map the markers to chromosomes. Assume equal sized chromosomes; okay if
+# later we assume an equal number of crossovers per chromosome
+chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
+markers_per_chr <- table(chrs_per_marker)
 
 #===============================================================================
 # Generate data
@@ -66,36 +87,47 @@ for(c in c_params) {
       # (ensure no clones and thus always the same no. of vertices in RGs)
       anyclones <- TRUE
       while (anyclones) {
-        parent1 <- sapply(all_markers, function(t) {
-          sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-        parent2 <- sapply(all_markers, function(t) {
-          sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-
         if (rare_enrich) {
-          parent3 <- sapply(all_markers, function(t) {
+          parent1 <- sapply(all_markers, function(t) {
             sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
         } else {
-          parent3 <- sapply(all_markers, function(t) {
+          parent1 <- sapply(all_markers, function(t) {
             sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
         }
+        parent2 <- sapply(all_markers, function(t) {
+          sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
+        parent3 <- sapply(all_markers, function(t) {
+          sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
 
-        anyclones <- any(identical(parent1[1:m_min_clone], parent2[1:m_min_clone]),
-                         identical(parent1[1:m_min_clone], parent3[1:m_min_clone]),
-                         identical(parent2[1:m_min_clone], parent3[1:m_min_clone]))
+        anyclones <- any(identical(parent1[min_marker_subset], parent2[min_marker_subset]),
+                         identical(parent1[min_marker_subset], parent3[min_marker_subset]),
+                         identical(parent2[min_marker_subset], parent3[min_marker_subset]))
       }
+
+      parents12 <- cbind(parent1, parent2)
+      parents13 <- cbind(parent1, parent3)
+      parents23 <- cbind(parent2, parent3)
 
       # Sample children genotypes independently (ensure no intra-clones)
       clones <- TRUE
       while (clones) {
-        child12 <-  sapply(all_markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
-        child13 <-  sapply(all_markers, function(t) sample(c(parent1[[t]], parent3[[t]]), 1), simplify = F)
-        child23 <-  sapply(all_markers, function(t) sample(c(parent2[[t]], parent3[[t]]), 1), simplify = F)
-        clones <- identical(child13[1:m_min_clone], child23[1:m_min_clone])
+
+        # Sample parental allocations independently
+        ps <- sapply(1:3, function(i) recombine_parent_ids(markers_per_chr)[,1])
+        rownames(ps) <- all_markers
+
+        # Construct children genotypes from parental allocations
+        child12 <- sapply(all_markers, function(i) parents12[[i,ps[i,1]]])
+        child13 <- sapply(all_markers, function(i) parents13[[i,ps[i,2]]])
+        child23 <- sapply(all_markers, function(i) parents23[[i,ps[i,3]]])
+
+        # Check for clones in MOI = 2 infection only
+        clones <- identical(child12[min_marker_subset], child13[min_marker_subset])
       }
 
       # Make parasite infection and data
-      initial <- rbind(unlist(child12))
-      relapse <- rbind(unlist(child13), unlist(child23)) # MOI recurrence > initial
+      initial <- rbind(unlist(child12), unlist(child13))
+      relapse <- rbind(unlist(child23))
       y <- list(initial = apply(initial, 2, unique, simplify = F),
                 relapse = apply(relapse, 2, unique, simplify = F))
 
@@ -120,7 +152,8 @@ for(i in 1:n_repeats){
     for(rare_enrich in c(TRUE, FALSE)) {
       y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
       for(m in n_markers){
-        y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
+        marker_subset <- marker_subsets[[m]]
+        y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
         ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
         ps_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[as.character(i)]][[as.character(m)]] <- ps
       }
@@ -141,8 +174,9 @@ for(i in 1:n_repeats){
   print(i)
   y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
   # compute posterior relapse probabilities for all marker counts from one onwards
-  for(m in 1:max(n_markers)){
-    y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
+  for(m in 1:max_n_markers){
+    marker_subset <- marker_subsets[[m]]
+    y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
     ps <- suppressMessages(compute_posterior(y, fs))
     ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
   }
@@ -159,7 +193,6 @@ Half_siblings <- list(fs_store = fs_store,
                       ps_store_all_ms = ps_store_all_ms,
                       c_cutoff = c_cutoff,
                       n_alleles = n_alleles,
-                      m_min_clone = m_min_clone,
                       seed = seed)
 
 

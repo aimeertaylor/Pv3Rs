@@ -40,11 +40,16 @@ min_marker_subset <- sample(all_markers, min_n_markers, replace = FALSE)
 
 # Create progressive marker subsets, randomly sampled over chromosomes
 marker_subsets <- list()
-marker_subsets[[as.character(min_n_markers)]] <- min_marker_subset
+marker_subsets[[1]] <- sample(min_marker_subset, 1)
+for(m in 2:min_n_markers){
+  markers_thusfar <- marker_subsets[[m-1]]
+  marker_to_add <- sample(setdiff(min_marker_subset, markers_thusfar), 1)
+  marker_subsets[[m]] <- c(markers_thusfar, marker_to_add)
+}
 for(m in min_n_markers:(max_n_markers-1)) {
-  markers_thusfar <- marker_subsets[[as.character(m)]]
+  markers_thusfar <- marker_subsets[[m]]
   marker_to_add <- sample(setdiff(all_markers, markers_thusfar), 1)
-  marker_subsets[[as.character(m+1)]] <- c(markers_thusfar, marker_to_add)
+  marker_subsets[[m+1]] <- c(markers_thusfar, marker_to_add)
 }
 
 # Map the markers to chromosomes. Assume equal sized chromosomes; okay if
@@ -90,19 +95,19 @@ for(c in c_params) {
     children_clones <- TRUE
     while (children_clones) {
 
-    # Sample parental allocations
-    cs <- recombine_parent_ids(markers_per_chr)
+      # Sample parental allocations
+      cs <- recombine_parent_ids(markers_per_chr)
 
-    # Construct children genotypes from parental allocations
-    children <- sapply(1:max_n_markers, function(i) {
-      sapply(1:4, function(j) {
-        parents[i,cs[i,j]]
+      # Construct children genotypes from parental allocations
+      children <- sapply(1:max_n_markers, function(i) {
+        sapply(1:4, function(j) {
+          parents[i,cs[i,j]]
+        })
       })
-    })
-    colnames(children) <- all_markers
+      colnames(children) <- all_markers
 
-    # Check diversity among children in the first few markers
-    children_clones <- nrow(unique(children[,min_marker_subset])) < 4
+      # Check diversity among children in the first few markers
+      children_clones <- nrow(unique(children[,min_marker_subset])) < 4
     }
 
     # For different numbers of genotypes per infection
@@ -142,7 +147,7 @@ for(i in 1:n_repeats){
     for(MOIs in MOIs_per_infection) {
       y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[i]]
       for(m in n_markers){
-        marker_subset <- marker_subsets[[as.character(m)]]
+        marker_subset <- marker_subsets[[m]]
         y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
         ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
         ps_store[[as.character(c)]][[MOIs]][[as.character(i)]][[as.character(m)]] <- ps
@@ -163,9 +168,10 @@ for(i in 1:n_repeats){
   for(MOIs in MOIs_per_infection) {
     y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[i]]
     # compute posterior relapse probabilities for all marker counts from one onwards
-    for(m in min_n_markers:max_n_markers){
-      marker_subset <- marker_subsets[[as.character(m)]]
-      y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
+    marker_subset <- min_marker_subset
+    for(m in 1:max_n_markers){
+      marker_subset <- marker_subsets[[m]]
+      y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
       ps <- suppressMessages(compute_posterior(y, fs))
       ps_store_all_ms[[MOIs]][[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
     }
