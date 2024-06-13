@@ -109,18 +109,20 @@ llikeRGs <- sapply(ps_store, function(X) {
 }, simplify = F)
 
 # Re-order colours to graph type
-graph_cols <- RColorBrewer::brewer.pal(n = 9, "Paired")[c(7,5,8,9,6,4,3,1,2)]
+graph_cols <- RColorBrewer::brewer.pal(n = 9, "Paired")
+graph_plot_order <- c(4, 2, 6, 8, 5, 9, 1, 3, 7)
+names(graph_cols) <- graph_plot_order
 
 # Plot graphs
 par(mfrow = c(3,3))
-for(g in c(8,9,6,7,2,5,4,1,3)) { # Re-order graphs
+for(g in graph_plot_order) {
   ps <- ps_store[[1]][[1]][[1]][[1]]
   RG <- ps$RGs[[g]]
   par(mar = c(0.5, 0.5, 0.5, 0.5))
   igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
   igraphRG <- igraph::set_vertex_attr(igraphRG, "name", value = NA) # Remove genotype names
   plot_RG(RG =  igraphRG, vertex_palette = "Greys", labels = NA)
-  box(col = graph_cols[g], lwd = 3)
+  box(col = graph_cols[as.character(g)], lwd = 3)
 }
 
 # For each m, c combination, plot the graph likelihood and data
@@ -129,7 +131,7 @@ for(c in 100){ # Just focus on one since concentration parameter has little bear
     par(mfcol = c(n_repeats,length(c_params)), mar = c(0,0,0,0))
     for(m in n_markers){
       for(i in 1:n_repeats) {
-        x <- llikeRGs[[as.character(c)]][[MOIs]][[as.character(i)]][,as.character(m)]
+        x <- llikeRGs[[as.character(c)]][[MOIs]][[as.character(i)]][,as.character(m)][graph_plot_order]
         x[x == -Inf] <- NA # Mask -Inf
         x <- x - min(x, na.rm = T) # Re-scale before exponentiating (otherwise all 0)
         x <- exp(x)/sum(exp(x), na.rm = T) # Exponentiate and normalise
