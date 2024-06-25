@@ -1,24 +1,18 @@
 ################################################################################
-# Code to prepare Half_siblings dataset following best practice outlined in
-# 7.1.1 of https://r-pkgs.org/data.html. This script only features in the source
-# version of the package (it is listed under .Rbuildignore). For c_params in
-# 0.1, 1, 10, 100, n_markers in 10, 50, 100 and 150, and 10 repeats, takes a
-# couple of minutes to run on a powerful MacBook Pro with 32 GB memory.
 ################################################################################
 rm(list = ls())
-library(MCMCpack) # For rdirichlet
+#library(MCMCpack) # For rdirichlet
 library(tictoc) # For timing
 
 #===============================================================================
 # Magic numbers
 #===============================================================================
 seed <- 1 # For reproducibility
-c_params <- c(0.1, 1, 10, 100) # Dirichlet concentration parameter
+c_params <- 100 #c(0.1, 1, 10, 100) # Dirichlet concentration parameter
 n_markers <- c(10, 50, 100, 150) # Number of makers
 n_repeats <- 10 # Number of simulations per c_param, n_marker combination
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
 n_alleles <- 3 # Number of alleles per marker (marker cardinality)
-m_min_clone <- 4 # Minimum number of markers for which clone is disallowed
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -32,16 +26,36 @@ ps_store_all_ms <- list() # all_ms for all marker counts
 # Set the seed, name markers and get alleles
 #===============================================================================
 set.seed(seed) # Set the seed
-all_markers <- paste0("m", 1:max(n_markers)) # Marker names
+max_n_markers <- max(n_markers)
+min_n_markers <- min(n_markers) # Size of marker subset for which clones are disallowed
+all_markers <- paste0("m", 1:max_n_markers) # Marker names
 alleles <- letters[1:n_alleles] # Alleles
+min_marker_subset <- sample(all_markers, min_n_markers, replace = FALSE)
+
+# Create progressive marker subsets, randomly sampled over chromosomes
+marker_subsets <- list()
+marker_subsets[[1]] <- sample(min_marker_subset, 1)
+for(m in 2:min_n_markers){
+  markers_thusfar <- marker_subsets[[m-1]]
+  marker_to_add <- sample(setdiff(min_marker_subset, markers_thusfar), 1)
+  marker_subsets[[m]] <- c(markers_thusfar, marker_to_add)
+}
+for(m in min_n_markers:(max_n_markers-1)) {
+  markers_thusfar <- marker_subsets[[m]]
+  marker_to_add <- sample(setdiff(all_markers, markers_thusfar), 1)
+  marker_subsets[[m+1]] <- c(markers_thusfar, marker_to_add)
+}
+
+# Map the markers to chromosomes. Assume equal sized chromosomes; okay if
+# later we assume an equal number of crossovers per chromosome
+chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
+markers_per_chr <- table(chrs_per_marker)
 
 #===============================================================================
 # Generate data
 #
 # If rare_enrich = TRUE, draw rare alleles with high probability for one of the
-# parents who fathers the intra-episode siblings (interpret as an migrant
-# from another population); otherwise, draw alleles proportional to allele
-# frequencies for all parents (parents from a single population)
+# two parents.
 #===============================================================================
 tictoc::tic()
 for(c in c_params) {
@@ -79,7 +93,7 @@ for(c in c_params) {
             sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
         }
 
-        clones <- any(identical(parent1[1:m_min_clone], parent2[1:m_min_clone]))
+        clones <- identical(parent1[min_marker_subset], parent2[min_marker_subset])
 
       }
 
@@ -88,6 +102,12 @@ for(c in c_params) {
       while (clones) {
         child1 <- parent1
         child2 <- parent2
+
+        # Sample parental allocations
+        ps <- recombine_parent_ids(markers_per_chr)[,1]
+        rownames(ps) <- all_markers
+
+
         child12 <-  sapply(all_markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
         clones <- identical(child2[1:m_min_clone], child12[1:m_min_clone])
       }
