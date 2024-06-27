@@ -7,61 +7,22 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-SiblingType <- "Half_siblings" # "Half" "ParentChildLike" "Meiotic"
-load(sprintf("../data/%s.rda", SiblingType))
-attached <- search() # Check no Half_siblings already attached
-if(any(grepl("siblings", attached))) stop("Stop and detach")
+load("../data/ParentChildLike_siblings.rda")
+attached <- search()
+if(any(grepl("siblings", attached))) stop('detach("ParentChildLike_siblings")')
 
-attach(Half_siblings)
+attach(ParentChildLike_siblings)
 c_params <- names(ys_store)
 n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))
 n_repeats <- length(ys_store[[1]][[1]])
 if (n_repeats != 10) stop("Plots assume 10 repeats")
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
-#pdf(file = sprintf("./%s_siblings_simulation.pdf", SiblingType), width = 7, height = 7)
 
 # ==============================================================================
 # Process results generated given equifrequent alleles, parents from a single
 # population, and all marker counts from one onwards.
 # ==============================================================================
-# Compute summary statistics of the data: locus types
-locus_types <- sapply(1:n_repeats, function(i) {
-  y <- ys_store[[as.character(tail(c_params, 1))]][["rare_enrich_FALSE"]][[i]]
-  y_summary <- locus_type_summary(y)
-})
-
-# Compute summary statistics of the data: locus type proportions
-locus_types_props <- sapply(1:n_repeats, function(i) {
-  types <- c("All diff.", "All match", "Intra-match", "Inter-match")
-  exp_locus_type_props <- setNames(rep(0,4), types)
-  sapply(1:max(n_markers), function(m) {
-   x <- table(locus_types[1:m, i])/m
-   exp_locus_type_props[names(x)] <- x
-   return(exp_locus_type_props)
-   })
-}, simplify = F)
-
-# Generate all possible half sib alleles (n_alleles available upon attach)
-halfsib_alleles <- enumerate_halfsib_alleles(n_alleles)
-
-# Format into a list to pass to locus_type_summary
-halfsib_y <- list(init = apply(halfsib_alleles[,1:2], 1, unique),
-                  recur = as.list(halfsib_alleles[,3]))
-
-# Generate locus types
-halfsib_locus_types <- locus_type_summary(y = halfsib_y)
-
-# Compute locus type proportions
-exp_locus_type_props <- table(halfsib_locus_types)/nrow(halfsib_alleles)
-
-
-# ==============================================================================
-# Plot results generated given equifrequent alleles, parents from a single
-# population, and all marker counts from one onwards.
-# ==============================================================================
-layout(mat = matrix(c(1,2,3,4,4,4), ncol = 2)) # Layout for plots
-
 # Plot the posterior relapse probability trajectories
 plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1,
      xlab = "Marker count", ylab = "Posterior relapse probability")
@@ -70,41 +31,6 @@ legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, horiz = T
 for(i in 1:n_repeats){
   lines(x = 1:max(n_markers), y = ps_store_all_ms[[as.character(i)]], col = cols[i], lwd = 2)
 }
-
-# Plot inter-to-intra-match ratio
-plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,2), bty = "n", las = 1,
-     xlab = "Marker count", ylab = "Intra-to-inter match ratio")
-abline(h = 0.5*log2(5/2), lty = "dashed")
-for(i in 1:n_repeats){
-  ratio <- locus_types_props[[i]]["Intra-match", ]/locus_types_props[[i]]["Inter-match", ]
-  lines(x = 1:max(n_markers), y = ratio, col = cols[i], lwd = 2)
-}
-
-# Plot all match to all different ratio
-plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,2), bty = "n", las = 1,
-     xlab = "Marker count", ylab = "All match to all diff. ratio")
-abline(h = exp_locus_type_props["All diff."]/exp_locus_type_props["All match"], lty = "dashed")
-for(i in 1:n_repeats){
-  ratio <- locus_types_props[[i]]["All diff.", ]/locus_types_props[[i]]["All match", ]
-  lines(x = 1:150, y = ratio, col = cols[i], lwd = 2)
-}
-
-# Plot locus type proportion given all markers
-locus_types_all <- apply(locus_types, 2, function(x) table(x)/length(x))
-dotchart(t(locus_types_all), color = cols, pch = 20, pt.cex = 1.5, cex = 0.75)
-title(main = sprintf("Type proportion after %s markers", max(n_markers)))
-segments(x0 = exp_locus_type_props["All diff."],
-         x1 = exp_locus_type_props["All diff."],
-         y0 = 37, y1 = 46, lty = "dashed")
-segments(x0 = exp_locus_type_props["All match"],
-         x1 = exp_locus_type_props["All match"],
-         y0 = 25, y1 = 34, lty = "dashed")
-segments(x0 = exp_locus_type_props["Inter-match"],
-         x1 = exp_locus_type_props["Inter-match"],
-         y0 = 13, y1 = 22, lty = "dashed")
-segments(x0 = exp_locus_type_props["Intra-match"],
-         x1 = exp_locus_type_props["Intra-match"],
-         y0 = 1, y1 = 10, lty = "dashed")
 
 
 # ==============================================================================
@@ -129,7 +55,7 @@ justRGs <- sapply(ps_store, function(X) {
 justRG <- justRGs[[1]][[1]][[1]][[1]]
 RGcheck <- sapply(c_params, function(c) {
   sapply(c(TRUE, FALSE), function(rare_enrich) {
-      sapply(2:n_repeats, function(i) {
+      sapply(1:n_repeats, function(i) {
         sapply(n_markers, function(m) {
         identical(justRG, justRGs[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]][[as.character(m)]])
       })
@@ -225,7 +151,7 @@ for(rare_enrich in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
         x[x == -Inf] <- NA # Mask -Inf
         x <- x - min(x, na.rm = T) # Re-scale before exponentiating (otherwise all 0)
         x <- exp(x)/sum(exp(x), na.rm = T) # Exponentiate and normalise
-        pie(x[!is.na(x)], col = graph_cols[!is.na(x)], labels = NA, border = NA)
+        try(pie(x[!is.na(x)], col = graph_cols[!is.na(x)], labels = NA, border = NA))
         symbols(x = 0, y = 0, circles = c(0.25), inches = FALSE, bg = "white", fg = "white", add = TRUE)
         text(label = round(post_L[[as.character(c)]][as.character(m),i], 2), x = 0, y = 0, cex = 0.5)
       }
@@ -257,6 +183,6 @@ for(rare_enrich in c("rare_enrich_FALSE", "rare_enrich_TRUE")) {
   par(par_default)
 }
 
-detach("Half_siblings")
+detach("ParentChildLike_siblings")
 #dev.off()
 

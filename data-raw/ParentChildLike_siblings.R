@@ -1,18 +1,18 @@
 ################################################################################
 ################################################################################
 rm(list = ls())
-#library(MCMCpack) # For rdirichlet
+library(MCMCpack) # For rdirichlet
 library(tictoc) # For timing
 
 #===============================================================================
 # Magic numbers
 #===============================================================================
 seed <- 1 # For reproducibility
-c_params <- 100 #c(0.1, 1, 10, 100) # Dirichlet concentration parameter
+c_params <- c(0.1, 1, 10, 100) # Dirichlet concentration parameter
 n_markers <- c(10, 50, 100, 150) # Number of makers
 n_repeats <- 10 # Number of simulations per c_param, n_marker combination
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
-n_alleles <- 3 # Number of alleles per marker (marker cardinality)
+n_alleles <- 5 # Number of alleles per marker (marker cardinality)
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -97,19 +97,22 @@ for(c in c_params) {
 
       }
 
+      parents <- cbind(parent1, parent2)
+
       # Sample children genotypes independently (ensure no intra-clones)
       clones <- TRUE
       while (clones) {
-        child1 <- parent1
-        child2 <- parent2
+        child1 <- unlist(parent1)
+        child2 <- unlist(parent2)
 
         # Sample parental allocations
         ps <- recombine_parent_ids(markers_per_chr)[,1]
-        rownames(ps) <- all_markers
+        names(ps) <- all_markers
 
+        # Create recombinant
+        child12 <- do.call("c", sapply(all_markers, function(m) parents[m,ps[m]]))
 
-        child12 <-  sapply(all_markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
-        clones <- identical(child2[1:m_min_clone], child12[1:m_min_clone])
+        clones <- identical(child12[min_marker_subset], child2[min_marker_subset])
       }
 
       # Make parasite infection and data
@@ -139,7 +142,8 @@ for(i in 1:n_repeats){
     for(rare_enrich in c(TRUE, FALSE)) {
       y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
       for(m in n_markers){
-        y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
+        marker_subset <- marker_subsets[[m]]
+        y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
         ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
         ps_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[as.character(i)]][[as.character(m)]] <- ps
       }
@@ -160,8 +164,9 @@ for(i in 1:n_repeats){
   print(i)
   y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
   # compute posterior relapse probabilities for all marker counts from one onward
-  for(m in 1:max(n_markers)){
-    y <- sapply(y_all_markers, function(x) x[1:m], simplify = FALSE)
+  for(m in 1:max_n_markers){
+    marker_subset <- marker_subsets[[m]]
+    y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
     ps <- suppressMessages(compute_posterior(y, fs))
     ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
   }
@@ -178,7 +183,6 @@ ParentChildLike_siblings <- list(fs_store = fs_store,
                  ps_store_all_ms = ps_store_all_ms,
                  c_cutoff = c_cutoff,
                  n_alleles = n_alleles,
-                 m_min_clone = m_min_clone,
                  seed = seed)
 
 

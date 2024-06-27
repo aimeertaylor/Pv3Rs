@@ -7,8 +7,7 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-SiblingType <- "Half_siblings" # "Half" "ParentChildLike" "Meiotic"
-load(sprintf("../data/%s.rda", SiblingType))
+load(sprintf("../data/Half_siblings.rda", SiblingType))
 attached <- search() # Check no Half_siblings already attached
 if(any(grepl("siblings", attached))) stop("Stop and detach")
 
@@ -129,7 +128,7 @@ justRGs <- sapply(ps_store, function(X) {
 justRG <- justRGs[[1]][[1]][[1]][[1]]
 RGcheck <- sapply(c_params, function(c) {
   sapply(c(TRUE, FALSE), function(rare_enrich) {
-      sapply(2:n_repeats, function(i) {
+      sapply(1:n_repeats, function(i) {
         sapply(n_markers, function(m) {
         identical(justRG, justRGs[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]][[as.character(m)]])
       })

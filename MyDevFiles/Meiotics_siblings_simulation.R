@@ -85,7 +85,7 @@ justRGs <- sapply(ps_store, function(X) {
 justRG <- justRGs[[1]][[1]][[1]][[1]]
 RGcheck <- sapply(c_params, function(c) {
   sapply(MOIs_per_infection, function(MOIs) {
-    sapply(2:n_repeats, function(i) {
+    sapply(1:n_repeats, function(i) {
       sapply(n_markers, function(m) {
         identical(justRG, justRGs[[as.character(c)]][[MOIs]][[i]][[as.character(m)]])
       })
