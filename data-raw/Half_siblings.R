@@ -164,7 +164,7 @@ tictoc::toc()
 
 #===============================================================================
 # Generate results for equifrequent alleles, for parents from a single
-# population, and for all marker counts from one onwards.
+# population, and for all marker counts from one onward.
 #===============================================================================
 c <- 100 # For uniform allele frequencies only
 rare_enrich <- FALSE # For parents from the same population
@@ -173,7 +173,7 @@ tictoc::tic()
 for(i in 1:n_repeats){
   print(i)
   y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
-  # compute posterior relapse probabilities for all marker counts from one onwards
+  # compute posterior relapse probabilities for all marker counts from one onward
   for(m in 1:max_n_markers){
     marker_subset <- marker_subsets[[m]]
     y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
