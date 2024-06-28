@@ -4,10 +4,10 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-load(sprintf("../data/Clone.rda"))
-attached <- search() # Check no Half_siblings already attached
-if(any(grepl("siblings", attached))) stop('detach("Stranger")')
+attached <- search()
+if(exists("ys_store")) {print(attached); stop('detach("XXX")')}
 
+load(sprintf("../data/Clone.rda"))
 attach(Clone)
 n_repeats <- length(ys_store[[1]])
 c_params <- names(ys_store)
