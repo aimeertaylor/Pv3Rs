@@ -4,10 +4,10 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-load(sprintf("../data/Stranger.rda"))
-attached <- search() # Check no Half_siblings already attached
-if(any(grepl("siblings", attached))) stop('detach("Full_siblings")')
+attached <- search()
+if(exists("ys_store")) {print(attached); stop('detach("XXX")')}
 
+load(sprintf("../data/Stranger.rda"))
 attach(Stranger)
 n_repeats <- length(ys_store[[1]])
 c_params <- names(ys_store)
@@ -105,7 +105,7 @@ for(g in graph_plot_order) {
 }
 
 # For each m, c combination, plot the graph likelihood and data
-for(c in 100){ # Just focus on one since concentration parameter has little bearing
+for(c in c_params){ # Just focus on one since concentration parameter has little bearing
     par(mfcol = c(n_repeats,length(c_params)), mar = c(0,0,0,0))
     for(m in n_markers){
       for(i in 1:n_repeats) {

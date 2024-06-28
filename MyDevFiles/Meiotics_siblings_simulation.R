@@ -5,9 +5,10 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
+attached <- search()
+if(exists("ys_store")) {print(attached); stop('detach("XXX")')}
+
 load(sprintf("../data/Meiotic_siblings.rda"))
-attached <- search() # Check no Half_siblings already attached
-if(any(grepl("siblings", attached))) detach(Meiotic_siblings)
 attach(Meiotic_siblings)
 n_repeats <- length(ys_store[[1]][[1]])
 MOIs_per_infection <- names(ys_store[[1]])

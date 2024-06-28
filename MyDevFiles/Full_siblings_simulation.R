@@ -4,10 +4,10 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-load(sprintf("../data/Full_siblings.rda"))
-attached <- search() # Check no Half_siblings already attached
-if(any(grepl("siblings", attached))) stop('detach("Full_siblings")')
+attached <- search()
+if(exists("ys_store")) {print(attached); stop('detach("XXX")')}
 
+load(sprintf("../data/Full_siblings.rda"))
 attach(Full_siblings)
 n_repeats <- length(ys_store[[1]][[1]])
 MOIs_per_infection <- names(ys_store[[1]])
@@ -24,7 +24,7 @@ plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1, xaxt =
      xlab = "Marker count", ylab = "Posterior relapse probability")
 axis(side = 1, at = seq(0, max(n_markers), 10))
 
-#legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, horiz = TRUE, bty = "n")
+legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, horiz = TRUE, bty = "n")
 for(MOIs in MOIs_per_infection) {
   LTY = ifelse(MOIs == "2_1", 1, 2)
   for(i in 1:n_repeats){
@@ -125,7 +125,7 @@ for(g in graph_plot_order) {
 }
 
 # For each m, c combination, plot the graph likelihood and data
-for(c in 100){ # Just focus on one since concentration parameter has little bearing
+for(c in c_params){ # Just focus on one since concentration parameter has little bearing
   for(MOIs in MOIs_per_infection){
     par(mfcol = c(n_repeats,length(c_params)), mar = c(0,0,0,0))
     for(m in n_markers){

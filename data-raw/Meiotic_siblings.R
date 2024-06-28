@@ -17,7 +17,7 @@ c_params <- c(0.5, 1, 100) # Dirichlet concentration parameter
 n_markers <- c(10, 50, 100) # Number of makers
 n_repeats <- 5 # Number of simulations per c_param, n_marker combination
 c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
-n_alleles <- 4 # Number of alleles per marker (marker cardinality)
+n_alleles <- 5 # Number of alleles per marker (marker cardinality)
 MOIs_per_infection <- c("2_1", "3_1")
 
 #===============================================================================

@@ -7,10 +7,10 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-load("../data/ParentChildLike_siblings.rda")
 attached <- search()
-if(any(grepl("siblings", attached))) stop('detach("ParentChildLike_siblings")')
+if(exists("ys_store")) {print(attached); stop('detach("XXX")')}
 
+load("../data/ParentChildLike_siblings.rda")
 attach(ParentChildLike_siblings)
 c_params <- names(ys_store)
 n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))

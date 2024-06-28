@@ -77,14 +77,11 @@ for(c in c_params) {
     # (ensure no clones and thus always the same no. of vertices in RGs)
     parental_clones <- TRUE
     while (parental_clones) {
-      parent1 <- sapply(all_markers, function(t) {
-        sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
-      parent2 <- sapply(all_markers, function(t) {
-        sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
+      parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
+      parent2 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
       parental_clones <- identical(parent1[min_marker_subset], parent2[min_marker_subset])
     }
     parents <- cbind(parent1, parent2)
-
 
     # Note condition on sufficient diversity
     children_clones <- TRUE
@@ -92,13 +89,13 @@ for(c in c_params) {
 
       # Sample parental allocations independently
       # Equivalent to sampling without replace from four oocysts
-      cs <- sapply(1:4, function(i) recombine_parent_ids(markers_per_chr)[,1])
+      cs1 <- recombine_parent_ids(markers_per_chr)[,1:2]
+      cs2 <- recombine_parent_ids(markers_per_chr)[,1:2]
+      cs <- cbind(cs1, cs2)
 
       # Construct children genotypes from parental allocations
       children <- sapply(1:max_n_markers, function(i) {
-        sapply(1:4, function(j) {
-          parents[i,cs[i,j]]
-        })
+        sapply(1:ncol(cs), function(j) parents[i,cs[i,j]])
       })
       colnames(children) <- all_markers
 

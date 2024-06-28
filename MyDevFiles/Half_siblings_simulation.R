@@ -7,10 +7,10 @@
 # ==============================================================================
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-load(sprintf("../data/Half_siblings.rda", SiblingType))
-attached <- search() # Check no Half_siblings already attached
-if(any(grepl("siblings", attached))) stop("Stop and detach")
+attached <- search()
+if(exists("ys_store")) {print(attached); stop('detach("XXX")')}
 
+load("../data/Half_siblings.rda")
 attach(Half_siblings)
 c_params <- names(ys_store)
 n_markers <- as.numeric(names(ps_store[[1]][[1]][[1]]))
