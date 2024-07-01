@@ -1,5 +1,5 @@
 ################################################################################
-# Script illustrating that the bulk data from a pool of four recombinant filial
+# Script illustrating that the bulk data from a pool of three recombinant filial
 # chromatids is indistinguishable from the bulk data from their two parents
 #
 # See following for examples of complex chiasmata
@@ -7,86 +7,130 @@
 ################################################################################
 
 library(Pv3Rs) # For plot_data
-rm(list = ls()) # For cleanliness
-set.seed(1) # For reproducibility
+# rm(list = ls()) # For cleanliness
+# set.seed(1) # For reproducibility
+#
+# chr_length <- 20 # Length of the chromosome
+# n_recom_events <- 2 # Number of independent recombination events
+#
+# # Sample parents
+# parentA <- sample(c(0,1), replace = T, size = chr_length)
+# parentB <- sample(c(0,1), replace = T, size = chr_length)
+#
+# # Record sister chromatids pre crossover
+# pre_CO <- cbind(parentA, parentA, parentB, parentB)
+#
+# # For i in 1 to some number of recombination events
+# post_COs <- lapply(1:n_recom_events, function(i) {
+#
+#   # Sample number of crossovers
+#   # Although there could be more than two crossovers, let's stick to at most two
+#   n_cross_over <- sample(c(1,2), 1)
+#
+#   # Sample chiasmata position
+#   # Although a cross-over could technically occur at the same position on
+#   # complementary chromatids, let's avoid sampling chiasmata positions with
+#   # replacement
+#   if (n_cross_over > chr_length) stop # check we can sample without replacement
+#   chiasmata_pos <- sample(1:(chr_length-1), replace = F, n_cross_over)
+#
+#   # Sample sister chromatids per chiasmata position
+#   # Although two cross-overs could involve the same sister chromatid, let's assume
+#   # at most one crossover per chromatid
+#   if(length(chiasmata_pos) == 2) {
+#
+#     post_CO <- cbind(c(parentA[1:chiasmata_pos[1]], parentB[(chiasmata_pos[1]+1):chr_length]),
+#                      c(parentA[1:chiasmata_pos[2]], parentB[(chiasmata_pos[2]+1):chr_length]),
+#                      c(parentB[1:chiasmata_pos[1]], parentA[(chiasmata_pos[1]+1):chr_length]),
+#                      c(parentB[1:chiasmata_pos[2]], parentA[(chiasmata_pos[2]+1):chr_length]))
+#
+#   } else if(length(chiasmata_pos) == 1) {
+#
+#     post_CO <- cbind(c(parentA[1:chiasmata_pos[1]], parentB[(chiasmata_pos[1]+1):chr_length]),
+#                      parentA,
+#                      c(parentB[1:chiasmata_pos[1]], parentA[(chiasmata_pos[1]+1):chr_length]),
+#                      parentB)
+#   }
+#
+#   return(post_CO)
+# })
+#
+# # Check the post_COs are different
+# identity_matrix <- sapply(1:(length(post_COs)-1), function(i) {
+#   sapply((i+1):length(post_COs), function(j) {
+#     identical(post_COs[[i]], post_COs[[j]])
+#   })
+# })
+#
+# # Some of the recombination events are the same
+# # (not so surprising given the chr_length is small)
+# sapply(identity_matrix, function(x) sum(as.numeric(x)))
+#
+# # Reduce pool of recombinant chromatids to bulk data
+# ys_post <- lapply(post_COs, function(post_CO) {
+#   x <- apply(post_CO, 1, unique, simplify = F)
+#   names(x) <- paste0("m", 1:chr_length)
+#   return(x)
+# })
+# names(ys_post) <- paste0("recombin", 1:100)
+#
+# # Reduce chromatids pre recombination to bulk data
+# ys_pre <- apply(pre_CO, 1, unique, simplify = F)
+# names(ys_pre) <- paste0("m", 1:chr_length)
+#
+# # Format for plot
+# pre <- list(ys_pre = ys_pre)
+# ys <- c(pre, ys_post)
+# x <- list(ys = ys)
+#
+# # Plot data
+# plot_data(x, marker_annotate = F)
 
-chr_length <- 20 # Length of the chromosome
-n_recom_events <- 2 # Number of independent recombination events
+# ===========
+rm(list = ls())
+library(MCMCpack)
+max_n_markers <- 150
+all_markers <- paste0("m", 1:max_n_markers)
+n_alleles <- 5
+alleles <- letters[1:n_alleles]
+fs_param <- setNames(rep(1, n_alleles), alleles)
+fs <- sapply(all_markers, function(i) setNames(rdirichlet(1, fs_param), alleles), simplify = F)
+parent1 <- sapply(all_markers, function(i) sample(alleles, size = 1, prob = fs[[i]]))
+parent2 <- sapply(all_markers, function(i) sample(alleles, size = 1, prob = fs[[i]]))
+parents <- cbind(parent1, parent2)
+chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
+markers_per_chr <- table(chrs_per_marker)
+cs_meiotic <- recombine_parent_ids(markers_per_chr)
+cs_full <- sapply(1:4, function(i) recombine_parent_ids(markers_per_chr)[,1])
 
-# Sample parents
-parentA <- sample(c(0,1), replace = T, size = chr_length)
-parentB <- sample(c(0,1), replace = T, size = chr_length)
-
-# Record sister chromatids pre crossover
-pre_CO <- cbind(parentA, parentA, parentB, parentB)
-
-# For i in 1 to some number of recombination events
-post_COs <- lapply(1:n_recom_events, function(i) {
-
-  # Sample number of crossovers
-  # Although there could be more than two crossovers, let's stick to at most two
-  n_cross_over <- sample(c(1,2), 1)
-
-  # Sample chiasmata position
-  # Although a cross-over could technically occur at the same position on
-  # complementary chromatids, let's avoid sampling chiasmata positions with
-  # replacement
-  if (n_cross_over > chr_length) stop # check we can sample without replacement
-  chiasmata_pos <- sample(1:(chr_length-1), replace = F, n_cross_over)
-
-  # Sample sister chromatids per chiasmata position
-  # Although two cross-overs could involve the same sister chromatid, let's assume
-  # at most one crossover per chromatid
-  if(length(chiasmata_pos) == 2) {
-
-    post_CO <- cbind(c(parentA[1:chiasmata_pos[1]], parentB[(chiasmata_pos[1]+1):chr_length]),
-                     c(parentA[1:chiasmata_pos[2]], parentB[(chiasmata_pos[2]+1):chr_length]),
-                     c(parentB[1:chiasmata_pos[1]], parentA[(chiasmata_pos[1]+1):chr_length]),
-                     c(parentB[1:chiasmata_pos[2]], parentA[(chiasmata_pos[2]+1):chr_length]))
-
-  } else if(length(chiasmata_pos) == 1) {
-
-    post_CO <- cbind(c(parentA[1:chiasmata_pos[1]], parentB[(chiasmata_pos[1]+1):chr_length]),
-                     parentA,
-                     c(parentB[1:chiasmata_pos[1]], parentA[(chiasmata_pos[1]+1):chr_length]),
-                     parentB)
-  }
-
-  return(post_CO)
+# Construct children genotypes from parental allocations
+children_meiotic <- sapply(1:max_n_markers, function(i) {
+  sapply(1:ncol(cs_meiotic), function(j) parents[i,cs_meiotic[i,j]])
 })
 
-# Check the post_COs are different
-identity_matrix <- sapply(1:(length(post_COs)-1), function(i) {
-  sapply((i+1):length(post_COs), function(j) {
-    identical(post_COs[[i]], post_COs[[j]])
-  })
+# Construct children genotypes from parental allocations
+children_full <- sapply(1:max_n_markers, function(i) {
+  sapply(1:ncol(cs_full), function(j) parents[i,cs_full[i,j]])
 })
+colnames(children_meiotic) <- all_markers
+colnames(children_full) <- all_markers
 
-# Some of the recombination events are the same
-# (not so surprising given the chr_length is small)
-sapply(identity_matrix, function(x) sum(as.numeric(x)))
+# Format parasite infection data for compute_posterior
+y_full <- list(initial = apply(children_full[1:3,], 2, unique, simplify = F),
+                   relapse = apply(children_full[4,,drop=FALSE], 2, unique, simplify = F))
 
-# Reduce pool of recombinant chromatids to bulk data
-ys_post <- lapply(post_COs, function(post_CO) {
-  x <- apply(post_CO, 1, unique, simplify = F)
-  names(x) <- paste0("m", 1:chr_length)
-  return(x)
-})
-names(ys_post) <- paste0("recombin", 1:100)
+y_meitotic <- list(initial = apply(children_meiotic[1:3,], 2, unique, simplify = F),
+                   relapse = apply(children_full[4,,drop=FALSE], 2, unique, simplify = F))
 
-# Reduce chromatids pre recombination to bulk data
-ys_pre <- apply(pre_CO, 1, unique, simplify = F)
-names(ys_pre) <- paste0("m", 1:chr_length)
-
-# Format for plot
-pre <- list(ys_pre = ys_pre)
-ys <- c(pre, ys_post)
-x <- list(ys = ys)
-
-# Plot data
-plot_data(x, marker_annotate = F)
+y_parents <- list(initial = apply(t(parents), 2, unique, simplify = F),
+                  relapse = apply(children_full[4,,drop=FALSE], 2, unique, simplify = F))
 
 
+suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
+suppressMessages(compute_posterior(y = y_parents, fs)$marg)
 
+suppressMessages(compute_posterior(y = y_full, fs)$marg)
 
-
+plot_data(list(meiotic = y_meitotic,
+               parents = y_parents,
+               full = y_full), marker_annotate = F)
