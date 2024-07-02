@@ -7,12 +7,13 @@ library(tictoc) # For timing
 #===============================================================================
 # Magic numbers
 #===============================================================================
-seed <- 1 # For reproducibility
-c_params <- c(0.1, 1, 10, 100) # Dirichlet concentration parameter
-n_markers <- c(10, 50, 100, 150) # Number of makers
-n_repeats <- 10 # Number of simulations per c_param, n_marker combination
-c_cutoff <- 99 # Above c_cutoff, switch from Dirichlet to 1/n_alleles
+cases <- c("ParentChildLike", "Half")
 n_alleles <- 5 # Number of alleles per marker (marker cardinality)
+n_repeats <- 2 # Number of simulations per parameter combination
+n_markers <- c(10, 50, 100, 150) # Number of markers for which RG liklihood returned
+c_params <- c(0.5, 1, 10, 100) # Dirichlet concentration parameter
+c_cutoff <- 99 # Switch from Dirichlet r.v. to 1/n_alleles above c_cutoff
+seed <- 1 # For reproducibility
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -23,170 +24,200 @@ ps_store <- list() # p for posterior
 ps_store_all_ms <- list() # all_ms for all marker counts
 
 #===============================================================================
-# Set the seed, name markers and get alleles
+# Set the seed, name markers and get alleles, maker subsets etc.
 #===============================================================================
 set.seed(seed) # Set the seed
+min_n_markers <- min(n_markers)
 max_n_markers <- max(n_markers)
-min_n_markers <- min(n_markers) # Size of marker subset for which clones are disallowed
+alleles <- letters[1:n_alleles]
 all_markers <- paste0("m", 1:max_n_markers) # Marker names
-alleles <- letters[1:n_alleles] # Alleles
-min_marker_subset <- sample(all_markers, min_n_markers, replace = FALSE)
 
-# Create progressive marker subsets, randomly sampled over chromosomes
-marker_subsets <- list()
-marker_subsets[[1]] <- sample(min_marker_subset, 1)
-for(m in 2:min_n_markers){
-  markers_thusfar <- marker_subsets[[m-1]]
-  marker_to_add <- sample(setdiff(min_marker_subset, markers_thusfar), 1)
-  marker_subsets[[m]] <- c(markers_thusfar, marker_to_add)
-}
-for(m in min_n_markers:(max_n_markers-1)) {
-  markers_thusfar <- marker_subsets[[m]]
-  marker_to_add <- sample(setdiff(all_markers, markers_thusfar), 1)
-  marker_subsets[[m+1]] <- c(markers_thusfar, marker_to_add)
-}
+# Create marker subsets, randomly sampled over chromosomes
+marker_subsets <- list(sample(all_markers, 1))
+rorder <- sample(all_markers, size = max_n_markers)
+for(m in 2:max_n_markers) marker_subsets[[m]] <- rorder[1:m]
+# smallest subset over which clones are disallowed (ensures the set of RGs is
+# the same for all n_markers):
+no_clone_subset <- marker_subsets[[min_n_markers]]
 
-# Map the markers to chromosomes. Assume equal sized chromosomes; okay if
-# later we assume an equal number of crossovers per chromosome
+# Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
+# providing we later assume an equal number of crossovers per chromosome
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
 markers_per_chr <- table(chrs_per_marker)
 
 #===============================================================================
 # Generate data
-#
-# If rare_enrich = TRUE, draw rare alleles with high probability for one of the
-# two parents.
 #===============================================================================
 tictoc::tic()
-for(c in c_params) {
+for(case in cases) {
+  for(c in c_params) {
 
-  # Sample allele frequencies
-  fs <- sapply(all_markers, function(m) {
-    if(c > c_cutoff) {
-      fs_unnamed <- rep(1/n_alleles, n_alleles)
-    } else {
-      fs_unnamed <- MCMCpack::rdirichlet(1, alpha = rep(c, n_alleles))
-    }
-    setNames(fs_unnamed, alleles)
-  }, USE.NAMES = TRUE, simplify = FALSE)
-  fs_store[[as.character(c)]] <- fs
+    # Sample allele frequencies
+    fs <- sapply(all_markers, function(m) {
+      if(c > c_cutoff) {
+        fs_unnamed <- rep(1/n_alleles, n_alleles)
+      } else {
+        fs_unnamed <- MCMCpack::rdirichlet(1, alpha = rep(c, n_alleles))
+      }
+      setNames(fs_unnamed, alleles)
+    }, USE.NAMES = TRUE, simplify = FALSE)
 
-  for(rare_enrich in c(TRUE, FALSE)) {
-    for(i in 1:n_repeats) {
+    # Store allele frequencies
+    fs_store[[as.character(c)]] <- fs
 
-      print(paste(c,rare_enrich,i))
+    for(rare_enrich in c(TRUE, FALSE)) {
+      for(i in 1:n_repeats) {
 
-      # Sample parental genotypes
-      # (ensure no clones and thus always the same no. of vertices in RGs)
-      clones <- TRUE
+        print(paste(c,rare_enrich,i))
 
-      while (clones) {
+        if (case == "ParentChildLike") {
+          # Sample parental genotypes
+          parent_clones <- TRUE
+          while (parent_clones) {
+            if (rare_enrich) { # draw rare alleles with high probability
+              parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
+            } else {
+              parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
+            }
+            parent2 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
+            parent_clones <- identical(parent1[no_clone_subset], parent2[no_clone_subset])
+          }
 
-        parent1 <- sapply(all_markers, function(t) {
-          sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
+          parents <- cbind(parent1, parent2)
 
-        if (rare_enrich) {
-          parent2 <- sapply(all_markers, function(t) {
-            sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
+          # Sample children genotypes
+          children_clones <- TRUE
+          while (children_clones) {
+
+            # Sample parental allocations
+            cs <- recombine_parent_ids(markers_per_chr)[,1]
+            names(cs) <- all_markers
+
+            # Create recombinant
+            child12 <- sapply(all_markers, function(m) parents[m,cs[m]])
+            child1 <- parent1
+            child2 <- parent2
+
+            children_clones <- identical(child1[no_clone_subset], child12[no_clone_subset])
+          }
+
+          # Make parasite infection and data
+          initial <- rbind(child1, child12)
+          relapse <- rbind(child2)
+
+        } else if (case == "Half") {
+
+          # Sample parental genotypes
+          parent_clones <- TRUE
+          while (parent_clones) {
+            if (rare_enrich) { # draw rare alleles with high probability
+              parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
+            } else {
+              parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
+            }
+            parent2 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
+            parent3 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
+            parent_clones <- any(identical(parent1[no_clone_subset], parent2[no_clone_subset]),
+                                 identical(parent1[no_clone_subset], parent3[no_clone_subset]),
+                                 identical(parent2[no_clone_subset], parent3[no_clone_subset]))
+          }
+
+          parents12 <- cbind(parent1, parent2)
+          parents13 <- cbind(parent1, parent3)
+          parents23 <- cbind(parent2, parent3)
+
+          # Sample children genotypes
+          children_clones <- TRUE
+          while (children_clones) {
+
+            # Sample parental allocations independently
+            cs <- sapply(1:3, function(i) recombine_parent_ids(markers_per_chr)[,1])
+            rownames(cs) <- all_markers
+
+            # Construct children genotypes from parental allocations
+            child12 <- sapply(all_markers, function(i) parents12[[i,cs[i,1]]])
+            child13 <- sapply(all_markers, function(i) parents13[[i,cs[i,2]]])
+            child23 <- sapply(all_markers, function(i) parents23[[i,cs[i,3]]])
+
+            # Check for clones in MOI = 2 infection only
+            children_clones <- identical(child12[no_clone_subset], child13[no_clone_subset])
+          }
+
+          # Make parasite infection and data
+          initial <- rbind(child12, child13)
+          relapse <- rbind(child23)
+
         } else {
-          parent2 <- sapply(all_markers, function(t) {
-            sample(alleles, size = 1, prob = fs[[t]])}, simplify = F)
+          stop('case should either be "ParentChildLike" or "Half"')
         }
 
-        clones <- identical(parent1[min_marker_subset], parent2[min_marker_subset])
+        y <- list(initial = apply(initial, 2, unique, simplify = F),
+                  relapse = apply(relapse, 2, unique, simplify = F))
 
-      }
+        # Store the data
+        ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]] <- y
 
-      parents <- cbind(parent1, parent2)
-
-      # Sample children genotypes independently (ensure no intra-clones)
-      clones <- TRUE
-      while (clones) {
-        child1 <- unlist(parent1)
-        child2 <- unlist(parent2)
-
-        # Sample parental allocations
-        ps <- recombine_parent_ids(markers_per_chr)[,1]
-        names(ps) <- all_markers
-
-        # Create recombinant
-        child12 <- do.call("c", sapply(all_markers, function(m) parents[m,ps[m]]))
-
-        clones <- identical(child12[min_marker_subset], child2[min_marker_subset])
-      }
-
-      # Make parasite infection and data
-      initial <- rbind(unlist(child1))
-      relapse <- rbind(unlist(child2), unlist(child12)) # MOI recurrence > initial
-      y <- list(initial = apply(initial, 2, unique, simplify = F),
-                relapse = apply(relapse, 2, unique, simplify = F))
-
-      # Store the data
-      ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]] <- y
-
-    }
-  }
-}
-tictoc::toc()
-
-#===============================================================================
-# Generate results for different allele frequency types, for a migrant parent
-# (rare_enrich TRUE) as well as parents from a single population, and for
-# different marker counts
-#===============================================================================
-tictoc::tic()
-for(i in 1:n_repeats){
-  print(i)
-  for(c in c_params) {
-    fs <- fs_store[[as.character(c)]]
-    for(rare_enrich in c(TRUE, FALSE)) {
-      y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
-      for(m in n_markers){
-        marker_subset <- marker_subsets[[m]]
-        y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
-        ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
-        ps_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[as.character(i)]][[as.character(m)]] <- ps
       }
     }
   }
-}
-tictoc::toc()
 
-#===============================================================================
-# Generate results for equifrequent alleles, for parents from a single
-# population, and for all marker counts from one onward.
-#===============================================================================
-c <- 100 # For uniform allele frequencies only
-rare_enrich <- FALSE # For parents from the same population
-fs <- fs_store[[as.character(c)]] # Extract frequencies
-tictoc::tic()
-for(i in 1:n_repeats){
-  print(i)
-  y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
-  # compute posterior relapse probabilities for all marker counts from one onward
-  for(m in 1:max_n_markers){
-    marker_subset <- marker_subsets[[m]]
-    y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
-    ps <- suppressMessages(compute_posterior(y, fs))
-    ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
+  tictoc::toc()
+
+  #===============================================================================
+  # Generate results with return.logp = TRUE
+  #===============================================================================
+  tictoc::tic()
+  for(i in 1:n_repeats){
+    print(i)
+    for(c in c_params) {
+      fs <- fs_store[[as.character(c)]]
+      for(rare_enrich in c(TRUE, FALSE)) {
+        y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
+        for(m in n_markers){
+          marker_subset <- marker_subsets[[m]]
+          y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
+          ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
+          ps_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[as.character(i)]][[as.character(m)]] <- ps
+        }
+      }
+    }
   }
-}
-tictoc::toc()
+  tictoc::toc()
+
+  #===============================================================================
+  # Generate results for markers 1:max_n_markers
+  #===============================================================================
+  c <- 100 # For uniform allele frequencies only
+  rare_enrich <- FALSE # For parents from the same population
+  fs <- fs_store[[as.character(c)]] # Extract frequencies
+  tictoc::tic()
+  for(i in 1:n_repeats){
+    print(i)
+    y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
+    for(m in 1:max_n_markers){
+      marker_subset <- marker_subsets[[m]]
+      y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
+      ps <- suppressMessages(compute_posterior(y, fs))
+      ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
+    }
+  }
+  tictoc::toc()
 
 
-#===============================================================================
-# Bundle data, results and magic numbers
-#===============================================================================
-ParentChildLike_siblings <- list(fs_store = fs_store,
+  #=============================================================================
+  # Bundle data, results and magic numbers
+  #=============================================================================
+  output <- list(n_alleles = n_alleles,
+                 n_repeats = n_repeats,
+                 n_markers = n_markers,
+                 c_params = c_params,
+                 c_cutoff = c_cutoff,
+                 seed = seed,
+                 fs_store = fs_store,
                  ys_store = ys_store,
                  ps_store = ps_store,
-                 ps_store_all_ms = ps_store_all_ms,
-                 c_cutoff = c_cutoff,
-                 n_alleles = n_alleles,
-                 seed = seed)
+                 ps_store_all_ms = ps_store_all_ms)
 
 
-#===============================================================================
-# Save Half_siblings as exported data
-#===============================================================================
-usethis::use_data(ParentChildLike_siblings, overwrite = TRUE)
+save(output, file = sprintf("%s_siblings.rda", case))
+}
