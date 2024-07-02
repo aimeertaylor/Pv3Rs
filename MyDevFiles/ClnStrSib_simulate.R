@@ -1,11 +1,7 @@
 ################################################################################
-# Bulk data from three of four meiotic siblings
-
-# To do: check simulations for c("Stranger", "Clone", "Full_sibling", "Meiotic_sibling")
-# are as expected; delete the data_raw/ scripts for these cases
-
 ################################################################################
 rm(list = ls())
+library(Pv3Rs)
 library(MCMCpack) # For rdirichlet
 library(tictoc) # For timing
 
@@ -167,7 +163,7 @@ for(relapsing_parasite in relapsing_parasites){
   tictoc::toc()
 
   #=============================================================================
-  # Generate results for equifrequent alleles and markers 1:max_n_markers
+  # Generate results for markers 1:max_n_markers
   #=============================================================================
   c <- tail(c_params, 1) # For uniform allele frequencies only
   fs <- fs_store[[as.character(c)]] # Extract frequencies

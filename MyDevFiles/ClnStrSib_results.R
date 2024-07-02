@@ -1,6 +1,11 @@
 ################################################################################
-#
-# ==============================================================================
+# Bulk data from three meiotic siblings is identical to bulk data from parents.
+# As such, infections with three or more meiotic siblings are liable to be
+# classified as infections of strangers (Aside: implies single cell data are
+# needed for superinfection vs cotransmission) with a clonal edge to a sibling
+# relapse, regardless of whether or not the relapsing sibling is a full sibling
+# or a meiotic sibling
+################################################################################
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
 relapsing_parasites <- c("Stranger", "Clone", "Full_sibling", "Meiotic_sibling")
