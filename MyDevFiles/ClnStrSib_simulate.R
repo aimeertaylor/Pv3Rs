@@ -8,7 +8,7 @@ library(tictoc) # For timing
 #===============================================================================
 # Magic numbers / quantities
 #===============================================================================
-relapsing_parasites <- c("Stranger", "Clone", "Full_sibling", "Meiotic_sibling")
+cases <- c("Stranger", "Clone", "Full_sibling", "Meiotic_sibling")
 MOIs_per_infection_all <- c("2_1", "3_1") # Evaluate both for siblings only
 n_alleles <- 5 # Number of alleles per marker (marker cardinality)
 n_repeats <- 5 # Number of simulations per parameter combination
@@ -50,11 +50,11 @@ markers_per_chr <- table(chrs_per_marker)
 #===============================================================================
 # Generate data
 #===============================================================================
-for(relapsing_parasite in relapsing_parasites){
+for(case in cases){
 
-  print(relapsing_parasite)
+  print(case)
 
-  if(grepl("sibling", relapsing_parasite)) {
+  if(grepl("sibling", case)) {
     MOIs_per_infection <- MOIs_per_infection_all
   } else {
     MOIs_per_infection <- MOIs_per_infection_all[1]
@@ -90,7 +90,7 @@ for(relapsing_parasite in relapsing_parasites){
       while (children_clones) {
 
         # Sample parental allocations
-        if(relapsing_parasite == "Full_sibling") {
+        if(case == "Full_sibling") {
           # independently for fourth child
           cs <- cbind(recombine_parent_ids(markers_per_chr)[,1:3],
                       recombine_parent_ids(markers_per_chr)[,1]) # Full sibling
@@ -119,9 +119,9 @@ for(relapsing_parasite in relapsing_parasites){
           initial <- children[1:3,] # Three of four meiotic siblings
         }
 
-        if (relapsing_parasite == "Clone") {
+        if (case == "Clone") {
           relapse <- rbind(children[1,])
-        } else if (relapsing_parasite == "Stranger") {
+        } else if (case == "Stranger") {
           stranger <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
           relapse <- rbind(stranger)
         } else {
@@ -169,9 +169,9 @@ for(relapsing_parasite in relapsing_parasites){
   fs <- fs_store[[as.character(c)]] # Extract frequencies
 
   # Specifiy the recurrent state with largested expected posterior
-  if (relapsing_parasite == "Clone") {
+  if (case == "Clone") {
     exp_state <- "C"
-  } else if (relapsing_parasite == "Stranger") {
+  } else if (case == "Stranger") {
     exp_state <- "I"
   } else {
     exp_state <- "L"
@@ -253,5 +253,5 @@ for(relapsing_parasite in relapsing_parasites){
                  post_S = post_S,
                  llikeRGs = llikeRGs)
 
-  save(output, file = sprintf("%s.rda", relapsing_parasite))
+  save(output, file = sprintf("%s.rda", case))
 }
