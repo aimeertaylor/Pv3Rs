@@ -46,11 +46,14 @@ no_clone_subset <- marker_subsets[[min_n_markers]]
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
 markers_per_chr <- table(chrs_per_marker)
 
-#===============================================================================
-# Generate data
-#===============================================================================
-tictoc::tic()
 for(case in cases) {
+
+  print(case)
+
+  #===============================================================================
+  # Generate data
+  #===============================================================================
+  tictoc::tic()
   for(c in c_params) {
 
     # Sample allele frequencies
@@ -58,7 +61,7 @@ for(case in cases) {
       if(c > c_cutoff) {
         fs_unnamed <- rep(1/n_alleles, n_alleles)
       } else {
-        fs_unnamed <- MCMCpack::rdirichlet(1, alpha = rep(c, n_alleles))
+        fs_unnamed <- MCMCpack::rdirichlet(1, rep(c, n_alleles))
       }
       setNames(fs_unnamed, alleles)
     }, USE.NAMES = TRUE, simplify = FALSE)
@@ -68,8 +71,6 @@ for(case in cases) {
 
     for(rare_enrich in c(TRUE, FALSE)) {
       for(i in 1:n_repeats) {
-
-        print(paste(c,rare_enrich,i))
 
         if (case == "ParentChildLike") {
           # Sample parental genotypes
@@ -202,11 +203,9 @@ for(case in cases) {
       ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
     }
   }
-  tictoc::toc()
-
 
   #=============================================================================
-  # Bundle data, results and magic numbers
+  # Bundle magic numbers, data and results
   #=============================================================================
   output <- list(n_alleles = n_alleles,
                  n_repeats = n_repeats,

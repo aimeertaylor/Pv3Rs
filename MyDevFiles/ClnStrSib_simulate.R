@@ -47,9 +47,6 @@ no_clone_subset <- marker_subsets[[min_n_markers]]
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
 markers_per_chr <- table(chrs_per_marker)
 
-#===============================================================================
-# Generate data
-#===============================================================================
 for(case in cases){
 
   print(case)
@@ -60,6 +57,9 @@ for(case in cases){
     MOIs_per_infection <- MOIs_per_infection_all[1]
   }
 
+  #===============================================================================
+  # Generate data
+  #===============================================================================
   tictoc::tic()
   for(c in c_params) {
 
@@ -142,7 +142,7 @@ for(case in cases){
 
 
   #=============================================================================
-  # Generate results with return.logp = TRUE for c_params and n_markers
+  # Generate results with return.logp = TRUE
   #=============================================================================
   tictoc::tic()
   for(i in 1:n_repeats){
@@ -165,7 +165,7 @@ for(case in cases){
   #=============================================================================
   # Generate results for markers 1:max_n_markers
   #=============================================================================
-  c <- tail(c_params, 1) # For uniform allele frequencies only
+  c <- 100 # For uniform allele frequencies only
   fs <- fs_store[[as.character(c)]] # Extract frequencies
 
   # Specifiy the recurrent state with largested expected posterior
