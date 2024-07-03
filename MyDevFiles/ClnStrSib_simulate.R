@@ -186,7 +186,7 @@ for(case in cases){
         marker_subset <- marker_subsets[[m]]
         y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
         ps <- suppressMessages(compute_posterior(y, fs))
-        ps_store_all_ms[[MOIs]][[as.character(i)]][[paste0("m",m)]] <- ps$marg[, exp_state]
+        ps_store_all_ms[[MOIs]][[as.character(i)]][[paste0("m",m)]] <- ps$marg
       }
     }
   }
@@ -246,6 +246,7 @@ for(case in cases){
                  c_params = c_params,
                  c_cutoff = c_cutoff,
                  seed = seed,
+                 exp_state = exp_state,
                  fs_store = fs_store,
                  ys_store = ys_store,
                  ps_store = ps_store,

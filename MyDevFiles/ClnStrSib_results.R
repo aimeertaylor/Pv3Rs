@@ -8,14 +8,14 @@
 ################################################################################
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-relapsing_parasites <- c("Stranger", "Clone", "Full_sibling", "Meiotic_sibling")
+cases <- c("Stranger", "Clone", "Full_sibling", "Meiotic_sibling")
 
-for(relapsing_parasite in relapsing_parasites){
+for(case in cases){
 
   par(par_default)
   attached <- search()
   if(exists("ys_store")) detach("output")
-  load(sprintf("./%s.rda", relapsing_parasite))
+  load(sprintf("./%s.rda", case))
   attach(output)
   cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
   cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
@@ -23,23 +23,38 @@ for(relapsing_parasite in relapsing_parasites){
   # ==============================================================================
   # Plots given equifrequent alleles across all marker counts
   # ==============================================================================
+  par(mfrow = c(2,1))
+
+  # PLot trajaectories
   plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1,
        xaxt = "n", xlab = "Marker count", ylab = "Posterior expected state probability")
-  axis(side = 1, at = seq(0, max(n_markers), 10))
-  title(main = relapsing_parasite)
-
+  axis(side = 1, at = seq(0, max(n_markers), 10)); title(main = case)
   legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, horiz = TRUE, bty = "n")
   for(MOIs in MOIs_per_infection) {
     LTY = ifelse(MOIs == "2_1", 1, 2)
     for(i in 1:n_repeats){
       lines(x = 1:max(n_markers),
-            y = ps_store_all_ms[[MOIs]][[as.character(i)]], col = cols[i], lwd = 2, lty = LTY)
+            y = sapply(ps_store_all_ms[[MOIs]][[as.character(i)]], function(x) x[,exp_state]),
+            col = cols[i], lwd = 2, lty = LTY)
     }
   }
+
+  # Plot simplex
+  par(mar = c(0,0,0,0))
+  V_labels <- c("Recrudescence", "Relapse", "Reinfection")
+  plot_simplex(v_labels =  V_labels, classifcation_threshold = 0.5)
+  for(MOIs in MOIs_per_infection) {
+    LTY = ifelse(MOIs == "2_1", 1, 2)
+    for(i in n_repeats){
+      xy_post <- cbind(c(0,0), apply(do.call(rbind, ps_store_all_ms[[MOIs]][[as.character(i)]]), 1, project2D))
+      lines(x = xy_post["x",], y = xy_post["y",], lty = LTY)
+      points(x = xy_post["x",], y = xy_post["y",], pch = 20)}
+    }
 
   # ==============================================================================
   # Plots for different allele frequencies and for marker counts in n_markers
   # ==============================================================================
+  par(par_default)
   par(mfrow = c(3,1))
   for(c in c_params){
     plot(NULL, xlim = range(n_markers)+c(-10,10), ylim = c(0,1),

@@ -52,6 +52,9 @@ for(case in cases) {
 
   #===============================================================================
   # Generate data
+  # When rare_enrich is TRUE, draw rare alleles with high probability for one
+  # parent (interpret as an migrant from another population) who parents
+  # intra-episode parasite.
   #===============================================================================
   tictoc::tic()
   for(c in c_params) {
@@ -76,7 +79,9 @@ for(case in cases) {
           # Sample parental genotypes
           parent_clones <- TRUE
           while (parent_clones) {
-            if (rare_enrich) { # draw rare alleles with high probability
+
+            # draw rare alleles with high probability
+            if (rare_enrich) {
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
             } else {
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
@@ -162,7 +167,6 @@ for(case in cases) {
       }
     }
   }
-
   tictoc::toc()
 
   #===============================================================================
@@ -200,9 +204,10 @@ for(case in cases) {
       marker_subset <- marker_subsets[[m]]
       y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
       ps <- suppressMessages(compute_posterior(y, fs))
-      ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg[,"L"]
+      ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg
     }
   }
+  tictoc::toc()
 
   #=============================================================================
   # Bundle magic numbers, data and results

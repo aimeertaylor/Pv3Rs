@@ -8,6 +8,9 @@
 #'   anticlockwise from the top vertex. If NULL (default), vertices are not
 #'   annotated.
 #'
+#' @param classifcation_threshold A number between 0 and 1 over which a
+#'   recurrent state is classified
+#'
 #' @examples
 #' # Plot 2D simplex
 #' plot_simplex()
@@ -58,7 +61,7 @@
 #' arrows(x0 = xy_prior["x"], x1 = xy_post["x"],
 #'        y0 = xy_prior["y"], y1 = xy_post["y"], length = 0.1)
 #' @export
-plot_simplex <- function(v_labels = NULL) {
+plot_simplex <- function(v_labels = NULL, classifcation_threshold = NULL) {
 
   # Define some constants:
   h <- sqrt(3)/2 # Height of equilateral triangle with unit sides
@@ -76,6 +79,39 @@ plot_simplex <- function(v_labels = NULL) {
   # Annotate vertices:
   if (!is.null(v_labels)) {
     text(x = c(0, -0.5, 0.5), y = c(r, -k, -k), labels = v_labels, pos = c(3,1,1))
+  }
+
+  if(!is.null(classifcation_threshold)) {
+
+    ct <- classifcation_threshold
+    if(ct < 0 | ct > 1) stop("The classifcation_threshold should be a number between 0 and 1")
+
+    # Project critical points
+    xyCLI <- project2D(c(1/3,1/3,1/3))
+    xyCL <- project2D(c(ct,ct,0))
+    xyCI <- project2D(c(ct,0,ct))
+    xyLI <- project2D(c(0,ct,ct))
+    xyC <- project2D(c(1,0,0))
+    xyL <- project2D(c(0,1,0))
+    xyI <- project2D(c(0,0,1))
+
+    # Delineate weak classification
+    # (more than 0.3 posterior probability for one state)
+    p1 <- rbind(xyL, xyCL, xyCLI, xyLI)
+    p2 <- rbind(xyC, xyCI, xyCLI, xyCL)
+    p3 <- rbind(xyI, xyLI, xyCLI, xyCI)
+    polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = adjustcolor("purple", alpha.f = 0.35))
+    polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = adjustcolor("yellow", alpha.f = 0.35))
+    polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = adjustcolor("red", alpha.f = 0.35))
+
+    # Delineate strong classification
+    # (more than 0.5 posterior probability for one state)
+    p1 <- rbind(xyL, xyCL, xyLI)
+    p2 <- rbind(xyC, xyCI, xyCL)
+    p3 <- rbind(xyI, xyLI, xyCI)
+    polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = "purple")
+    polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = "yellow")
+    polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = "red")
   }
 
 }

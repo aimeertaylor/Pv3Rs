@@ -4,12 +4,15 @@
 \alias{plot_simplex}
 \title{Plots a 2D simplex}
 \usage{
-plot_simplex(v_labels = NULL)
+plot_simplex(v_labels = NULL, classifcation_threshold = NULL)
 }
 \arguments{
 \item{v_labels}{A vector of labels with which to annotate vertices
 anticlockwise from the top vertex. If NULL (default), vertices are not
 annotated.}
+
+\item{classifcation_threshold}{A number between 0 and 1 over which a
+recurrent state is classified}
 }
 \description{
 Plots a 2D simplex, a triangle with unit sides centered at the origin, to
