@@ -2,6 +2,8 @@
 # Initial thoughts on using repeat values to encode MOIs and within-sample
 # allele frequencies. To be continued after maternity leave (Nov 2023)
 
+# July 2024: is this still a thing or did YS correct it?
+
 library(Pv3Rs)
 
 # =====================================================================
@@ -54,10 +56,10 @@ compute_posterior(y2, fs)
 
 
 # =====================================================================
-# Problem when wants to encode an imbalanced within-sample allele frequency
-# without inflating the MOI. For example, following encodes MOIs of 2 and 3,
-# incompatible with recrudescece; not MOIs of 2 and 2 with selection of c(2,1)
-# genotype from 50% to 66%, compatible with recrudescence
+# Problem occurs when one wants to encode an imbalanced within-sample allele
+# frequency without inflating the MOI. For example, the following encodes MOIs
+# of 2 and 3; not MOIs of 2 and 2 with selection of c(2,1) genotype from 50% to
+# 66%, compatible with recrudescence
 
 y <- list(enrol = list(m1=c('1','2'), m2=c('1')),
            recur = list(m1=c('1','2','2'), m2=c('1')))
