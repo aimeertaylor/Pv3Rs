@@ -1,6 +1,7 @@
 ################################################################################
-# Script illustrating that the bulk data from a pool of three recombinant filial
-# chromatids is indistinguishable from the bulk data from their two parents
+# Script illustrating that the bulk data from a pool of three meiotic siblings
+# is indistinguishable from the bulk data from their two parents; that meiotic siblings
+# are 33% related; and that...
 #
 # See following for examples of complex chiasmata
 # https://biology.stackexchange.com/questions/42288/do-only-one-or-both-pairs-of-homologous-chromatids-exchange-genetic-material-dur
@@ -51,16 +52,23 @@ suppressMessages(compute_posterior(y = y_parents, fs)$marg)
 # And that the problem does not occur given full siblings:
 suppressMessages(compute_posterior(y = y_full, fs)$marg)
 
-# Plot data
+# Plot data:
 plot_data(list(meiotic = y_meitotic,
                parents = y_parents,
                full = y_full), marker_annotate = F)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# To-finish: compute IBD-based relatedness between meiotic sibs
+# Check siblings are related as expected:
 all_pairs <- gtools::combinations(4,2)
-apply(all_pairs, 1, function(i) {
-  pair <- cs_meiotic[,all_pairs[i,]]
-  mean(pair[,1] == pair[,2])
-})
 
+average_meiotic_relatedness <- mean(apply(all_pairs, 1, function(ind){
+  pair <- cs_meiotic[,ind]
+  mean(pair[,1] == pair[,2])
+}))
+
+average_full_relatedness <- mean(apply(all_pairs, 1, function(ind){
+  pair <- cs_full[,ind]
+  mean(pair[,1] == pair[,2])
+}))
+
+average_meiotic_relatedness
+average_full_relatedness
