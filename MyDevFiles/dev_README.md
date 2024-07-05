@@ -25,9 +25,6 @@ RelationshipStudy/
 Benchmarking study
 Benchmark/
 
- 
-
-
 ## Files from developing current implementation (removed)
 
 Demo a synthetic example with MOI = 8, now in vignettes/demo.Rmd

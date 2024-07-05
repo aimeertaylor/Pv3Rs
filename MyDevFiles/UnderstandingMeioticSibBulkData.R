@@ -48,10 +48,19 @@ y_parents <- list(initial = apply(t(parents), 2, unique, simplify = F),
 suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
 suppressMessages(compute_posterior(y = y_parents, fs)$marg)
 
-# And that the problem does not occur fro full siblings:
+# And that the problem does not occur given full siblings:
 suppressMessages(compute_posterior(y = y_full, fs)$marg)
 
-
+# Plot data
 plot_data(list(meiotic = y_meitotic,
                parents = y_parents,
                full = y_full), marker_annotate = F)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# To-finish: compute IBD-based relatedness between meiotic sibs
+all_pairs <- gtools::combinations(4,2)
+apply(all_pairs, 1, function(i) {
+  pair <- cs_meiotic[,all_pairs[i,]]
+  mean(pair[,1] == pair[,2])
+})
+
