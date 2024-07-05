@@ -3,7 +3,12 @@
 # using repeat values (explore further) It is not possible to encode
 # within-sample allele values using repeat values.
 #
-# To-do: check readme, check analytical solution for MOI encoding (ask YS?)
+# To-do:
+# check readme,
+# check analytical solution for MOI encoding (ask YS?)
+# Add an example to graph prior bias
+# Add check for same number of markers across episodes
+# Add warning for repeat values
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)

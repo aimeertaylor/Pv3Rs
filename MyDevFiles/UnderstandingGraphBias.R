@@ -4,29 +4,29 @@
 # Add an warning for recurrences with no data can have non-zero marginal probabilities
 ################################################################################
 
-# When not in development mode
+# When not in development mode:
 devtools::install_github("aimeertaylor/Pv3Rs", build_vignettes = FALSE)
 library(Pv3Rs)
 rm(list = ls())
 
 #===============================================================================
-#' Examples of unwanted effects on posterior of prior on graphs
-#'
-#' Predominantly, the marginal probability that the first recurrence is a
-#' recrudescence increases as the graph grows without data (red arrow on simplex
-#' plot). Predominantly, the marginal probability that the first recurrence is a
-#' reinfection increases as the graph grows with repeat data (blue arrow on
-#' simplex plot). In both cases, the  marginal probability that the first
-#' recurrence is a relapse decreases (both arrows on the simplex plot).
-#'
-#' These general observations are not very sensitive to the observed allele
-#' frequency (try comparing Obs_allele equal to 0.05, 0.5 and 0.95).
-#'
-#' Also of note, the marginal probabilities of recurrences with no data diverge
-#' from the prior at a decreasing rate (compare rows 2 to 4 of results0[[4]]).
-#'
-#' Also of note, the marginal probabilities of different recurrences differ even
-#' when all recurrences have the same data (compare rows 2 to 4 of results1[[4]]).
+# Examples of unwanted effects on posterior of prior on graphs
+#
+# Predominantly, the marginal probability that the first recurrence is a
+# recrudescence increases as the graph grows without data (red arrow on simplex
+# plot). Predominantly, the marginal probability that the first recurrence is a
+# reinfection increases as the graph grows with repeat data (blue arrow on
+# simplex plot). In both cases, the  marginal probability that the first
+# recurrence is a relapse decreases (both arrows on the simplex plot).
+#
+# These general observations are not very sensitive to the observed allele
+# frequency (try comparing Obs_allele equal to 0.05, 0.5 and 0.95).
+#
+# Also of note, the marginal probabilities of recurrences with no data diverge
+# from the prior at a decreasing rate (compare rows 2 to 4 of results0[[4]]).
+#
+# Also of note, the marginal probabilities of different recurrences differ even
+# when all recurrences have the same data (compare rows 2 to 4 of results1[[4]]).
 #===============================================================================
 
 # Allele frequencies:
