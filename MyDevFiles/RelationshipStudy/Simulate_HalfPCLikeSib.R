@@ -9,8 +9,8 @@ library(tictoc) # For timing
 # Magic numbers / quantities
 #===============================================================================
 cases <- c("ParentChildLike", "Half")
-n_alleles <- 5 # Number of alleles per marker (marker cardinality)
-n_repeats <- 2 # Number of simulations per parameter combination
+n_alleles <- 12 # Number of alleles per marker (marker cardinality)
+n_repeats <- 10 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100, 150) # Number of markers for which RG likelihood returned
 c_params <- c(0.5, 1, 10, 100) # Dirichlet concentration parameter
 c_cutoff <- 99 # Switch from Dirichlet r.v. to 1/n_alleles above c_cutoff

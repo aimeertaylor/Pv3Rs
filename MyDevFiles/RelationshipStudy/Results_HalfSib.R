@@ -11,7 +11,7 @@ attached <- search()
 if(exists("ys_store")) detach(output)
 load("Half_siblings.rda")
 attach(output)
-#if (n_repeats != 10) stop("Plots assume 10 repeats")
+if (n_repeats != 10) stop("Plots assume 10 repeats")
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
 

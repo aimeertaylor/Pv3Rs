@@ -1,5 +1,7 @@
 # ==============================================================================
-# Made up example, based on Figure in manuscript
+# Made up example, based on Figure 1 of the 2022 medRxiv preprint
+# Not quite right because sibs in initial infection ought to be meiotic.
+# To-do: update how the data, using recombine_parent_ids()
 # ==============================================================================
 
 # Make parasite genotypes, where green-ish genotypes are yellow-blue mosaics;
@@ -26,7 +28,6 @@ y <- list(initial = apply(initial, 2, unique, simplify = F),
           recrud = apply(recrud, 2, unique, simplify = F),
           reinf = apply(reinf, 2, unique, simplify = F))
 
-
 # Function to draw allele frequencies that sum to one
 rdirichlet(1, alpha = rep(0.1,4))
 
@@ -38,18 +39,27 @@ fs <- list(
   m4 = setNames(rdirichlet(1, alpha = rep(0.1,4)), c("yellow", "hotpink", "red", "blue"))
 )
 
-# compute
-post <- compute_posterior(y, fs, return.RG=TRUE, return.logp=TRUE)
+# Plot the data
+plot_data(ys = list(example = y))
 
+# Compute results
+post <- compute_posterior(y, fs, return.RG=TRUE, return.logp=TRUE)
 post$marg # Makes sense
 sort(post$joint, decreasing = T) # Makes sense
 
-# How to plot a graph for a real sample where gs and ts_per_gs are unknown? - record
-# Most likely has a clonal edge
-RGlogp <- sapply(post$RGs, function(RG) RG$logp) # log likelihoods of graphs
+# Plot result on the simplex:
+xy <- apply(post$marg, 1, project2D)
+plot_simplex(v_labels = c("Recrudescence", "Relapse", "Reinfection"),
+             classifcation_threshold = 0.5)
+points(x = xy["x",], xy["y",], pch = 21, cex = 1.5,
+       bg = c("purple", "yellow", "red", fg = "black"))
+
+# Most likely graph (could colour according to the Figure)
+RGlogp <- sapply(post$RGs, function(RG) RG$logp)
 RG <- post$RGs[[which.max(RGlogp)]]
-gs <- paste0("g", 1:6)
-ts_per_gs <- c(1,1,2,2,3,4)
+MOIs <- determine_MOIs(y)
+gs <- paste0("g", 1:sum(MOIs))
+ts_per_gs <- rep(1:length(MOIs), MOIs)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20, vertex_palette = "Blues")
 seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
