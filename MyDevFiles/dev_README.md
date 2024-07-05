@@ -3,17 +3,30 @@
 Verify the examples in https://doi.org/10.1101/2022.11.23.22282669
 - `Description_examples.R`
 
+Example for Fig1 of the MedRxiv 2022 preprint: 
+- `Example_PreprintFig.R`
+
 Examples of unwanted effects due to uniform distribution over graphs
-- `Graph_prior_bias_examples.R`
+- `UnderstandingGraphBias.R`
+
+Illustrating how bulk data from meiotic sibs is identical to bulk data from their parents:
+- `UnderstandingMeioticSibBulkData.R'
+
+Exploring repeat values and how they could encode MOIs (possibly) and intra-sample allele frequency imbalance (to-avoid):
+- `UnderstandingRepeatValues.R'
 
 Example of half siblings (not yet described)
 - `Half_siblings_YF.R` (`Half_siblings.R` renamed)
 - `Half_siblings_AT.R` (Aimee's attempt to understand how the frequency of a relapse classification tends to one with the number of markers despite the inter-to-intra match ratio converging to some fixed value with the number of markers). 
-- `Half_siblings_simulation.R
 
-Aimee to describe
-- `MS_data_demo_to_sort.R`
-- `ToSortPostMaternity.R`
+Study of model behaviour given different relationships of recurrent parasites (not yet described)
+RelationshipStudy/
+
+Benchmarking study
+Benchmark/
+
+ 
+
 
 ## Files from developing current implementation (removed)
 
