@@ -1,7 +1,8 @@
 ################################################################################
-# Script illustrating that the bulk data from a pool of three meiotic siblings
-# is indistinguishable from the bulk data from their two parents; that meiotic siblings
-# are 33% related; and that...
+# Script illustrating that perfect bulk data from a pool of three meiotic
+# siblings is indistinguishable from perfect bulk data from their two parents;
+# that a single error is enough to recover full-sibling like behaviour; and that
+# meiotic siblings are 33% related.
 #
 # See following for examples of complex chiasmata
 # https://biology.stackexchange.com/questions/42288/do-only-one-or-both-pairs-of-homologous-chromatids-exchange-genetic-material-dur
@@ -14,7 +15,8 @@ all_markers <- paste0("m", 1:max_n_markers)
 n_alleles <- 5
 alleles <- letters[1:n_alleles]
 fs_param <- setNames(rep(1, n_alleles), alleles)
-fs <- sapply(all_markers, function(i) setNames(rdirichlet(1, fs_param), alleles), simplify = F)
+fs <- sapply(all_markers, function(i) {
+  setNames(rdirichlet(1, fs_param), alleles)}, simplify = F)
 parent1 <- sapply(all_markers, function(i) sample(alleles, size = 1, prob = fs[[i]]))
 parent2 <- sapply(all_markers, function(i) sample(alleles, size = 1, prob = fs[[i]]))
 parents <- cbind(parent1, parent2)
@@ -45,11 +47,22 @@ y_meitotic <- list(initial = apply(children_meiotic[1:3,], 2, unique, simplify =
 y_parents <- list(initial = apply(t(parents), 2, unique, simplify = F),
                   relapse = apply(children_full[4,,drop=FALSE], 2, unique, simplify = F))
 
-# Check they give the same posterior state probabilities:
-suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
+# Meiotic sibs and their parents indistinguishable:
 suppressMessages(compute_posterior(y = y_parents, fs)$marg)
+suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
 
-# And that the problem does not occur given full siblings:
+# What happens if we inflate the MOI with a dummy marker? Relapse probability
+# increases slightly - this is not actionable (without single-cell sequences, we
+# cannot disentagle three meiotic siblings in bulk data)
+y_meitotic$initial$m150 <- c(NA,NA,NA)
+determine_MOIs(y_meitotic)
+suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
+
+# Because we assume no error, a single error is enough to solve the problem:
+y_meitotic$initial$m150 <- "a"
+suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
+
+# No problem with full siblings:
 suppressMessages(compute_posterior(y = y_full, fs)$marg)
 
 # Plot data:
