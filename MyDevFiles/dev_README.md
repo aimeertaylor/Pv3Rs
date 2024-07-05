@@ -10,7 +10,7 @@ Examples of unwanted effects due to uniform distribution over graphs
 - `UnderstandingGraphBias.R`
 
 Illustrating how bulk data from meiotic sibs is identical to bulk data from their parents:
-- `UnderstandingMeioticSibBulkData.R'
+- `UnderstandingMeioticSibs.R'
 
 Exploring repeat values and how they could encode MOIs (possibly) and intra-sample allele frequency imbalance (to-avoid):
 - `UnderstandingRepeatValues.R'
