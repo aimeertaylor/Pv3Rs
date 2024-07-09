@@ -44,7 +44,7 @@ We can access the joint posterior through `post$joint`. Here, we find the most l
 ```{r}
 post$joint[which.max(post$joint)]
 ```
-The log-likelihoods of each relationship graph is also returned in the output. Here, we plot the relationship graph for which the data are most likely:
+The log-likelihoods of each relationship graph is also returned in the output. Here, we plot the relationship graph with the largest likelihood:
 ```{r}
 RG <- post$RGs[[which.max(sapply(post$RGs, function(RG) RG$logp))]]
 # default genotype names
@@ -55,9 +55,9 @@ plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
 seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
 ```
 
-In this example, the most likely recurrence-state sequence given the data is incompatible with the graph for which the data are most likely (the graph for which the data are most likely is compatible with `r seqs_comp_MLE_RG`). This apparent inconsistency can be understood as follows. It is not due to bias induced by the uniform prior on graphs (see `?compute_posterior` examples). Indeed, when data from the first recurrence are analysed alone, the most probable cause of recurrence is reinfection, but the graph for which the data are most likely is incompatible with reinfection. 
+**N.B.** This approach of finding the `most likely' relationship graph does not take into account of symmetries. Specifically, relationship graphs that are isomorphic up to within-episode genotype permutations have the same likelihood. The user should note that the the most likely equivalence class of relationship graphs may not contain the relationship graph with the largest likelihood. 
 
-Although sequences `r seqs_comp_MLE_RG` are associated with the graph for which the data are most likely, they are also associated with many graphs for which the data are unlikely or impossible under the model. Meanwhile, the most likely sequence `r names(post$joint[which.max(post$joint)])` is associated with fewer graphs, over which the average conditional probability of the data is larger (see histograms below). The average conditional probability given graphs compatible with a specific sequence is equal to the probability of the data given said sequence (the likelihood of a sequence) because the probability of a graph given a sequence is uniform over graphs compatible with said sequence. Moreover, in the current case where the prior on sequences is uniform, the likelihood is proportional to the prior and the maximum posterior estimate is equal to the maximum likelihood estimate (see scatter plot below). 
+The figure below shows histograms of the likelihoods of the relationship graphs compatible with each possible sequence of recurrence states, along with the likelihood of the sequence of recurrence states (dark line). Although sequences `r seqs_comp_MLE_RG` are all associated with the relationship graph with the largest log-likelihood, we observe that the likelihoods of these sequences of recurrence states decrease as the number of compatible relationship graphs increase. This behaviour is expected due to our choice of a uniform prior over relationship graphs. 
 
 ```{r, fig.height=10, fig.width=7}
 # Extract sequences
@@ -89,6 +89,8 @@ for(poss_seq in poss_seqs) {
   abline(v = likelihoods[1,poss_seq], col = "blue")
 }
 ```
+
+Note that since in the current case, the prior on sequences is uniform, the likelihood is proportional to the posterior, and so the maximum posterior estimat is equivalent to the maximum likelihood estimate (see scatter plot below). 
 
 ```{r, fig.height=5, fig.width=7}
 par(mfrow = c(1, 1))
