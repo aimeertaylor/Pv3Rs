@@ -230,7 +230,7 @@ plot(
   1, 1, type="n", 
   xlim=c(1.5, 7.5), 
   ylim=c(min_time*0.5, max_time*2),
-  xlab="Number of monoepisodes",
+  xlab="Number of monoclonal episodes",
   ylab="Runtime (s)",
   log="y",
 )
@@ -314,7 +314,7 @@ $$R_n = \sum_{k=1}^n S(n,k)B_k.$$
 
 To establish the asymptotics of $R_n$, we first note that $R_n \ge S(n,n)B_n = B_n$. It is well known that $\log B_n \sim n\log n$. If we additionally have that $R_n \le n^n$, it then follows that $\log R_n \sim n\log n$. The rest of this appendix is devoted to proving that $R_n \le n^n$ is indeed true. Let $\mathcal{H}_n$ be the set of all functions $h$ that map elements of $\{1,\ldots,n\}$ to $\{1,\ldots,n\}$. Since $|\mathcal{H}_n|=n^n$, it suffices to show that there is an injection from the set of all relationship graphs (with $n$ genotypes) to $\mathcal{H}_n$. 
 
-Consider the following mapping of a relationship graph to a function $h$: Given a relationship graph, label the genotypes from $1$ to $n$, and label the clonal cells from $1$ to $k$. For each $k'=1,\ldots,k$, let $c_{k'}$ denote the smallest genotype in clonal cell $k'$. For each genotype $i$ in clonal cell $k'$ that is not $c_{k'}$, we define $h(i)=c_{k'}$. It remains to define the values of $h(c_1),\ldots,h(c_k)$. The sibling relationships induce a partition of $\{1,\ldots,k\}$ into subsets of clonal cells. Let $\{x_1,\ldots,x_m\}$ be such a subset, where $1\le x_1 \le \cdots \le x_m\le k$. For each $m'=1,\ldots,m$, we define $h(c_{x_{m'}})=h(c_{x_{m'+1}})$, where subscripts of $x$ are taken modulo $m$. We repeat the same for all subsets of the partition induced by sibling relationships, which completes the definition of the mapping. Informally, we select one genotype from each clonal cell to be a representative. The function $h$ maps non-representative genotypes to their corresponding representatives, and maps representative genotypes to representative genotypes, such that each subset induced by the sibling relationships corresponds to a cycle induced by $h$.
+Consider the following mapping of a relationship graph to a function $h$: Given a relationship graph, label the genotypes from $1$ to $n$, and label the clonal cells from $1$ to $k$. For each $k'=1,\ldots,k$, let $c_{k'}$ denote the smallest genotype label in clonal cell $k'$. For each genotype $i$ in clonal cell $k'$ that is not $c_{k'}$, we define $h(i)=c_{k'}$. It remains to define the values of $h(c_1),\ldots,h(c_k)$. The sibling relationships induce a partition of $\{1,\ldots,k\}$ into subsets of clonal cells. Let $\{x_1,\ldots,x_m\}$ be such a subset, where $1\le x_1 \le \cdots \le x_m\le k$. For each $m'=1,\ldots,m$, we define $h(c_{x_{m'}})=h(c_{x_{m'+1}})$, where subscripts of $x$ are taken modulo $m$. We repeat the same for all subsets of the partition induced by sibling relationships, which completes the definition of the mapping. Informally, we select one genotype from each clonal cell to be a representative. The function $h$ maps non-representative genotypes to their corresponding representatives, and maps representative genotypes to representative genotypes, such that each subset induced by the sibling relationships corresponds to a cycle induced by $h$.
 
 It remains to show that this mapping is indeed an injection. Consider two different relationship graphs $g_1$ and $g_2$, corresponding to the functions $h_1$ and $h_2$ under the mapping above. We seek to show that $h_1\neq h_2$. Suppose that the genotypes $i$ and $i'$ have a different relationship under $g_1$ and $g_2$. It suffices to consider the following two cases:
 
