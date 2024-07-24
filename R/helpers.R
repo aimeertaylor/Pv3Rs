@@ -23,9 +23,8 @@ determine_MOIs <- function(y) {
 #'
 #' Note that this function is not tested for input with repeated alleles.
 #'
-#' @param y.inf List of unique alleles observed across markers for genotypes
-#'   within one infection. Repeated alleles will lead to overcounting the
-#'   assignments.
+#' @param y.inf List of alleles observed across markers for genotypes within one
+#'   infection.
 #' @param gs.inf Vector of genotype names for genotypes within one infection.
 #' @param use.sym Boolean for permutation symmetry is exploited as a
 #'   computational shortcut. Due to permutation symmetry of intra-infection
@@ -61,11 +60,11 @@ enumerate_alleles <- function(y.inf, gs.inf, use.sym = TRUE) {
   # find single marker for fixed allele assignment
   # must be a marker whose number of observed alleles = MOI
   # arbitrarily take the first such marker to be the 'anchor' marker
-  n.uniq <- sapply(y.inf, length)
-  MOI <- max(n.uniq)
+  y.lens <- sapply(y.inf, length)
+  MOI <- max(y.lens)
 
   for (m.fix in marker_names) {
-    if (n.uniq[m.fix] == MOI) break
+    if (y.lens[m.fix] == MOI) break
   }
 
   comb_per_m <- list() # stores allele assignments for each marker
@@ -74,13 +73,23 @@ enumerate_alleles <- function(y.inf, gs.inf, use.sym = TRUE) {
       comb_per_m[[m]] <- as.data.frame(t(y.inf[[m]]))
       colnames(comb_per_m[[m]]) <- gs.inf
     } else {
+      counts <- table(y.inf[[m]])
+      alleles <- names(counts)
       # get all combinations of allele assignments
       combs <- expand.grid(rep(list(y.inf[[m]]), MOI), stringsAsFactors = F)
       # remove assignments that under-represent the observed marker diversity
-      comb_per_m[[m]] <- combs[apply(
+      res <- apply(
         combs, 1,
-        function(row) length(unique(row))
-      ) == n.uniq[m], ]
+        function(row) {
+          comb.counts <- table(row)
+          for(a in alleles) {
+            comb.count <- comb.counts[a]
+            if(is.na(comb.count) || comb.count < counts[a]) return(FALSE)
+          }
+          return(TRUE)
+        }
+      )
+      comb_per_m[[m]] <- dplyr::distinct(combs[res,])
       colnames(comb_per_m[[m]]) <- gs.inf
     }
   }

@@ -253,6 +253,9 @@ compute_posterior <- function(
   all_got <- all(sapply(ms, function(m) all(as[[m]][!is.na(as[[m]])] %in% names(fs[[m]]))))
   if (!all_got) stop("Not all alleles have a named frequency")
 
+  # Check all episodes contain information about all markers
+  stopifnot(all(sapply(y, function(y_m) identical(names(y_m), ms))))
+
 
   infection_count <- length(y)
   stopifnot(infection_count > 1)

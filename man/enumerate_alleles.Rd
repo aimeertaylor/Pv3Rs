@@ -7,9 +7,8 @@
 enumerate_alleles(y.inf, gs.inf, use.sym = TRUE)
 }
 \arguments{
-\item{y.inf}{List of unique alleles observed across markers for genotypes
-within one infection. Repeated alleles will lead to overcounting the
-assignments.}
+\item{y.inf}{List of alleles observed across markers for genotypes within one
+infection.}
 
 \item{gs.inf}{Vector of genotype names for genotypes within one infection.}
 
