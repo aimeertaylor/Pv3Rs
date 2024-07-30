@@ -21,10 +21,10 @@ determine_MOIs <- function(y) {
 
 #' Find all allele assignments for genotypes within the same infection
 #'
-#' Note that this function is not tested for input with repeated alleles.
+#' Note that this function is not tested for input with alleles mixed with NA.
 #'
 #' @param y.inf List of alleles observed across markers for genotypes within one
-#'   infection.
+#'   infection. Alleles must not be repeated for the same marker.
 #' @param gs.inf Vector of genotype names for genotypes within one infection.
 #' @param use.sym Boolean for permutation symmetry is exploited as a
 #'   computational shortcut. Due to permutation symmetry of intra-infection
@@ -56,16 +56,25 @@ enumerate_alleles <- function(y.inf, gs.inf, use.sym = TRUE) {
     }))
   }
 
+  for (y.m in y.inf) {
+    stopifnot("Repeated alleles are not allowed"=length(unique(y.m))==length(y.m))
+  }
+
   marker_names <- names(y.inf)
   # find single marker for fixed allele assignment
   # must be a marker whose number of observed alleles = MOI
   # arbitrarily take the first such marker to be the 'anchor' marker
   y.lens <- sapply(y.inf, length)
-  MOI <- max(y.lens)
+  MOI <- length(gs.inf)
 
-  for (m.fix in marker_names) {
-    if (y.lens[m.fix] == MOI) break
+  m.fix <- NA
+  for (m in marker_names) {
+    if (y.lens[m] == MOI) {
+      m.fix <- m
+      break
+    }
   }
+  if(is.na(m.fix)) use.sym <- F
 
   comb_per_m <- list() # stores allele assignments for each marker
   for (m in marker_names) {
@@ -73,20 +82,14 @@ enumerate_alleles <- function(y.inf, gs.inf, use.sym = TRUE) {
       comb_per_m[[m]] <- as.data.frame(t(y.inf[[m]]))
       colnames(comb_per_m[[m]]) <- gs.inf
     } else {
-      counts <- table(y.inf[[m]])
-      alleles <- names(counts)
       # get all combinations of allele assignments
+      n.alleles <- length(y.inf[[m]])
       combs <- expand.grid(rep(list(y.inf[[m]]), MOI), stringsAsFactors = F)
       # remove assignments that under-represent the observed marker diversity
       res <- apply(
         combs, 1,
         function(row) {
-          comb.counts <- table(row)
-          for(a in alleles) {
-            comb.count <- comb.counts[a]
-            if(is.na(comb.count) || comb.count < counts[a]) return(FALSE)
-          }
-          return(TRUE)
+          length(unique(row)) == n.alleles
         }
       )
       comb_per_m[[m]] <- dplyr::distinct(combs[res,])

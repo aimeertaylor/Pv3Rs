@@ -4,20 +4,28 @@
 \alias{compute_posterior}
 \title{Compute the posterior distribution of recurrence states}
 \usage{
-compute_posterior(y, fs, prior = NULL, return.RG = FALSE, return.logp = FALSE)
+compute_posterior(
+  y,
+  fs,
+  prior = NULL,
+  MOIs = NULL,
+  return.RG = FALSE,
+  return.logp = FALSE
+)
 }
 \arguments{
 \item{y}{Observed data in the form of a list of lists. Alleles should be
 provided as a set of distinct alleles for each infection (per marker).
-The number of entries
-is the number of episodes in chronological order. Episode names can be
-specified, but they are not used. Each episode is in turn a list of
-observed alleles for each marker, which must be named, or \code{NA} if not
-observed. For a given marker, alleles are modeled as categorical random
-variables. As such, allele names are arbitrary, but must correspond with
-frequency names (see examples below). The same names can be used for
-alleles belonging to different markers. As such, frequencies must be
-specified per named allele per named marker.}
+The number of entries is the number of episodes in chronological order.
+Episode names can be specified, but they are not used. Each episode is in
+turn a list of distinct observed alleles for each marker, which must be
+named, or \code{NA} if not observed. If a vector of observed alleles
+contains \code{NA} for a given marker, the non-\code{NA} entries will be
+ignored due to ambiguity. For a given marker, alleles are modeled as
+categorical random variables. As such, allele names are arbitrary, but must
+correspond with frequency names (see examples below). The same names can be
+used for alleles belonging to different markers. As such, frequencies must
+be specified per named allele per named marker.}
 
 \item{fs}{List of allele frequencies as vectors. Names of the list must match
 with the marker names in \code{y}. Within lists (i.e., for each marker),
@@ -28,6 +36,10 @@ recurrent episode. Each row corresponds to an episode in chronological
 order. The column names must be C, L, and I for recrudescence, relapse and
 reinfection respectively. Row names can be specified by they are not used.
 If prior is not provided, a uniform prior will be used.}
+
+\item{MOIs}{Multiplicity of infection for each episode. If MOIs are not
+provided, the most parsimonious MOIs will be used; see
+\code{\link{determine_MOIs}}.}
 
 \item{return.RG}{Boolean for whether to return the relationship graphs,
 defaults to \code{FALSE}.}
@@ -82,9 +94,9 @@ generating estimates for recurrences that have no paired data due to
 missingness (see Microsatellite data example in \code{vignette("demo", "Pv3Rs")}).
 
 The data input expects each list of alleles (for an infection) to consist of
-a set of distinct alleles. Providing the function with a multiset of alleles
-may lead to undefined behaviour. Note that the function will automatically
-produce all assignments with repeated alleles.
+a set of distinct alleles. Note that \code{Pv3Rs} supports prevalence data
+but not quantitative (proportional abundance) data. If repeated alleles are
+provided, they will be collapsed to one occurrence.
 }
 \examples{
 

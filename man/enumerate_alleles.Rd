@@ -8,7 +8,7 @@ enumerate_alleles(y.inf, gs.inf, use.sym = TRUE)
 }
 \arguments{
 \item{y.inf}{List of alleles observed across markers for genotypes within one
-infection.}
+infection. Alleles must not be repeated for the same marker.}
 
 \item{gs.inf}{Vector of genotype names for genotypes within one infection.}
 
@@ -25,7 +25,7 @@ List of dataframes, one for each marker. The columns correspond to
 genotypes, while the rows correspond to allele assignments for a marker.
 }
 \description{
-Note that this function is not tested for input with repeated alleles.
+Note that this function is not tested for input with alleles mixed with NA.
 }
 \examples{
 # 3 markers

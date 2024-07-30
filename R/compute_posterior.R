@@ -29,21 +29,22 @@
 #' missingness (see Microsatellite data example in `vignette("demo", "Pv3Rs")`).
 #'
 #' The data input expects each list of alleles (for an infection) to consist of
-#' a set of distinct alleles. Providing the function with a multiset of alleles
-#' may lead to undefined behaviour. Note that the function will automatically
-#' produce all assignments with repeated alleles.
+#' a set of distinct alleles. Note that \code{Pv3Rs} supports prevalence data
+#' but not quantitative (proportional abundance) data. If repeated alleles are
+#' provided, they will be collapsed to one occurrence.
 #'
 #' @param y Observed data in the form of a list of lists. Alleles should be
 #'   provided as a set of distinct alleles for each infection (per marker).
-#'   The number of entries
-#'   is the number of episodes in chronological order. Episode names can be
-#'   specified, but they are not used. Each episode is in turn a list of
-#'   observed alleles for each marker, which must be named, or \code{NA} if not
-#'   observed. For a given marker, alleles are modeled as categorical random
-#'   variables. As such, allele names are arbitrary, but must correspond with
-#'   frequency names (see examples below). The same names can be used for
-#'   alleles belonging to different markers. As such, frequencies must be
-#'   specified per named allele per named marker.
+#'   The number of entries is the number of episodes in chronological order.
+#'   Episode names can be specified, but they are not used. Each episode is in
+#'   turn a list of distinct observed alleles for each marker, which must be
+#'   named, or \code{NA} if not observed. If a vector of observed alleles
+#'   contains \code{NA} for a given marker, the non-\code{NA} entries will be
+#'   ignored due to ambiguity. For a given marker, alleles are modeled as
+#'   categorical random variables. As such, allele names are arbitrary, but must
+#'   correspond with frequency names (see examples below). The same names can be
+#'   used for alleles belonging to different markers. As such, frequencies must
+#'   be specified per named allele per named marker.
 #' @param fs List of allele frequencies as vectors. Names of the list must match
 #'   with the marker names in `y`. Within lists (i.e., for each marker),
 #'   frequencies must be specified per allele name.
@@ -52,6 +53,9 @@
 #'   order. The column names must be C, L, and I for recrudescence, relapse and
 #'   reinfection respectively. Row names can be specified by they are not used.
 #'   If prior is not provided, a uniform prior will be used.
+#' @param MOIs Multiplicity of infection for each episode. If MOIs are not
+#'   provided, the most parsimonious MOIs will be used; see
+#'   \code{\link{determine_MOIs}}.
 #' @param return.RG Boolean for whether to return the relationship graphs,
 #'   defaults to `FALSE`.
 #' @param return.logp Boolean for whether to return the log-likelihood for each
@@ -224,7 +228,8 @@
 #'
 #' @export
 compute_posterior <- function(
-    y, fs, prior = NULL, return.RG = FALSE, return.logp = FALSE
+    y, fs, prior = NULL, MOIs = NULL,
+    return.RG = FALSE, return.logp = FALSE
 ) {
   # Check y is a list of lists:
   if (class(y) != "list" | unique(unlist(lapply(y, class))) != "list") {
@@ -243,24 +248,61 @@ compute_posterior <- function(
     }
   }
 
+  warned_rep <- F
+  warned_na <- F
+  for(epi_name in names(y)) {
+    for(m in names(y[[epi_name]])) {
+      # Collapse repeated alleles to single occurrence
+      if(anyDuplicated(y[[epi_name]][[m]])) {
+        if(!warned_rep) {
+          warning("Repeated alleles are collapsed to a single occurrence. If you wish to specify MOIs, please use the `MOIs` argument.")
+          warned_rep <- T
+        }
+        y[[epi_name]][[m]] <- unique(y[[epi_name]][[m]])
+      }
+      # Check NA is not mixed with actual alleles for one marker + episode
+      if(length(y[[epi_name]][[m]]) > 1 & any(is.na(y[[epi_name]][[m]]))) {
+        if(!warned_na) {
+          warning("Alleles mixed with NA entries are ignored due to ambiguity.")
+          warned_na <- T
+        }
+        y[[epi_name]][[m]] <- NA
+      }
+    }
+  }
+
+  # Extract marker names
+  ms <- unique(as.vector(sapply(y, names)))
+
+  # Check all episodes have the same marker names
+  stopifnot(
+    "Marker names are not consistent across episodes"=all(
+      sapply(y, function(y_m) identical(sort(names(y_m)), sort(ms)))
+    )
+  )
+
+  # Check all markers have allele frequencies
+  stopifnot(
+    "Some markers are missing allele frequencies"=all(ms %in% names(fs))
+  )
 
   # Check all alleles have a named frequency
-  ms <- unique(as.vector(sapply(y, names))) # Extract marker names
-  # For each marker, list allele names:
+  # For each marker, list allele names
   as <- lapply(ms, function(m) unique(as.vector(unlist(sapply(y, function(yt) yt[[m]])))))
   names(as) <- ms # Name list entries by marker
   # For each marker, check all alleles have a named frequency:
-  all_got <- all(sapply(ms, function(m) all(as[[m]][!is.na(as[[m]])] %in% names(fs[[m]]))))
-  if (!all_got) stop("Not all alleles have a named frequency")
-
-  # Check all episodes contain information about all markers
-  stopifnot(all(sapply(y, function(y_m) identical(names(y_m), ms))))
+  have_freq <- all(sapply(ms, function(m) all(as[[m]][!is.na(as[[m]])] %in% names(fs[[m]]))))
+  stopifnot("Not all alleles have a named frequency"=have_freq)
 
 
   infection_count <- length(y)
-  stopifnot(infection_count > 1)
+  stopifnot("Need more than 1 episode"=infection_count > 1)
 
-  MOIs <- determine_MOIs(y)
+  min_MOIs <- determine_MOIs(y)
+  if(is.null(MOIs)) MOIs <- min_MOIs
+  else stopifnot("MOIs provided do not support the observed allele diversity"=all(MOIs >= min_MOIs))
+
+
   gs_count <- sum(MOIs)
   gs <- paste0("g", 1:gs_count)
   ts_per_gs <- rep(1:infection_count, MOIs)
@@ -276,7 +318,7 @@ compute_posterior <- function(
     )
     colnames(prior) <- causes
   } else {
-    if (!identical(colnames(prior), causes)) stop('The prior should have colnames "C", "L" and "I"')
+    stopifnot('The prior should have colnames "C", "L" and "I"'=identical(colnames(prior), causes))
   }
 
 
