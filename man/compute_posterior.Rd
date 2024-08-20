@@ -14,15 +14,16 @@ compute_posterior(
 )
 }
 \arguments{
-\item{y}{Observed data in the form of a list of lists. Alleles should be
-provided as a set of distinct alleles for each infection (per marker).
-The number of entries is the number of episodes in chronological order.
-Episode names can be specified, but they are not used. Each episode is in
-turn a list of distinct observed alleles for each marker, which must be
-named, or \code{NA} if not observed. If a vector of observed alleles
-contains \code{NA} for a given marker, the non-\code{NA} entries will be
-ignored due to ambiguity. For a given marker, alleles are modeled as
-categorical random variables. As such, allele names are arbitrary, but must
+\item{y}{Observed data in the form of a list of lists. The outer list is a
+list of episodes in chronological order. The inner list is a list of named
+markers per episode. Episode names can be specified, but they are not used.
+Markers must be named. Each episode must list the same markers. If not all
+markers were typed per episode, data on untyped markers can be encoded as
+missing (see below). For each marker, one must specify an allelic vector: a
+set of distinct alleles observed at that marker. \code{NA}s encode missing
+per-marker data, i.e., when no alleles are observed for a given marker.
+\code{NA} entries in allelic vectors that contain both \code{NA} and
+non-\code{NA} entries are ignored. Allele names are arbitrary, but must
 correspond with frequency names (see examples below). The same names can be
 used for alleles belonging to different markers. As such, frequencies must
 be specified per named allele per named marker.}
@@ -93,10 +94,11 @@ informative nature of multiple per-marker allele calls (see example below and
 generating estimates for recurrences that have no paired data due to
 missingness (see Microsatellite data example in \code{vignette("demo", "Pv3Rs")}).
 
-The data input expects each list of alleles (for an infection) to consist of
-a set of distinct alleles. Note that \code{Pv3Rs} supports prevalence data
-but not quantitative (proportional abundance) data. If repeated alleles are
-provided, they will be collapsed to one occurrence.
+At present, \code{Pv3Rs} supports prevalence data, not quantitative
+(proportional abundance) data. The data input expects each per-episode,
+per-marker allelic vector to be a set of distinct alleles. Allele repeats at
+markers with observed data, and repeat NAs at markers with missing data, are
+removed.
 }
 \examples{
 
