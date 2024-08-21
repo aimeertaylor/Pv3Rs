@@ -87,18 +87,13 @@ Model assumptions:
 \item{Relationship graphs are equally likely given recurrence states}
 }
 
-\code{compute_posterior} supports missing data, which should be encoded as
-\code{NA}s. However, to avoid estimates based entirely on the weakly
-informative nature of multiple per-marker allele calls (see example below and
-\code{vignette("missing_data", "Pv3Rs")} for more details), we recommend against
-generating estimates for recurrences that have no paired data due to
-missingness (see Microsatellite data example in \code{vignette("demo", "Pv3Rs")}).
-
-At present, \code{Pv3Rs} supports prevalence data, not quantitative
-(proportional abundance) data. The data input expects each per-episode,
-per-marker allelic vector to be a set of distinct alleles. Allele repeats at
-markers with observed data, and repeat NAs at markers with missing data, are
-removed.
+At present, \code{Pv3Rs} only supports prevalence data (categorical data that
+signal the detection of alleles), not quantitative data (proportional
+abundance) data. The data input expects each per-episode, per-marker allelic
+vector to be a set of distinct alleles. Allele repeats at markers with
+observed data, and repeat \code{NA}s at markers with missing data, are
+removed. \code{NA}s in allelic vectors that also contain non-\code{NA} values
+are ignored.
 }
 \examples{
 

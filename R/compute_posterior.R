@@ -21,18 +21,13 @@
 #'   \item{Relationship graphs are equally likely given recurrence states}
 #' }
 #'
-#' \code{compute_posterior} supports missing data, which should be encoded as
-#' \code{NA}s. However, to avoid estimates based entirely on the weakly
-#' informative nature of multiple per-marker allele calls (see example below and
-#' `vignette("missing_data", "Pv3Rs")` for more details), we recommend against
-#' generating estimates for recurrences that have no paired data due to
-#' missingness (see Microsatellite data example in `vignette("demo", "Pv3Rs")`).
-#'
-#' At present, \code{Pv3Rs} supports prevalence data, not quantitative
-#' (proportional abundance) data. The data input expects each per-episode,
-#' per-marker allelic vector to be a set of distinct alleles. Allele repeats at
-#' markers with observed data, and repeat NAs at markers with missing data, are
-#' removed.
+#' At present, \code{Pv3Rs} only supports prevalence data (categorical data that
+#' signal the detection of alleles), not quantitative data (proportional
+#' abundance) data. The data input expects each per-episode, per-marker allelic
+#' vector to be a set of distinct alleles. Allele repeats at markers with
+#' observed data, and repeat \code{NA}s at markers with missing data, are
+#' removed. \code{NA}s in allelic vectors that also contain non-\code{NA} values
+#' are ignored.
 #'
 #' @param y Observed data in the form of a list of lists. The outer list is a
 #'   list of episodes in chronological order. The inner list is a list of named
@@ -305,7 +300,7 @@ compute_posterior <- function(
 
   min_MOIs <- determine_MOIs(y)
   if(is.null(MOIs)) MOIs <- min_MOIs
-  else stopifnot("MOIs provided do not support the observed allele diversity"=all(MOIs >= min_MOIs))
+  else stopifnot("MOIs provided do not support the observed allelic diversity" = all(MOIs >= min_MOIs))
 
 
   gs_count <- sum(MOIs)
