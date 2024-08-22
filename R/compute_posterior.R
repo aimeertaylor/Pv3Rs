@@ -245,31 +245,8 @@ compute_posterior <- function(
     }
   }
 
-  warned_rep <- F
-  warned_na <- F
-  for(epi_name in names(y)) {
-    for(m in names(y[[epi_name]])) {
-      # Collapse repeated alleles to single occurrence
-      if(anyDuplicated(y[[epi_name]][[m]])) {
-        if(!warned_rep) {
-          warning("Repeat alleles at markers with observed data
-                  (or repeat NAs at markers with missing data)
-                  are collapsed to a single occurrence.
-                  If you wish to specify MOIs, please use the `MOIs` argument.")
-          warned_rep <- T
-        }
-        y[[epi_name]][[m]] <- unique(y[[epi_name]][[m]])
-      }
-      # Check NA is not mixed with actual alleles for one marker + episode
-      if(length(y[[epi_name]][[m]]) > 1 & any(is.na(y[[epi_name]][[m]]))) {
-        if(!warned_na) {
-          warning("NA entries among non-NA alleles are ignored due to ambiguity.")
-          warned_na <- T
-        }
-        y[[epi_name]][[m]] <- NA
-      }
-    }
-  }
+  # remove repeats and NAs
+  y <- prep_data(y)
 
   # Extract marker names
   ms <- unique(as.vector(sapply(y, names)))

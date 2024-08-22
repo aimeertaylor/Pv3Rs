@@ -15,7 +15,17 @@ Returns a vector of the (minimum) multiplicity of infection (MOI) for
 each infection.
 }
 \description{
-Determine MOIs from unphased data
+The MOIs returned correspond to the parsimonious explanation of the data,
+i.e. the minimal MOIs required to support the observed allelic diversity.
+}
+\details{
+At present, \code{Pv3Rs} only supports prevalence data (categorical data that
+signal the detection of alleles), not quantitative data (proportional
+abundance) data. The data input expects each per-episode, per-marker allelic
+vector to be a set of distinct alleles. Allele repeats at markers with
+observed data, and repeat \code{NA}s at markers with missing data, are
+removed. \code{NA}s in allelic vectors that also contain non-\code{NA} values
+are ignored.
 }
 \examples{
 # two infections, three markers

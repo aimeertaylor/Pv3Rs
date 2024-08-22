@@ -1,5 +1,16 @@
 #' Determine MOIs from unphased data
 #'
+#' The MOIs returned correspond to the parsimonious explanation of the data,
+#' i.e. the minimal MOIs required to support the observed allelic diversity.
+#'
+#' At present, \code{Pv3Rs} only supports prevalence data (categorical data that
+#' signal the detection of alleles), not quantitative data (proportional
+#' abundance) data. The data input expects each per-episode, per-marker allelic
+#' vector to be a set of distinct alleles. Allele repeats at markers with
+#' observed data, and repeat \code{NA}s at markers with missing data, are
+#' removed. \code{NA}s in allelic vectors that also contain non-\code{NA} values
+#' are ignored.
+#'
 #' @param y A sequence of lists, where each list contains the genetic data at
 #'   each marker as a vector. Each list corresponds to one infection.
 #'
@@ -16,7 +27,7 @@
 #'
 #' @export
 determine_MOIs <- function(y) {
-  unname(sapply(y, function(x) max(sapply(x, length))))
+  unname(sapply(prep_data(y), function(x) max(sapply(x, length))))
 }
 
 #' Find all allele assignments for genotypes within the same infection
@@ -235,6 +246,47 @@ split_two <- function(s) {
       )
     })
   )
+}
+
+#' Pre-process data to remove repeats and \code{NA}s
+#'
+#' Removes repeated alleles and any \code{NA}s in allelic vectors that also
+#' contain non-\code{NA} values.
+#'
+#' @param y A sequence of lists, where each list contains the genetic data at
+#' each marker as a vector. Each list corresponds to one infection.
+#'
+#' @export
+prep_data <- function(y) {
+  warned_rep <- F
+  warned_na <- F
+  for(epi_name in names(y)) {
+    for(m in names(y[[epi_name]])) {
+      alleles <- y[[epi_name]][[m]]
+      # Collapse repeated alleles to single occurrence
+      if(anyDuplicated(alleles)) {
+        if(!warned_rep) {
+          warning(paste0(
+            "Repeat alleles at markers with observed data ",
+            "(or repeat NAs at markers with missing data) ",
+            "are collapsed to a single occurrence. "
+          ))
+          warned_rep <- T
+        }
+        alleles <- unique(alleles)
+      }
+      # Check NA is not mixed with actual alleles for one marker + episode
+      if(any(!is.na(alleles)) & any(is.na(alleles))) {
+        if(!warned_na) {
+          warning("NA entries among non-NA alleles are ignored.")
+          warned_na <- T
+        }
+        alleles <- alleles[!is.na(alleles)]
+      }
+      y[[epi_name]][[m]] <- alleles
+    }
+  }
+  return(y)
 }
 
 #' Message progress bar
