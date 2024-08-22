@@ -257,12 +257,14 @@ compute_posterior <- function(
   y <- prep_data(y)
 
   # Extract marker names
-  ms <- unique(as.vector(sapply(y, names)))
+  ms <- unique(do.call(c, lapply(y, names)))
 
   # Check all episodes have the same marker names
   stopifnot(
-    "Marker names are not consistent across episodes"=all(
-      sapply(y, function(y_m) identical(sort(names(y_m)), sort(ms)))
+    "Markers are inconsistent across episodes.
+    NB: If not all markers are typed per episode,
+    data on untyped markers can be encoded as missing using NAs."=all(
+      all(sapply(y, function(y_m) identical(sort(names(y_m)), sort(ms))))
     )
   )
 
