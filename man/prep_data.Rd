@@ -7,10 +7,24 @@
 prep_data(y)
 }
 \arguments{
-\item{y}{A sequence of lists, where each list contains the genetic data at
-each marker as a vector. Each list corresponds to one infection.}
+\item{y}{Observed data in the form of a list of lists. The outer list is a
+list of episodes in chronological order. The inner list is a list of named
+markers per episode. Episode names can be specified, but they are not used.
+Markers must be named. Each episode must list the same markers. If not all
+markers are typed per episode, data on untyped markers can be encoded as
+missing (see below). For each marker, one must specify an allelic vector: a
+set of distinct alleles detected at that marker. \code{NA}s encode missing
+per-marker data, i.e., when no alleles are observed for a given marker.}
 }
 \description{
-Removes repeated alleles and any \code{NA}s in allelic vectors that also
-contain non-\code{NA} values.
+Removes repeat alleles and all \code{NA}s from allelic vectors with non-\code{NA} values.
+Removes repeat \code{NA}s from allelic vectors with only \code{NA} values.
+}
+\examples{
+
+y <- list(list(m1 = c("A", "A", NA, "B"), m2 = c("A"), m3 = c("C")),
+          list(m1 = c(NA, NA), m2 = c("B", "C"), m3 = c("A", "B", "C")))
+
+prep_data(y)
+
 }

@@ -250,40 +250,49 @@ split_two <- function(s) {
 
 #' Pre-process data to remove repeats and \code{NA}s
 #'
-#' Removes repeated alleles and any \code{NA}s in allelic vectors that also
-#' contain non-\code{NA} values.
+#' Removes repeat alleles and all \code{NA}s from allelic vectors with non-\code{NA} values.
+#' Removes repeat \code{NA}s from allelic vectors with only \code{NA} values.
 #'
-#' @param y A sequence of lists, where each list contains the genetic data at
-#' each marker as a vector. Each list corresponds to one infection.
+#' @param y Observed data in the form of a list of lists. The outer list is a
+#'   list of episodes in chronological order. The inner list is a list of named
+#'   markers per episode. Episode names can be specified, but they are not used.
+#'   Markers must be named. Each episode must list the same markers. If not all
+#'   markers are typed per episode, data on untyped markers can be encoded as
+#'   missing (see below). For each marker, one must specify an allelic vector: a
+#'   set of distinct alleles detected at that marker. \code{NA}s encode missing
+#'   per-marker data, i.e., when no alleles are observed for a given marker.
+#'
+#' @examples
+#'
+#' y <- list(list(m1 = c("A", "A", NA, "B"), m2 = c("A"), m3 = c("C")),
+#'           list(m1 = c(NA, NA), m2 = c("B", "C"), m3 = c("A", "B", "C")))
+#'
+#' prep_data(y)
 #'
 #' @export
 prep_data <- function(y) {
   warned_rep <- F
   warned_na <- F
-  for(epi_name in names(y)) {
-    for(m in names(y[[epi_name]])) {
-      alleles <- y[[epi_name]][[m]]
+  for(episode in 1:length(y)) {
+    for(m in names(y[[episode]])) {
+      alleles <- y[[episode]][[m]]
       # Collapse repeated alleles to single occurrence
       if(anyDuplicated(alleles)) {
         if(!warned_rep) {
-          warning(paste0(
-            "Repeat alleles at markers with observed data ",
-            "(or repeat NAs at markers with missing data) ",
-            "are collapsed to a single occurrence. "
-          ))
+          warning("Repeats removed")
           warned_rep <- T
         }
         alleles <- unique(alleles)
       }
-      # Check NA is not mixed with actual alleles for one marker + episode
+      # Check NA is not mixed with named alleles for one marker + episode
       if(any(!is.na(alleles)) & any(is.na(alleles))) {
         if(!warned_na) {
-          warning("NA entries among non-NA alleles are ignored.")
+          warning("NAs among non-NA values removed.")
           warned_na <- T
         }
         alleles <- alleles[!is.na(alleles)]
       }
-      y[[epi_name]][[m]] <- alleles
+      y[[episode]][[m]] <- alleles
     }
   }
   return(y)
