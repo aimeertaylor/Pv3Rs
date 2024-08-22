@@ -7,8 +7,10 @@
 determine_MOIs(y)
 }
 \arguments{
-\item{y}{A sequence of lists, where each list contains the genetic data at
-each marker as a vector. Each list corresponds to one infection.}
+\item{y}{Observed data in the form of a list of lists. The outer list is a
+list of episodes in chronological order. The inner list is a list of named
+markers per episode. For each marker, one must specify an allelic vector: a
+set of distinct alleles detected at that marker.}
 }
 \value{
 Returns a vector of the (minimum) multiplicity of infection (MOI) for
@@ -19,13 +21,15 @@ The MOIs returned correspond to the parsimonious explanation of the data,
 i.e. the minimal MOIs required to support the observed allelic diversity.
 }
 \details{
+For a given episode, the minimal MOI required to support the observed allelic
+diversity is equal to the maximum number of per-marker alleles observed
+across markers.
+
 At present, \code{Pv3Rs} only supports prevalence data (categorical data that
-signal the detection of alleles), not quantitative data (proportional
-abundance) data. The data input expects each per-episode, per-marker allelic
-vector to be a set of distinct alleles. Allele repeats at markers with
-observed data, and repeat \code{NA}s at markers with missing data, are
-removed. \code{NA}s in allelic vectors that also contain non-\code{NA} values
-are ignored.
+signal the detection of alleles), not quantitative (proportional abundance)
+data. Allele repeats at markers with observed data, and repeat \code{NA}s at
+markers with missing data, are removed. \code{NA}s in allelic vectors that
+also contain non-\code{NA} values are ignored.
 }
 \examples{
 # two infections, three markers
