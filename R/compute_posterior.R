@@ -1,7 +1,7 @@
-#' Compute the posterior distribution of recurrence states
+#' Compute the posterior probability of \emph{P. vivax} recurrence states
 #'
-#' Entry point to Bayesian inference for \emph{P. vivax} recurrence states based
-#' on genetic data. Specifically, this function finds the posterior
+#' Compute the posterior probability of \emph{P. vivax} recurrence states based
+#' on genetic data. Specifically, \code{compute_posterior} finds the posterior
 #' probabilities of relapse, reinfection and recrudescence from genetic data.
 #' Please note that the progress bar does not necessarily increment at a uniform
 #' rate, and may sometimes appear to be stuck while the code is still running.
@@ -21,6 +21,11 @@
 #'   \item{Relationship graphs are equally likely given recurrence states}
 #' }
 #'
+#' For each relationship graph (RG), the model sums over all possible
+#' identity-by-descent partitions (IPs). Because some RGs are compatible with
+#' more IPs than others, the RG log likelihood progress bar does not increment
+#' uniformly.
+#'
 #' At present, \code{Pv3Rs} only supports prevalence data (categorical data that
 #' signal the detection of alleles), not quantitative data (proportional
 #' abundance) data. The data input expects each per-episode, per-marker allelic
@@ -33,9 +38,9 @@
 #'   list of episodes in chronological order. The inner list is a list of named
 #'   markers per episode. Episode names can be specified, but they are not used.
 #'   Markers must be named. Each episode must list the same markers. If not all
-#'   markers were typed per episode, data on untyped markers can be encoded as
+#'   markers are typed per episode, data on untyped markers can be encoded as
 #'   missing (see below). For each marker, one must specify an allelic vector: a
-#'   set of distinct alleles observed at that marker. \code{NA}s encode missing
+#'   set of distinct alleles detected at that marker. \code{NA}s encode missing
 #'   per-marker data, i.e., when no alleles are observed for a given marker.
 #'   \code{NA} entries in allelic vectors that contain both \code{NA} and
 #'   non-\code{NA} entries are ignored. Allele names are arbitrary, but must
@@ -78,105 +83,107 @@
 #' # ===========================================================================
 #' # Example where alleles are named arbitrarily
 #' # ===========================================================================
-#' # Data on an enrolment episode and a recurrence:
+#' # Data on an enroll ment episode and a recurrence:
 #' y <- list(episode0 = list(marker1 = c("Tinky Winky", "Dipsy"),
-#'                           marker2 = c("Laa-Laa", "Po")),
+#'                           marker2 = c("Tinky Winky", "Laa-Laa", "Po")),
 #'           episode1 = list(marker1 = "Tinky Winky",
 #'                           marker2 = "Laa-Laa"))
 #'
 #' # Allele frequencies:
 #' fs <- list(
 #'   marker1 = setNames(c(0.4, 0.6), c("Tinky Winky", "Dipsy")),
-#'   marker2 = setNames(c(0.2, 0.8), c("Laa-Laa", "Po"))
+#'   marker2 = setNames(c(0.1, 0.1, 0.2, 0.6), c("Tinky Winky", "Dipsy", "Laa-Laa", "Po"))
 #' )
 #'
 #' # Compute posterior probabilities using default uniform prior, note that
 #' # since there is only one recurrence, the marginal probabilities are the same
 #' # as the joint probabilities:
-#' compute_posterior(y, fs)
+#' posterior_probs <- compute_posterior(y, fs)
+#' posterior_probs
 #'
+#' # Plot posterior probabilities on the simplex
+#' pardefault <- par()
+#' par(mar = c(0,0,0,0))
+#' vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
+#' plot_simplex(v_labels = vertex_names[colnames(posterior_probs$marg)],
+#'             classifcation_threshold = 0.5)
+#' xy <- project2D(posterior_probs$marg[1,]) # Project onto 2D coordinates
+#' points(x = xy["x"], y = xy["y"], pch = 20) # Plot projection on the simplex
+#' par(mar = pardefault$mar) # Restore plotting margins
 #'
 #'
 #' # ===========================================================================
 #' # Example where alleles are given numeric names: 1, 2, 3, 4, 5
 #' # ===========================================================================
-#' # Allele frequencies with numeric names
+#' # Data:
+#' y <- list(enroll = list(m1=c('3','2'), m2=c('1','3'), m3=c('1','2')),
+#'           recur1 = list(m1=c('1','4'), m2=c('1','2'), m3=c('1','2')),
+#'           recur2 = list(m1=c('1','5'), m2=c('2','3'), m3=c('1')))
+#'
+#' # Allele frequencies
 #' fs <- list(m1=c('1'=0.78, '2'=0.14, '3'=0.07, '4'=0.005, '5' = 0.005),
 #'            m2=c('1'=0.27, '2'=0.35, '3'=0.38),
 #'            m3=c('1'=0.55, '2'=0.45))
 #'
-#' # Data:
-#' y <- list(enrol = list(m1=c('3','2'), m2=c('1','3'), m3=c('1','2')),
-#'           recur1 = list(m1=c('1','4'), m2=c('1','2'), m3=c('1','2')),
-#'           recur2 = list(m1=c('1','5'), m2=c('2','3'), m3=c('1')))
-#'
 #' compute_posterior(y, fs)
 #'
 #'
-#'
 #' # ===========================================================================
-#' # Example demonstrating the cosmetic-only nature of episode names. Due to the
-#' # cosmetic-only nature of episode names, input info (episode data and prior)
-#' # and output results should be chronologically ordered and interpreted.
+#' # Example demonstrating the cosmetic-only nature of episode names: Input info
+#' # and output results should be ordered and interpreted chronologically,
+#' # regardless of episode names.
 #' # ===========================================================================
-#' y <- list(enrol = list(m1 = NA),
+#' # Data
+#' y <- list(enroll = list(m1 = NA),
 #'           recur2 = list(m1 = NA),
 #'           recur1 = list(m1 = NA))
-#' prior <- array(c(0.2,0.7,0.2,0.3,0.6,0), dim = c(2,3),
-#'                dimnames = list(c("recur1", "recur2"), c("C", "L", "I")))
 #'
-#' # The first prior row named "recur1" is returned for the first recurrence
-#' # despite it being named "recur2" and the the second prior row named "recur2"
-#' # is returned for the second recurrence despite it being named "recur1":
-#' compute_posterior(y, fs, prior)
-#' prior
+#' # Prior
+#' prior <- matrix(c(0.2,0.2,0.6,0.7,0.1,0.2),
+#'                 byrow = TRUE, nrow = 2,
+#'                 dimnames = list(c("recur1", "recur2"),c("C", "L", "I")))
 #'
+#' # Print prior and posterior, noting that the "recur1" prior is returned for
+#' # the first recurrence, despite it being named "recur2"; the "recur2" prior is
+#' # returned for the second recurrence, despite it being named "recur1".
+#' prior; suppressMessages(compute_posterior(y, fs, prior))$marg
 #'
 #'
 #' #============================================================================
-#' # compute_posterior() returns the prior when there are no data. However, the
-#' # prior will be re-weighted if NAs encode MOIs that are incompatible with
+#' # Example demonstrating the return of the prior when all data are missing and
+#' # the effect of MOI. compute_posterior() returns the prior when there are no
+#' # data. However, the prior will be re-weighted if MOIs are incompatible with
 #' # recrudescence. (Recrudescing parasites are clones of parasites in the
 #' # preceding blood-stage infection. The Pv3R model assumes no within-host
-#' # mutations, genotyping errors or undetected alleles. As such, recrudescence
-#' # is incompatible with an MOI increase relative to the preceding infection.)
+#' # mutations, genotyping errors or undetected alleles. As such, recrudescence is
+#' # incompatible with an MOI increase on the preceding infection.)
 #' #============================================================================
 #' # Allele frequencies:
 #' fs <- list(m1 = setNames(c(0.25, 0.75), c("A", "Other")))
 #'
-#' # Data on an enrolment episode and two recurrences:
-#' y_no_data_MOIs111 <- list(enrol = list(m1 = NA),
-#'                           recur1 = list(m1 = NA),
-#'                           recur2 = list(m1 = NA))
+#' # Data on enrollment and two recurrences:
+#' y_missing <- list(enroll = list(m1 = NA),
+#'                   recur1 = list(m1 = NA),
+#'                   recur2 = list(m1 = NA))
 #'
-#' y_no_data_MOIs121 <- list(enrol = list(m1 = NA),
-#'                           recur1 = list(m1 = c(NA, NA)),
-#'                           recur2 = list(m1 = NA))
-#'
-#' # Compute posterior probabilities:
-#' post3Rs_no_data_MOIs111 <- compute_posterior(y_no_data_MOIs111, fs)
-#' post3Rs_no_data_MOIs121 <- compute_posterior(y_no_data_MOIs121, fs)
-#'
-#' # Returns the default prior since MOIs 111 are compatible with all 3R
-#' # sequences:
-#' post3Rs_no_data_MOIs111
+#' # Returns the default prior:
+#' compute_posterior(y_missing, fs)
 #'
 #' # Returns the default prior re-weighted to the exclusion of 3R sequences with
 #' # a recrudescence at the first recurrence:
-#' post3Rs_no_data_MOIs121
+#' compute_posterior(y_missing, fs, MOIs = c(1,2,1))
 #'
 #'
 #'
 #' #============================================================================
-#' # Example demonstrating the weakly informative nature of multiple per-marker
-#' # allele calls; see vignette("missing_data", "Pv3Rs") for more details.
+#' # Example demonstrating the weakly informative nature of a heteroallelic
+#' # call; see XXX for more details.
 #' #============================================================================
 #' fs = list(m1 = c('1' = 0.5, '2' = 0.5))
-#' y <- list(enrol = list(m1 = c('1', '2')), recur = list(m1 = NA))
+#' y <- list(enroll = list(m1 = c('1', '2')), recur = list(m1 = NA))
 #'
-#' # compute_posterior() does not return the prior despite there being no
-#' # recurrent data:
-#' compute_posterior(y, fs)
+#' # The prior is not returned despite there being no recurrent data:
+#' compute_posterior(y, fs)$marg
 #'
 #'
 #'
@@ -192,10 +199,10 @@
 #'
 #' # Data for different scenarios; scenarios where the number of recurrences
 #' # increases but only the first recurrence has data
-#' ys <- list(y1 = list(enrol = list(m1 = "A"), recur1 = list(m1 = "A")),
-#'            y2 = list(enrol = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA)),
-#'            y3 = list(enrol = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA)),
-#'            y4 = list(enrol = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA), recur4 = list(m1 = NA)))
+#' ys <- list(y1 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A")),
+#'            y2 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA)),
+#'            y3 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA)),
+#'            y4 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA), recur4 = list(m1 = NA)))
 #'
 #' # Compute posterior probabilities and extract marginal probabilities:
 #' results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
@@ -207,7 +214,8 @@
 #' n_recur <- max(sapply(ys, length)-1)
 #' pardefault <- par()
 #' par(mar = c(0,0,0,0))
-#' plot_simplex(v_labels = rownames(first_recur))
+#' vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
+#' plot_simplex(v_labels = vertex_names[rownames(first_recur)], classifcation_threshold = 0.5)
 #'
 #' # Project probabilities onto 2D simplex coordinates
 #' xy <- apply(first_recur, 2, project2D)
