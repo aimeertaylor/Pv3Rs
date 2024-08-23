@@ -37,7 +37,7 @@
 #' # Plot example Plasmodium vivax data set
 #' plot_data(ys = ys_VHX_BPD)
 #' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD)
-#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = F)
+#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = FALSE)
 #'
 #' # Demonstrating the adaptive nature of the colour scheme:
 #' ys <- ys_VHX_BPD["VHX_52"] # A single patient with
