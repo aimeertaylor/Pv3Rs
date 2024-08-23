@@ -2,7 +2,7 @@
 % Please edit documentation in R/sample_RG.R
 \name{sample_RG}
 \alias{sample_RG}
-\title{Sample a transitive relationship graph, alternate version}
+\title{Sample a transitive relationship graph}
 \usage{
 sample_RG(MOIs, igraph = T)
 }

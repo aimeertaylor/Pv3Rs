@@ -120,8 +120,7 @@ fs <- list(
 # Compute posterior probabilities using default uniform prior, note that
 # since there is only one recurrence, the marginal probabilities are the same
 # as the joint probabilities:
-posterior_probs <- compute_posterior(y, fs)
-posterior_probs
+( posterior_probs <- compute_posterior(y, fs) )
 
 # Plot posterior probabilities on the simplex
 pardefault <- par()
@@ -223,8 +222,10 @@ fs <- list(m1 = setNames(c(0.25, 1-0.25), c("A", "Other")))
 # increases but only the first recurrence has data
 ys <- list(y1 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A")),
            y2 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA)),
-           y3 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA)),
-           y4 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA), recur4 = list(m1 = NA)))
+           y3 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"),
+                     recur2 = list(m1 = NA), recur3 = list(m1 = NA)),
+           y4 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"),
+                     recur2 = list(m1 = NA), recur3 = list(m1 = NA), recur4 = list(m1 = NA)))
 
 # Compute posterior probabilities and extract marginal probabilities:
 results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)

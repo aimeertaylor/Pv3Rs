@@ -98,8 +98,7 @@
 #' # Compute posterior probabilities using default uniform prior, note that
 #' # since there is only one recurrence, the marginal probabilities are the same
 #' # as the joint probabilities:
-#' posterior_probs <- compute_posterior(y, fs)
-#' posterior_probs
+#' ( posterior_probs <- compute_posterior(y, fs) )
 #'
 #' # Plot posterior probabilities on the simplex
 #' pardefault <- par()
@@ -201,8 +200,10 @@
 #' # increases but only the first recurrence has data
 #' ys <- list(y1 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A")),
 #'            y2 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA)),
-#'            y3 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA)),
-#'            y4 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"), recur2 = list(m1 = NA), recur3 = list(m1 = NA), recur4 = list(m1 = NA)))
+#'            y3 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"),
+#'                      recur2 = list(m1 = NA), recur3 = list(m1 = NA)),
+#'            y4 = list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"),
+#'                      recur2 = list(m1 = NA), recur3 = list(m1 = NA), recur4 = list(m1 = NA)))
 #'
 #' # Compute posterior probabilities and extract marginal probabilities:
 #' results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
@@ -237,7 +238,7 @@ compute_posterior <- function(
     return.RG = FALSE, return.logp = FALSE
 ) {
   # Check y is a list of lists:
-  if (class(y) != "list" | unique(unlist(lapply(y, class))) != "list") {
+  if (!isa(y, "list") | !all(unlist(lapply(y, isa, "list")))) {
     stop("Data y must be a list of lists, even if only one marker is typed per infection")
   }
 

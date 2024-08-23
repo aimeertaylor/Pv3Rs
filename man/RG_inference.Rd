@@ -42,7 +42,7 @@ al_df1 <- as.data.frame(matrix(c("A", "B", "B"), nrow = 1))
 al_df2 <- as.data.frame(matrix(c(
   "C", "D", "C",
   "D", "C", "C"
-), nrow = 2, byrow = T))
+), nrow = 2, byrow = TRUE))
 colnames(al_df1) <- colnames(al_df2) <- paste0("g", 1:3)
 alleles_per_m <- list(m1 = al_df1, m2 = al_df2)
 RGs <- RG_inference(MOIs, fs, alleles_per_m)

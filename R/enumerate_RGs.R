@@ -1,4 +1,4 @@
-#' Enumerate transitive relationship graphs, alternate version
+#' Enumerate transitive relationship graphs
 #'
 #' A relationship graph is a complete graph on all genotypes, where each edge
 #' is annotated as a clone, sibling, or stranger edge. The enumerated
@@ -11,8 +11,8 @@
 #'   infections.}
 #' }
 #'
-#' This alternate version of \code{\link{enumerate_RGs_prev}} is based on generating
-#' set partitions. Since the clone edges induce a cluster graph, the
+#' Relationship graphs are enumerated by generating nested set partitions that
+#' meet certain constraints. Since the clone edges induce a cluster graph, the
 #' information encoded by clonal relationships is equivalent to a partition of
 #' the genotypes. Note that genotypes from the same infection cannot belong to
 #' the same partition cell. Subsequent information encoded by sibling
@@ -40,12 +40,12 @@
 #'     each clonal cell.}
 #'   }
 #'   Otherwise, each element is an \code{igraph} object (see
-#'   \code{\link{enumerate_RGs_prev}}) along with these four attributes. Note that
+#'   \code{\link{RG_to_igraph}}) along with these four attributes. Note that
 #'   the weight matrix contains information equivalent to that of the four
 #'   attributes.
 #'
 #' @examples
-#' graphs <- enumerate_RGs(c(2, 1, 2), igraph=T) # 250 graphs
+#' graphs <- enumerate_RGs(c(2, 1, 2), igraph=TRUE) # 250 graphs
 #'
 #' @export
 enumerate_RGs <- function(MOIs, igraph = TRUE) {

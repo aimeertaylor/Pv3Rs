@@ -1,8 +1,5 @@
 #' Converts relationship graph to an \code{igraph} object
 #'
-#' Makes a relationship graph object output by \code{\link{enumerate_RGs}}
-#' compatible with the \code{igraph} output of \code{\link{enumerate_RGs_prev}}.
-#'
 #' @param RG Relationship graph output by \code{\link{enumerate_RGs}} with
 #'   \code{igraph=FALSE}.
 #' @param gs Vector of genotype names.
@@ -15,7 +12,7 @@
 #' @examples
 #' set.seed(20)
 #' RG <- sample_RG(c(2, 2))
-#' RG <- RG_to_igraph(RG, c("g1", "g2"), c(1, 1, 2, 2))
+#' RG <- RG_to_igraph(RG, c("g1", "g2", "g3", "g4"), c(1, 1, 2, 2))
 #'
 #' @export
 RG_to_igraph <- function(RG, gs, ts_per_gs) {

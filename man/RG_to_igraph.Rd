@@ -20,12 +20,11 @@ An \code{igraph} object along with the original variables in
 \code{RG}.
 }
 \description{
-Makes a relationship graph object output by \code{\link{enumerate_RGs}}
-compatible with the \code{igraph} output of \code{\link{enumerate_RGs_prev}}.
+Converts relationship graph to an \code{igraph} object
 }
 \examples{
 set.seed(20)
 RG <- sample_RG(c(2, 2))
-RG <- RG_to_igraph(RG, c("g1", "g2"), c(1, 1, 2, 2))
+RG <- RG_to_igraph(RG, c("g1", "g2", "g3", "g4"), c(1, 1, 2, 2))
 
 }

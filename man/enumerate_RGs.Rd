@@ -2,7 +2,7 @@
 % Please edit documentation in R/enumerate_RGs.R
 \name{enumerate_RGs}
 \alias{enumerate_RGs}
-\title{Enumerate transitive relationship graphs, alternate version}
+\title{Enumerate transitive relationship graphs}
 \usage{
 enumerate_RGs(MOIs, igraph = TRUE)
 }
@@ -26,7 +26,7 @@ cells.}
 each clonal cell.}
 }
 Otherwise, each element is an \code{igraph} object (see
-\code{\link{enumerate_RGs_prev}}) along with these four attributes. Note that
+\code{\link{RG_to_igraph}}) along with these four attributes. Note that
 the weight matrix contains information equivalent to that of the four
 attributes.
 }
@@ -43,8 +43,8 @@ infections.}
 }
 }
 \details{
-This alternate version of \code{\link{enumerate_RGs_prev}} is based on generating
-set partitions. Since the clone edges induce a cluster graph, the
+Relationship graphs are enumerated by generating nested set partitions that
+meet certain constraints. Since the clone edges induce a cluster graph, the
 information encoded by clonal relationships is equivalent to a partition of
 the genotypes. Note that genotypes from the same infection cannot belong to
 the same partition cell. Subsequent information encoded by sibling
@@ -56,6 +56,6 @@ partition is represented in the form of a list of vectors (\code{clone} and
 entry identifies the partition cell the corresponding index belongs to.
 }
 \examples{
-graphs <- enumerate_RGs(c(2, 1, 2), igraph=T) # 250 graphs
+graphs <- enumerate_RGs(c(2, 1, 2), igraph=TRUE) # 250 graphs
 
 }

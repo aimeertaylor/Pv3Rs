@@ -1,4 +1,4 @@
-#' Sample a transitive relationship graph, alternate version
+#' Sample a transitive relationship graph
 #'
 #' Uses the techniques in \code{\link{enumerate_RGs}} to uniformly sample
 #' a relationship graph. All clonal partitions are generated, and the number
