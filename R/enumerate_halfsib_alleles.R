@@ -13,7 +13,7 @@
 #'   possible allelic draw. Alleles are represented by the first `n_alleles`
 #'   letters of the latin alphabet.
 #' @examples
-#' generate_halfsib_alleles(3)
+#' enumerate_halfsib_alleles(3)
 #'
 #' @export
 enumerate_halfsib_alleles <- function(n_alleles){

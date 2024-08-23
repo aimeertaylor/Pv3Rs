@@ -14,16 +14,17 @@ Imports:
     dplyr,
     fields,
     grDevices,
-    gtools,
     igraph,
     matrixStats,
-    MCMCpack,
     multicool,
     partitions,
     RColorBrewer
 Suggests: 
     knitr,
     rmarkdown,
+    codetools,
+    gtools,
+    plyr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr

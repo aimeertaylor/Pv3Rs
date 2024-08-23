@@ -14,7 +14,6 @@
 #'
 #' @param y A list of lists for two episodes; see [compute_posterior()] for more
 #'   details.
-#' @param m A positive whole number indexing a marker.
 #' @return A vector of strings summarising the data at each locus.
 #'
 #' @examples

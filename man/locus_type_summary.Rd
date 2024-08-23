@@ -9,8 +9,6 @@ locus_type_summary(y)
 \arguments{
 \item{y}{A list of lists for two episodes; see \code{\link[=compute_posterior]{compute_posterior()}} for more
 details.}
-
-\item{m}{A positive whole number indexing a marker.}
 }
 \value{
 A vector of strings summarising the data at each locus.

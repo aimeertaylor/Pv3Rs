@@ -44,7 +44,6 @@ no_clone_subset <- marker_subsets[[min_n_markers]]
 # Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
 # providing we later assume an equal number of crossovers per chromosome
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
-markers_per_chr <- table(chrs_per_marker)
 
 for(case in cases) {
 
@@ -97,7 +96,7 @@ for(case in cases) {
           while (children_clones) {
 
             # Sample parental allocations
-            cs <- recombine_parent_ids(markers_per_chr)[,1]
+            cs <- recombine_parent_ids(chrs_per_marker)[,1]
             names(cs) <- all_markers
 
             # Create recombinant
@@ -138,7 +137,7 @@ for(case in cases) {
           while (children_clones) {
 
             # Sample parental allocations independently
-            cs <- sapply(1:3, function(i) recombine_parent_ids(markers_per_chr)[,1])
+            cs <- sapply(1:3, function(i) recombine_parent_ids(chrs_per_marker)[,1])
             rownames(cs) <- all_markers
 
             # Construct children genotypes from parental allocations

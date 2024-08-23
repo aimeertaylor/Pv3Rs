@@ -21,9 +21,8 @@ parent1 <- sapply(all_markers, function(i) sample(alleles, size = 1, prob = fs[[
 parent2 <- sapply(all_markers, function(i) sample(alleles, size = 1, prob = fs[[i]]))
 parents <- cbind(parent1, parent2)
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
-markers_per_chr <- table(chrs_per_marker)
-cs_meiotic <- recombine_parent_ids(markers_per_chr)
-cs_full <- sapply(1:4, function(i) recombine_parent_ids(markers_per_chr)[,1])
+cs_meiotic <- recombine_parent_ids(chrs_per_marker)
+cs_full <- sapply(1:4, function(i) recombine_parent_ids(chrs_per_marker)[,1])
 
 # Construct children genotypes from parental allocations
 children_meiotic <- sapply(1:max_n_markers, function(i) {

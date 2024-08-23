@@ -132,7 +132,7 @@ enumerate_alleles <- function(y.inf, gs.inf, use.sym = TRUE) {
 #'
 #' @examples
 #' MOIs <- c(2, 2, 1)
-#' RG <- enumerate_RGs(MOIs, igraph = T)[[175]]
+#' RG <- enumerate_RGs(MOIs, igraph = TRUE)[[175]]
 #' gs_per_ts <- split(paste0("g", 1:sum(MOIs)), rep(1:length(MOIs), MOIs))
 #' # 1st recurrence can't be recrudescence, 2nd recurrence can't be reinfection
 #' plot_RG(RG, edge.curved = 0.2)
@@ -214,6 +214,8 @@ hash.IP <- function(IP, gs) {
 }
 
 #' Partition a vector into at most two subvectors
+#'
+#' @param s Vector to be split.
 #'
 #' @return
 #' Given a vector with no repeats, returns a list consisting of
@@ -314,16 +316,6 @@ prep_data <- function(y) {
 #' @field width_bar Width of the progress bar
 #' @field progress The number of character printed (continous)
 #' @field progress_step Addition to progress per iteration
-#'
-#' @examples
-#' test_bar <- function(i = 10){
-#'  bar <- msg_progress_bar(i)
-#'  for(j in 1:i){
-#'    bar$increment()
-#'    Sys.sleep(4/i)
-#'    }
-#'  }
-#'  test_bar(100)
 #'
 #' @author Mans Magnusson (MansMeg @ github)
 #'

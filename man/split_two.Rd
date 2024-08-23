@@ -6,6 +6,9 @@
 \usage{
 split_two(s)
 }
+\arguments{
+\item{s}{Vector to be split.}
+}
 \value{
 Given a vector with no repeats, returns a list consisting of
 \itemize{

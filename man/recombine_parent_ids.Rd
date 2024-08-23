@@ -4,10 +4,10 @@
 \alias{recombine_parent_ids}
 \title{Generate parental allocations for a meiotic tetrad}
 \usage{
-recombine_parent_ids(per_chr_marker_counts)
+recombine_parent_ids(chrs_per_marker)
 }
 \arguments{
-\item{per_chr_marker_counts}{A numeric vector of marker counts per chromosome}
+\item{chrs_per_marker}{A vector of chromosome numbers for each marker.}
 }
 \description{
 For a given set of per chromosome marker counts, generate per marker parental
@@ -24,8 +24,7 @@ have different lengths, and the number of crossovers increases with length)
 \examples{
 n_chrs <- 14 # P. vivax has 14 chromosomes
 n_markers <- 100 # For 100 markers
-chr_per_marker <- round(seq(0.51, n_chrs + 0.5, length.out = n_markers))
-n_markers_per_chr <- table(chrs_per_marker) # Per chromosome marker counts
-recombine_parent_ids(n_markers_per_chr)
+chrs_per_marker <- round(seq(0.51, n_chrs + 0.5, length.out = n_markers))
+recombine_parent_ids(chrs_per_marker)
 
 }

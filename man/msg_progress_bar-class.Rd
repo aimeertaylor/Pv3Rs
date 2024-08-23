@@ -33,17 +33,6 @@ console output. See https://gist.github.com/MansMeg/1ec56b54e1d9d238b4fd.
 \item{\code{initialize(iter)}}{Initialize a messagebar object}
 }}
 
-\examples{
-test_bar <- function(i = 10){
- bar <- msg_progress_bar(i)
- for(j in 1:i){
-   bar$increment()
-   Sys.sleep(4/i)
-   }
- }
- test_bar(100)
-
-}
 \author{
 Mans Magnusson (MansMeg @ github)
 }

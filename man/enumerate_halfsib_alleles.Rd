@@ -23,6 +23,6 @@ enumerating all allelic combinations for the parents, and by secondly
 enumerating all the inheritable combinations for the children.
 }
 \examples{
-generate_halfsib_alleles(3)
+enumerate_halfsib_alleles(3)
 
 }

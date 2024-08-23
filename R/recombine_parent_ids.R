@@ -11,17 +11,17 @@
 #' \item Equi-distributed markers (implicit)
 #' }
 #'
-#' @param per_chr_marker_counts A numeric vector of marker counts per chromosome
+#' @param chrs_per_marker A vector of chromosome numbers for each marker.
 #'
 #' @examples
 #' n_chrs <- 14 # P. vivax has 14 chromosomes
 #' n_markers <- 100 # For 100 markers
-#' chr_per_marker <- round(seq(0.51, n_chrs + 0.5, length.out = n_markers))
-#' n_markers_per_chr <- table(chrs_per_marker) # Per chromosome marker counts
-#' recombine_parent_ids(n_markers_per_chr)
+#' chrs_per_marker <- round(seq(0.51, n_chrs + 0.5, length.out = n_markers))
+#' recombine_parent_ids(chrs_per_marker)
 #'
 #' @export
-recombine_parent_ids <- function(per_chr_marker_counts) {
+recombine_parent_ids <- function(chrs_per_marker) {
+  per_chr_marker_counts <- table(chrs_per_marker)
 
   chi_count <- 1 # Assumes one chiasmata per non-sister chromatid pair
   chr_count <- length(per_chr_marker_counts)
