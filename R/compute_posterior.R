@@ -30,9 +30,9 @@
 #' signal the detection of alleles), not quantitative data (proportional
 #' abundance) data. The data input expects each per-episode, per-marker allelic
 #' vector to be a set of distinct alleles. Allele repeats at markers with
-#' observed data, and repeat \code{NA}s at markers with missing data, are
-#' removed. \code{NA}s in allelic vectors that also contain non-\code{NA} values
-#' are ignored.
+#' observed data, and \code{NA} repeats at markers with missing data, are
+#' removed in a data pre-processing step. \code{NA}s in allelic vectors that
+#' also contain non-\code{NA} values are removed in a data pre-processing step.
 #'
 #' @param y Observed data in the form of a list of lists. The outer list is a
 #'   list of episodes in chronological order. The inner list is a list of named

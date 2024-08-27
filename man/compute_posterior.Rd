@@ -96,9 +96,9 @@ At present, \code{Pv3Rs} only supports prevalence data (categorical data that
 signal the detection of alleles), not quantitative data (proportional
 abundance) data. The data input expects each per-episode, per-marker allelic
 vector to be a set of distinct alleles. Allele repeats at markers with
-observed data, and repeat \code{NA}s at markers with missing data, are
-removed. \code{NA}s in allelic vectors that also contain non-\code{NA} values
-are ignored.
+observed data, and \code{NA} repeats at markers with missing data, are
+removed in a data pre-processing step. \code{NA}s in allelic vectors that
+also contain non-\code{NA} values are removed in a data pre-processing step.
 }
 \examples{
 
