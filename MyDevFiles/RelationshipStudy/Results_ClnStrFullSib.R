@@ -1,23 +1,45 @@
 ################################################################################
-# Bulk data from three meiotic siblings is identical to bulk data from parents.
-# As such, infections with three or more meiotic siblings are liable to be
-# classified as infections of strangers (Aside: implies single cell data are
-# needed for superinfection vs cotransmission) with a clonal edge to a sibling
-# relapse, regardless of whether or not the relapsing sibling is a full sibling
-# or a meiotic sibling
+# Plot results for an initial infection of two meiotic siblings (and three in a
+# sibling case) and a MOI=1 case recurrence which is either a stranger, clone,
+# regular sibling (i.e., a full sibling drawn independently), or meiotic sibling
+# (i.e. a full sibling drawn dependently).
+#
+# For each case, plot results when alleles are equifrequent and data are
+# available on all marker counts, and when alleles are not equifrequent and data
+# are on a subset of marker counts.
+#
+# For equifrequent alleles across all marker counts, plot the trajectory of the
+# posterior probability of the expected state (line plot), and of all states
+# (simplex plot), the latter showing where the posterior probability goes when
+# it evades the expected state.
+#
+# For different allele frequencies (generated using different Dirichlet
+# concentration parameters) and a subset of marker counts, plot the
+# trajectory of the posterior probability of the expected state (line plot), and
+# the relative likelihood of the relationship graphs.
+#
+# Bulk prevalence data from three meiotic siblings are identical to bulk data
+# from parents (furthermore, bulk relative abundance data from four meiotic
+# siblings are identical to bulk relative abundance data from parents). As such,
+# infections with three or more meiotic siblings are liable to be classified as
+# infections of strangers with a clonal edge to a sibling relapse, whether or
+# not the relapsing sibling is a full sibling or a meiotic sibling. Aside:
+# single cell data are needed for superinfection vs co-transmission.
 ################################################################################
+
+# Set working directory to source file location
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
-cases <- c("Stranger", "Clone", "Full_sibling", "Meiotic_sibling")
+cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
 
-for(case in cases){
+for(case in cases[4]){
 
   par(par_default)
   attached <- search()
   if(exists("ys_store")) detach("output")
   load(sprintf("./%s.rda", case))
   attach(output)
-  cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
+  cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colour repeats
   cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
 
   # ==============================================================================
@@ -28,9 +50,9 @@ for(case in cases){
   # PLot trajaectories
   plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1,
        xaxt = "n", xlab = "Marker count", ylab = "Posterior expected state probability")
-  axis(side = 1, at = seq(0, max(n_markers), 10)); title(main = case)
-  legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, horiz = TRUE, bty = "n")
-  for(MOIs in MOIs_per_infection) {
+  axis(side = 1, at = seq(0, max(n_markers), 10))
+  title(main = gsub("_", " ", case))
+    for(MOIs in MOIs_per_infection) {
     LTY = ifelse(MOIs == "2_1", 1, 2)
     for(i in 1:n_repeats){
       lines(x = 1:max(n_markers),
@@ -38,8 +60,12 @@ for(case in cases){
             col = cols[i], lwd = 2, lty = LTY)
     }
   }
+  legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
+         legend = 1:n_repeats)
+  legend("bottomright", lty = c(1,2), lwd = 2, title = "MOIs", box.col = "white",
+         legend = gsub("_", " and ", MOIs_per_infection))
 
-  # Plot simplex
+  # Plot simplex (helpful when the posterior evades the expected state)
   par(mar = c(0,0,0,0))
   V_labels <- c("Recrudescence", "Relapse", "Reinfection")
   plot_simplex(v_labels =  V_labels, classifcation_threshold = 0.5)
@@ -48,7 +74,7 @@ for(case in cases){
     for(i in n_repeats){
       xy_post <- cbind(c(0,0), apply(do.call(rbind, ps_store_all_ms[[MOIs]][[as.character(i)]]), 1, project2D))
       lines(x = xy_post["x",], y = xy_post["y",], lty = LTY)
-      points(x = xy_post["x",], y = xy_post["y",], pch = 20)}
+      points(x = xy_post["x",], y = xy_post["y",], pch = "-")}
     }
 
   # ==============================================================================

@@ -1,4 +1,15 @@
 ################################################################################
+# Simulate data and generate results for a initial infection of meiotic siblings
+# and a MOI=1 case recurrence, where the case recurrence is either
+#
+# a stranger, a clone, a regular sibling (i.e., a full sibling drawn
+# independently), or a meiotic sibling (i.e. a full sibling drawn dependently).
+#
+# The MOI of the initial infection is two or three in a sibling case.
+#
+# For each case, generate results for data on all marker counts when alleles are
+# equifrequent, and for a subset of marker counts when alleles are not
+# equifrequent.
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
@@ -8,7 +19,7 @@ library(tictoc) # For timing
 #===============================================================================
 # Magic numbers / quantities
 #===============================================================================
-cases <- c("Stranger", "Clone", "Full_sibling", "Meiotic_sibling")
+cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
 MOIs_per_infection_all <- c("2_1", "3_1") # Evaluate both for siblings only
 n_alleles <- 5 # Number of alleles per marker (marker cardinality)
 n_repeats <- 5 # Number of simulations per parameter combination
@@ -78,27 +89,27 @@ for(case in cases){
     for(i in 1:n_repeats) {
 
       parent_clones <- TRUE
-      while (parent_clones) {
+      while (parent_clones) { # Avoid clonal parents
         parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
         parent2 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
         parent_clones <- identical(parent1[no_clone_subset], parent2[no_clone_subset])
       }
       parents <- cbind(parent1, parent2)
 
-      children_clones <- TRUE
+      children_clones <- TRUE # Avoid clonal children
       while (children_clones) {
 
         # Sample parental allocations
-        if(case == "Full_sibling") {
+        if(case == "Regular_sibling") {
           # independently for fourth child
           cs <- cbind(recombine_parent_ids(chrs_per_marker)[,1:3],
-                      recombine_parent_ids(chrs_per_marker)[,1]) # Full sibling
+                      recombine_parent_ids(chrs_per_marker)[,1]) # Regular sibling
         } else {
           # Sample parental allocations dependently
           cs <- recombine_parent_ids(chrs_per_marker)
         }
 
-        # Construct children genotypes from parental allocations
+        # Construct children from parental allocations
         children <- sapply(1:max_n_markers, function(i) {
           sapply(1:ncol(cs), function(j) parents[i,cs[i,j]])
         })
@@ -111,9 +122,9 @@ for(case in cases){
       # For different numbers of genotypes per infection
       for(MOIs in MOIs_per_infection) {
 
-        # Make initial infection
+        # Make initial infection: either two or three of four meiotic siblings
         if (MOIs == "2_1") {
-          initial <- children[1:2,]
+          initial <- children[1:2,] # Two of four meiotic siblings
         } else if (MOIs == "3_1") {
           initial <- children[1:3,] # Three of four meiotic siblings
         }
