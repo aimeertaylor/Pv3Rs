@@ -18,13 +18,10 @@
 # trajectory of the posterior probability of the expected state (line plot), and
 # the relative likelihood of the relationship graphs.
 #
-# Bulk prevalence data from three meiotic siblings are identical to bulk data
-# from parents (furthermore, bulk relative abundance data from four meiotic
-# siblings are identical to bulk relative abundance data from parents). As such,
-# infections with three or more meiotic siblings are liable to be classified as
-# infections of strangers with a clonal edge to a sibling relapse, whether or
-# not the relapsing sibling is a full sibling or a meiotic sibling. Aside:
-# single cell data are needed for superinfection vs co-transmission.
+# Bulk prevalence data from three or four meiotic siblings are identical to bulk
+# data from parents. As such, infections with three meiotic siblings are liable
+# to be classified as infections of strangers with a clonal edge to a sibling
+# relapse (regular or meiotic).
 ################################################################################
 
 # Set working directory to source file location
@@ -32,7 +29,7 @@ rm(list = ls())
 par_default <- par(no.readonly = TRUE)
 cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
 
-for(case in cases[4]){
+for(case in cases){
 
   par(par_default)
   attached <- search()
