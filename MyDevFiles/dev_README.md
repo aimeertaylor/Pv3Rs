@@ -1,8 +1,5 @@
 ## Current files
 
-Verify the examples in https://doi.org/10.1101/2022.11.23.22282669
-- `Description_examples.R`
-
 Example for Fig1 of the MedRxiv 2022 preprint: 
 - `Example_PreprintFig.R`
 
@@ -10,10 +7,7 @@ Examples of unwanted effects due to uniform distribution over graphs
 - `UnderstandingGraphBias.R`
 
 Illustrating how bulk data from meiotic sibs is identical to bulk data from their parents:
-- `UnderstandingMeioticSibs.R'
-
-Exploring repeat values and how they could encode MOIs (possibly) and intra-sample allele frequency imbalance (to-avoid):
-- `UnderstandingRepeatValues.R'
+- `UnderstandingMeioticSibs.R`
 
 Example of half siblings (not yet described)
 - `Half_siblings_YF.R` (`Half_siblings.R` renamed)
@@ -25,17 +19,12 @@ RelationshipStudy/
 Benchmarking study
 Benchmark/
 
-## Files from developing current implementation (removed)
+Move to unit test? 
+- `NaN_test.R`
+- `ValidateNA.R`
 
-Demo a synthetic example with MOI = 8, now in vignettes/demo.Rmd
-- `Inference_example_ICL_3212.R`
-- `Sample_example_ICL_3212.R`
-
-Demo a microsatellite example, now in vignettes/demo.Rmd
-- `MS_data_demo.R`
-
-Compare current implementation against previous implementation
-- `Verify_enumerate_IP_RG.R`
+## Saved for illustrative purposes
+- `Graphs_2_2.pdf`
 
 ## Files from previous implementation (to remove)
 
@@ -45,5 +34,6 @@ Compare current implementation against previous implementation
 - `Check_pr_IP_inbred_RG4.R`
 - `Check_pr_IP_inbred_allstranger.R`
 - `Check_pr_IP_outbredRG.R`
-- `Graphs_2_2.pdf`
 - `Pr_IG_RG_inbred.pdf`
+
+
