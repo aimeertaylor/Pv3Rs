@@ -72,7 +72,7 @@ enumerate_alleles <- function(y.inf, gs.inf, use.sym = TRUE) {
   }
 
   for (y.m in y.inf) {
-    stopifnot("Repeated alleles are not allowed"=length(unique(y.m))==length(y.m))
+    stopifnot("Allele repeats are not allowed"=length(unique(y.m))==length(y.m))
   }
 
   marker_names <- names(y.inf)
@@ -285,7 +285,7 @@ prep_data <- function(y) {
       # Collapse repeated alleles to single occurrence
       if(anyDuplicated(alleles)) {
         if(!warned_rep) {
-          warning("Repeats removed")
+          warning("Ignoring allele repeats at markers with observed data (or NA repeats at markers with missing data).")
           warned_rep <- T
         }
         alleles <- unique(alleles)
@@ -293,7 +293,7 @@ prep_data <- function(y) {
       # Check NA is not mixed with named alleles for one marker + episode
       if(any(!is.na(alleles)) & any(is.na(alleles))) {
         if(!warned_na) {
-          warning("NAs among non-NA values removed.")
+          warning("Ignoring NAs among alleles detected at markers with observed data.")
           warned_na <- T
         }
         alleles <- alleles[!is.na(alleles)]
