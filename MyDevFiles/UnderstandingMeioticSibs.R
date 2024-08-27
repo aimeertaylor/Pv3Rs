@@ -50,12 +50,9 @@ y_parents <- list(initial = apply(t(parents), 2, unique, simplify = F),
 suppressMessages(compute_posterior(y = y_parents, fs)$marg)
 suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
 
-# What happens if we inflate the MOI with a dummy marker? Relapse probability
-# increases slightly - this is not actionable (without single-cell sequences, we
-# cannot disentagle three meiotic siblings in bulk data)
-y_meitotic$initial$m150 <- c(NA,NA,NA)
-determine_MOIs(y_meitotic)
-suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
+# Providing the true but unknowable MOI makes little difference (unknowable
+# without single-cell sequences)
+suppressMessages(compute_posterior(y = y_meitotic, fs, MOIs = c(3,1))$marg)
 
 # Because we assume no error, a single error is enough to solve the problem:
 y_meitotic$initial$m150 <- "a"
