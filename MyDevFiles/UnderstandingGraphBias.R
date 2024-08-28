@@ -116,21 +116,15 @@ results1[[4]] - matrix(results1[[4]][1,], byrow = T,
 #============================================================================
 # Example with recurrent data using MOIs to change graph structure
 #
-# One very rare A or many A give similar answers in terms of not
-# being reinfection; graph structure influences difference between relapse and
-# recrudescence
+# One very rare allele is as informative as many alleles (both force the
+# posterior away from reinfection), however many alleles slower (example
+# removed). Having ruled out reinfection, graph structure influences posterior
+# odds of relapse versus recrudescence.
 #============================================================================
 # Markers, alleles and allele frequencies:
-max_n_markers <- 100
-marker_names <- paste0("m", 1:max_n_markers)
-n_alleles <- 5
-alleles <- LETTERS[1:n_alleles]
-fs_param <- setNames(rep(1, n_alleles), alleles)
-fs <- sapply(marker_names, function(i) {
-  setNames(MCMCpack::rdirichlet(1, fs_param), alleles)}, simplify = F)
-y <- list(enrol = as.list(setNames(rep("A", max_n_markers), marker_names)),
-          recur = as.list(setNames(rep("A", max_n_markers), marker_names)))
-#y <- list(enrol = list(m1 = "A"), recur = list(m1 = "A"))
+f_rare <- 0.0001
+fs = list(m1 = c('1' = f_rare, '2' = 1-f_rare))
+y <- list(enrol = list(m1 = "1"), recur = list(m1 = "1"))
 
 MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3))
 
