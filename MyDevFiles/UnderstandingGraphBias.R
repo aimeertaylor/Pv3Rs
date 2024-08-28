@@ -1,24 +1,22 @@
 ################################################################################
 # To-do list:
+# Examples of unwanted effects on posterior of prior on graphs
 # Make this into a vignette
 # Add an warning for recurrences with no data can have non-zero marginal probabilities
 # Add examples from Thur 22nd August
 ################################################################################
 
-# # When not in development mode:
-# devtools::install_github("aimeertaylor/Pv3Rs", build_vignettes = FALSE)
-# library(Pv3Rs)
-# rm(list = ls())
-
 #===============================================================================
-# Examples of unwanted effects on posterior of prior on graphs
+# Example with recurrent data using multiple recurrences to change graph structure
 #
-# Predominantly, the marginal probability that the first recurrence is a
-# recrudescence increases as the graph grows without data (red arrow on simplex
-# plot). Predominantly, the marginal probability that the first recurrence is a
-# reinfection increases as the graph grows with repeat data (blue arrow on
-# simplex plot). In both cases, the  marginal probability that the first
-# recurrence is a relapse decreases (both arrows on the simplex plot).
+# The marginal probability that the first recurrence is a recrudescence
+# increases as the graph grows without data (red arrow on simplex plot).
+#
+# The marginal probability that the first recurrence is a reinfection increases
+# as the graph grows with repeat data (blue arrow on simplex plot).
+#
+# In both cases, the  marginal probability that the first recurrence is a
+# relapse decreases (both arrows on the simplex plot).
 #
 # These general observations are not very sensitive to the observed allele
 # frequency (try comparing Obs_allele equal to 0.05, 0.5 and 0.95).
@@ -27,7 +25,8 @@
 # from the prior at a decreasing rate (compare rows 2 to 4 of results0[[4]]).
 #
 # Also of note, the marginal probabilities of different recurrences differ even
-# when all recurrences have the same data (compare rows 2 to 4 of results1[[4]]).
+# when all recurrences have the same data (compare rows 2 to 4 of
+# results1[[4]]).
 #===============================================================================
 
 # Allele frequencies:
@@ -115,41 +114,88 @@ results1[[4]] - matrix(results1[[4]][1,], byrow = T,
 
 
 #============================================================================
-# Example of the effect on the posterior of the prior on relationship graphs
-# graphs using MOIs
-# What happens to the effect with more and more data?
+# Example with recurrent data using MOIs to change graph structure
+#
+# One very rare A or many A give similar answers in terms of not
+# being reinfection; graph structure influences difference between relapse and
+# recrudescence
 #============================================================================
-# Allele frequencies:
-f_A <- 0.99
-
-
-fs <- list(m1 = setNames(c(f_A, 1-f_A), c("A", "Other")))
-
-# Data (toggle between recur being "A" and NA)
-y <- list(enroll = list(m1 = "A"), recur = list(m1 = "A"))
+# Markers, alleles and allele frequencies:
+max_n_markers <- 100
+marker_names <- paste0("m", 1:max_n_markers)
+n_alleles <- 5
+alleles <- LETTERS[1:n_alleles]
+fs_param <- setNames(rep(1, n_alleles), alleles)
+fs <- sapply(marker_names, function(i) {
+  setNames(MCMCpack::rdirichlet(1, fs_param), alleles)}, simplify = F)
+y <- list(enrol = as.list(setNames(rep("A", max_n_markers), marker_names)),
+          recur = as.list(setNames(rep("A", max_n_markers), marker_names)))
+#y <- list(enrol = list(m1 = "A"), recur = list(m1 = "A"))
 
 MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3))
 
 # Compute posterior probabilities and extract marginal probabilities:
-results <- do.call(rbind, lapply(MOIs, function(x) compute_posterior(y, fs, MOIs = x)$marg))
+results <- do.call(rbind, lapply(MOIs, function(x) suppressMessages(compute_posterior(y, fs, MOIs = x)$marg)))
+xy <- apply(results, 1, project2D) # Project probabilities onto 2D simplex coordinates
 
 # Plot 2D simplex
 pardefault <- par()
 par(mar = c(0,0,0,0))
 vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
 plot_simplex(v_labels = vertex_names[colnames(results)], classifcation_threshold = 0.5)
-
-# Project probabilities onto 2D simplex coordinates
-xy <- apply(results, 1, project2D)
-
-# # Plot divergence from one recurrence to four:
-# arrows(x0 = xy["x", 1], x1 = xy["x", length(MOIs)],
-#        y0 = xy["y", 1], y1 = xy["y", length(MOIs)],
-#        length = 0.05, col = "red")
-
-# Plot a point for each recurrence from one to four:
-points(x = xy["x", ], y = xy["y", ], pch = as.character(1:length(MOIs)), cex = 0.2)
+points(x = xy["x", ], y = xy["y", ], pch = as.character(1:length(MOIs)), cex = 0.25)
 
 # Restore plotting margins
 par(mar = pardefault$mar)
 
+#============================================================================
+# Examples without recurrent data
+#
+# The prior is only returned when the initial infection has a homoallelic call
+# and an MOI of one and.
+#
+# A homoallelic call has a systematic effect that is amplified when the allele
+# of the homoallelic call is rare — what is going on?
+#
+# A heteroallelic call has a minor effect that doesn't change with the allele
+# frequency of the rare allele.
+#============================================================================
+f_rare <- 0.001
+fs = list(m1 = c('1' = f_rare, '2' = 1-f_rare))
+MOIs <- list(c(1,1), c(2,1), c(1,3), c(3,1), c(2,2), c(3,2), c(3,3))
+
+# Data
+y_hom <- list(enroll = list(m1 = c('1')), recur = list(m1 = NA))
+y_het <- list(enroll = list(m1 = c('1','2')), recur = list(m1 = NA))
+
+# Compute posterior probabilities and extract marginal probabilities:
+results_hom <- do.call(rbind, lapply(MOIs, function(x) suppressMessages(compute_posterior(y_hom, fs, MOIs = x)$marg)))
+results_het <- do.call(rbind, lapply(MOIs[-1], function(x) suppressMessages(compute_posterior(y_het, fs, MOIs = x)$marg)))
+
+# Print results
+results_hom # Prior is only returned for MOI = c(1,1)
+results_het
+
+# Project probabilities onto 2D simplex coordinates
+xy_hom <- apply(results_hom, 1, project2D)
+xy_het <- apply(results_het, 1, project2D)
+
+pardefault <- par()
+par(mfrow = c(1,2))
+
+# Plot 2D simplex:hom
+par(mar = c(0,0,0,0))
+vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
+plot_simplex(v_labels = vertex_names[colnames(results)], classifcation_threshold = 0.5)
+points(x = xy_hom["x", ], y = xy_hom["y", ], pch = as.character(1:length(MOIs)), cex = 0.25)
+title(main = "Homologous initial", line = -2)
+
+# Plot 2D simplex:het
+par(mar = c(0,0,0,0))
+vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
+plot_simplex(v_labels = vertex_names[colnames(results)], classifcation_threshold = 0.5)
+points(x = xy_het["x", ], y = xy_het["y", ], pch = as.character(1:length(MOIs)), cex = 0.25)
+title(main = "Heterologous initial", line = -2)
+
+# Restore plotting margins
+par(mar = pardefault$mar)
