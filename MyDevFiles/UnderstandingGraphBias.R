@@ -1,4 +1,5 @@
 ################################################################################
+# Does it make sense to have both return.RG and return.logp?.
 # Examples of graph prior effects on posterior
 # Make this into a vignette: need to compute RG after ruling out a state
 # If the data can only rule out a state, then the result reflects the prior on graphs given MOIs.
@@ -60,32 +61,6 @@ par(mar = pardefault$mar)
 
 
 
-#============================================================================
-# Example with recurrent data using MOIs to change graph structure
-#
-# Having ruled out reinfection, posterior odds of relapse versus recrudescence
-# depends on graphs. Having ruled out recrudescence, posterior odds of relapse
-# verus reinfection depends on graphs. This is easiest to see for relapse versus
-# recrudescence using one very rare allele (as informative as many alleles and
-# quicker); see example below.
-#============================================================================
-# Frequencies, data and MOIs
-f_rare <- 0.0001
-fs = list(m1 = c('1' = f_rare, '2' = 1-f_rare))
-y <- list(enrol = list(m1 = "1"), recur = list(m1 = c("1")))
-MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3))
-
-# Compute posterior probabilities, extract marginal probabilities and project
-results <- do.call(rbind, lapply(MOIs, function(x) suppressMessages(compute_posterior(y, fs, MOIs = x)$marg)))
-xy <- apply(results, 1, project2D) # Project probabilities onto 2D simplex coordinates
-
-# Plot 2D simplex
-pardefault <- par()
-par(mar = c(0,0,0,0))
-vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
-plot_simplex(v_labels = vertex_names[colnames(results)], classifcation_threshold = 0.5)
-points(x = xy["x", ], y = xy["y", ], pch = as.character(1:length(MOIs)), cex = 0.25)
-par(mar = pardefault$mar) # Restore plotting margins
 
 #===============================================================================
 # Example with recurrent data using multiple recurrences to change graph structure
@@ -175,3 +150,78 @@ results0[[4]] - array(1/3, dim = dim(results0[[4]]))
 results1[[4]] - matrix(results1[[4]][1,], byrow = T,
                        nrow = nrow(results0[[4]]),
                        ncol = ncol(results0[[4]]))
+
+#============================================================================
+# Example with recurrent data using MOIs to change graph structure
+#
+# Having ruled out reinfection, posterior odds of relapse versus recrudescence
+# depends on graphs. Having ruled out recrudescence, posterior odds of relapse
+# verus reinfection depends on graphs. This is easiest to see for relapse versus
+# recrudescence using one very rare allele (as informative as many alleles and
+# quicker); see example below.
+#============================================================================
+# Frequencies, data and MOIs
+f_rare <- 0.0001
+fs = list(m1 = c('1' = f_rare, '2' = 1-f_rare))
+y <- list(enrol = list(m1 = "1"), recur = list(m1 = c("1")))
+MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3))
+
+# Compute posterior probabilities, extract marginal probabilities and project
+results <- do.call(rbind, lapply(MOIs, function(x) suppressMessages(compute_posterior(y, fs, MOIs = x)$marg)))
+xy <- apply(results, 1, project2D) # Project probabilities onto 2D simplex coordinates
+
+# Plot 2D simplex
+pardefault <- par()
+par(mar = c(0,0,0,0))
+vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
+plot_simplex(v_labels = vertex_names[colnames(results)], classifcation_threshold = 0.5)
+points(x = xy["x", ], y = xy["y", ], pch = as.character(1:length(MOIs)), cex = 0.25)
+par(mar = pardefault$mar) # Restore plotting margins
+
+#===============================================================================
+# Understanding output when either relapse or recrudescence
+# +++++++ THIS IS WHERE I AM
+#===============================================================================
+prior_weight <- sapply(2:length(MOIs), FUN = function(i) {
+
+  sum_MOIs <- sum(MOIs[[i]])
+  gs <- paste0("g", 1:sum_MOIs)
+  ts <- 1:length(MOIs[[i]])
+  ts_per_gs <- rep(ts, MOIs[[i]])
+  gs_per_ts <- split(gs, ts_per_gs)
+  RGs <- enumerate_RGs(MOIs[[i]])
+  Sts_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts = gs_per_ts)
+
+  RGs_C_or_L <- !sapply(Sts_gvn_RGs, function(RG) "I" %in% RG)
+  RGs_C <- sapply(Sts_gvn_RGs, function(RG) "C" %in% RG)
+  pr_RG_gvn_L <- 1/length(RGs)
+  pr_RG_gvn_C <- 1/sum(RGs_C)
+
+  # Adjacency matrix for all within-infection siblings
+  mat_within <- Matrix::bdiag(lapply(MOIs[[i]],function(MOI) matrix(1, ncol = MOI, nrow = MOI)))
+  colnames(mat_within) <- gs
+  rownames(mat_within) <- gs
+  edges_within <- igraph::as_ids(igraph::E(igraph::graph_from_adjacency_matrix(mat_within, mode = "undirected", diag = F)))
+  RGs_edges_within <- sapply(RGs, function(RG) all(edges_within %in% igraph::as_ids(igraph::E(RG))))
+
+  x <- c(sum(RGs_edges_within*pr_RG_gvn_L), sum(RGs_edges_within*pr_RG_gvn_C))
+  return(x/sum(x))
+})
+
+prior_reweight
+results[,c("C","L")]
+
+# For the MOIs c(3,3) case
+gs <- paste0("g", 1:6)
+ts <- 1:length(c(3,3))
+ts_per_gs <- rep(ts, c(3,3))
+X <- compute_posterior(y, fs, MOIs = c(3,3), return.RG = TRUE, return.logp = T)
+
+# extract logp
+x <- sapply(X$RGs, function(RG) RG$logp)
+x[x == -Inf] <- NA # Mask -Inf
+x <- x - min(x, na.rm = T) # Re-scale before exponentiating (otherwise all 0)
+x <- exp(x)/sum(exp(x), na.rm = T) # Exponentiate and normalise
+
+unique(x[as.logical(RGs_C_or_L * RGs_edges_within)]) # some more likely than others
+max(x[!(RGs_C_or_L * RGs_edges_within)]) # all others are unlikely
