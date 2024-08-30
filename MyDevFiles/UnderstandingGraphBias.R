@@ -161,7 +161,7 @@ results1[[4]] - matrix(results1[[4]][1,], byrow = T,
 # quicker); see example below.
 #============================================================================
 # Frequencies, data and MOIs
-f_rare <- 0.0001
+f_rare <- 0.0001 # Make reinfection unlikely
 fs = list(m1 = c('1' = f_rare, '2' = 1-f_rare))
 y <- list(enrol = list(m1 = "1"), recur = list(m1 = c("1")))
 MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3))
@@ -178,39 +178,49 @@ plot_simplex(v_labels = vertex_names[colnames(results)], classifcation_threshold
 points(x = xy["x", ], y = xy["y", ], pch = as.character(1:length(MOIs)), cex = 0.25)
 par(mar = pardefault$mar) # Restore plotting margins
 
-#===============================================================================
-# Understanding output when either relapse or recrudescence
-# +++++++ THIS IS WHERE I AM
-#===============================================================================
-prior_weight <- sapply(2:length(MOIs), FUN = function(i) {
+# ------------------------------------------------------------------------------
+# Understanding the relapse vs recrudescence results
+#
+# The fraction of intra-infection related graphs compatible with
+# recrudescence versus relapse is a function of the MOI
+# ------------------------------------------------------------------------------
+graph_frac_CL <- sapply(2:length(MOIs), FUN = function(i) {
 
-  sum_MOIs <- sum(MOIs[[i]])
-  gs <- paste0("g", 1:sum_MOIs)
+  gs <- paste0("g", 1:sum(MOIs[[i]]))
   ts <- 1:length(MOIs[[i]])
   ts_per_gs <- rep(ts, MOIs[[i]])
   gs_per_ts <- split(gs, ts_per_gs)
   RGs <- enumerate_RGs(MOIs[[i]])
-  Sts_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts = gs_per_ts)
+  CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts = gs_per_ts) # states
+  RGs_C_or_L <- sapply(CIL_gvn_RGs, function(RG) !("I" %in% RG))
+  RGs_C <- sapply(CIL_gvn_RGs, function(RG) "C" %in% RG)
 
-  RGs_C_or_L <- !sapply(Sts_gvn_RGs, function(RG) "I" %in% RG)
-  RGs_C <- sapply(Sts_gvn_RGs, function(RG) "C" %in% RG)
-  pr_RG_gvn_L <- 1/length(RGs)
-  pr_RG_gvn_C <- 1/sum(RGs_C)
-
-  # Adjacency matrix for all within-infection siblings
-  mat_within <- Matrix::bdiag(lapply(MOIs[[i]],function(MOI) matrix(1, ncol = MOI, nrow = MOI)))
-  colnames(mat_within) <- gs
-  rownames(mat_within) <- gs
+  # Make a vector of intra-infection edges by first creating a block diag. matrix
+  mat_within <- Matrix::bdiag(lapply(MOIs[[i]],function(x) matrix(1, ncol=x, nrow=x)))
+  colnames(mat_within) <- gs; rownames(mat_within) <- gs
   edges_within <- igraph::as_ids(igraph::E(igraph::graph_from_adjacency_matrix(mat_within, mode = "undirected", diag = F)))
   RGs_edges_within <- sapply(RGs, function(RG) all(edges_within %in% igraph::as_ids(igraph::E(RG))))
 
-  x <- c(sum(RGs_edges_within*pr_RG_gvn_L), sum(RGs_edges_within*pr_RG_gvn_C))
-  return(x/sum(x))
+  graph_frac_CL_unnormalised <- c(frac_c = sum(RGs_edges_within*RGs_C)/sum(RGs_C),
+                                  frac_l = sum(RGs_edges_within*RGs_C_or_L)/length(RGs))
+
+  graph_frac_CL <- graph_frac_CL_unnormalised/sum(graph_frac_CL_unnormalised)
+
+  return(graph_frac_CL)
 })
 
-prior_reweight
-results[,c("C","L")]
+# Compare tabulated results
+t(graph_frac_CL)
+results
 
+# Compare plotted results
+plot(x = graph_frac_CL["frac_c",], y = results[-1,c("C")],
+     xlim = c(0,1), ylim = c(0,1), pch = 20, bty = "n",
+     xlab = c("Prior prevalence"),
+     ylab = c("Posterior probability"))
+abline(a = 0, b = 1)
+
+# TO SORT FROM HERE:
 # For the MOIs c(3,3) case
 gs <- paste0("g", 1:6)
 ts <- 1:length(c(3,3))
