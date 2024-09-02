@@ -5,6 +5,8 @@
 # If the data can only rule out a state, then the result reflects the prior on graphs given MOIs.
 # Add an warning for recurrences with no data can have non-zero marginal probabilities
 # What is going on with the homoallelic exampled with no recurrent data?
+# Extend example without recurrent data into number of recurrences and
+# explain with relative prior proportion
 ################################################################################
 #============================================================================
 # Examples without recurrent data
@@ -161,13 +163,14 @@ results1[[4]] - matrix(results1[[4]][1,], byrow = T,
 # quicker); see example below.
 #============================================================================
 # Frequencies, data and MOIs
-f_rare <- 0.0001 # Make reinfection unlikely
+f_rare <- 0.001 # Make reinfection unlikely, recrudescence likely
 fs = list(m1 = c('1' = f_rare, '2' = 1-f_rare))
 y <- list(enrol = list(m1 = "1"), recur = list(m1 = c("1")))
-MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3))
+MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3), c(4,2))
 
 # Compute posterior probabilities, extract marginal probabilities and project
-results <- do.call(rbind, lapply(MOIs, function(x) suppressMessages(compute_posterior(y, fs, MOIs = x)$marg)))
+prior <- matrix(rep(1/3,3), nrow = 1, dimnames = list(NULL,c("C", "L", "I")))
+results <- do.call(rbind, lapply(MOIs, function(x) suppressMessages(compute_posterior(y, fs, MOIs = x, prior = prior)$marg)))
 xy <- apply(results, 1, project2D) # Project probabilities onto 2D simplex coordinates
 
 # Plot 2D simplex
@@ -179,12 +182,12 @@ points(x = xy["x", ], y = xy["y", ], pch = as.character(1:length(MOIs)), cex = 0
 par(mar = pardefault$mar) # Restore plotting margins
 
 # ------------------------------------------------------------------------------
-# Understanding the relapse vs recrudescence results
+# Understanding the relapse vs recrudescence results...
 #
-# The fraction of intra-infection related graphs compatible with
-# recrudescence versus relapse is a function of the MOI
+# The relative proportion of intra-infection related graphs compatible with
+# recrudescence versus relapse but not reinfection is a function of the MOI
 # ------------------------------------------------------------------------------
-graph_frac_CL <- sapply(2:length(MOIs), FUN = function(i) {
+graph_frac_CL <- sapply(1:length(MOIs), FUN = function(i) {
 
   gs <- paste0("g", 1:sum(MOIs[[i]]))
   ts <- 1:length(MOIs[[i]])
@@ -195,11 +198,16 @@ graph_frac_CL <- sapply(2:length(MOIs), FUN = function(i) {
   RGs_C_or_L <- sapply(CIL_gvn_RGs, function(RG) !("I" %in% RG))
   RGs_C <- sapply(CIL_gvn_RGs, function(RG) "C" %in% RG)
 
-  # Make a vector of intra-infection edges by first creating a block diag. matrix
-  mat_within <- Matrix::bdiag(lapply(MOIs[[i]],function(x) matrix(1, ncol=x, nrow=x)))
-  colnames(mat_within) <- gs; rownames(mat_within) <- gs
-  edges_within <- igraph::as_ids(igraph::E(igraph::graph_from_adjacency_matrix(mat_within, mode = "undirected", diag = F)))
-  RGs_edges_within <- sapply(RGs, function(RG) all(edges_within %in% igraph::as_ids(igraph::E(RG))))
+  if(identical(MOIs[[i]], c(1,1))) {
+    RGs_edges_within <- rep(TRUE, length(RGs))
+  } else {
+    # Make a vector of intra-infection edges by first creating a block diag. matrix
+    mat_within <- Matrix::bdiag(lapply(MOIs[[i]],function(x) matrix(1, ncol=x, nrow=x)))
+    colnames(mat_within) <- gs; rownames(mat_within) <- gs
+    edges_within <- igraph::as_ids(igraph::E(igraph::graph_from_adjacency_matrix(mat_within, mode = "undirected", diag = F)))
+    RGs_edges <- lapply(RGs, function(RG) igraph::as_ids(igraph::E(RG)))
+    RGs_edges_within <- sapply(RGs_edges, function(RG_E) all(edges_within %in% RG_E))
+  }
 
   graph_frac_CL_unnormalised <- c(frac_c = sum(RGs_edges_within*RGs_C)/sum(RGs_C),
                                   frac_l = sum(RGs_edges_within*RGs_C_or_L)/length(RGs))
@@ -214,24 +222,49 @@ t(graph_frac_CL)
 results
 
 # Compare plotted results
-plot(x = graph_frac_CL["frac_c",], y = results[-1,c("C")],
-     xlim = c(0,1), ylim = c(0,1), pch = 20, bty = "n",
-     xlab = c("Prior prevalence"),
+plot(x = graph_frac_CL["frac_c",], y = results[,c("C")],
+     pch = as.character(1:length(MOIs)),
+     xlim = c(0,1), ylim = c(0,1), bty = "n",
+     xlab = c("Relative prior proportion"),
      ylab = c("Posterior probability"))
 abline(a = 0, b = 1)
 
-# TO SORT FROM HERE:
+# ------------------------------------------------------------------------------
+# Understanding the relapse vs recrudescence results...
+#
+# The liklihood of the graphs in the MOI c(3,3) case is indeed limited to the
+# those with intra-infection relatedness compatible with recrudescence or relapse
+# but not reinfection.
+# ------------------------------------------------------------------------------
 # For the MOIs c(3,3) case
-gs <- paste0("g", 1:6)
+gs <- paste0("g", 1:sum(c(3,3)))
 ts <- 1:length(c(3,3))
 ts_per_gs <- rep(ts, c(3,3))
-X <- compute_posterior(y, fs, MOIs = c(3,3), return.RG = TRUE, return.logp = T)
+gs_per_ts <- split(gs, ts_per_gs)
+result33  <- compute_posterior(y, fs, MOIs = c(3,3), return.RG = TRUE, return.logp = T)
+
+RGs <- sapply(result33$RGs, function(RG) RG_to_igraph(RG, gs, ts_per_gs))
+CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts = gs_per_ts) # states
+RGs_C_or_L <- sapply(CIL_gvn_RGs, function(CIL_gvn_RG) !("I" %in% CIL_gvn_RG))
+
+# Make a vector of intra-infection edges by first creating a block diag. matrix
+mat_within <- Matrix::bdiag(lapply(c(3,3),function(x) matrix(1, ncol=x, nrow=x)))
+colnames(mat_within) <- gs; rownames(mat_within) <- gs
+edges_within <- igraph::as_ids(igraph::E(igraph::graph_from_adjacency_matrix(mat_within, mode = "undirected", diag = F)))
+RGs_edges <- lapply(RGs, function(RG) igraph::as_ids(igraph::E(RG)))
+RGs_edges_within <- sapply(RGs_edges, function(RG_E) all(edges_within %in% RG_E))
 
 # extract logp
-x <- sapply(X$RGs, function(RG) RG$logp)
+x <- sapply(result33$RGs, function(RG) RG$logp)
 x[x == -Inf] <- NA # Mask -Inf
 x <- x - min(x, na.rm = T) # Re-scale before exponentiating (otherwise all 0)
 x <- exp(x)/sum(exp(x), na.rm = T) # Exponentiate and normalise
 
-unique(x[as.logical(RGs_C_or_L * RGs_edges_within)]) # some more likely than others
-max(x[!(RGs_C_or_L * RGs_edges_within)]) # all others are unlikely
+# Inspect probabilities
+unique(x[RGs_C_or_L & RGs_edges_within]) # some more likely than others
+max(x[!(RGs_C_or_L & RGs_edges_within)]) # all others are unlikely
+
+# Plot the most likely
+for(i in which(RGs_C_or_L & RGs_edges_within)){
+  plot_RG(RGs[[i]])
+}
