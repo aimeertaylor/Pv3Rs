@@ -83,7 +83,7 @@
 #' # ===========================================================================
 #' # Example where alleles are named arbitrarily
 #' # ===========================================================================
-#' # Data on an enroll ment episode and a recurrence:
+#' # Data on an enrollment episode and a recurrence:
 #' y <- list(episode0 = list(marker1 = c("Tinky Winky", "Dipsy"),
 #'                           marker2 = c("Tinky Winky", "Laa-Laa", "Po")),
 #'           episode1 = list(marker1 = "Tinky Winky",

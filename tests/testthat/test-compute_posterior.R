@@ -138,3 +138,86 @@ testthat::test_that("Examples from the pre-print agree", {
   testthat::expect_equal(post$marg, expect)
 
 })
+
+
+# Check for under/overflow issues
+testthat::test_that("Check that 1000 markers does not lead to under/overflow", {
+  m <- 1000
+  markers <- paste0("m", 1:m) # Marker names
+  alleles <- letters # Alleles
+  n_alleles <- length(alleles) # Number of alleles per marker
+
+  # Sample allele frequencies
+  fs <- sapply(markers, function(m) {
+      fs_unnamed <- gtools::rdirichlet(1, alpha = rep(1, n_alleles))
+      setNames(fs_unnamed, alleles)
+    }, USE.NAMES = TRUE, simplify = FALSE
+  )
+
+  # Sample parental genotypes
+  parent1 <- sapply(markers, function(t) {
+    sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
+  parent2 <- sapply(markers, function(t) {
+    sample(alleles, size = 1, prob = 1-fs[[t]])}, simplify = F)
+
+  # Sample children genotypes (ensure all different)
+  anyclones <- TRUE
+  while (anyclones) {
+    child1 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
+    child2 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
+    child3 <-  sapply(markers, function(t) sample(c(parent1[[t]], parent2[[t]]), 1), simplify = F)
+    anyclones <- any(identical(child1, child2),
+                     identical(child2, child3),
+                     identical(child1, child3))
+  }
+
+  # Make parasite infection (incompatible with recrudescence)
+  initial <- rbind(unlist(child1))
+  relapse <- rbind(unlist(child2), unlist(child3))
+  y <- list(apply(initial, 2, unique, simplify = F),
+            apply(relapse, 2, unique, simplify = F))
+
+  # Compute posterior
+  post <- suppressMessages(compute_posterior(y, fs))
+
+  expect <- matrix(c(0, 1, 0), ncol=3, byrow=T, dimnames=list(NULL, causes))
+  testthat::expect_equal(post$marg, expect)
+})
+
+
+# Likelihood involving missing data should be equivalent to summing likelihoods
+# over all possible imputations of missing data
+testthat::test_that("Check NAs are handled correctly if no data for first recurrence", {
+  alleles <- c("A", "B", "C")
+  get_logp <- function(post) {
+    sapply(post$RGs, function(RG) RG$logp)
+  }
+  fs <- list(m1=setNames(gtools::rdirichlet(1, rep(1, length(alleles))), alleles))
+
+  # simulate data for initial episode, MOI = 2
+  a1 <- unique(sample(alleles, 2, replace=T, prob=fs$m1))
+  # data is NA for first recurrence, MOI = 2
+  # simulate data for second recurrence, MOI = 1
+  a3 <- sample(alleles, 1, replace=T, prob=fs$m1)
+
+  y <- list(initial=list(m1=a1), recur1=list(m1=NA), recur2=list(m1=a3))
+  # likelihood calculation with NA
+  post <- suppressMessages(compute_posterior(y, fs,
+                                             return.RG=T, return.logp=T,
+                                             MOIs=c(2,2,1)))
+  logp_NA <- get_logp(post)
+
+  # all possible imputations for first recurrence
+  a2_list <- list("A", "B", "C", c("A","B"), c("B","C"), c("A","C"))
+  # logp calculation for each imputation, each RG
+  logp_mat <- sapply(a2_list, function(a2) {
+    y_impute <- list(initial=list(m1=a1), recur1=list(m1=a2), recur2=list(m1=a3))
+    post_impute <- suppressMessages(compute_posterior(y_impute, fs,
+                                                      return.RG=T, return.logp=T,
+                                                      MOIs=c(2,2,1)))
+    get_logp(post_impute)
+  })
+
+  # check if logp with NA == logsumexp of logp with imputed values
+  testthat::expect_equal(logp_NA, apply(logp_mat, 1, matrixStats::logSumExp))
+})
