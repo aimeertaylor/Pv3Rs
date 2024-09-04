@@ -1,30 +1,47 @@
 ################################################################################
-# Does it make sense to have both return.RG and return.logp?.
+# General to-dos:
+# Does it make sense to have both return.RG and return.logp?
+# Add a warning for unpaired data
+#
 # Examples of graph prior effects on posterior
 # Make this into a vignette: need to compute RG after ruling out a state
-# If the data can only rule out a state, then the result reflects the prior on graphs given MOIs.
-# Add an warning for recurrences with no data can have non-zero marginal probabilities
-# What is going on with the homoallelic exampled with no recurrent data?
-# Extend example without recurrent data into number of recurrences and
-# explain with relative prior proportion
+#
+# When genetic data can only rule out a state, the output of compute_posterior
+# is approximately equal to the relative prior proportion of compatible graphs
+# given MOIs.
+#
+# explain multiple recurrences with relative prior proportion
 ################################################################################
+pardefault <- par()
+
+# Simplex plot parameters
+par(mfrow = c(1,2), mar = c(0,0,0,0))
+vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
+
 #============================================================================
-# Examples without recurrent data
+# Example for data on a single episode using MOIs to change graph structure
 #
-# The prior is only returned when the initial infection has a homoallelic call
-# and an MOI of one and.
+# Pv3Rs is designed to analyse data on two or more episodes.
 #
-# A homoallelic call has a systematic effect that is amplified when the allele
-# of the homoallelic call is rare.
+# The output of compute posterior is approximately equal to the relative prior
+# proportion of relationship graphs compatible with the observed data. Is this
+# ever not the case?
+#
+# A homoallelic call has large effect that is amplified when the allele of the
+# homoallelic call is rare.
 #
 # A heteroallelic call has a minor effect that doesn't change with the allele
 # frequency of the rare allele.
+#
+# A single heteroallelic observation changes the
+# summation over IBD partitions but not the summation over relationship graphs
+# and this has a smaller effect.
 #============================================================================
 f_rare <- 0.001
 fs = list(m1 = c('1' = f_rare, '2' = 1-f_rare))
-MOIs <- list(c(1,1), c(2,1), c(1,3), c(3,1), c(2,2), c(3,2), c(3,3))
+MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3))
 
-# Data
+# Data: a homoallelic or heteroallelic call for a single unpaired episode
 y_hom <- list(enroll = list(m1 = c('1')), recur = list(m1 = NA))
 y_het <- list(enroll = list(m1 = c('1','2')), recur = list(m1 = NA))
 
@@ -32,37 +49,127 @@ y_het <- list(enroll = list(m1 = c('1','2')), recur = list(m1 = NA))
 results_hom <- do.call(rbind, lapply(MOIs, function(x) suppressMessages(compute_posterior(y_hom, fs, MOIs = x)$marg)))
 results_het <- do.call(rbind, lapply(MOIs[-1], function(x) suppressMessages(compute_posterior(y_het, fs, MOIs = x)$marg)))
 
-# Print results
-results_hom # Prior is only returned for MOI = c(1,1)
-results_het
-
 # Project probabilities onto 2D simplex coordinates
 xy_hom <- apply(results_hom, 1, project2D)
 xy_het <- apply(results_het, 1, project2D)
 
-pardefault <- par()
-par(mfrow = c(1,2))
+# Plot 2D simplex:het
+plot_simplex(v_labels = vertex_names[colnames(results_het)], classifcation_threshold = 0.5)
+points(x = xy_het["x", ], y = xy_het["y", ], pch = 20, cex = 0.25)
+title(main = "Heteroallelic", line = -5)
 
 # Plot 2D simplex:hom
-par(mar = c(0,0,0,0))
-vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
-plot_simplex(v_labels = vertex_names[colnames(results)], classifcation_threshold = 0.5)
-points(x = xy_hom["x", ], y = xy_hom["y", ], pch = as.character(1:length(MOIs)), cex = 0.25)
-title(main = "Homologous initial", line = -2)
+plot_simplex(v_labels = vertex_names[colnames(results_hom)], classifcation_threshold = 0.5)
+points(x = xy_hom["x", ], y = xy_hom["y", ], pch = 20, cex = 0.25)
+title(main = "Homoallelic", line = -5)
+
+# ------------------------------------------------------------------------------
+# Understanding the notable impact of the homoallelic call
+# ------------------------------------------------------------------------------
+graph_frac_hom <- sapply(1:length(MOIs), FUN = function(i) {
+
+  gs <- paste0("g", 1:sum(MOIs[[i]])) # name genotypes
+  ts <- 1:length(MOIs[[i]]) # episode indices
+  ts_per_gs <- rep(ts, MOIs[[i]]) # episode index of each genotype
+  gs_per_ts <- split(gs, ts_per_gs) # genotypes grouped by episode
+  RGs <- enumerate_RGs(MOIs[[i]]) # generate all relationship graphs
+  CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts) # list compatible states
+  RGs_C <- sapply(CIL_gvn_RGs, function(RG) "C" %in% RG) # RGs compatible with recrudescence
+  RGs_I <- sapply(CIL_gvn_RGs, function(RG) "I" %in% RG) # RGs compatible with reinfection
+
+  # Since a rare homoallelic call is best explained by intra-episode relatedness
+  # Find RGs with intra-episode relatedness
+  if(identical(MOIs[[i]], c(1,1))) {
+    RGs_edges_within <- rep(TRUE, length(RGs)) # monoclonal case is trivial
+  } else {
+    # Make adjecency matrix with intra-episode edges for the first episode
+    mat_within <- matrix(0, ncol = sum(MOIs[[i]]), nrow = sum(MOIs[[i]]), dimnames = list(gs, gs)) # initiate matrix
+    mat_within[1:MOIs[[i]][1], 1:MOIs[[i]][1]] <- 1 # populate matrix
+    edges_within <- igraph::as_ids(igraph::E(igraph::graph_from_adjacency_matrix(mat_within, mode = "undirected", diag = F)))
+    RGs_edges <- lapply(RGs, function(RG) igraph::as_ids(igraph::E(RG))) # Get edges for every RG
+    RGs_edges_within <- sapply(RGs_edges, function(RG_E) all(edges_within %in% RG_E))
+  }
+
+  graph_frac_unnormalised <- c(frac_C = sum(RGs_edges_within*RGs_C)/sum(RGs_C),
+                                  frac_L = sum(RGs_edges_within)/length(RGs),
+                                  frac_I = sum(RGs_edges_within*RGs_I)/sum(RGs_I))
+
+  graph_frac <- graph_frac_unnormalised/sum(graph_frac_unnormalised)
+
+  return(graph_frac)
+})
+
+# Add to relative prior proportion to simplex
+xy_graph_frac_hom <- apply(graph_frac_hom, 2, project2D)
+points(x = xy_graph_frac_hom["x", ], y = xy_graph_frac_hom["y", ], pch = 1)
+
+# ------------------------------------------------------------------------------
+# Understanding the negligible impact of the heteroallelic call
+# ------------------------------------------------------------------------------
+graph_frac_het <- sapply(1:length(MOIs), FUN = function(i) {
+
+  gs <- paste0("g", 1:sum(MOIs[[i]]))
+  ts <- 1:length(MOIs[[i]])
+  ts_per_gs <- rep(ts, MOIs[[i]])
+  gs_per_ts <- split(gs, ts_per_gs)
+  RGs <- enumerate_RGs(MOIs[[i]])
+  CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts = gs_per_ts) # states
+  RGs_C <- sapply(CIL_gvn_RGs, function(RG) "C" %in% RG)
+  RGs_I <- sapply(CIL_gvn_RGs, function(RG) "I" %in% RG)
+
+  graph_frac_unnormalised <- c(frac_C = sum(RGs_C)/sum(RGs_C),
+                               frac_L = 1,
+                               frac_I = sum(RGs_I)/sum(RGs_I))
+
+  graph_frac <- graph_frac_unnormalised/sum(graph_frac_unnormalised)
+  return(graph_frac)
+})
+
+# Almost identical
+results_het
+t(graph_frac_het)
+
+#===============================================================================
+# Example for data on a single episode using recurrences to change graph structure
+#
+# Changing the graph structure by adding recurrences has very little impact when
+# data are limited to a single episode.
+#===============================================================================
+# Allele frequencies:
+f_rare <- 0.25
+fs <- list(m1 = setNames(c(f_rare, 1-f_rare), c("A", "Other")))
+
+# The number of recurrences increases but only the first recurrence has data
+ys_homo <- list(list(list(m1 = "A"), list(m1 = NA)), # 1 recurrence
+                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA)), # 2 recurrences
+                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA)), # etc.
+                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
+
+# The number of recurrences increases and all have the same data
+ys_het <- list(list(list(m1 = c("A", "Other")), list(m1 = NA)),  # 1 recurrence
+               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA)), # 2 recurrences
+               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA), list(m1 = NA)), # etc.
+               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
+
+# Compute posterior probabilities and extract marginal probabilities:
+results_hom <- lapply(ys_homo, function(y) compute_posterior(y, fs)$marg)
+results_het <- lapply(ys_het, function(y) compute_posterior(y, fs)$marg)
+
+# Extract results for the first recurrence only:
+first_recur_hom <- sapply(results_hom, function(result) result[1,])
+first_recur_het <- sapply(results_het, function(result) result[1,])
+
+# Project probabilities onto 2D simplex coordinates
+xy_hom <- apply(first_recur_homo, 2, project2D)
+xy_het <- apply(first_recur_het, 2, project2D)
 
 # Plot 2D simplex:het
-par(mar = c(0,0,0,0))
-vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
-plot_simplex(v_labels = vertex_names[colnames(results)], classifcation_threshold = 0.5)
-points(x = xy_het["x", ], y = xy_het["y", ], pch = as.character(1:length(MOIs)), cex = 0.25)
-title(main = "Heterologous initial", line = -2)
-
-# Restore plotting margins
-par(mar = pardefault$mar)
-
-
-
-
+plot_simplex(v_labels = vertex_names[colnames(results_het[[1]])], classifcation_threshold = 0.5)
+points(x = xy_hom["x", ], y = xy_hom["y", ], pch = 20, cex = 0.25, col = "red")
+points(x = xy_het["x", ], y = xy_het["y", ], pch = 20, cex = 0.25, col = "blue")
+title(main = "Heteroallelic", line = -5)
+legend("topright", inset = 0.1, col = c("red", "blue"), pch = 20, bty = "n",
+       legend = c("Homoallelic", "Heteroallelic"))
 
 #===============================================================================
 # Example with recurrent data using multiple recurrences to change graph structure
@@ -92,51 +199,43 @@ f_rare <- 0.25
 fs <- list(m1 = setNames(c(f_rare, 1-f_rare), c("A", "Other")))
 
 # The number of recurrences increases but only the first recurrence has data
-ys0 <- list(list(list(m1 = "A"), list(m1 = "A")), # 1 recurrence
+ys_one <- list(list(list(m1 = "A"), list(m1 = "A")), # 1 recurrence
             list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA)), # 2 recurrences
             list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA)), # etc.
             list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
 
 # The number of recurrences increases and all have the same data
-ys1 <- list(list(list(m1 = "A"), list(m1 = "A")),  # 1 recurrence
+ys_all <- list(list(list(m1 = "A"), list(m1 = "A")),  # 1 recurrence
             list(list(m1 = "A"), list(m1 = "A"), list(m1 = "A")), # 2 recurrences
             list(list(m1 = "A"), list(m1 = "A"), list(m1 = "A"), list(m1 = "A")), # etc.
             list(list(m1 = "A"), list(m1 = "A"), list(m1 = "A"), list(m1 = "A"), list(m1 = "A")))
 
 # Compute posterior probabilities and extract marginal probabilities:
-results0 <- lapply(ys0, function(y) compute_posterior(y, fs)$marg)
-results1 <- lapply(ys1, function(y) compute_posterior(y, fs)$marg)
+results_one <- lapply(ys_one, function(y) compute_posterior(y, fs)$marg)
+results_all <- lapply(ys_all, function(y) compute_posterior(y, fs)$marg)
 
 # Extract results for the first recurrence only:
-first_recur0 <- sapply(results0, function(result) result[1,])
-first_recur1 <- sapply(results1, function(result) result[1,])
-
-# As expected, posterior probabilities agree when there is only one recurrence
-# (first columns match), otherwise they diverge
-first_recur0
-first_recur1
-
+first_recur_one <- sapply(results_one, function(result) result[1,])
+first_recur_all <- sapply(results_all, function(result) result[1,])
 
 # ------------------------------------------------------------------------------
 # Plot divergence on 2D simplex
 # ------------------------------------------------------------------------------
 n_recur <- ncol(first_recur0)
-pardefault <- par()
-par(mar = c(0,0,0,0))
-plot_simplex(v_labels = rownames(first_recur0), classifcation_threshold = 0.5)
+plot_simplex(v_labels = vertex_names, classifcation_threshold = 0.5)
 legend("topright", inset = 0.1, col = c("red", "blue"), pch = 20, bty = "n",
        legend = c("Only the first recurrence has data",
-                  "Recurrences have repeat data"))
+                  "All recurrences have the same data"))
 
 # Project and plot first_recur0
-xy <- apply(first_recur0, 2, project2D)
+xy <- apply(first_recur_one, 2, project2D)
 arrows(x0 = xy["x", 1], x1 = xy["x", n_recur],
        y0 = xy["y", 1], y1 = xy["y", n_recur],
        length = 0.05, col = "red")
 points(x = xy["x", ], y = xy["y", ], pch = ".")
 
 # Project and plot first_recur1
-xy <- apply(first_recur1, 2, project2D)
+xy <- apply(first_recur_all, 2, project2D)
 arrows(x0 = xy["x", 1], x1 = xy["x", n_recur],
        y0 = xy["y", 1], y1 = xy["y", n_recur],
        length = 0.05, col = "blue")
@@ -145,13 +244,47 @@ points(x = xy["x", ], y = xy["y", ], pch = ".")
 
 # The marginal probabilities of recurrences with no data diverge from the prior
 # at a decreasing rate, at least for relapse and reinfection:
-results0[[4]] - array(1/3, dim = dim(results0[[4]]))
+results_one
 
 # The marginal probabilities of different recurrences differ when they all
 # recurrences have the same data:
-results1[[4]] - matrix(results1[[4]][1,], byrow = T,
-                       nrow = nrow(results0[[4]]),
-                       ncol = ncol(results0[[4]]))
+results_all
+
+# ------------------------------------------------------------------------------
+# Understanding the notable impact of the homoallelic call
+# ------------------------------------------------------------------------------
+graph_frac_hom <- sapply(1:length(MOIs), FUN = function(i) {
+
+  gs <- paste0("g", 1:sum(MOIs[[i]])) # name genotypes
+  ts <- 1:length(MOIs[[i]]) # episode indices
+  ts_per_gs <- rep(ts, MOIs[[i]]) # episode index of each genotype
+  gs_per_ts <- split(gs, ts_per_gs) # genotypes grouped by episode
+  RGs <- enumerate_RGs(MOIs[[i]]) # generate all relationship graphs
+  CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts) # list compatible states
+  RGs_C <- sapply(CIL_gvn_RGs, function(RG) "C" %in% RG) # RGs compatible with recrudescence
+  RGs_I <- sapply(CIL_gvn_RGs, function(RG) "I" %in% RG) # RGs compatible with reinfection
+
+  # Since a rare homoallelic call is best explained by intra-episode relatedness
+  # Find RGs with intra-episode relatedness
+  if(identical(MOIs[[i]], c(1,1))) {
+    RGs_edges_within <- rep(TRUE, length(RGs)) # monoclonal case is trivial
+  } else {
+    # Make adjecency matrix with intra-episode edges for the first episode
+    mat_within <- matrix(0, ncol = sum(MOIs[[i]]), nrow = sum(MOIs[[i]]), dimnames = list(gs, gs)) # initiate matrix
+    mat_within[1:MOIs[[i]][1], 1:MOIs[[i]][1]] <- 1 # populate matrix
+    edges_within <- igraph::as_ids(igraph::E(igraph::graph_from_adjacency_matrix(mat_within, mode = "undirected", diag = F)))
+    RGs_edges <- lapply(RGs, function(RG) igraph::as_ids(igraph::E(RG))) # Get edges for every RG
+    RGs_edges_within <- sapply(RGs_edges, function(RG_E) all(edges_within %in% RG_E))
+  }
+
+  graph_frac_unnormalised <- c(frac_C = sum(RGs_edges_within*RGs_C)/sum(RGs_C),
+                               frac_L = sum(RGs_edges_within)/length(RGs),
+                               frac_I = sum(RGs_edges_within*RGs_I)/sum(RGs_I))
+
+  graph_frac <- graph_frac_unnormalised/sum(graph_frac_unnormalised)
+
+  return(graph_frac)
+})
 
 #============================================================================
 # Example with recurrent data using MOIs to change graph structure
@@ -232,7 +365,7 @@ abline(a = 0, b = 1)
 # ------------------------------------------------------------------------------
 # Understanding the relapse vs recrudescence results...
 #
-# The liklihood of the graphs in the MOI c(3,3) case is indeed limited to the
+# The likelihood of the graphs in the MOI c(3,3) case is indeed limited to the
 # those with intra-infection relatedness compatible with recrudescence or relapse
 # but not reinfection.
 # ------------------------------------------------------------------------------
