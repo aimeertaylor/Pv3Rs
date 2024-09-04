@@ -25,15 +25,15 @@ plot_simplex()
 
 xy <- project2D(v = c("C" = 1, "L" = 0, "I" = 0))
 points(x = xy["x"], xy["y"], pch = "C")
-text(x = xy["x"], xy["y"], labels = "(1,0,0)")
+graphics::text(x = xy["x"], xy["y"], labels = "(1,0,0)")
 
 xy <- project2D(v = c("C" = 0, "L" = 1, "I" = 0))
 points(x = xy["x"], xy["y"], pch = "L")
-text(x = xy["x"], xy["y"], labels = "(0,1,0)")
+graphics::text(x = xy["x"], xy["y"], labels = "(0,1,0)")
 
 xy <- project2D(v = c("C" = 0, "L" = 0, "I" = 1))
 points(x = xy["x"], xy["y"], pch = "I")
-text(x = xy["x"], xy["y"], labels = "(0,0,1)")
+graphics::text(x = xy["x"], xy["y"], labels = "(0,0,1)")
 
 # ==============================================================================
 # Given data on an enrollment episode and a recurrence,

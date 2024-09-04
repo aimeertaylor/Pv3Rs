@@ -91,8 +91,8 @@
 #'
 #' # Allele frequencies:
 #' fs <- list(
-#'   marker1 = setNames(c(0.4, 0.6), c("Tinky Winky", "Dipsy")),
-#'   marker2 = setNames(c(0.1, 0.1, 0.2, 0.6), c("Tinky Winky", "Dipsy", "Laa-Laa", "Po"))
+#'   marker1 = stats::setNames(c(0.4, 0.6), c("Tinky Winky", "Dipsy")),
+#'   marker2 = stats::setNames(c(0.1, 0.1, 0.2, 0.6), c("Tinky Winky", "Dipsy", "Laa-Laa", "Po"))
 #' )
 #'
 #' # Compute posterior probabilities using default uniform prior, note that
@@ -158,7 +158,7 @@
 #' # incompatible with an MOI increase on the preceding infection.)
 #' #============================================================================
 #' # Allele frequencies:
-#' fs <- list(m1 = setNames(c(0.25, 0.75), c("A", "Other")))
+#' fs <- list(m1 = stats::setNames(c(0.25, 0.75), c("A", "Other")))
 #'
 #' # Data on enrollment and two recurrences:
 #' y_missing <- list(enroll = list(m1 = NA),
@@ -194,7 +194,7 @@
 #' # MyDevFiles/Graph_prior_bias_examples.R])
 #' #============================================================================
 #' # Allele frequencies:
-#' fs <- list(m1 = setNames(c(0.25, 1-0.25), c("A", "Other")))
+#' fs <- list(m1 = stats::setNames(c(0.25, 1-0.25), c("A", "Other")))
 #'
 #' # Data for different scenarios; scenarios where the number of recurrences
 #' # increases but only the first recurrence has data
@@ -350,9 +350,9 @@ compute_posterior <- function(
   )))
 
   # number of RGs consistent with each vector of recurrence states (R)
-  n_rg_per_rstr <- setNames(rep(0, n_rstrs), rstrs)
+  n_rg_per_rstr <- stats::setNames(rep(0, n_rstrs), rstrs)
   # for each R, stores log sum of p(y|RG) across RGs compatible with R
-  logp_sum_per_rstr <- setNames(rep(-Inf, n_rstrs), rstrs)
+  logp_sum_per_rstr <- stats::setNames(rep(-Inf, n_rstrs), rstrs)
 
   # for each RG, add p(y|RG) for recurrence states where RG is compatible
   RG_i <- 0

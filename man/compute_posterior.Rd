@@ -113,8 +113,8 @@ y <- list(episode0 = list(marker1 = c("Tinky Winky", "Dipsy"),
 
 # Allele frequencies:
 fs <- list(
-  marker1 = setNames(c(0.4, 0.6), c("Tinky Winky", "Dipsy")),
-  marker2 = setNames(c(0.1, 0.1, 0.2, 0.6), c("Tinky Winky", "Dipsy", "Laa-Laa", "Po"))
+  marker1 = stats::setNames(c(0.4, 0.6), c("Tinky Winky", "Dipsy")),
+  marker2 = stats::setNames(c(0.1, 0.1, 0.2, 0.6), c("Tinky Winky", "Dipsy", "Laa-Laa", "Po"))
 )
 
 # Compute posterior probabilities using default uniform prior, note that
@@ -180,7 +180,7 @@ prior; suppressMessages(compute_posterior(y, fs, prior))$marg
 # incompatible with an MOI increase on the preceding infection.)
 #============================================================================
 # Allele frequencies:
-fs <- list(m1 = setNames(c(0.25, 0.75), c("A", "Other")))
+fs <- list(m1 = stats::setNames(c(0.25, 0.75), c("A", "Other")))
 
 # Data on enrollment and two recurrences:
 y_missing <- list(enroll = list(m1 = NA),
@@ -216,7 +216,7 @@ compute_posterior(y, fs)$marg
 # MyDevFiles/Graph_prior_bias_examples.R])
 #============================================================================
 # Allele frequencies:
-fs <- list(m1 = setNames(c(0.25, 1-0.25), c("A", "Other")))
+fs <- list(m1 = stats::setNames(c(0.25, 1-0.25), c("A", "Other")))
 
 # Data for different scenarios; scenarios where the number of recurrences
 # increases but only the first recurrence has data

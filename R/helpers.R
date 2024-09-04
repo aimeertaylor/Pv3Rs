@@ -146,7 +146,7 @@ compatible_rstrs <- function(RG, gs_per_ts) {
   # `r_by_recur` is a vector storing possible recur. states for each recurrence
   r_by_recur <- lapply(1:n_recur, function(x) c("L")) # relapse always possible
   # prepend clonal partition vector with 'g'
-  clone.vec <- setNames(RG$clone.vec, paste0("g", 1:length(RG$clone.vec)))
+  clone.vec <- stats::setNames(RG$clone.vec, paste0("g", 1:length(RG$clone.vec)))
   sib.vec <- RG$sib.vec
 
   for (i in 1:n_recur) { # for each recurrence
@@ -201,7 +201,7 @@ compatible_rstrs <- function(RG, gs_per_ts) {
 #'
 #' @export
 hash.IP <- function(IP, gs) {
-  ibd_vec <- setNames(gs, gs)
+  ibd_vec <- stats::setNames(gs, gs)
   ibd_i <- 1
   # use of `order` on the 'min' genotype name of each IBD cell ensures that the
   # for loop runs in the same order even if genotype names within an IBD cell
@@ -318,9 +318,9 @@ prep_data <- function(y) {
 #' @field progress_step Addition to progress per iteration
 #'
 #' @author Mans Magnusson (MansMeg @ github)
-#'
+#' @importFrom methods new
 msg_progress_bar <-
-  setRefClass(
+  methods::setRefClass(
     Class = "msg_progress_bar",
     fields = list(iter = "numeric",
                   i = "numeric",

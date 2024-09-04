@@ -51,7 +51,7 @@ sample_RG <- function(MOIs, igraph = T) {
   n.clones <- max(CP) # number of clonal cells
   clone.names <- paste0("c", 1:n.clones)
   # list of vectors of genotype names by clonal cell
-  clones <- setNames(split(gs, CP), clone.names)
+  clones <- stats::setNames(split(gs, CP), clone.names)
 
   # given clonal relationships, generate all compatible sibling relationships
   # sibling partitions are all set partitions of the clonal cells
@@ -60,7 +60,7 @@ sample_RG <- function(MOIs, igraph = T) {
 
   sib.vec <- sib.parts[, j] # membership vector
   n.sib.clones <- max(sib.vec) # number of sibling cells
-  sib.clones <- setNames(
+  sib.clones <- stats::setNames(
     split(clone.names, sib.vec),
     paste0("s", 1:n.sib.clones)
   ) # list of vectors of clonal cell names by sibling cell

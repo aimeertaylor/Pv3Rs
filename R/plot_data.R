@@ -51,7 +51,7 @@ plot_data = function(ys,
                      marker_annotate = TRUE){
 
   # Function to create ramped colours based on "Paired" brewer.pal
-  cols <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))
+  cols <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))
 
   # Extract patients and episode counts and names
   n_patients <- length(ys)
@@ -164,18 +164,18 @@ plot_data = function(ys,
   for(ID in unique(IDs)){
     inds = which(IDs == ID)
     inds_mapped_01 = (inds - 0)/(n_episodes + 1 - 0)
-    ID_midpoints[as.character(ID)] = median(inds_mapped_01)
+    ID_midpoints[as.character(ID)] = stats::median(inds_mapped_01)
   }
 
   # Plot
-  par(mfrow = c(1,1),
-      fig = c(0,0.75,0.03,0.97), # fig = c(x1, x2, y1, y2) (to leave room for the legend)
-      mar = c(4,4,0,0.5)) # mar = c(bottom, left, top, right)
+  graphics::par(mfrow = c(1,1),
+                fig = c(0,0.75,0.03,0.97), # fig = c(x1, x2, y1, y2) (to leave room for the legend)
+                mar = c(4,4,0,0.5)) # mar = c(bottom, left, top, right)
 
   # Add IDs to each vertical edge
   Empty_array = array(dim = dim(marker_data_wide_factor))
   matrix_to_plot = t(rbind(-1, cbind(ID_01, Empty_array, ID_01), -1))
-  image(matrix_to_plot, ylim = c(0,1), col = grey(c(0,0.35,0.75)), axes = FALSE)
+  graphics::image(matrix_to_plot, ylim = c(0,1), col = grDevices::grey(c(0,0.35,0.75)), axes = FALSE)
 
   # Add marker data
   COLs = seq(1, n_markers_wide, factorial_maxMOI)
@@ -183,8 +183,9 @@ plot_data = function(ys,
     Y = marker_data_wide_factor
     Y[,-(COLs[i]:(COLs[i]+(factorial_maxMOI)-1))] = NA
     if (all(is.na(Y))) next # If no data skip to next maker
-    image(t(rbind(-1, cbind(NA, Y, NA), -1)), col = c(grey(0), cols(marker_cardinalities[i])),
-          axes = FALSE, add = TRUE, zlim = c(-1, marker_cardinalities[i]))
+    graphics::image(t(rbind(-1, cbind(NA, Y, NA), -1)),
+                    col = c(grDevices::grey(0), cols(marker_cardinalities[i])),
+                    axes = FALSE, add = TRUE, zlim = c(-1, marker_cardinalities[i]))
   }
 
   # Add axes
@@ -195,16 +196,16 @@ plot_data = function(ys,
   } else {
     xaxis_at = xaxis[seq((1 + factorial_maxMOI/2), n_markers_wide, factorial_maxMOI)] + ifelse((factorial_maxMOI %% 2) == 0, xaxis_diff/2, 1)
   }
-  axis(at = xaxis_at, side = 1, line = -0.5, labels = markers, cex.axis = 0.5, tick = F)
-  axis(at = xaxis_at, side = 1, line = 0.5, labels = paste('(', marker_cardinalities, ')', sep = ''), cex.axis = 0.5, tick = F)
-  axis(side = 2, at = ID_midpoints, labels = levels(IDs_factor)[unique(IDs)], cex.axis = 0.5, las = 2, lwd.ticks = 0.25, lwd = 0)
-  axis(side = 1, at = c(0, tail(xaxis, 1)), line = -0.5, labels = rep('Grouping', 2), las = 2, cex.axis = 0.5, tick = F)
-  title(ylab = bquote(.(n_episodes) ~ 'episodes (one row per episode, grouped by patient ID)'),
-        line = 3.3, cex.lab = 0.5)
-  title(xlab = 'Marker (number of distinct alleles)', line = 3, cex.lab = 0.5)
+  graphics::axis(at = xaxis_at, side = 1, line = -0.5, labels = markers, cex.axis = 0.5, tick = F)
+  graphics::axis(at = xaxis_at, side = 1, line = 0.5, labels = paste('(', marker_cardinalities, ')', sep = ''), cex.axis = 0.5, tick = F)
+  graphics::axis(side = 2, at = ID_midpoints, labels = levels(IDs_factor)[unique(IDs)], cex.axis = 0.5, las = 2, lwd.ticks = 0.25, lwd = 0)
+  graphics::axis(side = 1, at = c(0, utils::tail(xaxis, 1)), line = -0.5, labels = rep('Grouping', 2), las = 2, cex.axis = 0.5, tick = F)
+  graphics::title(ylab = bquote(.(n_episodes) ~ 'episodes (one row per episode, grouped by patient ID)'),
+                  line = 3.3, cex.lab = 0.5)
+  graphics::title(xlab = 'Marker (number of distinct alleles)', line = 3, cex.lab = 0.5)
 
   # Add legend
-  par(fig = c(0,1,0,1)) # Critical to avoid odd placement of first legend column
+  graphics::par(fig = c(0,1,0,1)) # Critical to avoid odd placement of first legend column
   legendwidth = (1-0.76)/n_markers
   for(marker in markers){ # For each marker in turn
     i = which(marker == markers)

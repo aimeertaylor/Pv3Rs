@@ -21,3 +21,4 @@ MyDevFiles*
 ^R/sample_single_recurrence_RG.R$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$

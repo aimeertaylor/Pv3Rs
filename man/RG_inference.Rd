@@ -35,8 +35,8 @@ efficiency.
 # 1 marker, 2 infections, MOIs = 2, 1
 MOIs <- c(2, 1)
 fs <- list(
-  m1 = setNames(c(0.4, 0.6), c("A", "B")),
-  m2 = setNames(c(0.2, 0.8), c("C", "D"))
+  m1 = stats::setNames(c(0.4, 0.6), c("A", "B")),
+  m2 = stats::setNames(c(0.2, 0.8), c("C", "D"))
 )
 al_df1 <- as.data.frame(matrix(c("A", "B", "B"), nrow = 1))
 al_df2 <- as.data.frame(matrix(c(

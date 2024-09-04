@@ -80,7 +80,7 @@ plot_RG <- function(RG,
 
   # Plot the graph
   igraph::plot.igraph(RG,
-    layout = if (layout_by_group) RG_layout else layout_nicely,
+    layout = if (layout_by_group) RG_layout else igraph::layout_nicely,
     vertex.labels = igraph::vertex_attr(RG)$name,
     vertex.color = infection_colours[igraph::vertex_attr(RG)$group],
     edge.color = edge_col[as.character(igraph::edge_attr(RG)$weight)],

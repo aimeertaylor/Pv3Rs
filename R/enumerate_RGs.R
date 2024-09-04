@@ -83,7 +83,7 @@ enumerate_RGs <- function(MOIs, igraph = TRUE) {
     n.clones <- max(CP) # number of clonal cells
     clone.names <- paste0("c", 1:n.clones)
     # list of vectors of genotype names by clonal cell
-    clones <- setNames(split(gs, CP), clone.names)
+    clones <- stats::setNames(split(gs, CP), clone.names)
 
     # given clonal relationships, generate all compatible sibling relationships
     # sibling partitions are all set partitions of the clonal cells
@@ -92,7 +92,7 @@ enumerate_RGs <- function(MOIs, igraph = TRUE) {
     for (j in 1:n.parts) { # for each sibling partition
       sib.vec <- sib.parts[, j] # membership vector
       n.sib.clones <- max(sib.vec) # number of sibling cells
-      sib.clones <- setNames(
+      sib.clones <- stats::setNames(
         split(clone.names, sib.vec),
         paste0("s", 1:n.sib.clones)
       ) # list of vectors of clonal cell names by sibling cell
@@ -139,7 +139,7 @@ enumerate_CPs <- function(MOIs) {
   gs_count <- sum(MOIs) # Number of genotypes
 
   ts_per_gs <- rep(1:infection_count, MOIs)
-  gstarts <- head(c(1, cumsum(MOIs) + 1), -1) # first genotype of each infection
+  gstarts <- utils::head(c(1, cumsum(MOIs) + 1), -1) # first genotype of each infection
 
   # find all possible clonal relationships
   # initialise with lexicographically 'smallest' possible clone partition
@@ -167,7 +167,7 @@ enumerate_CPs <- function(MOIs) {
     start_i <- i
     infection <- ts_per_gs[i]
     # clonal cells that are disallowed due to no intra-infection clones
-    avoid <- head(CP_part[gstarts[infection]:i], -1)
+    avoid <- utils::head(CP_part[gstarts[infection]:i], -1)
 
     # try candidate values for new value of CP_part[i]
     candidate <- CP_part[i] + 1

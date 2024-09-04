@@ -24,8 +24,8 @@
 #' # 1 marker, 2 infections, MOIs = 2, 1
 #' MOIs <- c(2, 1)
 #' fs <- list(
-#'   m1 = setNames(c(0.4, 0.6), c("A", "B")),
-#'   m2 = setNames(c(0.2, 0.8), c("C", "D"))
+#'   m1 = stats::setNames(c(0.4, 0.6), c("A", "B")),
+#'   m2 = stats::setNames(c(0.2, 0.8), c("C", "D"))
 #' )
 #' al_df1 <- as.data.frame(matrix(c("A", "B", "B"), nrow = 1))
 #' al_df2 <- as.data.frame(matrix(c(
@@ -49,7 +49,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
   log_fs <- lapply(fs, log) # allele log-frequencies
 
   # hash tables to store p(marker m observed data | IBD partition)
-  IP_lookups <- setNames(lapply(ms, function(m) {
+  IP_lookups <- stats::setNames(lapply(ms, function(m) {
     new.env(
       hash = T,
       size = multicool::Bell(sum(MOIs)),
@@ -74,7 +74,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
         # check if there is no assignment where all of their alleles are equal
         if (!any(apply(
           assignment_df[clones], 1,
-          function(row) length(unique(na.omit(row))) <= 1
+          function(row) length(unique(stats::na.omit(row))) <= 1
         ))) {
           incompatible <- TRUE
           break

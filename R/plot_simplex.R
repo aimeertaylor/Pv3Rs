@@ -17,15 +17,15 @@
 #'
 #' xy <- project2D(v = c("C" = 1, "L" = 0, "I" = 0))
 #' points(x = xy["x"], xy["y"], pch = "C")
-#' text(x = xy["x"], xy["y"], labels = "(1,0,0)")
+#' graphics::text(x = xy["x"], xy["y"], labels = "(1,0,0)")
 #'
 #' xy <- project2D(v = c("C" = 0, "L" = 1, "I" = 0))
 #' points(x = xy["x"], xy["y"], pch = "L")
-#' text(x = xy["x"], xy["y"], labels = "(0,1,0)")
+#' graphics::text(x = xy["x"], xy["y"], labels = "(0,1,0)")
 #'
 #' xy <- project2D(v = c("C" = 0, "L" = 0, "I" = 1))
 #' points(x = xy["x"], xy["y"], pch = "I")
-#' text(x = xy["x"], xy["y"], labels = "(0,0,1)")
+#' graphics::text(x = xy["x"], xy["y"], labels = "(0,0,1)")
 #'
 #' # ==============================================================================
 #' # Given data on an enrollment episode and a recurrence,
@@ -74,11 +74,11 @@ plot_simplex <- function(v_labels = NULL, classifcation_threshold = NULL) {
        ylab = "", xlab = "")
 
   # Plot equilateral triangle:
-  polygon(x = c(-0.5, 0.5, 0), y = c(-k, -k, r))
+  graphics::polygon(x = c(-0.5, 0.5, 0), y = c(-k, -k, r))
 
   # Annotate vertices:
   if (!is.null(v_labels)) {
-    text(x = c(0, -0.5, 0.5), y = c(r, -k, -k), labels = v_labels, pos = c(3,1,1))
+    graphics::text(x = c(0, -0.5, 0.5), y = c(r, -k, -k), labels = v_labels, pos = c(3,1,1))
   }
 
   if(!is.null(classifcation_threshold)) {
@@ -100,18 +100,18 @@ plot_simplex <- function(v_labels = NULL, classifcation_threshold = NULL) {
     p1 <- rbind(xyL, xyCL, xyCLI, xyLI)
     p2 <- rbind(xyC, xyCI, xyCLI, xyCL)
     p3 <- rbind(xyI, xyLI, xyCLI, xyCI)
-    polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = adjustcolor("purple", alpha.f = 0.35))
-    polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = adjustcolor("yellow", alpha.f = 0.35))
-    polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = adjustcolor("red", alpha.f = 0.35))
+    graphics::polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = grDevices::adjustcolor("purple", alpha.f = 0.35))
+    graphics::polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = grDevices::adjustcolor("yellow", alpha.f = 0.35))
+    graphics::polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = grDevices::adjustcolor("red", alpha.f = 0.35))
 
     # Delineate strong classification
     # (more than 0.5 posterior probability for one state)
     p1 <- rbind(xyL, xyCL, xyLI)
     p2 <- rbind(xyC, xyCI, xyCL)
     p3 <- rbind(xyI, xyLI, xyCI)
-    polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = "purple")
-    polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = "yellow")
-    polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = "red")
+    graphics::polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = "purple")
+    graphics::polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = "yellow")
+    graphics::polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = "red")
   }
 
 }
