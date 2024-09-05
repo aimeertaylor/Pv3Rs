@@ -18,6 +18,7 @@ Imports:
     methods,
     multicool,
     partitions,
+    purrr,
     RColorBrewer
 Suggests: 
     knitr,
