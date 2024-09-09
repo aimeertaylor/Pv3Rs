@@ -43,7 +43,7 @@ fs <- list(m1 = c(A = 0.27, C = 0.35, G = 0.18, T = 0.20),
 
 We can plot the data using `plot_data()`. 
 
-```{r, fig.align='center', fig.dim = c(5,3)}
+```{r, fig.align='center'}
 plot_data(ys = list("Data" = y), fs = fs)
 ```
 Different colours in the data plot (left) represent different alleles. Alleles
@@ -166,7 +166,7 @@ sequences of recurrence states decrease as the number of compatible relationship
 graphs increase. This behaviour is expected due to our choice of a uniform prior
 over relationship graphs.
 
-```{r, fig.height=10, fig.width=7}
+```{r}
 # Extract sequences
 seqs <- names(post$joint)
 
@@ -199,7 +199,7 @@ for(poss_seq in poss_seqs) {
 
 Note that because the prior on sequences is uniform in the current case, the likelihood is proportional to the posterior, and so the maximum posterior estimate is equivalent to the maximum likelihood estimate (see scatter plot below). 
 
-```{r, fig.height=5, fig.width=7}
+```{r}
 par(mfrow = c(1, 1))
 plot(y = post$joint, x = likelihoods[1,], bty = "n",
      ylab = "Posterior", xlab = "Likelihood", pch = 20)
