@@ -262,13 +262,6 @@ writeLines(paste("Not all episodes have inter-episode data:", length(no_common))
 writeLines(paste("Can proceed with inference:", length(suitable)))
 ```
 
-We can plot the data
-
-```{r}
-ys_suitable <- y.dfs[suitable]
-plot_data(ys = , fs = Fs_Combined)  
-```
-
 Using a uniform prior over recurrence states, we perform inference on the recurrence states for the first 5 cases:
 
 ```{r}
