@@ -12,7 +12,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.align='center',
-  fig.dim = c(5,3)
 )
 knitr::opts_chunk$set(echo = TRUE)
 ```
