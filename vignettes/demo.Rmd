@@ -166,7 +166,7 @@ sequences of recurrence states decrease as the number of compatible relationship
 graphs increase. This behaviour is expected due to our choice of a uniform prior
 over relationship graphs.
 
-```{r}
+```{r, fig.height=10}
 # Extract sequences
 seqs <- names(post$joint)
 
@@ -199,7 +199,7 @@ for(poss_seq in poss_seqs) {
 
 Note that because the prior on sequences is uniform in the current case, the likelihood is proportional to the posterior, and so the maximum posterior estimate is equivalent to the maximum likelihood estimate (see scatter plot below). 
 
-```{r}
+```{r, fig.height=5}
 par(mfrow = c(1, 1))
 plot(y = post$joint, x = likelihoods[1,], bty = "n",
      ylab = "Posterior", xlab = "Likelihood", pch = 20)
