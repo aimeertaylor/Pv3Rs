@@ -40,9 +40,9 @@
 #' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = FALSE)
 #'
 #' # Demonstrating the adaptive nature of the colour scheme:
-#' ys <- ys_VHX_BPD["VHX_52"] # A single patient with
-#' plot_data(ys) # Legend adapts to alleles detected in VHX_52 only
-#' plot_data(ys, fs = fs_VHX_BPD)
+#' ys <- ys_VHX_BPD["VHX_52"] # A single patient
+#' plot_data(ys, fs = fs_VHX_BPD) # Colours and the legend match plots above
+#' plot_data(ys) # Colours and the legend adapt to alleles detected in VHX_52
 #'
 #'
 #' @export
