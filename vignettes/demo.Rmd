@@ -11,7 +11,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.align='center'
+  fig.align ='center', 
+  fig.width = 7
 )
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -52,20 +53,20 @@ allele frequencies are specified, common alleles have relatively large legend
 areas, while rare alleles have relatively small legend areas.
 
 Given the number of alleles observed during each episode, the most parsimonious
-explanation is that there are three, two, and one distinct parasite genotypes*
-in the three episodes respectively. (*A genotype is defined here as a
-realisation of the parasite genome, which is haploid and has 14 chromosomes.)
+explanation is that there are three, two, and one distinct parasite genotypes
+in the three episodes respectively (a genotype is defined here as a
+realisation of the haploid parasite genome). 
 
 ```{r}
 determine_MOIs(y)
 ```
 
-If more precise MOI estimates based on alternative data are available, they can
-be used in genetic recurrent state inference by specifying the `MOI`
-argument in the function `compute_posterior()`.
+If better MOI estimates are available, they can be used in genetic recurrent
+state inference by specifying the `MOI` argument in the function
+`compute_posterior()`.
 
 When performing genetic recurrent state inference, the bulk of the computational
-time lies in computing log-likelihoods of relationship graphs (log p(Y|RG) over
+time lies in computing log-likelihoods of graphs of relationships between
 genotypes.
 
 ```{r, cache=TRUE}
