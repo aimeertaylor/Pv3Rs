@@ -11,7 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.align='center',
+  fig.align='center'
 )
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -89,7 +89,7 @@ function `plot_simplex()`.
 
 ```{r}
 # Plot simplex
-par(mar = rep(0,4))
+par(mar = rep(0.1,4))
 plot_simplex(v_labels = c(C = "Recrudescence", 
                           L = "Relapse", 
                           I = "Reinfection")[colnames(post$marg)], 
@@ -134,7 +134,7 @@ gs <- paste0("g", 1:6)
 ts_per_gs <- rep(1:length(y), determine_MOIs(y)) 
 
 # Plot RG
-par(mar = rep(0,4))
+par(mar = rep(0.1,4))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
 
 # Generate infection colours in order to add a legend
