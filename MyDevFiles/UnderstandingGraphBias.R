@@ -1,8 +1,6 @@
 ################################################################################
-# The output of compute posterior converges (exactly?) to the prior-weighted
+# The output of compute posterior converges approximately to the prior-weighted
 # relative fraction of relationship graphs compatible with the observed data.
-#
-# This is one when the data suggest there are inter-episode siblings XXX
 ################################################################################
 rm(list = ls())
 
@@ -275,7 +273,7 @@ legend("left", bty = "n", col = 1:length(MOIs), pch = 20, title = "MOIs",
 # one very rare allele.
 #-------------------------------------------------------------------------------
 # Frequencies, data and MOIs
-f_rare <- 0.001 # Make reinfection unlikely, recrudescence likely
+f_rare <- 0.01 # Make reinfection unlikely, recrudescence likely
 fs = list(m1 = c('1' = f_rare, '2' = 1-f_rare))
 y <- list(enrol = list(m1 = "1"), recur = list(m1 = c("1")))
 MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3))
