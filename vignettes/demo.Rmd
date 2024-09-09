@@ -10,105 +10,161 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.align='center',
+  fig.dim = c(5,3)
 )
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r setup}
 library(Pv3Rs)
-par_default <- par(no.readonly = TRUE)
 ```
 
 ## Synthetic example
 
-We first look at an synthetic example with 3 markers (named `m1`,`m2`,`m3`) and three episodes, with known allele frequencies. 
+We first look at a synthetic example of three episodes (names are optional) with three markers (names are obligatory) whose alleles have known frequencies. 
 
 ```{r}
-y <- list("Enrollment" = list(m1=c('C','G','T'), m2=c('A','C'), m3=c('C','G','T')),
-          "Recurrence 1" = list(m1=c('C','T'), m2=c('A'), m3=c('A','C')),
-          "Recurrence 2" = list(m1=c('T'), m2=c('A'), m3=c('A')))
+y <- list("Enrollment" = list(m1 = c('C','G','T'), 
+                              m2 = c('A','C'),
+                              m3 = c('C','G','T')),
+          "Recurrence 1" = list(m1 = c('C','T'), 
+                                m2 = c('A'), 
+                                m3 = c('A','C')),
+          "Recurrence 2" = list(m1 = c('T'), 
+                                m2 = c('A'), 
+                                m3 = c('A')))
 
-fs <- list(m1=c(A=0.27, C=0.35, G=0.18, T=0.20),
-           m2=c(A=0.78, C=0.14, G=0.07, T=0.01),
-           m3=c(A=0.21, C=0.45, G=0.26, T=0.08))
+fs <- list(m1 = c(A = 0.27, C = 0.35, G = 0.18, T = 0.20),
+           m2 = c(A = 0.78, C = 0.14, G = 0.07, T = 0.01),
+           m3 = c(A = 0.21, C = 0.45, G = 0.26, T = 0.08))
 ```
 
 We can plot the data using `plot_data()`. 
 
 ```{r, fig.align='center', fig.dim = c(5,3)}
-plot_data(ys = list(example = y), fs = fs)
+plot_data(ys = list("Data" = y), fs = fs)
 ```
+Different colours in the data plot (left) represent different alleles. Alleles
+are also listed in the legend (right), with one column per marker. The marker
+order in the legend is the same as in the data plot (see horizontal axis). When
+allele frequencies are specified, common alleles have relatively large legend
+areas, while rare alleles have relatively small legend areas.
 
-
-Given the number of alleles observed during each episode, the most parsimonious explanation is that there are three, two, and one distinct parasite genotypes* across the three episodes respectively. 
-(*A genotype is defined here as a realisation of the parasite genome, which is haploid and has 14 chromosomes.)
+Given the number of alleles observed during each episode, the most parsimonious
+explanation is that there are three, two, and one distinct parasite genotypes*
+in the three episodes respectively. (*A genotype is defined here as a
+realisation of the parasite genome, which is haploid and has 14 chromosomes.)
 
 ```{r}
-determine_MOIs(y = y)
+determine_MOIs(y)
 ```
 
-If more precise MOI estimates based on alternative data are available, they can be input into the function `compute_posterior()` that computes the posterior probability of recurrence states. 
+If more precise MOI estimates based on alternative data are available, they can
+be used in genetic recurrent state inference by specifying the `MOI`
+argument in the function `compute_posterior()`.
 
-When performing inference on the recurrence states, the bulk of the computational time lies in computing the log-likelihood of each possible relationship graph over the six genotypes.
+When performing genetic recurrent state inference, the bulk of the computational
+time lies in computing log-likelihoods of relationship graphs (log p(Y|RG) over
+genotypes.
 
 ```{r, cache=TRUE}
 post <- compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE)
 ```
 
-Note that we did not specify the prior, so a uniform prior across all three recurrence states is assumed by default. We set `return.RG=TRUE` for relationship graphs to be returned. This is by default `FALSE` to conserve memory.
+In the call to `compute_posterior()` above we did not specify a prior, and so a
+uniform prior across all three recurrence states per recurrence is assumed by
+default. We set `return.RG=TRUE` for relationship graphs to be returned. This is
+by default `FALSE` to conserve memory.
 
-The marginal posterior probabilities of each recurrence state is stored in `post$marg`:
+The marginal posterior probabilities of each recurrence state is stored in
+`post$marg`.
 
 ```{r}
 post$marg
 ```
 
-The marginal posterior probabilities can be plotted on the simplex using the function `plot_simplex()`. 
+The marginal posterior probabilities can be plotted on the simplex using the
+function `plot_simplex()`.
 
 ```{r}
-par(mar = c(0,0,0,0))
-
 # Plot simplex
+par(mar = rep(0,4))
 plot_simplex(v_labels = c(C = "Recrudescence", 
                           L = "Relapse", 
-                          I = "Reinfection")[colnames(post$marg)], classifcation_threshold = 0.5)
+                          I = "Reinfection")[colnames(post$marg)], 
+             classifcation_threshold = 0.5)
 
 # Project marginal posterior probabilties onto 2D coordinates
 xy <- apply(post$marg, 1, project2D) 
-
+xy_prior <- project2D(rep(1/3,3)) 
 
 # Plot projection on the simplex
 points(x = xy["x",], y = xy["y",], pch = 20) 
 text(x = xy["x",], y = xy["y",], pos = 3, labels = gsub("_", " ", rownames(post$marg)))
+
+# Add default prior per recurrence
+points(x = xy_prior["x"], y = xy_prior["y"], pch = 20)
+text(x = xy_prior["x"], y = xy_prior["y"], pos = 3, labels = "Prior probability")
 ```
 
-We can access the joint posterior through `post$joint`. Here, we find the most likely sequence of recurrence states:
+The point in the yellow region is most likely a recrudescence with posterior
+probability greater than 0.5 (it falls in the bright yellow region); the point
+in the red region is most likely a reinfection with posterior probability
+greater than 0.5 (it falls in the bright red region).
+
+We can access the joint posterior through `post$joint`. Here, we find the most
+likely sequence of recurrence states:
 
 ```{r}
 post$joint[which.max(post$joint)]
 ```
 
-The log-likelihoods of each relationship graph is also returned in the output. Here, we plot the relationship graph with the largest likelihood:
+The log-likelihood of each relationship graph is also returned in the output.
+We plot the relationship graph with the largest likelihood. 
 
 ```{r}
-# Extract the most likely relationship graph
+# Extract the relationship graph (RG) with the largest log likelihood
 RG <- post$RGs[[which.max(sapply(post$RGs, function(RG) RG$logp))]]
 
-gs <- paste0("g", 1:6) # Generate genotype names
-ts_per_gs <- rep(1:length(y), determine_MOIs(y)) # episode index per genotypes
+# Generate genotype names for plot_RG()
+gs <- paste0("g", 1:6) 
+
+# Generate episode indices for plot RG()
+ts_per_gs <- rep(1:length(y), determine_MOIs(y)) 
+
+# Plot RG
+par(mar = rep(0,4))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
-infection_colours <- RColorBrewer::brewer.pal(n = 8, "Set2")
+
+# Generate infection colours in order to add a legend
+infection_colours <- RColorBrewer::brewer.pal(n = 8, "Set2") 
+
+# Add a legend
 legend("left", pch = 21, pt.bg = infection_colours[unique(ts_per_gs)], 
        bty = "n", legend = names(y), title = "Episode")
 
-# The sequences of state compatible with the most likely relationship graph
+# The sequences of states compatible with the relationship graph RG
 seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
 ```
 
-**N.B.** This approach of finding the `most likely' relationship graph does not take into account of symmetries. Specifically, relationship graphs that are isomorphic up to within-episode genotype permutations have the same likelihood. The user should note that the most likely equivalence class of relationship graphs may not contain the relationship graph with the largest likelihood. 
+N.B. This approach of finding the relationship graph for which the data are most
+probable does not take into account symmetries in the graphs. Specifically,
+relationship graphs that are isomorphic up to within-episode genotype
+permutations have the same likelihood. The user should note that the
+relationship graph with the largest likelihood might not be in the equivalence
+class for which the data are most probable when all relationship graphs in that
+class are summed over.
 
-The figure below shows histograms of the likelihoods of the relationship graphs compatible with each possible sequence of recurrence states, along with the likelihood of the sequence of recurrence states (red vertical line). Although sequences `r seqs_comp_MLE_RG` are all associated with the relationship graph with the largest log-likelihood, we observe that the likelihoods of these sequences of recurrence states decrease as the number of compatible relationship graphs increase. This behaviour is expected due to our choice of a uniform prior over relationship graphs. 
+The figure below shows histograms of the likelihoods of the relationship graphs
+compatible with each possible sequence of recurrence states, along with the
+likelihood of the sequence of recurrence states (red vertical line). Although
+sequences `r seqs_comp_MLE_RG` are all associated with the relationship graph
+with the largest log-likelihood, we observe that the likelihoods of these
+sequences of recurrence states decrease as the number of compatible relationship
+graphs increase. This behaviour is expected due to our choice of a uniform prior
+over relationship graphs.
 
 ```{r, fig.height=10, fig.width=7}
 # Extract sequences
@@ -128,7 +184,6 @@ seq_per_RG_matx <- sapply(seqs, function(seq) sapply(seq_per_RG_list, function(x
 poss_seqs <- names(sort(post$joint[post$joint > 0], decreasing = T))
 likelihoods <- array(0, dim = c(1, length(post$joint)), dimnames = list(NULL, names(post$joint)))
 
-par(par_default)
 par(mfrow = c(3, 2))
 ML <- max(prob_data_given_graph)
 xlims <- range(prob_data_given_graph)
