@@ -21,10 +21,15 @@
 #'
 #' @export
 recombine_parent_ids <- function(chrs_per_marker) {
+
+  if(!all(cummax(chrs_per_marker) == chrs_per_marker)) {
+    stop("Chromosomes must be increasing order")
+  }
+
   per_chr_marker_counts <- table(chrs_per_marker)
 
   chi_count <- 1 # Assumes one chiasmata per non-sister chromatid pair
-  chr_count <- length(per_chr_marker_counts)
+  chr_count <- length(per_chr_marker_counts) # Number of chromosomes
 
   # Sample per chromosome parent one segment lengths (in units of markers)
   # for chromatid sets one and two independently
@@ -32,14 +37,14 @@ recombine_parent_ids <- function(chrs_per_marker) {
   c2_p1_segment_length <- sapply(per_chr_marker_counts, sample, size = chi_count)
 
   # Parent allocation for chromatid set one after crossover
-  c1 <- do.call("c", sapply(1:chr_count, function(i) {
+  c1 <- do.call("c", lapply(1:chr_count, function(i) {
     x <- rep(2, per_chr_marker_counts[i])
     x[1:c1_p1_segment_length[i]] <- 1
     return(x)
   }))
 
   # Parent allocation for chromatid set two after crossover
-  c2 <- do.call("c", sapply(1:chr_count, function(i) {
+  c2 <- do.call("c", lapply(1:chr_count, function(i) {
     x <- rep(2, per_chr_marker_counts[i])
     x[1:c2_p1_segment_length[i]] <- 1
     return(x)
@@ -61,11 +66,13 @@ recombine_parent_ids <- function(chrs_per_marker) {
   # Parent allocation for the tetrad post independent orientation
   cs <- sapply(1:4, function(i) {
     c_ind <- recomb_chromatid_ids[i,]
-    do.call("c", sapply(1:chr_count, function(j) {
-      m_ind <- which(chrs_per_marker == j)
+    do.call("c", lapply(1:chr_count, function(j) {
+      m_ind <- which(chrs_per_marker == unique(chrs_per_marker)[j])
       cs_pre[m_ind,c_ind[j]]
     }))
   })
+
+  rownames(cs) <- NULL
 
   # Return per-marker parental ids for the tetrad
   return(cs)
