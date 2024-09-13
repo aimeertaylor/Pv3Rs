@@ -41,10 +41,6 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
   # check that allele assignments are given as data frames
   for (al.df in alleles_per_m) stopifnot(class(al.df)[1] == "data.frame")
 
-  if(sum(MOIs) > 10) warning(
-    "Total MOI > 10 may lead to high memory use", immediate=T
-  )
-
   ms <- names(alleles_per_m) # marker names
   log_fs <- lapply(fs, log) # allele log-frequencies
 
@@ -56,6 +52,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
       parent = emptyenv()
     )
   }), ms)
+
   # enumerate all relationship graphs
   RGs <- enumerate_RGs(MOIs, igraph = FALSE)
   gs <- paste0("g", 1:sum(MOIs)) # genotype names
