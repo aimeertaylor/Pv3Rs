@@ -235,8 +235,8 @@
 #' @export
 compute_posterior <- function(
     y, fs, prior = NULL, MOIs = NULL,
-    return.RG = FALSE, return.logp = FALSE
-) {
+    return.RG = FALSE, return.logp = FALSE) {
+
   # Check y is a list of lists:
   if (!isa(y, "list") | !all(unlist(lapply(y, isa, "list")))) {
     stop("Data y must be a list of lists, even if only one marker is typed per infection")
@@ -287,9 +287,11 @@ compute_posterior <- function(
   stopifnot("Need more than 1 episode"=infection_count > 1)
 
   min_MOIs <- determine_MOIs(y)
-  if(is.null(MOIs)) MOIs <- min_MOIs
-  else stopifnot("MOIs provided do not support the observed allelic diversity" = all(MOIs >= min_MOIs))
-
+  if (is.null(MOIs)) {
+    MOIs <- min_MOIs
+  } else {
+    stopifnot("MOIs provided do not support the observed allelic diversity" = all(MOIs >= min_MOIs))
+  }
 
   gs_count <- sum(MOIs)
   gs <- paste0("g", 1:gs_count)
@@ -302,7 +304,7 @@ compute_posterior <- function(
   # use uniform prior if prior not given
   if (is.null(prior)) {
     prior <- matrix(rep(1 / 3, 3 * (infection_count - 1)),
-      ncol = 3
+                    ncol = 3
     )
     colnames(prior) <- causes
   } else {
@@ -332,8 +334,8 @@ compute_posterior <- function(
     # returns one list of merged dataframes given two lists of dataframes
     function(x, y) {
       mapply(merge, x, y,
-        MoreArgs = list(by = NULL, all = T),
-        SIMPLIFY = F
+             MoreArgs = list(by = NULL, all = T),
+             SIMPLIFY = F
       )
     },
     alleles_per_inf_per_m
