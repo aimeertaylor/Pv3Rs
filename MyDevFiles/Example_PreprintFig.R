@@ -2,9 +2,9 @@
 # Made up example, based on modification of Figure 1 of the 2022 medRxiv preprint
 # ==============================================================================
 rm(list = ls())
-library(Pv3Rs)
-library(MCMCpack) # For rdirichlet
-library(tictoc) # For timing
+# library(Pv3Rs)
+# library(MCMCpack) # For rdirichlet
+# library(tictoc) # For timing
 
 # Magic numbers / quantities
 set.seed(5) # For reproducibility
@@ -51,24 +51,32 @@ recrude <- as.list(strangers[,3])
 reinfec <- as.list(strangers[,4])
 
 # Make data
-y <- list(initial = initial,
-          relapse = relapse,
-          recrude = recrude,
-          reinfec = reinfec)
+y <- list("initial episode (day 0)" = initial,
+          "1st recurence (day XXX)" = relapse,
+          "2nd recurence (day XXX)" = recrude,
+          "3rd recurence (day XXX)" = reinfec)
+
+# Make phased data
+y_phased <- list(as.list(children[3,]),
+                 as.list(children[4,]),
+                 as.list(children[1,]),
+                 as.list(strangers[,3]))
 
 # Plot the data
+plot_data(ys = list(example = y_phased), fs = fs, marker_annotate = F)
 plot_data(ys = list(example = y), fs = fs, marker_annotate = F)
 
 # Reduce the number of markers evaluated
-for(n_markers_eval in c(3,5,10)){
+for(n_markers_eval in c(4,5,10)){
 
 y_eval <- sapply(y, function(x) x[1:n_markers_eval], USE.NAMES = T, simplify = F)
 
 # Compute results
 post <- compute_posterior(y_eval, fs, return.RG=TRUE, return.logp=TRUE)
+colnames(post$marg) <- c("Recrudesence", "Relapse", "Reinfection")
 
 # Extract results
-post$marg # Marginal probabilities
+round(post$marg,2) # Marginal probabilities
 which.max(post$joint) # Most likely sequence
 
 # Plot result on the simplex:
