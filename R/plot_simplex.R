@@ -8,7 +8,7 @@
 #'   anticlockwise from the top vertex. If NULL (default), vertices are not
 #'   annotated.
 #'
-#' @param classifcation_threshold A number between 0 and 1 over which a
+#' @param v_cutoff A number between 0 and 1 over which a
 #'   recurrent state is classified
 #'
 #' @examples
@@ -61,7 +61,9 @@
 #' arrows(x0 = xy_prior["x"], x1 = xy_post["x"],
 #'        y0 = xy_prior["y"], y1 = xy_post["y"], length = 0.1)
 #' @export
-plot_simplex <- function(v_labels = NULL, classifcation_threshold = NULL) {
+plot_simplex <- function(v_labels = NULL,
+                         v_cutoff = NULL,
+                         v_colors = c("purple","yellow","red")) {
 
   # Define some constants:
   h <- sqrt(3)/2 # Height of equilateral triangle with unit sides
@@ -78,13 +80,16 @@ plot_simplex <- function(v_labels = NULL, classifcation_threshold = NULL) {
 
   # Annotate vertices:
   if (!is.null(v_labels)) {
-    graphics::text(x = c(0, -0.5, 0.5), y = c(r, -k, -k), labels = v_labels, pos = c(3,1,1))
+    graphics::text(x = c(0, -0.5, 0.5),
+                   y = c(r, -k, -k),
+                   labels = v_labels,
+                   pos = c(3,1,1))
   }
 
-  if(!is.null(classifcation_threshold)) {
+  if(!is.null(v_cutoff)) {
 
-    ct <- classifcation_threshold
-    if(ct < 0 | ct > 1) stop("The classifcation_threshold should be a number between 0 and 1")
+    ct <- v_cutoff
+    if(ct < 0 | ct > 1) stop("The v_cutoff should be a number between 0 and 1")
 
     # Project critical points
     xyCLI <- project2D(c(1/3,1/3,1/3))
@@ -100,18 +105,19 @@ plot_simplex <- function(v_labels = NULL, classifcation_threshold = NULL) {
     p1 <- rbind(xyL, xyCL, xyCLI, xyLI)
     p2 <- rbind(xyC, xyCI, xyCLI, xyCL)
     p3 <- rbind(xyI, xyLI, xyCLI, xyCI)
-    graphics::polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = grDevices::adjustcolor("purple", alpha.f = 0.35))
-    graphics::polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = grDevices::adjustcolor("yellow", alpha.f = 0.35))
-    graphics::polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = grDevices::adjustcolor("red", alpha.f = 0.35))
+
+    graphics::polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = grDevices::adjustcolor(v_colors[1], alpha.f = 0.35))
+    graphics::polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = grDevices::adjustcolor(v_colors[2], alpha.f = 0.35))
+    graphics::polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = grDevices::adjustcolor(v_colors[3], alpha.f = 0.35))
 
     # Delineate strong classification
     # (more than 0.5 posterior probability for one state)
     p1 <- rbind(xyL, xyCL, xyLI)
     p2 <- rbind(xyC, xyCI, xyCL)
     p3 <- rbind(xyI, xyLI, xyCI)
-    graphics::polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = "purple")
-    graphics::polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = "yellow")
-    graphics::polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = "red")
+    graphics::polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = v_colors[1])
+    graphics::polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = v_colors[2])
+    graphics::polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = v_colors[3])
   }
 
 }
