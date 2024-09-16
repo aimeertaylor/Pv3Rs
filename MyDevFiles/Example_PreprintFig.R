@@ -51,10 +51,10 @@ recrude <- as.list(strangers[,3])
 reinfec <- as.list(strangers[,4])
 
 # Make data
-y <- list("initial episode (day 0)" = initial,
-          "1st recurence (day XXX)" = relapse,
-          "2nd recurence (day XXX)" = recrude,
-          "3rd recurence (day XXX)" = reinfec)
+y <- list("Day 0 episode" = initial,
+          "Day 40 recurrence" = relapse,
+          "Day 70 recurrence" = recrude,
+          "Day 200 recurrence" = reinfec)
 
 # Make phased data
 y_phased <- list(as.list(children[3,]),
@@ -67,7 +67,7 @@ plot_data(ys = list(example = y_phased), fs = fs, marker_annotate = F)
 plot_data(ys = list(example = y), fs = fs, marker_annotate = F)
 
 # Reduce the number of markers evaluated
-for(n_markers_eval in c(4,5,10)){
+n_markers_eval <- 2
 
 y_eval <- sapply(y, function(x) x[1:n_markers_eval], USE.NAMES = T, simplify = F)
 
@@ -81,10 +81,9 @@ which.max(post$joint) # Most likely sequence
 
 # Plot result on the simplex:
 xy <- apply(post$marg, 1, project2D)
-plot_simplex(v_labels = c("Recrudescence", "Relapse", "Reinfection"), 0.5)
-points(x = xy["x",], xy["y",], pch = 21, cex = 2,
-       bg = c("purple", "yellow", "red", fg = "black"))
-}
+plot_simplex(v_labels = c("", "", ""), 0.5, c("purple", "blue", "red")) # make it so can pass more information
+points(x = xy["x",], xy["y",], pch = 20, cex = 4)
+
 
 # Most likely graph
 pdf("~/Dropbox/Presentations_Slides_Figures_Posters/Presentations/GEM_2024/Example_graph", width = 7, height = 3)
