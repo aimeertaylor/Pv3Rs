@@ -4,24 +4,33 @@
 \alias{plot_simplex}
 \title{Plots a 2D simplex}
 \usage{
-plot_simplex(v_labels = NULL, classifcation_threshold = NULL)
+plot_simplex(
+  v_labels = NULL,
+  v_cutoff = NULL,
+  v_colours = c("yellow", "purple", "red")
+)
 }
 \arguments{
-\item{v_labels}{A vector of labels with which to annotate vertices
-anticlockwise from the top vertex. If NULL (default), vertices are not
-annotated.}
+\item{v_labels}{A vector of labels that annotate vertices anticlockwise from
+top. If NULL (default), vertices are not annotated.}
 
-\item{classifcation_threshold}{A number between 0 and 1 over which a
-recurrent state is classified}
+\item{v_cutoff}{An arbitrary number between 0.5 and 1 that separates regions
+of low and high probability; e.g., regions where the most probable cause of
+a recurrence could be classified as uncertain versus relatively certain.}
+
+\item{v_colours}{A vector of colours associated with the vertices
+anticlockwise from top; see example below.}
 }
 \description{
-Plots a 2D simplex, a triangle with unit sides centered at the origin, to
-which marginal posterior probabilities of the 3Rs can be added; see
-\code{\link[=project2D]{project2D()}} and examples below.
+Plots a 2D simplex, a triangle with unit sides centred at the origin, onto
+which marginal posterior probabilities of relapse, reinfection and
+recrudescence (or any other vector of three numbers in zero to one summing to
+one) can be projected; see \code{\link[=project2D]{project2D()}} and examples below.
 }
 \examples{
 # Plot 2D simplex
-plot_simplex()
+plot_simplex(v_labels = c("Recrudescence", "Reinfection", "Relapse"),
+             v_cutoff = 0.75)
 
 xy <- project2D(v = c("C" = 1, "L" = 0, "I" = 0))
 points(x = xy["x"], xy["y"], pch = "C")
@@ -34,6 +43,7 @@ graphics::text(x = xy["x"], xy["y"], labels = "(0,1,0)")
 xy <- project2D(v = c("C" = 0, "L" = 0, "I" = 1))
 points(x = xy["x"], xy["y"], pch = "I")
 graphics::text(x = xy["x"], xy["y"], labels = "(0,0,1)")
+
 
 # ==============================================================================
 # Given data on an enrollment episode and a recurrence,
@@ -56,14 +66,15 @@ prior <- array(c(0.2, 0.3, 0.5), dim = c(1,3),
 # Compute posterior probabilities
 post <- compute_posterior(y, fs, prior)
 
-# Project marginal prior probabilities onto x and y coordinates:
+# Projev_cutoff marginal prior probabilities onto x and y coordinates:
 xy_prior <- project2D(as.vector(prior))
 
-# Project marginal posterior probabilities onto x and y coordinates:
+# Projev_cutoff marginal posterior probabilities onto x and y coordinates:
 xy_post <- project2D(as.vector(post$marg))
 
-# Plot simplex
-plot_simplex(colnames(post$marg))
+# Plot simplex with probability greater than 0.8 considered relatively
+# certain
+plot_simplex(colnames(post$marg), 0.8)
 
 # Plot the deviation of the posterior from the prior
 arrows(x0 = xy_prior["x"], x1 = xy_post["x"],

@@ -94,7 +94,7 @@ par(mar = rep(0.1,4))
 plot_simplex(v_labels = c(C = "Recrudescence", 
                           L = "Relapse", 
                           I = "Reinfection")[colnames(post$marg)], 
-             classifcation_threshold = 0.5)
+             v_cutoff = 0.75)
 
 # Project marginal posterior probabilties onto 2D coordinates
 xy <- apply(post$marg, 1, project2D) 

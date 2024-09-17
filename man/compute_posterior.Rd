@@ -127,7 +127,7 @@ pardefault <- par()
 par(mar = c(0,0,0,0))
 vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
 plot_simplex(v_labels = vertex_names[colnames(posterior_probs$marg)],
-            classifcation_threshold = 0.5)
+             v_cutoff = 0.9)
 xy <- project2D(posterior_probs$marg[1,]) # Project onto 2D coordinates
 points(x = xy["x"], y = xy["y"], pch = 20) # Plot projection on the simplex
 par(mar = pardefault$mar) # Restore plotting margins
@@ -238,7 +238,7 @@ n_recur <- max(sapply(ys, length)-1)
 pardefault <- par()
 par(mar = c(0,0,0,0))
 vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
-plot_simplex(v_labels = vertex_names[rownames(first_recur)], classifcation_threshold = 0.5)
+plot_simplex(v_labels = vertex_names[rownames(first_recur)], v_cutoff = 0.9)
 
 # Project probabilities onto 2D simplex coordinates
 xy <- apply(first_recur, 2, project2D)

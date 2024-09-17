@@ -7,19 +7,21 @@
 project2D(v)
 }
 \arguments{
-\item{v}{A numeric vector of three probabilities that sum to one.}
+\item{v}{A numeric vector of three numbers in zero to one that sum to one.}
 }
 \value{
 A numeric vector of two coordinates that can be used to plot the
-probability vector \code{v} on the origin-centered 2D simplex (see \code{\link[=plot_simplex]{plot_simplex()}}), where the top,
-left, and right vertices of the simplex correspond with the first, second
-and third entries of \code{v} respectively.
+probability vector \code{v} on the origin-centred 2D simplex (see
+\code{\link[=plot_simplex]{plot_simplex()}}), where the top, left, and right vertices of the simplex
+correspond with the first, second and third entries of \code{v}
+respectively.
 }
 \description{
 Project three probabilities that sum to one (e.g., the marginal probabilities
-of the 3Rs) onto the coordinates of a 2D simplex centered at the origin
-(i.e., a triangle centered at (0,0) with unit sides).
+of the 3Rs) onto the coordinates of a 2D simplex centred at the origin
+(i.e., a triangle centred at (0,0) with unit sides).
 }
 \examples{
 project2D(v = c(0.75,0.20,0.05))
+
 }
