@@ -17,8 +17,7 @@
 #'
 #' @examples
 #' # Plot 2D simplex
-#' plot_simplex(v_labels = c("Recrudescence", "Reinfection", "Relapse"),
-#'              v_cutoff = 0.75)
+#' plot_simplex()
 #'
 #' xy <- project2D(v = c("C" = 1, "L" = 0, "I" = 0))
 #' points(x = xy["x"], xy["y"], pch = "C")
