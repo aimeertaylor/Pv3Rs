@@ -67,7 +67,7 @@ plot_data(ys = list(example = y_phased), fs = fs, marker_annotate = F)
 plot_data(ys = list(example = y), fs = fs, marker_annotate = F)
 
 # Reduce the number of markers evaluated
-n_markers_eval <- 2
+n_markers_eval <- 8
 
 y_eval <- sapply(y, function(x) x[1:n_markers_eval], USE.NAMES = T, simplify = F)
 
@@ -76,17 +76,15 @@ post <- compute_posterior(y_eval, fs, return.RG=TRUE, return.logp=TRUE)
 colnames(post$marg) <- c("Recrudesence", "Relapse", "Reinfection")
 
 # Extract results
-round(post$marg,2) # Marginal probabilities
+round(post$marg,4) # Marginal probabilities
 which.max(post$joint) # Most likely sequence
 
 # Plot result on the simplex:
 xy <- apply(post$marg, 1, project2D)
-plot_simplex(v_labels = c("", "", ""), 0.5, c("purple", "blue", "red")) # make it so can pass more information
+plot_simplex(v_labels = c("", "", ""), 0.75, c("blue", "purple", "red")) # make it so can pass more information
 points(x = xy["x",], xy["y",], pch = 20, cex = 4)
 
-
 # Most likely graph
-pdf("~/Dropbox/Presentations_Slides_Figures_Posters/Presentations/GEM_2024/Example_graph", width = 7, height = 3)
 RGlogp <- sapply(post$RGs, function(RG) RG$logp)
 RG <- post$RGs[[which.max(RGlogp)]]
 MOIs <- determine_MOIs(y)
@@ -95,4 +93,4 @@ ts_per_gs <- rep(1:length(MOIs), MOIs)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0, vertex.size=20, vertex_palette = "Blues")
 seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
-dev.off()
+
