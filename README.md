@@ -14,8 +14,8 @@ correction regardless of the analytical method (e.g., it could be used to
 visualise *Plasmodium falciparum* data intended for analysis using a WHO match
 counting algorithm).
 
-- `Pv3Rs::plot_simplex` and `Pv3Rs::project2D` can be used to plot a vector of
-any three numbers in 0 to 1 that sum to one.
+- Together, `Pv3Rs::plot_simplex` and `Pv3Rs::project2D` can be used to plot a 
+vector of any three numbers between 0 and 1 that sum to one.
 
 ## Please be aware of the following points!
 
@@ -44,21 +44,22 @@ preceding infection, both recrudescence and relapse are plausible).
 
 - The main Pv3Rs function, `compute_posterior()`, could be used to estimate the
 probable cause of recurrent *P. falciparum* malaria by setting the prior
-probability of relapse to zero. However, for *P. falciparum* recurrent state
-inference, the current version of Pv3Rs is suboptimal: genotyping errors, which
+probability of relapse to zero. However, the current version of Pv3Rs is 
+suboptimal for *P. falciparum* recurrent state inference: genotyping errors, which
 are not accounted for under the current Pv3Rs model, are liable to lead to the
-misclassification of recrudescence as relapse.
+misclassification of recrudescence as reinfection when relapse is suppressed.
 
 ### Notable assumptions: 
 
-3) Relationship graphs compatible with a given state are equally likely *a priori*
-4) Perfect detection of alleles (no genotyping error)
+1) Relationship graphs compatible with a given sequence of recurrent states are
+equally likely *a priori*
+2) Perfect detection of alleles (no genotyping error)
 3) Perfect detection of parasites (problematic for low density clones)
-2) Perfect detection of episodes (requires active follow up) 
-1) Mutually exclusive recurrent states (requires frequent follow up with treatment)
-2) No within-host *de novo* mutations 
-6) Parasite population is outbred
-5) All siblings are regular siblings
+4) Perfect detection of episodes (requires active follow up) 
+5) Mutually exclusive recurrent states (requires frequent follow up with treatment)
+6) No within-host *de novo* mutations 
+7) Parasite population is outbred
+8) All siblings are regular siblings
     - Siblings are transitive (not true of some parent child-like sibling trios)
     - Siblings are independent (not true of meiotic siblings)
     - Siblings draw from at most two parents (not true of half-siblings)
@@ -77,7 +78,7 @@ recrudescence. An example will be provided in an upcoming vignette.
 - Pv3Rs scales to 100s of markers but not whole-genome sequence (WGS) data.  
 
 - We do not recommend running `Pv3Rs::compute_posterior()` for data whose total 
-genotype count (sum of per-episode multiplicities of infection, exceeds eight).
+genotype count (sum of per-episode multiplicities of infection) exceeds eight.
 If the total genotype counts exceeds eight but there are multiple recurrences,
 it might be possible to generate recurrent state estimates for individual
 recurrences (this approach was used in [2]).
