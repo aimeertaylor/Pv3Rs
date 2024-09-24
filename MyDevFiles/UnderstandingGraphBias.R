@@ -4,6 +4,102 @@
 ################################################################################
 rm(list = ls())
 
+# Understanding behaviour
+
+#===============================================================================
+# Example for data on a single episode (no recurrent data) using recurrences to
+# change relationship graph structure.
+#
+# Adding recurrences has very little impact when data are limited to a single
+# episode: no limits are imposed on relationship graphs.
+#===============================================================================
+# Allele frequencies:
+f_rare <- 0.001
+fs <- list(m1 = setNames(c(f_rare, 1-f_rare), c("A", "Other")))
+
+# The number of recurrences increases but only the first recurrence has data
+ys_homo <- list(list(list(m1 = "A"), list(m1 = NA)), # 1 recurrence
+                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA)), # 2 recurrences
+                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA)), # etc.
+                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
+
+# The number of recurrences increases and all have the same data
+ys_het <- list(list(list(m1 = c("A", "Other")), list(m1 = NA)),  # 1 recurrence
+               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA)), # 2 recurrences
+               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA), list(m1 = NA)), # etc.
+               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
+
+# Compute posterior probabilities and extract marginal probabilities:
+results_hom <- lapply(ys_homo, function(y) compute_posterior(y, fs)$marg)
+results_het <- lapply(ys_het, function(y) compute_posterior(y, fs)$marg)
+
+# Extract results for the first recurrence only:
+first_recur_hom <- sapply(results_hom, function(result) result[1,])
+first_recur_het <- sapply(results_het, function(result) result[1,])
+
+# Project probabilities onto 2D simplex coordinates
+xy_hom <- apply(first_recur_hom, 2, project2D)
+xy_het <- apply(first_recur_het, 2, project2D)
+
+# Plot 2D simplex:het
+par(mfrow = c(1,1))
+plot_simplex(vertex_names[colnames(results_het[[1]])],  0.5)
+points(x = xy_hom["x", ], y = xy_hom["y", ], pch = 20, col = "hotpink")
+points(x = xy_het["x", ], y = xy_het["y", ], pch = 20, col = "blue")
+legend("topright", inset = 0.1, col = c("hotpink", "blue"), pch = 20, bty = "n",
+       legend = c("Homoallelic", "Heteroallelic"))
+
+
+#===============================================================================
+# Example with recurrent data using multiple recurrences to change graph
+# structure. This is the long version of the example on ?compute_posterior
+#
+# The marginal probability that the first recurrence is a recrudescence
+# increases at a decreasing rate as the graph grows without data. Decreasing the
+# frequency of the observed allele decreases the probability of reinfection.
+# (try changing f_rare).
+#===============================================================================
+# Allele frequencies:
+f_rare <- 0.001
+fs <- list(m1 = setNames(c(f_rare, 1-f_rare), c("A", "Other")))
+
+# The number of recurrences increases but only the first recurrence has data
+ys <- list(list(list(m1 = "A"), list(m1 = "A")), # 1 recurrence
+           list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA)), # 2 recurrences
+           list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA)), # etc.
+           list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
+
+# Expectation for a rare repeat allele
+MOIs <- lapply(ys, determine_MOIs) # First, get MOIs
+graph_frac_first <- sapply(1:length(MOIs), FUN = function(i) {
+  stuff <- get_graph_stuff(MOIs[[i]])
+  # RGs compatible with recrudescence at the first recurrence
+  RGs_C_first <- sapply(stuff$CIL_gvn_RGs, function(x) "C" %in% do.call(rbind, strsplit(x, split = ""))[,1])
+  # RGs compatible with recrudescence or relapse at the first recurrence
+  RGs_C_or_L_first <- sapply(stuff$CIL_gvn_RGs, function(x) !("I" %in% do.call(rbind, strsplit(x, split = ""))[,1]))
+  RGs_edges <- lapply(stuff$RGs, function(RG) igraph::as_ids(igraph::E(RG)))
+  RGs_g1g2_edge <- sapply(RGs_edges, function(RG_E) all("g1|g2" %in% RG_E)) # A clone between the first and second infection
+  graph_frac_unnormalised <- c(frac_C = sum(RGs_g1g2_edge*RGs_C_first)/sum(RGs_C_first),
+                               frac_L = sum(RGs_g1g2_edge*RGs_C_or_L_first)/length(stuff$RGs),
+                               frac_I = 0)
+  graph_frac <- graph_frac_unnormalised/sum(graph_frac_unnormalised)
+  return(graph_frac)
+})
+
+# Compute posterior probabilities, extract marginal probabilities:
+results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
+results_first <- sapply(results, function(result) result[1,]) # Extract 1st recurrence results
+
+# Plot 2D simplex
+plot_simplex(vertex_names, 0.5)
+xy <- apply(results_first, 2, project2D)
+points(x = xy["x", ], y = xy["y", ], pch = "-", col = 1:length(ys), cex = 1)
+xy <- apply(graph_frac_first, 2, project2D)
+points(x = xy["x", ], y = xy["y", ], col = 1:length(ys), cex = 1)
+legend("right", col = 1:length(ys), pch = "-", pt.cex = 2, bty = "n",
+       legend = 1:length(ys), title = "Recurrence \n count")
+
+
 # Simplex plot parameters
 pardefault <- par()
 vertex_names <- c(C = "Recrudescence", L = "Relapse", I = "Reinfection")
@@ -22,7 +118,6 @@ get_graph_stuff <- function(x) {
 
 # ==============================================================================
 # Marginal probabilities of different recurrences with the same data differ
-# slightly
 # ==============================================================================
 fs <- list(m1 = setNames(c(0.25, 1-0.25), c("A", "Other")))
 y <- list(list(m1 = "A"), list(m1 = "A"), list(m1 = "A"), list(m1 = "A"))
@@ -31,7 +126,7 @@ compute_posterior(y, fs)$marg
 
 #===============================================================================
 # Example for data on a single episode (no recurrent data) using MOIs to change
-# graph structure.
+# graph structure (and also data)
 #
 # A rare homoallelic call has large effect (it limits the summation over
 # relationship graphs to those with intra-episode sibling edges). A
@@ -100,7 +195,7 @@ xy_graph_frac_hom <- apply(graph_frac_hom, 2, project2D)
 par(mfrow = c(1,2))
 
 # Plot 2D simplex:hom
-plot_simplex(vertex_names[colnames(results_hom)], classifcation_threshold = 0.5)
+plot_simplex(vertex_names[colnames(results_hom)], 0.5)
 points(x = xy_graph_frac_hom["x", ], y = xy_graph_frac_hom["y", ], col = 1:length(MOIs), cex = 2)
 points(x = xy_hom["x", ], y = xy_hom["y", ], pch = 20, cex = 1, col = 1:length(MOIs))
 
@@ -111,106 +206,12 @@ legend("left", col = 1:length(MOIs), pch = 20, title = "MOIs", inset = 0,
        legend = sapply(MOIs, paste, collapse = " & "), bty = "n")
 
 # Plot 2D simplex:het
-plot_simplex(vertex_names[colnames(results_het)], classifcation_threshold = 0.5)
+plot_simplex(vertex_names[colnames(results_het)], 0.5)
 points(x = xy_graph_frac_het["x", ], y = xy_graph_frac_het["y", ], col = (1:length(MOIs))[-1], cex = 2)
 points(x = xy_het["x", ], y = xy_het["y", ], col = (1:length(MOIs))[-1], pch = 20)
 
 
 
-#===============================================================================
-# Example for data on a single episode (no recurrent data) using recurrences to
-# change relationship graph structure.
-#
-# Adding recurrences has very little impact when data are limited to a single
-# episode: no limits are imposed on relationship graphs.
-#===============================================================================
-# Allele frequencies:
-f_rare <- 0.001
-fs <- list(m1 = setNames(c(f_rare, 1-f_rare), c("A", "Other")))
-
-# The number of recurrences increases but only the first recurrence has data
-ys_homo <- list(list(list(m1 = "A"), list(m1 = NA)), # 1 recurrence
-                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA)), # 2 recurrences
-                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA)), # etc.
-                list(list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
-
-# The number of recurrences increases and all have the same data
-ys_het <- list(list(list(m1 = c("A", "Other")), list(m1 = NA)),  # 1 recurrence
-               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA)), # 2 recurrences
-               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA), list(m1 = NA)), # etc.
-               list(list(m1 = c("A", "Other")), list(m1 = NA), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
-
-# Compute posterior probabilities and extract marginal probabilities:
-results_hom <- lapply(ys_homo, function(y) compute_posterior(y, fs)$marg)
-results_het <- lapply(ys_het, function(y) compute_posterior(y, fs)$marg)
-
-# Extract results for the first recurrence only:
-first_recur_hom <- sapply(results_hom, function(result) result[1,])
-first_recur_het <- sapply(results_het, function(result) result[1,])
-
-# Project probabilities onto 2D simplex coordinates
-xy_hom <- apply(first_recur_hom, 2, project2D)
-xy_het <- apply(first_recur_het, 2, project2D)
-
-# Plot 2D simplex:het
-par(mfrow = c(1,1))
-plot_simplex(vertex_names[colnames(results_het[[1]])],  0.5)
-points(x = xy_hom["x", ], y = xy_hom["y", ], pch = 20, col = "hotpink")
-points(x = xy_het["x", ], y = xy_het["y", ], pch = 20, col = "blue")
-legend("topright", inset = 0.1, col = c("hotpink", "blue"), pch = 20, bty = "n",
-       legend = c("Homoallelic", "Heteroallelic"))
-
-
-#===============================================================================
-# Example with recurrent data using multiple recurrences to change graph
-# structure.
-#
-# The marginal probability that the first recurrence is a recrudescence
-# increases at a decreasing rate as the graph grows without data. Decreasing the
-# frequency of the observed allele decreases the probability of reinfection.
-# (try changing f_rare).
-#===============================================================================
-# Allele frequencies:
-f_rare <- 0.01
-fs <- list(m1 = setNames(c(f_rare, 1-f_rare), c("A", "Other")))
-
-# The number of recurrences increases but only the first recurrence has data
-ys <- list(list(list(m1 = "A"), list(m1 = "A")), # 1 recurrence
-           list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA)), # 2 recurrences
-           list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA)), # etc.
-           list(list(m1 = "A"), list(m1 = "A"), list(m1 = NA), list(m1 = NA), list(m1 = NA)))
-
-# Expectation for a rare repeat allele
-MOIs <- lapply(ys, determine_MOIs) # First, get MOIs
-graph_frac_first <- sapply(1:length(MOIs), FUN = function(i) {
-  stuff <- get_graph_stuff(MOIs[[i]])
-  # RGs compatible with recrudescence at the first recurrence
-  RGs_C_first <- sapply(stuff$CIL_gvn_RGs, function(x) "C" %in% do.call(rbind, strsplit(x, split = ""))[,1])
-  # RGs compatible with recrudescence or relapse at the first recurrence
-  RGs_C_or_L_first <- sapply(stuff$CIL_gvn_RGs, function(x) !("I" %in% do.call(rbind, strsplit(x, split = ""))[,1]))
-  RGs_edges <- lapply(stuff$RGs, function(RG) igraph::as_ids(igraph::E(RG)))
-  RGs_g1g2_edge <- sapply(RGs_edges, function(RG_E) all("g1|g2" %in% RG_E)) # A clone between the first and second infection
-  graph_frac_unnormalised <- c(frac_C = sum(RGs_g1g2_edge*RGs_C_first)/sum(RGs_C_first),
-                               frac_L = sum(RGs_g1g2_edge*RGs_C_or_L_first)/length(stuff$RGs),
-                               frac_I = 0)
-  graph_frac <- graph_frac_unnormalised/sum(graph_frac_unnormalised)
-  return(graph_frac)
-})
-
-# Compute posterior probabilities, extract marginal probabilities:
-results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
-results_first <- sapply(results, function(result) result[1,]) # Extract 1st recurrence results
-
-# Project onto simplex
-xy <- apply(results_first, 2, project2D)
-xy <- apply(graph_frac_first, 2, project2D)
-
-# Plot divergence on 2D simplex
-plot_simplex(vertex_names, 0.5)
-points(x = xy["x", ], y = xy["y", ], pch = "-", col = 1:length(ys), cex = 1)
-points(x = xy["x", ], y = xy["y", ], col = 1:length(ys), cex = 1)
-legend("right", col = 1:length(ys), pch = "-", pt.cex = 2, bty = "n",
-       legend = 1:length(ys), title = "Recurrence \n count")
 
 
 #===============================================================================
