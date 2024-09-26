@@ -1,8 +1,7 @@
 ################################################################################
-# Plot results for an initial infection of two meiotic siblings (and three in a
+# Plot results for an initial infection of MOI=2 meiotic siblings (plus MOI=3 in a
 # sibling case) and a MOI=1 case recurrence which is either a stranger, clone,
-# regular sibling (i.e., a full sibling drawn independently), or meiotic sibling
-# (i.e. a full sibling drawn dependently).
+# regular sibling, or meiotic sibling.
 #
 # For each case, plot results when alleles are equifrequent and data are
 # available on all marker counts, and when alleles are not equifrequent and data
@@ -22,6 +21,8 @@
 # data from parents. As such, infections with three meiotic siblings are liable
 # to be classified as infections of strangers with a clonal edge to a sibling
 # relapse (regular or meiotic).
+#
+# Thing to add: where they are converging to (see Understanding Graph bias)
 ################################################################################
 
 # Set working directory to source file location
@@ -65,10 +66,10 @@ for(case in cases){
   # Plot simplex (helpful when the posterior evades the expected state)
   par(mar = c(0,0,0,0))
   V_labels <- c("Recrudescence", "Relapse", "Reinfection")
-  plot_simplex(v_labels =  V_labels, classifcation_threshold = 0.5)
+  plot_simplex(v_labels =  V_labels, v_cutoff = 0.5)
   for(MOIs in MOIs_per_infection) {
     LTY = ifelse(MOIs == "2_1", 1, 2)
-    for(i in n_repeats){
+    for(i in 3){
       xy_post <- cbind(c(0,0), apply(do.call(rbind, ps_store_all_ms[[MOIs]][[as.character(i)]]), 1, project2D))
       lines(x = xy_post["x",], y = xy_post["y",], lty = LTY)
       points(x = xy_post["x",], y = xy_post["y",], pch = "-")}
