@@ -1,11 +1,8 @@
 ################################################################################
-# Simulate data and generate results for a initial infection of meiotic siblings
-# and a MOI=1 case recurrence, where the case recurrence is either
-#
-# a stranger, a clone, a regular sibling (i.e., a full sibling drawn
-# independently), or a meiotic sibling (i.e. a full sibling drawn dependently).
-#
-# The MOI of the initial infection is two or three in a sibling case.
+# Simulate data and generate results for a initial infection of MOI=2 meiotic
+# siblings (plus MOI=3 in a sibling case) and a MOI=1 case recurrence, where the
+# case recurrence is either a stranger, a clone, a regular sibling, or a meiotic
+# sibling.
 #
 # For each case, generate results for data on all marker counts when alleles are
 # equifrequent, and for a subset of marker counts when alleles are not
