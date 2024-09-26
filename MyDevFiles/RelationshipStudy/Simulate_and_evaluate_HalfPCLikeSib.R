@@ -1,4 +1,27 @@
 ################################################################################
+# Simulate data and generate results for a initial infection of MOI=2 siblings
+# and a MOI=1 recurrence of a sibling, where siblings are either parent
+# child-like siblings or half siblings.
+#
+# In the ParentChildLike case, the recombinant is in the MOI=2 initial
+# infection.
+#
+# In both cases, explore two scenarios. One where parents draw from the same
+# allele distribution. Another the first parent who parents initial parasites
+# only, draws rare alleles with high probability (worse case scenario).
+# Otherwise stated:
+#
+# Half siblings:
+# initial <- rbind(child12, child13) # migrant is 1
+# relapse <- rbind(child23)
+#
+# Parent child-like siblings:
+# initial <- rbind(child1, child12) # migrant is 1
+# relapse <- rbind(child2)
+#
+# For each case, generate results for data on all marker counts when alleles are
+# equifrequent, and for a subset of marker counts when alleles are not
+# equifrequent.
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
