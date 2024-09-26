@@ -147,15 +147,14 @@ fs <- list(marker1 = c("Tinky Winky" = 0.4, "Dipsy" = 0.6),
 # Compute posterior probabilities using default prior
 posterior_probs <- compute_posterior(y, fs)
 
-# Plot posterior probabilities on the simplex
-plot_simplex(v_labels = c("Recrudescence", "Relapse", "Reinfection"),
-             v_cutoff = 0.9)
-xy <- project2D(posterior_probs$marg[1,]) # Project onto 2D coordinates
-points(x = xy["x"], y = xy["y"], pch = 20) # Plot projection on the simplex
+# Plot marginal probabilities
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.8) # Plot simplex
+xy <- project2D(posterior_probs$marg[1,]) # Project probabilities onto simplex
+points(x = xy["x"], y = xy["y"], pch = 20) # Plot projected probabilities
 
 
 #============================================================================
-# Example demonstrating the return of the prior when all data are missing
+# Demonstrating the return of the prior when all data are missing
 #============================================================================
 # Data
 y_missing <- list(enroll = list(m1 = NA),
@@ -176,7 +175,7 @@ suppressMessages(compute_posterior(y_missing, fs = list(m1 = c("A" = 1)),
 
 
 # ===========================================================================
-# Example demonstrating the cosmetic-only nature of episode names
+# Demonstrating the cosmetic-only nature of episode names
 # ===========================================================================
 # Data
 y <- list(enroll = list(m1 = NA),
@@ -195,7 +194,7 @@ prior
 
 
 #============================================================================
-# Example demonstrating the informative nature of non-recurrent data
+# Demonstrating the informative nature of non-recurrent data
 #============================================================================
 # Data and allele frequencies
 y_het <- list(list(m1 = c('1', '2')), list(m1 = NA))
@@ -210,13 +209,12 @@ suppressMessages(compute_posterior(y = y_hom, fs, MOIs = c(2,1)))$marg
 
 
 #============================================================================
-# Example of the effect on the posterior of increasingly large relationship
-# graphs: The marginal probabilities of the first recurrence change as the
-# number of recurrences increases even though only the first recurrence has
-# data.
+# Demonstrating the effect of increasingly large relationship graphs: the
+# marginal probability of the first recurrence changes slightly, albeit at a
+# decreasing rate, as the number of additional recurrences (all without data)
+# increases. The change is greatest when the observed allele is rare.
 #============================================================================
-# Data for different scenarios where the number of recurrences increases
-# but only the first recurrence has data
+# Data for different recurrence counts where only the 1st recurrence has data
 ys <- list(scenario1 = list(enroll = list(m1 = "A"),
                             recur1 = list(m1 = "A")),
            scenario2 = list(enroll = list(m1 = "A"),
@@ -233,7 +231,7 @@ ys <- list(scenario1 = list(enroll = list(m1 = "A"),
                             recur4 = list(m1 = NA)))
 
 # Allele frequencies
-fs <- list(m1 = c("A" = 0.25, "Other" = 1-0.25))
+f_A <- 0.01; fs <- list(m1 = c("A" = f_A, "Other" = 1-f_A))
 
 # Compute posterior probabilities and extract marginal probabilities
 results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
@@ -242,21 +240,11 @@ results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
 results_recur1 <- sapply(results, function(result) result[1,])
 results_recur1 # Results are different for different scenarios
 
-# ---------------------------------------------------------------------------
-# Visualise the difference for the first recurrence
-# ---------------------------------------------------------------------------
-# Plot simplex
-plot_simplex(v_labels = c("Recrudescence", "Relapse", "Reinfection"),
-             v_cutoff = 0.9)
-
-# Project probabilities onto 2D simplex coordinates
-xy <- apply(results_recur1, 2, project2D)
-
-# Plot divergence from one recurrence to four
-arrows(x0 = xy["x", 1], x1 = xy["x", 4], y0 = xy["y", 1], y1 = xy["y", 4],
-       length = 0.05, col = "red")
-
-# Plot a point for each recurrence from one to four:
-points(x = xy["x", ], y = xy["y", ], pch = ".")
+# Visualise the change in the marginal probability of the first recurrence
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.8) # Plot simplex
+xy <- apply(results_recur1, 2, project2D) # Project probabilities onto simplex
+points(x = xy["x", ], y = xy["y", ], pch = "-", col = 1:4) # Plot projections
+legend("left", col = 1:4, pch = "-", pt.cex = 2, bty = "n", legend = 1:4,
+title = "Recurrence \n count") # legend
 
 }
