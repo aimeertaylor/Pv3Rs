@@ -109,7 +109,7 @@ segments(x0 = exp_locus_type_props["Intra-match"],
 par(par_default)
 par(mar = c(0,0,0,0))
 V_labels <- c("Recrudescence", "Relapse", "Reinfection")
-plot_simplex(v_labels =  V_labels, classifcation_threshold = 0.5)
+plot_simplex(v_labels = V_labels, v_cutoff = 0.5)
 for(i in n_repeats){
   xy_post <- cbind(c(0,0), apply(do.call(rbind, ps_store_all_ms[[as.character(i)]]), 1, project2D))
   lines(x = xy_post["x",], y = xy_post["y",])

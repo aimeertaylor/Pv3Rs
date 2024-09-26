@@ -34,8 +34,7 @@ for(i in 1:n_repeats){
 
 # Plot simplex
 par(mar = c(0,0,0,0))
-V_labels <- c("Recrudescence", "Relapse", "Reinfection")
-plot_simplex(v_labels =  V_labels, classifcation_threshold = 0.5)
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5)
 for(i in n_repeats){
   xy_post <- cbind(c(0,0), apply(do.call(rbind, ps_store_all_ms[[as.character(i)]]), 1, project2D))
   lines(x = xy_post["x",], y = xy_post["y",])
