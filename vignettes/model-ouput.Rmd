@@ -1,0 +1,367 @@
+---
+title: "Understanding model behaviour"
+output: rmarkdown::html_vignette
+  toc: true
+vignette: >
+  %\VignetteIndexEntry{model-ouput}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%",
+  fig.dpi=300, # For quality 
+  fig.width=7
+)
+```
+
+```{r setup}
+library(Pv3Rs)
+```
+
+## Introduction
+
+In this vignette we demonstrate how the statistical model underpinning 
+`Pv3Rs::compute_posterior` behaves when it is well specified and misspecified. 
+
+* Posterior output when the model is well specified
+  + As a function of marker informativeness
+  + As a function of multiplicities of infection (MOIs)
+  + When there are no data
+
+* Posterior output when the model is misspecified because of 
+  + Genotyping errors or *de novo* mutations
+  + Meiotic siblings
+  + Parent child-like siblings
+  + Half siblings
+
+We have not yet characterised model misspecification due to inbred parasites. 
+
+## Well-specified model behaviour
+
+### Missing / limited data
+
+When data are entirely missing, `compute_posterior` returns the prior. 
+
+```{r}
+fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
+y = list(enrol = list(m1 = NA), recur = list(m1 = NA)) # Data
+suppressMessages(compute_posterior(y, fs))$marg # Posterior
+```
+
+When data are missing but the user provides MOIs that are incompatible with
+recrudescence, `compute_posterior` returns the prior re-weighted to the
+exclusion of recrudescence.
+
+```{r}
+fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
+y = list(enrol = list(m1 = NA), recur = list(m1 = NA)) # Data
+suppressMessages(compute_posterior(y, fs, MOIs = c(1,2)))$marg # Posterior
+```
+
+When genetic data are uninformative, `compute_posterior` returns the prior. 
+
+```{r}
+fs = list(m1 = c("A" = 1, "B" = 0)) # Allele frequencies
+y = list(list(m1 = "A"), recur = list(m1 = "A")) # Data
+suppressMessages(compute_posterior(y, fs))$marg # Posterior
+suppressMessages(compute_posterior(y, fs, MOIs = c(1,2)))$marg # Posterior
+```
+
+When a single allele repeat is common, all states are possible and the posterior
+is close to the prior.
+
+```{r}
+fs = list(m1 = c("A" = 0.95, "B" = 0.05)) # Allele frequencies
+y = list(enrol = list(m1 = "A"), recur = list(m1 = "A")) # Data
+suppressMessages(compute_posterior(y, fs))$marg # Posterior
+```
+
+#### Data on only one episode
+
+When only one episode has data and its MOI is one, `compute_posterior` returns
+the prior (possibly re-weighted to the exclusion of recrudescence, depending on
+the MOIs of the other episodes).
+
+```{r}
+# Allele frequencies
+fs = list(m1 = c("A" = 0.5, "B" = 0.5))
+
+# Data for different numbers of recurrences
+y <- list(enroll = list(m1 = NA), 
+          recur1 = list(m1 = "A"), 
+          recur2 = list(m1 = NA), 
+          recur3 = list(m1 = NA))
+
+# Marginal posterior probabilities given MOIs > 1 for episodes without data
+suppressMessages(compute_posterior(y, fs, MOIs = c(3,1,1,2)))$marg
+```
+
+When only one episode has data and its MOI is greater than one, the output of
+`compute_posterior` depends on the hetero/homoallelic nature of the data. 
+
+If the data are heteroallelic, the posterior remains close to the prior, both
+when the MOI increases with and without the number of alleles observed.
+
+Explanation: A heteroallelic call is compatible with intra-infection siblings
+and strangers. As such, a heteroallelic call does not constrain the summation
+over relationship graphs. However, for relationship graphs with intra-episode
+siblings, the heteroallelic data limits summation over identity-by-descent
+partitions to partitions with at least two cells for the episode with data. The
+lower bound on the cell count increases when the heteroallelic call is
+multiallelic.
+
+```{r}
+# Allele frequencies
+fs = list(m1 = c('A' = 0.2, 'B' = 0.2, 'C' = 0.2, 'D' = 0.2, 'E' = 0.2)) 
+
+# MOI increases with number of observed alleles 
+ys <- list(list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)), # Data 
+           list(enroll = list(m1 = c('A','B','C')), recur = list(m1 = NA)), 
+           list(enroll = list(m1 = c('A','B','C','D')), recur = list(m1 = NA)), 
+           list(enroll = list(m1 = c('A','B','C','D','E')), recur = list(m1 = NA)))
+do.call(rbind, lapply(ys, function(y) # Posterior 
+  suppressMessages(compute_posterior(y, fs)$marg))) 
+
+# MOI increases due to external input
+y <- list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data 
+MOIs <- list(c(3,1), c(2,2), c(3,2)) # MOIs
+do.call(rbind, lapply(MOIs, function(x) # Posterior 
+  suppressMessages(compute_posterior(y, fs, MOIs = x)$marg))) 
+```
+
+If the data are homoallelic and the allele is rare, the posterior departs from
+the prior because intra-episode rare allele repeats favour relationship graphs
+with intra-episode siblings.
+
+```{r}
+fs = list(m1 = c("A" = 0.001, "B" = 0.999)) # Allele frequencies
+y <- list(enroll = list(m1 = c('A')), recur = list(m1 = NA)) # Data 
+MOIs <- list(c(2,1), c(3,1), c(2,2), c(3,2), c(3,3)) # MOIs
+results <- do.call(rbind, lapply(MOIs, function(x) #  Posterior for different MOIs
+  suppressMessages(compute_posterior(y, fs, MOIs = x)$marg)))
+
+# Plot prior departure
+par(mar = c(0,0,0,0))
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
+xy <- apply(results, 1, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 20, cex = 1, col = 1:length(MOIs))
+legend("left", col = 1:length(MOIs), pch = 20, title = "MOIs", inset = 0,
+       legend = sapply(MOIs, paste, collapse = " & "), bty = "n")
+```
+
+Increasing the number of recurrences without adding data has little effect: the
+posterior is close to the value for a single recurrence. 
+
+```{r}
+# Allele frequencies (no impact)
+fs = list(m1 = c("A" = 0.001, "B" = 0.99)) # Allele frequencies
+
+# The number of recurrences increases but only the first recurrence has data
+ys <- list(one_recurrence = list(enroll = list(m1 = "A"), 
+                                     recur1 = list(m1 = NA)), 
+               two_recurrences = list(enroll = list(m1 = "A"), 
+                                      recur1 = list(m1 = NA), 
+                                      recur2 = list(m1 = NA)), 
+               three_recurrences = list(enroll = list(m1 = "A"), 
+                                        recur1 = list(m1 = NA), 
+                                        recur2 = list(m1 = NA), 
+                                        recur3 = list(m1 = NA)))
+
+# Compute posterior probabilities and extract marginal probabilities
+sapply(ys, function(y) {
+  suppressMessages(compute_posterior(y, fs, MOIs = c(2,2,rep(1, length(y)-2))))$marg[1,]
+})
+```
+
+#### Data on more than one episode
+
+When there are data on multiple episodes but no comparable data across episodes,
+`compute_posterior` behaves similarly to when data are limited to a single episode:
+
+- returns the prior when episodes with data have MOIs of one 
+- remains close to the prior when calls are heteroallelic
+- departs from the prior when calls are homoallelic and the allele is rare
+
+```{r}
+# Allele frequencies
+fs = list(m1 = c("A" = 0.001, "B" = 0.999), 
+          m2 = c("A" = 0.001, "B" = 0.999), 
+          m3 = c("A" = 0.001, "B" = 0.99))
+
+# Data for different numbers of recurrences
+y_hom <- list(enroll = list(m1 = "A", m2 = NA, m3 = NA), 
+          recur1 = list(m1 = NA, m2 = "A", m3 = NA), 
+          recur2 = list(m1 = NA, m2 = NA, m3 = "A"))
+
+y_het <- list(enroll = list(m1 = c("A", "B"), m2 = NA, m3 = NA), 
+          recur1 = list(m1 = NA, m2 = c("A", "B"), m3 = NA), 
+          recur2 = list(m1 = NA, m2 = NA, m3 = c("A", "B")))
+
+# Marginal posterior probabilities given MOIs > 1 for episodes without data
+suppressMessages(compute_posterior(y_hom, fs))$marg # Prior return 
+suppressMessages(compute_posterior(y_het, fs))$marg # Prior proximity
+suppressMessages(compute_posterior(y_hom, fs, MOIs = c(2,2,2)))$marg # Departure
+```
+
+Data on a single marker can quash the posterior probability of reinfection or
+recrudescence. More specifically, one rare match will quash the posterior
+probability of reinfection; one mismatch will quash the posterior probability of
+recrudescence. However, the output of `compute_posterior` is not the prior over
+recurrence states re-weighted to the exclusion of the quashed state. Rather, it
+is a transformation of the prior distribution over relationship graphs. This is
+demonstrated below: increasing the number of recurrences without adding data
+changes the prior distribution over relationship graphs and thus the posterior
+probabilities of relapse versus recrudescence (match data), and of relapse
+versus reinfection (mismatch data).
+
+```{r}
+# Data for different recurrence counts where only the 1st recurrence has data
+ys_match <- list(one_recurrence = list(enroll = list(m1 = "A"),
+                                       recur_match = list(m1 = "A")),
+                 two_recurrences = list(enroll = list(m1 = "A"),
+                                        recur_match = list(m1 = "A"),
+                                        recur2 = list(m1 = NA)),
+                 three_recurrences = list(enroll = list(m1 = "A"),
+                                          recur_match = list(m1 = "A"),
+                                          recur2 = list(m1 = NA),
+                                          recur3 = list(m1 = NA)),
+                 four_recurrences = list(enroll = list(m1 = "A"),
+                                         recur_match = list(m1 = "A"),
+                                         recur2 = list(m1 = NA),
+                                         recur3 = list(m1 = NA),
+                                         recur4 = list(m1 = NA)))
+
+# Data for different recurrence counts where only the 1st recurrence has data
+ys_mismatch <- list(one_recurrence = list(enroll = list(m1 = "A"),
+                                          recur_match = list(m1 = "B")),
+                    two_recurrences = list(enroll = list(m1 = "A"),
+                                           recur_match = list(m1 = "B"),
+                                           recur2 = list(m1 = NA)),
+                    three_recurrences = list(enroll = list(m1 = "A"),
+                                             recur_match = list(m1 = "B"),
+                                             recur2 = list(m1 = NA),
+                                             recur3 = list(m1 = NA)),
+                    four_recurrences = list(enroll = list(m1 = "A"),
+                                            recur_match = list(m1 = "B"),
+                                            recur2 = list(m1 = NA),
+                                            recur3 = list(m1 = NA),
+                                            recur4 = list(m1 = NA)))
+
+# Allele frequencies
+fs <- list(m1 = c("A" = 0.001, "B" = 0.999))
+
+# Compute posterior probabilities and extract marginal probabilities
+results_match <- lapply(ys_match, function(y) suppressMessages(compute_posterior(y, fs)$marg))
+results_mismatch <- lapply(ys_mismatch, function(y) suppressMessages(compute_posterior(y, fs)$marg))
+
+# Extract results for the first recurrence
+results_match_recur1 <- sapply(results_match, function(result) result[1,])
+results_mismatch_recur1 <- sapply(results_mismatch, function(result) result[1,])
+
+# Visualise the change in the marginal probability of the first recurrence
+par(mar = c(0,0,0,0))
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
+xy <- apply(results_match_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = "—", col = 1:4) # Plot projections
+text(x = mean(xy["x", ]), y = mean(xy["y", ]), labels = "match data", pos = 3) # Annotate
+xy <- apply(results_mismatch_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = "|", col = 1:4) # Plot projections
+text(x = mean(xy["x", ]), y = mean(xy["y", ]), labels = "mismatch data", pos = 3) # Annotate
+legend("left", col = 1:4, pch = "-", pt.cex = 2, bty = "n", legend = 1:4,
+       title = "Recurrence\ncount") # legend
+```
+
+Increasing MOIs also change the prior distribution over relationship graphs, and
+thus the posterior probabilities of relapse versus recrudescence (match data),
+and of relapse versus reinfection (mismatch data). However, when MOIs increase,
+the amount of data also increases.
+
+```{r}
+fs <- list(m1 = c("A" = 0.001, "B" = 0.999))
+MOIs <- list(c(1,1), c(2,1), c(3,1), c(2,2), c(3,2), c(3,3), c(4,2))
+results_match <- sapply(MOIs, function(x) 
+  suppressMessages(compute_posterior(y = ys_match[[1]], fs, MOIs = x)$marg))
+results_mismatch <- sapply(MOIs, function(x) 
+  suppressMessages(compute_posterior(y = ys_mismatch[[1]], fs, MOIs = x)$marg))
+ 
+par(mar = c(0,0,0,0)) # Visualise the change 
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
+xy <- apply(results_match, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(MOIs)) # Plot projections
+text(x = median(xy["x", ]), y = mean(xy["y", ]), labels = "match data", pos = 2) # Annotate
+xy <- apply(results_mismatch, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(MOIs)) # Plot projections
+text(x = sum(range(xy["x", ]))/2, y = mean(xy["y", ]), labels = "mismatch data", pos = 3) # Annotate
+legend("left", col = 1:length(MOIs), pch = 20, pt.cex = 2, bty = "n", 
+       legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
+```
+
+### Many marker data
+
+
+## Interpreting uncertainty
+
+Having rejected recrudescence, data on multiple markers are required to reject
+reinfection. Having rejected reinfection, data on multiple markers are required
+to reject recrudescence. 
+
+
+
+The marginal probabilities of relapse / reinfection of different recurrences
+with the same data differ slightly because XXX [discuss with YS]
+
+
+
+```{r}
+suppressMessages(compute_posterior(y = list(enroll = list(m1 = "A"), 
+                                            recur1 = list(m1 = "A"), 
+                                            recur2 = list(m1 = "A"), 
+                                            recur3 = list(m1 = "A")), 
+                                   fs = list(m1 = c("A" = 0.05,"B" = 0.95))))$marg
+```
+
+
+
+
+
+## Siblings and relapse
+When the model is well specified and recurrent parasites are regular siblings,
+the posterior probability of relapse tends to one regardless of the MOIs.
+
+## Clones and recrudescence 
+When the model is well specified and recurrent parasites are clones, the
+posterior probability of recrudescence tends towards a high but non-certain
+probability that depends on the MOIs. 
+
+## Strangers and reinfection 
+When the model is well specified and recurrent parasites are strangers, the
+posterior probability of reinfection tends towards a high but non-certain
+probability that depends on the MOIs. 
+
+## Effect of the prior assumption on relationship graphs 
+
+### Non-recurrent data are informative 
+
+### Effect when the graph grows without data
+
+The graph grows without data as the number of recurrences increases but all data are missing 
+
+### Effect when the graph grows with data
+
+The graph grows without data as the MOI increases
+
+
+
+# Misspecified model 
+
+The 
+
+
+
+
+   
+
