@@ -44,14 +44,18 @@ provided, the most parsimonious MOIs compatible with the data will be used;
 see \code{\link{determine_MOIs}}.}
 
 \item{return.RG}{Boolean for whether to return the relationship graphs,
-defaults to \code{FALSE}.}
+defaults to \code{FALSE}. If \code{return.logp} is set to \code{TRUE}, then \code{return.RG}
+is overridden to be \code{TRUE}, as log-probabilities are returned for each
+relationship graph.}
 
 \item{return.logp}{Boolean for whether to return the log-likelihood for each
-relationship graph, defaults to \code{FALSE}. Only returned if \code{return.RG} is
-\code{TRUE}. Setting \code{return.logp} to \code{FALSE} allows for permutation symmetries
-to be exploited to save computational time, see
-\code{\link{enumerate_alleles}}. Setting this to \code{TRUE} will result in
-longer runtimes, especially when multiplicities of infection are large.}
+relationship graph, defaults to \code{FALSE}. When setting \code{return.logp} to
+\code{TRUE}, \code{return.RG} should also be set to \code{TRUE}. Setting \code{return.logp} to
+\code{FALSE} allows for permutation symmetries to be exploited to save
+computational time, see \code{\link{enumerate_alleles}}. Setting this to
+\code{TRUE} will result in longer runtimes, especially when multiplicities of
+infection are large. Note that this argument does not affect the output of
+the posterior probabilities.}
 }
 \value{
 List containing:
@@ -147,9 +151,9 @@ fs <- list(marker1 = c("Tinky Winky" = 0.4, "Dipsy" = 0.6),
 # Compute posterior probabilities using default prior
 posterior_probs <- compute_posterior(y, fs)
 
-# Plot marginal probabilities
-plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.8) # Plot simplex
-xy <- project2D(posterior_probs$marg[1,]) # Project probabilities onto simplex
+# Plot posterior probabilities on the simplex
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Simplex
+xy <- project2D(posterior_probs$marg[1,]) # Project probabilities
 points(x = xy["x"], y = xy["y"], pch = 20) # Plot projected probabilities
 
 
@@ -230,8 +234,8 @@ ys <- list(scenario1 = list(enroll = list(m1 = "A"),
                             recur3 = list(m1 = NA),
                             recur4 = list(m1 = NA)))
 
-# Allele frequencies
-f_A <- 0.01; fs <- list(m1 = c("A" = f_A, "Other" = 1-f_A))
+# Allele frequencies: smaller f_A leads to larger change
+f_A <- 0.1; fs <- list(m1 = c("A" = f_A, "Other" = 1-f_A))
 
 # Compute posterior probabilities and extract marginal probabilities
 results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
@@ -241,8 +245,8 @@ results_recur1 <- sapply(results, function(result) result[1,])
 results_recur1 # Results are different for different scenarios
 
 # Visualise the change in the marginal probability of the first recurrence
-plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.8) # Plot simplex
-xy <- apply(results_recur1, 2, project2D) # Project probabilities onto simplex
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection")) # Plot simplex
+xy <- apply(results_recur1, 2, project2D) # Project probabilities
 points(x = xy["x", ], y = xy["y", ], pch = "-", col = 1:4) # Plot projections
 legend("left", col = 1:4, pch = "-", pt.cex = 2, bty = "n", legend = 1:4,
 title = "Recurrence \n count") # legend

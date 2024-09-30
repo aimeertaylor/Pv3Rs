@@ -75,13 +75,17 @@
 #'   provided, the most parsimonious MOIs compatible with the data will be used;
 #'   see \code{\link{determine_MOIs}}.
 #' @param return.RG Boolean for whether to return the relationship graphs,
-#'   defaults to `FALSE`.
+#'   defaults to `FALSE`. If `return.logp` is set to `TRUE`, then `return.RG`
+#'   is overridden to be `TRUE`, as log-probabilities are returned for each
+#'   relationship graph.
 #' @param return.logp Boolean for whether to return the log-likelihood for each
-#'   relationship graph, defaults to `FALSE`. Only returned if `return.RG` is
-#'   `TRUE`. Setting `return.logp` to `FALSE` allows for permutation symmetries
-#'   to be exploited to save computational time, see
-#'   \code{\link{enumerate_alleles}}. Setting this to `TRUE` will result in
-#'   longer runtimes, especially when multiplicities of infection are large.
+#'   relationship graph, defaults to `FALSE`. When setting `return.logp` to
+#'   `TRUE`, `return.RG` should also be set to `TRUE`. Setting `return.logp` to
+#'   `FALSE` allows for permutation symmetries to be exploited to save
+#'   computational time, see \code{\link{enumerate_alleles}}. Setting this to
+#'   `TRUE` will result in longer runtimes, especially when multiplicities of
+#'   infection are large. Note that this argument does not affect the output of
+#'   the posterior probabilities.
 #'
 #' @return List containing:
 #'   \describe{
@@ -288,7 +292,7 @@ compute_posterior <- function(
   have_freq <- all(sapply(ms, function(m) all(as[[m]][!is.na(as[[m]])] %in% names(fs[[m]]))))
   stopifnot("Not all alleles have a named frequency"=have_freq)
 
-
+  # Check there are at least 2 episodes
   infection_count <- length(y)
   stopifnot("Need more than 1 episode"=infection_count > 1)
 
@@ -317,6 +321,20 @@ compute_posterior <- function(
     stopifnot('The prior should have colnames "C", "L" and "I"'=identical(colnames(prior), causes))
   }
 
+  # Warn user if there is only allele information for < 2 episodes (unpaired)
+  for (m in ms) {
+    # boolean vector for whether each episode has allele information for marker m
+    has.allele <- sapply(y, function(y.epi) any(!is.na(y.epi[[m]])))
+    if(sum(has.allele) < 2) {
+      message(paste("Allele information for marker", m, "does not span 2 episodes"))
+    }
+  }
+
+  # Setting return.logp=T will enforce return.RG=T
+  if (return.logp & !return.RG) {
+    return.RG <- T
+    message("return.RG is overridden to TRUE since return.logp=TRUE")
+  }
 
   # For each infection we find the possible allele assignments
   # Because of permutation symmetry of the genotypes within an infection, we
