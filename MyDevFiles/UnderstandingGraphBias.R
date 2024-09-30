@@ -116,47 +116,8 @@ if (max(logps[!(RGs_edges_first)]) < min(logps[RGs_edges_first])) {
 
 
 
-#===============================================================================
-# Heteroallelic example without recurrent data using MOIs to change graphs.
-#
-# A Heteroallelic has a minor effect that doesn't change with allele frequency
-# (it limits the summation over IBD partitions, but not the summation over
-# relationship graphs)
-#
-# Graph expectation poor
-#===============================================================================
-fs = list(m1 = c("A" = 0.001, "B" = 0.999)) # Allele frequencies
-y <- list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data
-MOIs <- list(c(3,1), c(2,2), c(3,2)) # MOIs
 
-# ------------------------------------------------------------------------------
-# Posterior based on model
-# ------------------------------------------------------------------------------
-results <- sapply(MOIs, function(x) compute_posterior(y, fs, MOIs = x)$marg)
-plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
-xy <- apply(results, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 20, cex = 1, col = 1:length(MOIs))
-legend("left", col = 1:length(MOIs), pch = 20, title = "MOIs", inset = 0,
-       legend = sapply(MOIs, paste, collapse = " & "), bty = "n")
 
-# ------------------------------------------------------------------------------
-# Posterior approximation based on graphs only
-# ------------------------------------------------------------------------------
-graph_frac_het <- sapply(1:length(MOIs), FUN = function(i) {
-  stuff <- get_graph_stuff(MOIs[[i]])
-  RGs_C <- sapply(stuff$CIL_gvn_RGs, function(RG) "C" %in% RG)
-  RGs_I <- sapply(stuff$CIL_gvn_RGs, function(RG) "I" %in% RG)
-  graph_frac_unnormalised <- c(frac_C = sum(RGs_C)/sum(RGs_C),
-                               frac_L = 1,
-                               frac_I = sum(RGs_I)/sum(RGs_I))
-  graph_frac <- graph_frac_unnormalised/sum(graph_frac_unnormalised)
-  return(graph_frac)
-})
-xy_graph_frac_het <- apply(graph_frac_het, 2, project2D)
-points(x = xy_graph_frac_het["x", ], y = xy_graph_frac_het["y", ],
-       col = (1:length(MOIs))[-1], cex = 2)
-legend("bottom", pch = c(20, 1), pt.cex = c(1, 2), # Add legends
-       legend = c("Posterior probability", "Relative weighted graphs"), bty = "n")
 
 
 
