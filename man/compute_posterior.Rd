@@ -60,11 +60,14 @@ the posterior probabilities.}
 \value{
 List containing:
 \describe{
-\item{marg}{Matrix of marginal posterior probabilities of the possible
-recurrence states for each recurrent episode, one row per reinfection.}
-\item{joint}{Vector of joint posterior probabilities of each possible string
+\item{\code{marg}}{Matrix of marginal posterior probabilities of the possible
+recurrence states for each recurrent episode, one row per reinfection.
+This is a summary of the results in \code{joint} (see next), in the sense that
+each marginal probability is the sum of joint probabilities from \code{joint}
+over the corresponding recurrence sequences.}
+\item{\code{joint}}{Vector of joint posterior probabilities of each possible string
 of recurrence states.}
-\item{RGs}{List of relationship graphs with their log-likelihoods stored.
+\item{\code{RGs}}{List of relationship graphs with their log-likelihoods stored.
 Only returned if \code{return.RG} is \code{TRUE}. See
 \code{\link{enumerate_RGs}}.}
 }

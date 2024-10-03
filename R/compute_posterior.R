@@ -89,11 +89,14 @@
 #'
 #' @return List containing:
 #'   \describe{
-#'     \item{marg}{Matrix of marginal posterior probabilities of the possible
-#'       recurrence states for each recurrent episode, one row per reinfection.}
-#'     \item{joint}{Vector of joint posterior probabilities of each possible string
+#'     \item{`marg`}{Matrix of marginal posterior probabilities of the possible
+#'       recurrence states for each recurrent episode, one row per reinfection.
+#'       This is a summary of the results in `joint` (see next), in the sense that
+#'       each marginal probability is the sum of joint probabilities from `joint`
+#'       over the corresponding recurrence sequences.}
+#'     \item{`joint`}{Vector of joint posterior probabilities of each possible string
 #'       of recurrence states.}
-#'     \item{RGs}{List of relationship graphs with their log-likelihoods stored.
+#'     \item{`RGs`}{List of relationship graphs with their log-likelihoods stored.
 #'       Only returned if `return.RG` is `TRUE`. See
 #'       \code{\link{enumerate_RGs}}.}
 #'   }
