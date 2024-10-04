@@ -89,13 +89,18 @@
 #'
 #' @return List containing:
 #'   \describe{
-#'     \item{`marg`}{Matrix of marginal posterior probabilities of the possible
-#'       recurrence states for each recurrent episode, one row per reinfection.
-#'       This is a summary of the results in `joint` (see next), in the sense that
-#'       each marginal probability is the sum of joint probabilities from `joint`
-#'       over the corresponding recurrence sequences.}
-#'     \item{`joint`}{Vector of joint posterior probabilities of each possible string
-#'       of recurrence states.}
+#'     \item{`marg`}{Matrix of marginal posterior probabilities of
+#'       recurrent states for each recurrence, one row per recurrence with "C"
+#'       for recrudescence, "L" for relapse, and "I" for reinfection. `marg` is
+#'       a simple summary of `joint` (see next): each marginal probability of a
+#'       recurrent state is a sum over a subset of joint probabilities of
+#'       recurrent state sequences. For example, the marginal probability of "C"
+#'       at the first of two recurrences is a sum over the joint probabilities
+#'       of "CC",
+#'       "CL", and "CI".}
+#'     \item{`joint`}{Vector of joint posterior probabilities of each recurrent
+#'       state sequence, where within a sequence "C" denotes recrudescence,
+#'       "L" denotes relapse, and "I" denotes reinfection.}
 #'     \item{`RGs`}{List of relationship graphs with their log-likelihoods stored.
 #'       Only returned if `return.RG` is `TRUE`. See
 #'       \code{\link{enumerate_RGs}}.}
