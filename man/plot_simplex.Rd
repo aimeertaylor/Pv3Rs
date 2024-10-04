@@ -6,7 +6,7 @@
 \usage{
 plot_simplex(
   v_labels = NULL,
-  v_cutoff = NULL,
+  v_cutoff = 0.5,
   v_colours = c("yellow", "purple", "red")
 )
 }
@@ -15,8 +15,9 @@ plot_simplex(
 top. If NULL (default), vertices are not annotated.}
 
 \item{v_cutoff}{An arbitrary number between 0.5 and 1 that separates regions
-of low and high probability; e.g., regions where the most probable cause of
-a recurrence could be classified as uncertain versus relatively certain.}
+of lower and higher probability. Beware the use of fixed cut-offs for
+probable recrudescence classification and probable reinfection
+classification; see \link{vignette("model-output", package = "Pv3Rs")}.}
 
 \item{v_colours}{A vector of colours associated with the vertices
 anticlockwise from top; see example below.}
