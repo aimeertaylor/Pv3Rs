@@ -7,7 +7,12 @@ An R package developed to enable statistical genetic inference of
 - Reinfection
 - Recrudescence
 
-Some features are more general:
+The main function `Pv3Rs::compute_posterior` can be used to estimate posterior 
+probabibilities of relapse, reinfection and recrudescence for one or more 
+recurrence using genetic data to update a prior, which is ideally informative 
+(e.g., based on time-to-event information). 
+
+Other features are more general:
 
 - `Pv3Rs::plot_data` can be used to visualise genetic data for molecular
 correction regardless of the analytical method (e.g., it could be used to
@@ -24,8 +29,8 @@ vector of any three numbers between 0 and 1 that sum to one.
 The R package is currently under development and thus liable to contain many
 errors. The model around which the Pv3Rs R package is being developed is
 documented in the preprint [1]. The model builds upon a prototype documented in
-[2]; see [1] to better understand how the model underpinning Pv3Rs differs from
-the prototype.
+[2] (see [1] to better understand how the model underpinning Pv3Rs differs from
+the prototype).
 
 [1] [Taylor, Foo & White, 2022](https://www.medrxiv.org/content/10.1101/2022.11.23.22282669v1)
 
@@ -47,19 +52,23 @@ probable cause of recurrent *P. falciparum* malaria by setting the prior
 probability of relapse to zero. However, the current version of Pv3Rs is 
 suboptimal for *P. falciparum* recurrent state inference: genotyping errors, which
 are not accounted for under the current Pv3Rs model, are liable to lead to the
-misclassification of recrudescence as reinfection when relapse is suppressed.
+misclassification of recrudescence as reinfection when the probability of relapse
+is zero *a priori*.
 
 ### Notable assumptions: 
 
-1) Relationship graphs compatible with a given sequence of recurrent states are
+1) Relationship graphs compatible with a given recurrent state sequence are
 equally likely *a priori*
 2) Perfect detection of alleles (no genotyping error)
 3) Perfect detection of parasites (problematic for low density clones)
 4) Perfect detection of episodes (requires active follow up) 
 5) Mutually exclusive recurrent states (requires frequent follow up with treatment)
 6) No within-host *de novo* mutations 
-7) Parasite population is outbred
-8) All siblings are regular siblings
+7) Parasites are outbred (implies the parasite population is infinitely large and panmitic)
+8) Genetic markers are independent
+    - Ignores long-range linkage disequilibrium due to background relatedness
+    - Ignores short-range linkage disequilbrium between between sibling parasites 
+10) All siblings are regular siblings
     - Siblings are transitive (not true of some parent child-like sibling trios)
     - Siblings are independent (not true of meiotic siblings)
     - Siblings draw from at most two parents (not true of half-siblings)
@@ -80,8 +89,8 @@ recrudescence. An example will be provided in an upcoming vignette.
 - We do not recommend running `Pv3Rs::compute_posterior()` for data whose total 
 genotype count (sum of per-episode multiplicities of infection) exceeds eight.
 If the total genotype counts exceeds eight but there are multiple recurrences,
-it might be possible to generate recurrent state estimates for individual
-recurrences (this approach was used in [2]).
+it might be possible to generate recurrent state estimates for recurrences
+one-by-one (this approach was used in [2]).
 
 - We have not tested the per-marker allele limit of `Pv3Rs::compute_posterior()`. 
 Very high marker cardinalities could lead to very small allele frequencies and 
