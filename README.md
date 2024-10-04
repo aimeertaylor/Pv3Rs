@@ -82,6 +82,9 @@ For studies with possibly high rates of recrudescence, we recommend a
 sensitivity analysis to explore the impact of genotyping errors on
 recrudescence. An example will be provided in an upcoming vignette. 
 
+The marker independence assumption is liable to lead to overconfident posterior 
+probabilities when markers are linked. 
+
 ### Computational limits:
 
 - Pv3Rs scales to 100s of markers but not whole-genome sequence (WGS) data.  
