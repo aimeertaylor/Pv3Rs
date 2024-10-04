@@ -1,8 +1,8 @@
 ---
-title: "Understanding model output"
+title: "Understanding posterior output"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Understanding model ouput}
+  %\VignetteIndexEntry{Understanding posterior ouput}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,33 +24,33 @@ devtools::load_all(".") #library(Pv3Rs)
 
 ## Introduction
 
-Need to work out how best to tabulate log-likelihoods. 
+In this vignette we document the output of `Pv3Rs::compute_posterior` when the
+statistical model underpinning it is well specified and misspecified.
 
-In this vignette we demonstrate how the statistical model underpinning 
-`Pv3Rs::compute_posterior` behaves when it is well specified and misspecified. 
+More specifically, when the model is well specified, we document the output of `Pv3Rs::compute_posterior` when the data are missing, limited, and ample, and as 
+a function of genetic diversity (allele frequencies), recurrence counts and 
+multiplicities of infection (MOIs). 
 
-* Posterior output when the model is well specified
+Thereafter, we document the output of `Pv3Rs::compute_posterior` when the model
+is misspecified because of
 
-  + As a function of marker informativeness
-  + As a function of multiplicities of infection (MOIs)
-  + When  data
+- Genotyping errors or *de novo* mutations
+- Meiotic siblings
+- Parent child-like siblings
+- Half siblings
 
-* Posterior output when the model is misspecified because of 
-  + Genotyping errors or *de novo* mutations
-  + Meiotic siblings
-  + Parent child-like siblings
-  + Half siblings
+We have not yet characterised model misspecification due to inbred parasites.
+However, we intuit inter-marker dependence will lead to overconfident posterior
+probabilities, while population structure could lead to the misclassification of
+reinfection as relapse.
 
-We have not yet characterised model misspecification due to inbred parasites. 
-
-Before starting, let's define a helper function that, for a given set of MOIs,
-extracts the distribution over relationship graphs, which is defined by the
-relationship graphs and the recurrent state sequences they are compatible with.
+Before starting, we define a helper function that gets relationship graphs (and
+the recurrent state sequences they are compatible with) for a vector of
+per-episode MOIs.
 
 ```{r}
-# Define function to get gs, RGs, states given RGs, and thus avoid repetition
-get_graph_dist <- function(x) {
-  gs <- paste0("g", 1:sum(x)) # genotype names
+get_graph_dist <- function(x) { # get RG vertex labels, RGs, sequences given RGs
+  gs <- paste0("g", 1:sum(x)) # genotype names (graph vertices)
   ts <- 1:length(x) # episode indices
   ts_per_gs <- rep(ts, x) # episode index of each genotype
   gs_per_ts <- split(gs, ts_per_gs) # genotypes grouped by episode
@@ -68,8 +68,8 @@ When data are entirely missing, `compute_posterior` returns the prior.
 
 ```{r}
 fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
-y = list(enrol = list(m1 = NA), recur = list(m1 = NA)) # Data
-suppressMessages(compute_posterior(y, fs))$marg # Posterior
+y_missing = list(enrol = list(m1 = NA), recur = list(m1 = NA)) # Data
+suppressMessages(compute_posterior(y_missing, fs))$marg # Posterior
 ```
 
 When data are missing but the user provides MOIs that are incompatible with
@@ -77,39 +77,27 @@ recrudescence, `compute_posterior` returns the prior re-weighted to the
 exclusion of recrudescence.
 
 ```{r}
-fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
-y = list(enrol = list(m1 = NA), recur = list(m1 = NA)) # Data
-suppressMessages(compute_posterior(y, fs, MOIs = c(1,2)))$marg # Posterior
+suppressMessages(compute_posterior(y_missing, fs, MOIs = c(1,2)))$marg 
 ```
 
-When genetic data are uninformative, `compute_posterior` returns the prior. 
+When data are uninformative because there is no genetic diversity,
+`compute_posterior` returns the prior.
 
 ```{r}
-fs = list(m1 = c("A" = 1, "B" = 0)) # Allele frequencies
+fs = list(m1 = c("A" = 1)) # Unit allele frequencies: no genetic diversity
 y = list(list(m1 = "A"), recur = list(m1 = "A")) # Data
 suppressMessages(compute_posterior(y, fs))$marg # Posterior
-suppressMessages(compute_posterior(y, fs, MOIs = c(1,2)))$marg # Posterior
 ```
 
-
-#### Data on only one episode (no paired data)
+#### Data on only one episode 
 
 When only one episode has data and its MOI is one, `compute_posterior` returns
-the prior (possibly re-weighted to the exclusion of recrudescence, depending on
-the MOIs of the other episodes).
+the prior (re-weighted to the exclusion of recrudescence conditional on MOIs).
 
 ```{r}
-# Allele frequencies
-fs = list(m1 = c("A" = 0.5, "B" = 0.5))
-
-# Data for different numbers of recurrences
-y <- list(enroll = list(m1 = NA), 
-          recur1 = list(m1 = "A"), 
-          recur2 = list(m1 = NA), 
-          recur3 = list(m1 = NA))
-
-# Marginal posterior probabilities given MOIs > 1 for episodes without data
-suppressMessages(compute_posterior(y, fs, MOIs = c(3,1,1,2)))$marg
+fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
+y <- list(enroll = list(m1 = NA), recur1 = list(m1 = "A")) # No enrolment data
+suppressMessages(compute_posterior(y, fs))$marg # Posterior
 ```
 
 When only one episode has data and its MOI is greater than one, the output of
@@ -117,59 +105,50 @@ When only one episode has data and its MOI is greater than one, the output of
 
 ##### Heteroallelic data on only one episode (MOI necessarily exceeds one)
 
-If the data are heteroallelic, the posterior remains close to the prior, both
-when the MOI increases with and without the number of distinct alleles observed.
-
-Explanation: A heteroallelic call is compatible with intra-infection siblings
-and strangers. As such, a heteroallelic call does not constrain the summation
-over relationship graphs. However, for relationship graphs with intra-episode
-siblings, the heteroallelic data limits summation over identity-by-descent
-partitions to partitions with at least two cells for the episode with data. The
-lower bound on the cell count increases with the number of distinct alleles
-observed. 
+If the data are heteroallelic, the posterior is close but not equal to the prior
+because, for relationship graphs with intra-episode siblings, the heteroallelic
+data limits summation over identity-by-descent partitions to partitions with at
+least two cells for the episode with data. The lower bound on the cell count
+increases with the number of distinct alleles observed.
 
 ```{r}
-# Allele frequencies
-fs = list(m1 = c('A' = 0.2, 'B' = 0.2, 'C' = 0.2, 'D' = 0.2, 'E' = 0.2)) 
+fs = list(m1 = c('A'=0.25, 'B'=0.25, 'C'=0.25, 'D'=0.25)) # Allele frequencies 
 
 # MOI increases with number of observed alleles 
 ys <- list(list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)), # Data 
            list(enroll = list(m1 = c('A','B','C')), recur = list(m1 = NA)), 
            list(enroll = list(m1 = c('A','B','C','D')), recur = list(m1 = NA)))
 do.call(rbind, lapply(ys, function(y) # Posterior 
-  suppressMessages(compute_posterior(y, fs)$marg))) 
+  suppressMessages(compute_posterior(y, fs))$marg)) 
 
-# MOI increases due to external input
+# MOI increases with external input
 y <- list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data 
-MOIs <- list(c(3,1), c(2,2), c(3,2)) # MOIs
+MOIs <- list(c(2,1), c(2,2), c(3,2)) # MOIs
 do.call(rbind, lapply(MOIs, function(x) # Posterior 
-  suppressMessages(compute_posterior(y, fs, MOIs = x)$marg))) 
+  suppressMessages(compute_posterior(y, fs, MOIs = x))$marg)) 
 ```
 
 ##### Homoallelic data on only one episode with MOI greater than one
 
-If the data are homoallelic and the allele is rare, the posterior departs from
-the prior because rare intra-episode allelic repeats limit the likelihood to
-summation over relationship graphs with intra-episode relatedness. We can use
-different MOIs to demonstrate this: changing the MOIs changes the distribution
-over relationship graphs, and thus the posterior value.
+If the data are homoallelic, the observed allele is rare, and the MOI is greater
+than one because of external input, the posterior departs from the prior because
+rare intra-episode allelic repeats limit the likelihood to summation over
+relationship graphs with intra-episode relatedness. We can use different MOIs to
+demonstrate this: changing the MOIs changes the distribution over relationship
+graphs, and thus the posterior output.
 
 ```{r}
 #-------------------------------------------------------------------------------
-# Generate input for homoallelic data on only one episode with MOI > 1
+# Compute posterior for homoallelic data on only one episode with MOI > 1
 #-------------------------------------------------------------------------------
 MOIs <- list(c(2,1), c(2,2), c(3,2)) # Different MOIs 
 fs = list(m1 = c("A" = 0.001, "B" = 0.999)) # Allele frequencies
-y <- list(enroll = list(m1 = 'A'), recur = list(m1 = NA)) # Data 
-
-#-------------------------------------------------------------------------------
-# Compute posterior probabilities for different MOIs 
-#-------------------------------------------------------------------------------
-posteriors <- do.call(rbind, lapply(MOIs, function(x) 
-  suppressMessages(compute_posterior(y, fs, MOIs = x)$marg)))
+y <- list(enroll = list(m1 = 'A'), recur = list(m1 = NA)) # Data on enroll only
+posterior <- do.call(rbind, lapply(MOIs, function(x) # Posterior 
+  suppressMessages(compute_posterior(y, fs, MOIs = x))$marg))
 
 # ------------------------------------------------------------------------------
-# Posterior approximation based on graphs only
+# Approximate posterior using graphs only
 # ------------------------------------------------------------------------------
 approximation <- sapply(1:length(MOIs), FUN = function(i) {
   
@@ -182,13 +161,11 @@ approximation <- sapply(1:length(MOIs), FUN = function(i) {
     RGs_edges_first <- rep(TRUE, length(gd$RGs)) 
   } else { # Make adjacency matrix for the first episode
     MOI1 <- MOIs[[i]][1]; gs1 <- gd$gs[1:MOI1]
-    mat_first <- array(1, dim = c(MOI1, MOI1), dimnames = list(gs1, gs1))
-    graph_first <- igraph::graph_from_adjacency_matrix(mat_first, diag = F,
-                                                       mode = "undirected")
-    edges_first <- igraph::as_ids(igraph::E(graph_first)) # Edges 
+    mat <- array(1, dim = c(MOI1, MOI1), dimnames = list(gs1, gs1))
+    graph <- igraph::graph_from_adjacency_matrix(mat, diag=F, mode="undirected")
+    edges_first <- igraph::as_ids(igraph::E(graph)) # Edges of first episode
     RGs_edges <- lapply(gd$RGs, function(RG) igraph::as_ids(igraph::E(RG))) 
-    RGs_edges_first <- sapply(RGs_edges, function(RG_E) {
-      all(edges_first %in% RG_E)})
+    RGs_edges_first <- sapply(RGs_edges, function(x) all(edges_first %in% x))
   }
   
   approx_unnormalised <- c(C = sum(RGs_edges_first*RGs_C)/sum(RGs_C),
@@ -202,51 +179,46 @@ approximation <- sapply(1:length(MOIs), FUN = function(i) {
 #-------------------------------------------------------------------------------
 par(mar = c(0,0,0,0))
 plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
-xy <- apply(posteriors, 1, project2D) # Project probabilities
+xy <- apply(posterior, 1, project2D) # Project probabilities and plot:
 points(x = xy["x", ], y = xy["y", ], pch = 20, cex = 1, col = 1:length(MOIs))
-
-xy <- apply(approximation, 2, project2D)
+xy <- apply(approximation, 2, project2D) # Project probabilities and plot:
 points(x = xy["x", ], y = xy["y", ], col = 1:length(MOIs), cex = 2)
-
 legend("left", pch = c(20, 1), pt.cex = c(1, 2), bty = "n", inset = 0, 
-       legend = c("Posterior probability", "Relative weighted graphs"))
+       legend = c("Posterior probability", "Posterior approximation"))
 legend("right", col = 1:length(MOIs), pch = 20, bty = "n", inset = 0.2,
        legend = sapply(MOIs, paste, collapse = " & "), title = "MOIs")
 ```
 
-The likelihood is only appreciable for relationship graphs where the first
-episode parasites are all siblings (note the log scale).
+The likelihood is only appreciable for relationship graphs where all parasites
+in the first episode are siblings (note the log scale).
 
 ```{r, fig.height = 5, out.width="50%"}
 # ------------------------------------------------------------------------------
-# Maximum likelihood graphs for an illustrative case with MOIs 3 & 2
+# Maximum likelihood graphs for illustrative case with MOIs 3 & 2
 # ------------------------------------------------------------------------------
 # Classify graphs
 gd <- get_graph_dist(c(3,2))
 gs <- gd$gs[1:3] # genotypes in the 1st episode
 mat <- array(1, dim = c(3, 3), dimnames = list(gs, gs)) # matrix for the 1st
 graph <- igraph::graph_from_adjacency_matrix(mat, diag = F, mode = "undirected")
-edges_1st <- igraph::as_ids(igraph::E(graph)) # Graph edges of the 1st episode 
+edges_1st <- igraph::as_ids(igraph::E(graph)) # Edges of the first episode 
 RGs_edges <- lapply(gd$RGs, function(RG) igraph::as_ids(igraph::E(RG)))
 RGs_edges_1st <- sapply(RGs_edges, function(RG_E) all(edges_1st %in% RG_E))
 RGs_no_edges_1st <- sapply(RGs_edges, function(RG_E) all(!edges_1st %in% RG_E))
 
 # Get graph log likelihoods
-fs = list(m1 = c("A" = 0.001, "B" = 0.999)) # Allele frequencies
-y <- list(enroll = list(m1 = 'A'), recur = list(m1 = NA)) # Data 
 post <- suppressMessages(compute_posterior(y, fs, MOIs = c(3,2), return.logp=T))
 llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
 llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
 
 # Plot log likelihoods by graph classification
-plot(llikes_sorted$x, pch = 20, cex = 0.5, col = "cornflowerblue", bty = "n",
+plot(llikes_sorted$x, pch = 20, cex = 0.5, col = "hotpink", bty = "n",
      ylab = "Log-likelihood", xlab = "Relationship Graph")
 points(y = llikes_sorted$x[RGs_edges_1st[llikes_sorted$ix]], col = "black",
        x = which(RGs_edges_1st[llikes_sorted$ix]), pch = 20, cex  = 0.5)
 points(y = llikes_sorted$x[RGs_no_edges_1st[llikes_sorted$ix]], col="lightgray",
        x = which(RGs_no_edges_1st[llikes_sorted$ix]), pch = 20, cex  = 0.5)
-legend("topleft", pch = 20, bty= "n",
-       col = c("black", "cornflowerblue", "lightgray"), 
+legend("topleft", pch = 20, bty= "n", col = c("black", "hotpink", "lightgray"), 
        legend = c("Graphs with only siblings within the first episode",
                   "Graphs with some siblings in the first episode",
                   "Graphs with no siblings in the first episode"))
@@ -256,10 +228,7 @@ Increasing the number of recurrences without adding data has little effect: the
 posterior is close to the value for a single recurrence. 
 
 ```{r}
-# Allele frequencies (no impact)
-fs = list(m1 = c("A" = 0.001, "B" = 0.99)) # Allele frequencies
-
-# The number of recurrences increases but only the first has data
+# Data with different recurrence counts but only the first recurrence has data
 ys <- list("1_recurrence" = list(enroll = list(m1 = "A"), 
                                  recur1 = list(m1 = NA)), 
            "2_recurrence" = list(enroll = list(m1 = "A"), 
@@ -270,8 +239,7 @@ ys <- list("1_recurrence" = list(enroll = list(m1 = "A"),
                                  recur2 = list(m1 = NA), 
                                  recur3 = list(m1 = NA)))
 
-# Compute posterior probabilities and extract marginal probabilities
-sapply(ys, function(y) {
+sapply(ys, function(y) { # Posterior for different recurrence counts
   MOIs <- c(2,2,rep(1, length(y)-2))
   suppressMessages(compute_posterior(y, fs, MOIs = MOIs))$marg["recur1",]
 })
@@ -284,28 +252,25 @@ When there are data on multiple episodes but no comparable data across episodes,
 
 - it returns the prior when episodes with data have MOIs of one, 
 - its output remains close to the prior when calls are heteroallelic,
-- its output departs from the prior when MOIs of episodes with data exceed one, 
-  the call is homoallelic and the allele is rare
+- its output departs from the prior when the call is homoallelic, the observed 
+allele is rare, and the MOIs of episodes with data exceed one.
 
 ```{r}
 # Allele frequencies
-fs = list(m1 = c("A" = 0.001, "B" = 0.999), 
-          m2 = c("A" = 0.001, "B" = 0.999), 
-          m3 = c("A" = 0.001, "B" = 0.999))
+fs = list(m1 = c("A" = 0.01, "B" = 0.99), 
+          m2 = c("A" = 0.01, "B" = 0.99)) 
 
-# Data for different numbers of recurrences
-y_hom <- list(enroll = list(m1 = "A", m2 = NA, m3 = NA), 
-              recur1 = list(m1 = NA, m2 = "A", m3 = NA), 
-              recur2 = list(m1 = NA, m2 = NA, m3 = "A"))
+# Data with an incomparable homoallelic call
+y_hom <- list(enroll = list(m1 = "A", m2 = NA), 
+              recur1 = list(m1 = NA, m2 = "A"))
 
-y_het <- list(enroll = list(m1 = c("A", "B"), m2 = NA, m3 = NA), 
-              recur1 = list(m1 = NA, m2 = c("A", "B"), m3 = NA), 
-              recur2 = list(m1 = NA, m2 = NA, m3 = c("A", "B")))
+# Data with an incomparable heteroallelic call
+y_het <- list(enroll = list(m1 = c("A", "B"), m2 = NA), 
+              recur1 = list(m1 = NA, m2 = c("A", "B")))
 
-# Marginal posterior probabilities given MOIs > 1 for episodes without data
 suppressMessages(compute_posterior(y_hom, fs))$marg # Prior return 
 suppressMessages(compute_posterior(y_het, fs))$marg # Prior proximity
-suppressMessages(compute_posterior(y_hom, fs, MOIs = c(2,2,2)))$marg # Departure
+suppressMessages(compute_posterior(y_hom, fs, MOIs = c(2,2)))$marg # Departure
 ```
 
 When data on a single marker are comparable across episodes, the output
@@ -374,7 +339,7 @@ ms <- paste0("m", 1:marker_count)
 match <- as.list(sapply(ms, function(t) "A"))
 mismatch <- as.list(sapply(ms, function(t) "B"))
 no_data <- as.list(sapply(ms, function(t) NA))
-fs <- sapply(ms, FUN = function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
+fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
 
 
 ys_match <- list("1_recurrence" = list(enroll = match, 
@@ -646,18 +611,6 @@ probability that depends on the MOIs.
 When the model is well specified and recurrent parasites are strangers, the
 posterior probability of reinfection tends towards a high but non-certain
 probability that depends on the MOIs. 
-
-## Effect of the prior assumption on relationship graphs 
-
-### Non-recurrent data are informative 
-
-### Effect when the graph grows without data
-
-The graph grows without data as the number of recurrences increases but all data are missing 
-
-### Effect when the graph grows with data
-
-The graph grows without data as the MOI increases
 
 
 
