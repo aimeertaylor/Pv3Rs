@@ -25,6 +25,7 @@ seed <- 1 # For reproducibility
 #===============================================================================
 # Stores for data, frequencies & results
 #===============================================================================
+output_ClnStrSib <- list()
 ys_store <- list() # y for data
 fs_store <- list() # f for frequency
 ps_store <- list() # p for posterior
@@ -247,8 +248,8 @@ for(case in cases){
                  post_S = post_S,
                  llikeRGs = llikeRGs)
 
-  save(output, file = sprintf("%s.rda", case))
+  output_ClnStrSib[[case]] <- output
 }
 
-# Save ys_VHX_BPD as exported data
-usethis::use_data(ys_VHX_BPD, overwrite = TRUE)
+# Save as exported data
+usethis::use_data(output_ClnStrSib, overwrite = TRUE)

@@ -40,6 +40,7 @@ seed <- 1 # For reproducibility
 #===============================================================================
 # Stores for data, frequencies & results
 #===============================================================================
+output_HalfPCSib <- list()
 ys_store <- list() # y for data
 fs_store <- list() # f for frequency
 ps_store <- list() # p for posterior
@@ -250,5 +251,8 @@ for(case in cases) {
                  ps_store_all_ms = ps_store_all_ms,
                  ps_store_all_ms_admix_rare = ps_store_all_ms_admix_rare)
 
-save(output, file = sprintf("%s_siblings.rda", case))
+  output_HalfPCSib[[case]] <- output
 }
+
+# Save as exported data
+usethis::use_data(output_HalfPCSib, overwrite = TRUE)
