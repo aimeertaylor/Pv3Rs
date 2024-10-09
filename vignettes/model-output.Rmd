@@ -1,20 +1,20 @@
 ---
-title: "Understanding posterior output"
+title: "Understanding posterior estimates"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Understanding posterior ouput}
+  %\VignetteIndexEntry{Understanding posterior estimates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
   
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  out.width = "100%", # Line width taken up by plot
-  fig.dpi=300, # For quality 
-  fig.width=7, # Increase to zoom out
-  cache = TRUE
+collapse = TRUE,
+comment = "#>",
+out.width = "100%", # Line width taken up by plot
+fig.dpi=300, # For quality 
+fig.width=7, # Increase to outputoom out
+cache = TRUE
 )
 ```
 
@@ -26,28 +26,32 @@ devtools::load_all(".") #library(Pv3Rs)
 
 In this vignette we document the output of `compute_posterior` when the
 statistical model underpinning it is well specified and misspecified. More
-specifically, when the model is well specified, we document the output of
-`compute_posterior` when there are
+specifically we document the output of `compute_posterior` when the model is
+well specified but
 
-- no data: 
-  + data are missing,
-  + data are uninformative; 
-- limited data: 
-  + data on only one episode,
-  + data are incomparable across episodes,
-  + data on only one marker;
-- data on many markers:
-  + as a function of recurrence counts, 
-  + as a function of multiplicities of infection (MOIs). 
+- data are missing,
+- data are uninformative, 
+- data are limited to only one episode,
+- data are incomparable across episodes,
+- data are limited to only one marker. 
 
+As well as when the model is well specified data on many markers:
+- as a function of recurrence counts, 
+- as a function of multiplicities of infection (MOIs). 
+- interpretation of uncertainty
 Given XXX, we highlight issues with classification based on common thresholds.
-Thereafter, we document the output of `Pv3Rs::compute_posterior` when the model
-is misspecified because of
 
-- Meiotic siblings
-- Parent child-like siblings
-- Half siblings
-- Genotyping errors or *de novo* mutations
+We document the output of `Pv3Rs::compute_posterior` when the model is
+misspecified because of
+
+- meiotic siblings,
+- half siblings,
+- parent child-like siblings,
+- genotyping errors or *de novo* mutations
+
+The results documented here are summaries from a larger study (XXX), which contains the The
+likelihood results on relationship graphs described below but not shown (see
+larger study for full details).
 
 We have not yet characterised model misspecification due to inbred parasites.
 However, we intuit inter-marker dependence will lead to overconfident posterior
@@ -67,7 +71,7 @@ get_graph_dist <- function(x) {
 }
 ```
 
-## Missing data
+# Missing data
 
 When data are entirely missing, `compute_posterior` returns the prior. 
 
@@ -85,7 +89,7 @@ exclusion of recrudescence.
 suppressMessages(compute_posterior(y_missing, fs, MOIs = c(1,2)))$marg 
 ```
 
-## Uniformative data
+# Uniformative data
 
 When data are entirely uninformative because there is no genetic diversity,
 `compute_posterior` returns the prior.
@@ -96,7 +100,9 @@ y = list(list(m1 = "A"), recur = list(m1 = "A")) # Data
 suppressMessages(compute_posterior(y, fs))$marg # Posterior
 ```
 
-## Data on only one episode 
+# Data on only one episode 
+
+## Monoclonal data
 
 When only one episode has data and its MOI is one, `compute_posterior` returns
 the prior (re-weighted to the exclusion of recrudescence conditional on MOIs).
@@ -110,13 +116,14 @@ suppressMessages(compute_posterior(y, fs))$marg # Posterior
 When only one episode has data and its MOI is greater than one, the output of
 `compute_posterior` depends on the hetero/homoallelic nature of the data. 
 
-### Heteroallelic data on only one episode with MOI necessarily greater than one
+### Multiclonal heteroallelic data 
 
-If the data are heteroallelic, the posterior is close but not equal to the prior
-because, for relationship graphs with intra-episode siblings, the heteroallelic
-data limits summation over identity-by-descent partitions to partitions with at
-least two cells for the episode with data. The lower bound on the cell count
-increases with the number of distinct alleles observed.
+If the data are heteroallelic, the MOI is necessarily larger than one because
+the model assumes there are no false positives. The posterior is close but not
+equal to the prior because, for relationship graphs with intra-episode siblings,
+the heteroallelic data limits summation over identity-by-descent partitions to
+partitions with at least two cells for the episode with data. The lower bound on
+the cell count increases with the number of distinct alleles observed.
 
 ```{r}
 fs = list(m1 = c('A'=0.25, 'B'=0.25, 'C'=0.25, 'D'=0.25)) # Allele frequencies 
@@ -135,7 +142,7 @@ do.call(rbind, lapply(MOIs, function(x) # Posterior
   suppressMessages(compute_posterior(y, fs, MOIs = x))$marg)) 
 ```
 
-### Homoallelic data on only one episode with input MOI greater than one
+### Multiclonal homoallelic data 
 
 If the data are homoallelic, the MOI is greater than one because of external
 input, and the observed allele is rare, the posterior departs from the prior
@@ -255,7 +262,7 @@ sapply(ys, function(y) { # Posterior for different recurrence counts
 })
 ```
 
-## Data are incomparable across episodes
+# Data are incomparable across episodes
 
 When there are data on multiple episodes but no comparable data across episodes,
 `compute_posterior` behaves similarly to when data are on only one episode:
@@ -283,7 +290,7 @@ suppressMessages(compute_posterior(y_het, fs))$marg # Prior proximity
 suppressMessages(compute_posterior(y_hom, fs, MOIs = c(2,2)))$marg # Departure
 ```
 
-## Data on a single marker
+# Data on only one marker
 
 When data on a single marker are comparable across episodes, the output
 of `compute_posterior` depends on the *observation* and the frequencies of the observed alleles. For example, 
@@ -323,7 +330,7 @@ labels <- c("common match", "rare match", "mismatch", "partial common match")
 text(x = xy["x", ], y = xy["y", ], pos = 3, cex = 0.75, labels) # Annotate 
 ```
 
-## Data on many markers
+# Data on many markers
 
 Given equal prior recurrent state probabilities, posterior probabilities
 converge to either
@@ -590,8 +597,366 @@ prior <- as.matrix(data.frame("C" = 0.25, "L" = 0.25, "I" = 0.50))
 suppressMessages(compute_posterior(y, fs, prior))$marg
 ```
 
+# Meiotic siblings
+
+## Methods 
+
+We simulated data and generated results for an initial infection containing two
+or three meiotic siblings and a recurrent
+
+- stranger 
+- clone
+- regular sibling 
+- meiotic sibling
+
+## Results
+
+When the initial infection contains two meiotic siblings `compute_posterior` is
+well behaved with maximum likelihood on the true relationship graph (not shown). 
+Posterior probabilities converge to
+
+- probable reinfection when the recurrent parasite is a stranger, 
+- probable recrudescence when the recurrent parasite is a clone,
+- certain relapse when the recurrent parasite is a regular sibling,
+- certain relapse when the recurrent parasite is a meiotic sibling. 
+
+```{r echo = FALSE}
+MOIs <- "2_1"
+cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
+
+for(case in cases){
+  
+  rm(list = "output")
+  load(sprintf("../MyDevFiles/RelationshipStudy/%s.rda", case))
+  cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colour repeats
+  
+  # Compute effective cardinality cumulatively
+  cum_card_eff <- sapply(output$fs_store, function(fs) {
+    cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  
+  # Determine which fs in cum_card_eff are equifrequent
+  equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
+  
+  # Plot trajectories
+  plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+       xaxt = "n", xlab = "", ylab = "Posterior expected state probability")
+  
+  # Horioutputontal axis
+  axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
+  axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+  axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+       tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+  
+  title(main = gsub("_", " ", case))
+  title(xlab = "Marker count (cumulative effective cardinality)", line = 3.5)
+  
+  # Add trajectories
+  for(i in 1:output$n_repeats){
+    lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
+          y = sapply(output$ps_store_all_ms[[MOIs]][[as.character(i)]], function(x) 
+            x[,output$exp_state]))
+  }
+  
+  legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
+         legend = 1:output$n_repeats)
+}
+```
+
+When the initial infection contains three meiotic siblings and the recurrent
+parasite is either a stranger or a clone, posterior probabilities converge
+correctly to probable reinfection and probable recrudescence, respectively, 
+
+```{r echo = FALSE}
+MOIs <- "3_1"
+cases <- c("Stranger", "Clone")
+for(case in cases){
+  
+  rm(list = "output")  
+  load(sprintf("../MyDevFiles/RelationshipStudy/%s.rda", case))
+  cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colour repeats
+  
+  # Compute effective cardinality cumulatively
+  cum_card_eff <- sapply(output$fs_store, function(fs) {
+    cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  
+  # Determine which fs in cum_card_eff are equifrequent
+  equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
+  
+  # Plot trajectories
+  plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+       xaxt = "n", xlab = "", ylab = "Posterior expected state probability")
+  
+  # Horioutputontal axis
+  axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
+  axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+  axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+       tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+  
+  title(main = gsub("_", " ", case))
+  title(xlab = "Marker count (cumulative effective cardinality)", line = 3.5)
+  
+  # Add trajectories
+  for(i in 1:output$n_repeats){
+    lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
+          y = sapply(output$ps_store_all_ms[[MOIs]][[as.character(i)]], function(x) 
+            x[,output$exp_state]))
+  }
+  
+  legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
+         legend = 1:output$n_repeats)
+}
+```
+
+However, relationship graphs (not shown) are wrong for two reasons:
+
+- all the relationship graphs have two, not three, parasites in the initial 
+infection because there are at most two alleles per marker
+- the maximum likelihood relationship graphs have stranger parasites in the
+initial episode because prevalence data from three or four meiotic siblings are
+identical to bulk data from parents and the parents are strangers.
+
+We can force the graphs to have the correct parasite count by specifying
+external MOIs. Doing so recovers maximum likelihood on true relationship graphs.
+However, the correct MOIs are unknowable in practice: a collection of siblings
+from the same two parents can only ever have two alleles at a given marker
+[could var genes be helpful?].
+
+When the initial infection contains three meiotic siblings and the recurrent
+parasite is a regular or meiotic sibling, posterior probabilities converge to
+probable recrudescence with maximum likelihood on graphs with a clonal edge to
+the sibling relapse, and either two stranger parasites in the initial episode
+when no external MOIs are specified, or three sibling parasites in the initial
+episode when the correct MOIs (unknowable in practice) are provided externally.
+
+```{r echo = FALSE}
+MOIs <- "3_1"
+cases <- c("Regular_sibling", "Meiotic_sibling")
+for(case in cases){
+  
+  rm(list = "output")
+  load(sprintf("../MyDevFiles/RelationshipStudy/%s.rda", case))
+  cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colour repeats
+  
+  # Compute effective cardinality cumulatively
+  cum_card_eff <- sapply(output$fs_store, function(fs) {
+    cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  
+  # Determine which fs in cum_card_eff are equifrequent
+  equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
+  
+  # Plot trajectories
+  plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+       xaxt = "n", xlab = "", ylab = "Posterior recrudescence probability")
+  
+  # Horioutputontal axis
+  axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
+  axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+  axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+       tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+  
+  title(main = gsub("_", " ", case))
+  title(xlab = "Marker count (cumulative effective cardinality)", line = 3.5)
+  
+  # Add trajectories
+  for(i in 1:output$n_repeats){
+    lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
+          y = sapply(output$ps_store_all_ms[[MOIs]][[as.character(i)]], function(x) 
+            x[,"C"]))
+  }
+  
+  legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
+         legend = 1:output$n_repeats)
+}
+```
+
+# Half siblings
+
+## Methods 
+We simulated data for three half siblings: two in an initial episode, the third
+in a recurrence:
+
+- child of parents 1 and 2 in the initial episode
+- child of parents 1 and 3 in the initial episode
+- child of parents 2 and 3 in the recurrence
+
+We explored two scenarios: one where all parental parasites draw from the same
+allele distribution. Another with admixture where parent 1 draws alleles
+disproportionally to parents 2 and 3.  The admixture scenario is likely
+infrequent. We explore it because it is a worse case scenario: it is contrived
+to maximally hamper relapse classification.
+
+## Results
+
+In general, when parental parasites draw from the same allele distribution, the
+frequency of certain relapse increases erratically with the number of markers
+genotyped.
+
+```{r echo = FALSE, fig.height = 4}
+rm(list = "output")
+load("../MyDevFiles/RelationshipStudy/Half_siblings.rda") 
+cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colours for repeats
+
+# Compute effective cardinality cumulatively
+cum_card_eff <- sapply(output$fs_store, function(fs) {
+  cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+
+# Determine which fs in cum_card_eff are equifrequent
+equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
+
+# Plot the posterior relapse probability trajectories
+plot(NULL, bty = "n", las = 1, xaxt = "n", xlim = c(1,max(output$n_markers)), 
+     xlab = "Marker count (effective cardinality)", 
+     ylim = c(0,1), ylab = "Posterior relapse probability")
+
+# Where does this 2/11 come from - correct Results_HalfSib.R accordingly
+abline(h = 2/11, lty = "dashed")
+text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 3)
+legend("center", lwd = 2, col = cols, legend = 1:output$n_repeats, bty = "n", 
+       cex = 0.5, title = "Repeat")
+
+# Add horioutputontal axis
+axis_at <- c(1, seq(0, max(output$n_markers), 50)[-1])
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+
+# Add trajectories
+for(i in 1:output$n_repeats){
+  lines(x = 1:max(output$n_markers),
+        y = sapply(output$ps_store_all_ms[[as.character(i)]], function(x) x[,"L"]),
+        col = cols[i], lwd = 2)
+}
+```
+When intra-episode parasites systematically share rare alleles (admixture AND
+imbalanced allele frequencies), the frequency of probable reinfection increases
+erratically with the number of markers genotyped.
+
+```{r echo = FALSE, fig.height=4}
+# Plot the posterior relapse probability trajectories
+plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+     xaxt = "n", xlab = "Marker count (effective cardinality)",
+     ylab = "Posterior reinfection probability")
+
+legend("right", col = cols, lwd = 2, inset = 0.1, legend = (1:output$n_repeats)-1, 
+       bty = "n", cex = 0.5, title = "Repeats")
+
+# Add horsioutputontal axis
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", round(cum_card_eff[,"0.5"][axis_at])))
+
+# Add trajectories
+for(i in 1:output$n_repeats){
+  y <- sapply(output$ps_store_all_ms_admix_rare[[as.character(i)]],function(x) x[,"I"])
+  lines(x = 1:max(output$n_markers), y = y, col = cols[i], lwd = 2)
+}
+```
+The system behaves erratically because ??? 
+
+<!-- (The proportion of intra versus inter matches does not explain the erratic
+nature of repeats 1 and 3 MyDevFiles/RelationshipStudy/Results_HalfSib.R) -->
+
+In both scenarios, the likelihood of the true graph with siblings within and
+across episodes is quashed as soon as distinct alleles from all three parents
+are observed at a given marker. In general, 
+
+- when all parasites draw from the same allele distribution, the maximum
+likelihood graphs are the two with one inter-episode sibling edge.
+- when intra-episode parasites systematically share rare alleles,
+the maximum likelihood graph is the one with one intra-episode sibling edge.
+
+# Parent-child like siblings
+
+## Methods 
+We simulated data for three parent-child like siblings: 
+
+- child of selfed parent 1 in the initial episode
+- child of parents 1 and 2 in the initial episode
+- child of selfed parent 2 in the recurrence
+
+Aside: the alternative with both children of selfed parents in the initial
+episode is equivalent to the meiotic case above with three mieotic siblings in
+the initial episode because prevalence data from three meiotic siblings is
+equivalent to prevalence data from two stranger parents and leads to probable
+recrudescence rather than certain relapse with the number of markers genotyped.
+
+As for half-siblings, we explored two scenarios: one where all parental
+parasites draw from the same allele distribution. Another with admixture where
+parent 1 draws alleles disproportionally to parents 2 and 3. The admixture
+scenario is likely infrequent. We explore it because it is a worse case
+scenario: it is contrived to maximally hamper relapse classification.
+
+## Results
+
+When parental parasites draw from the same allele distribution, the
+frequency of certain relapse increases erratically with the number of markers
+genotyped.
+
+```{r echo = FALSE}
+# Colours for repeats
+cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") 
+
+# Cumulative eff. cardinality 
+cum_card_eff <- sapply(output$fs_store, function(fs) { 
+  cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+
+# Determine which fs in cum_card_eff are equifrequent
+equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff) 
+
+# Plot the posterior relapse probability trajectories
+plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+     xaxt = "n", xlab = "Marker count (effective cardinality)", 
+     ylab = "Posterior relapse probability")
+abline(h = 2/11, lty = "dashed") # What is this 
+text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 3)
+legend("right", col = cols, lwd = 2, inset = 0.1, legend = 1:output$n_repeats,
+       bty = "n", title = "Repeats", cex = 0.5)
+
+# Add horioutputontal axis
+axis_at <- c(1, seq(0, max(output$n_markers), 50)[-1])
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+
+# Add trajectories
+for(i in 1:output$n_repeats) {
+  lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
+        y = sapply(output$ps_store_all_ms[[as.character(i)]], function(x) x[,"L"]))
+}
+```
+
+When intra-episode parasites systematically share rare alleles (admixture AND
+imbalanced allele frequencies), the frequency of probable reinfection increases
+very erratically with the number of markers genotyped.
+
+```{r}
+# Plot the posterior relapse probability trajectories
+plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1, 
+     xaxt = "n",  xlab = "Marker count (effective cardinality)", 
+     ylab = "Posterior reinfection probability")
+
+# Add horioutputontal axis 
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+
+# Add trajectories
+for(i in 1:output$n_repeats){
+  y <- sapply(output$ps_store_all_ms_admix_rare[[as.character(i)]],function(x) x[,"I"])
+  lines(x = 1:max(output$n_markers), y = y, col = cols[i], lwd = 2)
+}
+
+# Add legend
+legend("right", col = cols, lwd = 2, inset = 0.1, legend = 1:output$n_repeats,
+       bty = "n", title = "Repeats", cex = 0.5)
+```
+In general, when all parasites draw from the same allele distribution, the maximum
+likelihood graph is the true graph with with siblings within and
+across episodes. Meanwhile, when intra-episode parasites systematically share rare alleles,
+the maximum likelihood graph is the one with one intra-episode sibling edge.
 
 
+#===============================================================================
 
 
 The marginal probabilities of relapse / reinfection of different recurrences

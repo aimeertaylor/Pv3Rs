@@ -6,9 +6,9 @@
 # In the ParentChildLike case, the recombinant is in the MOI=2 initial
 # infection.
 #
-# In both cases, explore two scenarios. One where parents draw from the same
-# allele distribution. Another the first parent who parents initial parasites
-# only, draws rare alleles with high probability (worse case scenario).
+# In both cases, explore two scenarios. One without admixture where parents draw
+# from the same allele distribution. Another with admixture where the first
+# parent who parents initial parasites only, draws alleles disproportionally.
 # Otherwise stated:
 #
 # Half siblings:
@@ -20,13 +20,11 @@
 # relapse <- rbind(child2)
 #
 # For each case, generate results for data on all marker counts when alleles are
-# equifrequent, and for a subset of marker counts when alleles are not
-# equifrequent.
+# equifrequent, and for a subset of marker counts when alleles are not.
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack) # For rdirichlet
-library(tictoc) # For timing
 
 #===============================================================================
 # Magic numbers / quantities
@@ -46,6 +44,7 @@ ys_store <- list() # y for data
 fs_store <- list() # f for frequency
 ps_store <- list() # p for posterior
 ps_store_all_ms <- list() # all_ms for all marker counts
+ps_store_all_ms_admix_rare <- list() # all_ms for all marker counts
 
 #===============================================================================
 # Set the seed, name markers and get alleles, maker subsets etc.
@@ -70,15 +69,11 @@ chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
 
 for(case in cases) {
 
-  print(case)
-
   #===============================================================================
   # Generate data
-  # When rare_enrich is TRUE, draw rare alleles with high probability for one
-  # parent (interpret as an migrant from another population) who parents
-  # intra-episode parasite.
+  # When admixture is TRUE, draw rare alleles with high probability for the
+  # parent that parents intra-episode parasite only.
   #===============================================================================
-  tictoc::tic()
   for(c in c_params) {
 
     # Sample allele frequencies
@@ -94,7 +89,7 @@ for(case in cases) {
     # Store allele frequencies
     fs_store[[as.character(c)]] <- fs
 
-    for(rare_enrich in c(TRUE, FALSE)) {
+    for(admixture in c(TRUE, FALSE)) {
       for(i in 1:n_repeats) {
 
         if (case == "ParentChildLike") {
@@ -103,7 +98,7 @@ for(case in cases) {
           while (parent_clones) {
 
             # draw rare alleles with high probability
-            if (rare_enrich) {
+            if (admixture) {
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
             } else {
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
@@ -139,7 +134,7 @@ for(case in cases) {
           # Sample parental genotypes
           parent_clones <- TRUE
           while (parent_clones) {
-            if (rare_enrich) { # draw rare alleles with high probability
+            if (admixture) { # draw rare alleles with high probability
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
             } else {
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
@@ -184,44 +179,21 @@ for(case in cases) {
                   relapse = apply(relapse, 2, unique, simplify = F))
 
         # Store the data
-        ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]] <- y
+        ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]] <- y
 
       }
     }
   }
-  tictoc::toc()
 
-  #===============================================================================
-  # Generate results with return.logp = TRUE
-  #===============================================================================
-  tictoc::tic()
-  for(i in 1:n_repeats){
-    print(i)
-    for(c in c_params) {
-      fs <- fs_store[[as.character(c)]]
-      for(rare_enrich in c(TRUE, FALSE)) {
-        y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
-        for(m in n_markers){
-          marker_subset <- marker_subsets[[m]]
-          y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
-          ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
-          ps_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[as.character(i)]][[as.character(m)]] <- ps
-        }
-      }
-    }
-  }
-  tictoc::toc()
-
-  #===============================================================================
+  #=============================================================================
   # Generate results for markers 1:max_n_markers
-  #===============================================================================
+  #=============================================================================
   c <- 100 # For uniform allele frequencies only
-  rare_enrich <- FALSE # For parents from the same population
+  admixture <- FALSE # For parents from the same population
   fs <- fs_store[[as.character(c)]] # Extract frequencies
-  tictoc::tic()
   for(i in 1:n_repeats){
     print(i)
-    y_all_markers <- ys_store[[as.character(c)]][[sprintf("rare_enrich_%s", rare_enrich)]][[i]]
+    y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
     for(m in 1:max_n_markers){
       marker_subset <- marker_subsets[[m]]
       y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
@@ -229,7 +201,39 @@ for(case in cases) {
       ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg
     }
   }
-  tictoc::toc()
+
+  c <- 0.5 # For admixed case with imbalanced allele frequencies
+  admixture <- TRUE # For parents from different populations
+  fs <- fs_store[[as.character(c)]] # Extract frequencies
+  for(i in 1:n_repeats){
+    print(i)
+    y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
+    for(m in 1:max_n_markers){
+      marker_subset <- marker_subsets[[m]]
+      y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
+      ps <- suppressMessages(compute_posterior(y, fs))
+      ps_store_all_ms_admix_rare[[as.character(i)]][[paste0("m",m)]] <- ps$marg
+    }
+  }
+
+  #=============================================================================
+  # Generate results with return.logp = TRUE
+  #=============================================================================
+  for(i in 1:n_repeats){
+    print(i)
+    for(c in c_params) {
+      fs <- fs_store[[as.character(c)]]
+      for(admixture in c(TRUE, FALSE)) {
+        y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
+        for(m in n_markers){
+          marker_subset <- marker_subsets[[m]]
+          y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
+          ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
+          ps_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[as.character(i)]][[as.character(m)]] <- ps
+        }
+      }
+    }
+  }
 
   #=============================================================================
   # Bundle magic numbers, data and results
@@ -243,8 +247,8 @@ for(case in cases) {
                  fs_store = fs_store,
                  ys_store = ys_store,
                  ps_store = ps_store,
-                 ps_store_all_ms = ps_store_all_ms)
-
+                 ps_store_all_ms = ps_store_all_ms,
+                 ps_store_all_ms_admix_rare = ps_store_all_ms_admix_rare)
 
 save(output, file = sprintf("%s_siblings.rda", case))
 }

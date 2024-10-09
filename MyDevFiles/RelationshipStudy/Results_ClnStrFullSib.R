@@ -1,6 +1,6 @@
 ################################################################################
-# Plot results for an initial infection of MOI=2 meiotic siblings (plus MOI=3 in a
-# sibling case) and a MOI=1 case recurrence which is either a stranger, clone,
+# Plot results for an initial infection of MOI=2 meiotic siblings (plus MOI=3 in
+# a sibling case) and a MOI=1 case recurrence which is either a stranger, clone,
 # regular sibling, or meiotic sibling.
 #
 # For each case, plot results when alleles are equifrequent and data are
@@ -21,8 +21,6 @@
 # data from parents. As such, infections with three meiotic siblings are liable
 # to be classified as infections of strangers with a clonal edge to a sibling
 # relapse (regular or meiotic).
-#
-# Thing to add: where they are converging to (see Understanding Graph bias)
 ################################################################################
 
 # Set working directory to source file location
@@ -38,19 +36,29 @@ for(case in cases){
   load(sprintf("./%s.rda", case))
   attach(output)
   cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colour repeats
-  cols_light <- sapply(cols, adjustcolor, alpha = 0.25)
+
+  # Compute effective cardinality cumulatively
+  cum_card_eff <- sapply(fs_store, function(fs) {
+    cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+
+  # Determine which fs in cum_card_eff are equifrequent
+  equifs <- which(as.numeric(colnames(cum_card_eff)) > c_cutoff)
 
   # ==============================================================================
   # Plots given equifrequent alleles across all marker counts
   # ==============================================================================
   par(mfrow = c(2,1))
 
-  # PLot trajaectories
+  # Plot trajectories
   plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1,
-       xaxt = "n", xlab = "Marker count", ylab = "Posterior expected state probability")
-  axis(side = 1, at = seq(0, max(n_markers), 10))
+       xaxt = "n", xlab = "", ylab = "Posterior expected state probability")
+  axis_at <- c(1, seq(0, max(n_markers), 10)[-1])
+  axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+  axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+       tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
   title(main = gsub("_", " ", case))
-    for(MOIs in MOIs_per_infection) {
+  title(xlab = "Marker count (cumulative effective cardinality)", line = 3.5)
+  for(MOIs in MOIs_per_infection) {
     LTY = ifelse(MOIs == "2_1", 1, 2)
     for(i in 1:n_repeats){
       lines(x = 1:max(n_markers),
@@ -60,20 +68,24 @@ for(case in cases){
   }
   legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
          legend = 1:n_repeats)
-  legend("bottomright", lty = c(1,2), lwd = 2, title = "MOIs", box.col = "white",
-         legend = gsub("_", " and ", MOIs_per_infection))
+  if(length(MOIs_per_infection) > 2) {
+    legend("bottomright", lty = c(1,2), lwd = 2, title = "MOIs", box.col = "white",
+           legend = gsub("_", " and ", MOIs_per_infection))
+  }
+
 
   # Plot simplex (helpful when the posterior evades the expected state)
   par(mar = c(0,0,0,0))
   V_labels <- c("Recrudescence", "Relapse", "Reinfection")
-  plot_simplex(v_labels =  V_labels, v_cutoff = 0.5)
+  plot_simplex(v_labels = V_labels, v_cutoff = 0.5)
   for(MOIs in MOIs_per_infection) {
     LTY = ifelse(MOIs == "2_1", 1, 2)
-    for(i in 3){
+    for(i in 1:n_repeats){
       xy_post <- cbind(c(0,0), apply(do.call(rbind, ps_store_all_ms[[MOIs]][[as.character(i)]]), 1, project2D))
-      lines(x = xy_post["x",], y = xy_post["y",], lty = LTY)
-      points(x = xy_post["x",], y = xy_post["y",], pch = "-")}
+      lines(x = xy_post["x",], y = xy_post["y",], lty = LTY, col = cols[i])
+      points(x = xy_post["x",], y = xy_post["y",], pch = "-")
     }
+  }
 
   # ==============================================================================
   # Plots for different allele frequencies and for marker counts in n_markers
@@ -84,13 +96,15 @@ for(case in cases){
     plot(NULL, xlim = range(n_markers)+c(-10,10), ylim = c(0,1),
          xaxt = "n", bty = "n", panel.first = grid(nx = NA, ny = NULL),
          ylab = "Posterior expected state probability",
-         xlab = "Number of markers",
-         main = sprintf("Concentration parameter: %s", c))
-    axis(side = 1, at = n_markers)
+         xlab = "Marker count (effective cardinality)")
+    title(main = sprintf("Concentration parameter: %s", c), line = 0)
+    axis(side = 1, at = n_markers, cex.axis = 0.7)
+    axis(side = 1, line = 1, at = n_markers, cex.axis = 0.7, tick = F,
+         labels = sprintf("(%s)", round(cum_card_eff[,as.character(c)][n_markers])))
     for(MOIs in MOIs_per_infection) {
       for(i in 1:n_repeats) {
         lines(y = post_S[[as.character(c)]][[MOIs]][,i], x = n_markers,
-              lwd = 1.5, col = cols_light[i], pch = 20,
+              lwd = 1.5, col = cols[i], pch = 20,
               lty = ifelse(MOIs == "2_1", 1, 2))
         points(y = post_S[[as.character(c)]][[MOIs]][,i], x = n_markers,
                lwd = 1.5, col = cols[i], pch = 20)
@@ -98,30 +112,33 @@ for(case in cases){
     }
   }
 
-  example_y <- ys_store[[1]][[1]][[1]]
-  example_MOIs <- determine_MOIs(example_y)
-  ts_per_gs <- rep(1:length(example_y), example_MOIs)
-  gs <- paste0("g", 1:sum(example_MOIs))
+  for(MOIs in MOIs_per_infection) {
 
-  graph_cols <- RColorBrewer::brewer.pal(n = 9, "Paired")
-  graph_plot_order <- c(4, 2, 6, 8, 5, 9, 1, 3, 7)
-  names(graph_cols) <- graph_plot_order
+    MOIs_num <- as.numeric(strsplit(MOIs, "_")[[1]])
+    ts_per_gs <- rep(1:length(MOIs_num), MOIs_num)
+    gs <- paste0("g", 1:sum(MOIs_num))
+    RGs <- enumerate_RGs(MOIs = MOIs_num, igraph = T)
+    graph_cols <- colorRamp(RColorBrewer::brewer.pal(n = 9, "Paired"))(seq(0, 1, length.out = length(RGs)))
+    graph_cols <- apply(round(graph_cols), 1, function(x) rgb(x[1], x[2], x[3], maxColorValue = 255))
+    graph_plot_order <- 1:length(RGs) #c(4, 2, 6, 8, 5, 9, 1, 3, 7)
+    names(graph_cols) <- graph_plot_order
 
-  # Plot graphs
-  par(mfrow = c(3,3))
-  for(g in graph_plot_order) {
-    ps <- ps_store[[1]][[1]][[1]][[1]]
-    RG <- ps$RGs[[g]]
-    par(mar = c(0.5, 0.5, 0.5, 0.5))
-    igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
-    igraphRG <- igraph::set_vertex_attr(igraphRG, "name", value = NA) # Remove names
-    plot_RG(RG =  igraphRG, vertex_palette = "Greys", labels = NA)
-    box(col = graph_cols[as.character(g)], lwd = 3)
-  }
+    # Plot graphs
+    par(mfrow = c(ceiling(sqrt(length(RGs))),ceiling(sqrt(length(RGs)))))
 
-  # For each m, c combination, plot the graph likelihood
-  for(c in c_params){
-    for(MOIs in MOIs_per_infection){
+    for(g in graph_plot_order) {
+      # ps <- ps_store[[1]][[1]][[1]][[1]]
+      # RG <- ps$RGs[[g]]
+      RG <- RGs[[g]]
+      par(mar = c(0.5, 0.5, 0.5, 0.5))
+      igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
+      igraphRG <- igraph::set_vertex_attr(igraphRG, "name", value = NA) # Remove names
+      plot_RG(RG =  igraphRG, vertex_palette = "Greys", labels = NA)
+      box(col = graph_cols[as.character(g)], lwd = 3)
+    }
+
+    # For each m, c combination, plot the graph likelihood
+    for(c in c_params){
       par(mfcol = c(n_repeats,length(c_params)), mar = c(0,0,0,0))
       for(m in n_markers){
         for(i in 1:n_repeats) {
