@@ -33,7 +33,7 @@ for(case in cases){
   par(par_default)
   attached <- search()
   if(exists("ys_store")) detach("output")
-  load(sprintf("./%s.rda", case))
+  load(sprintf("../../%s.rda", case))
   attach(output)
   cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colour repeats
 

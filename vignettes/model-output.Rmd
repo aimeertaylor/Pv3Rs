@@ -9,12 +9,13 @@ vignette: >
   
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>",
-out.width = "100%", # Line width taken up by plot
-fig.dpi=300, # For quality 
-fig.width=7, # Increase to outputoom out
-cache = TRUE
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%", # Line width taken up by plot
+  fig.dpi = 300, # For quality 
+  fig.width = 7, # Increase to outputoom out
+  fig.height = 4, 
+  cache = TRUE
 )
 ```
 
@@ -209,7 +210,7 @@ legend("right", col = 1:length(MOIs), pch = 20, bty = "n", inset = 0.2,
 The likelihood is only appreciable for relationship graphs where all parasites
 in the first episode are siblings.
 
-```{r echo = FALSE, fig.height = 5}
+```{r echo = FALSE}
 # ------------------------------------------------------------------------------
 # Maximum likelihood graphs for illustrative case with MOIs 3 & 2
 # ------------------------------------------------------------------------------
@@ -526,7 +527,7 @@ legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs),
 The likelihood is only appreciable for relationship graphs where the parasites
 in the first episode are all siblings and the inter-episode edges are clones.
 
-```{r echo = FALSE, fig.height = 5}
+```{r echo = FALSE}
 # ------------------------------------------------------------------------------
 # Maximum likelihood graphs for illustrative case with MOIs 3 & 3
 # ------------------------------------------------------------------------------
@@ -554,12 +555,11 @@ plot(llikes_sorted$x, pch = 20, cex = 0.5, col = "lightgray", bty = "n",
      ylab = "Log-likelihood", xlab = "Relationship Graph")
 points(y = llikes_sorted$x[(RGs_not_I & RGs_edges_within)[llikes_sorted$ix]], 
        x = which((RGs_not_I & RGs_edges_within)[llikes_sorted$ix]),
-       col = "cornflowerblue", pch = 20, cex  = 0.5)
+       col = "hotpink", pch = 20, cex  = 0.5)
 points(y = llikes_sorted$x[(RGs_C & RGs_edges_within)[llikes_sorted$ix]], 
        x = which((RGs_C & RGs_edges_within)[llikes_sorted$ix]), 
        col = "black", pch = 20, cex  = 0.5)
-legend("bottomright", pch = 20, bty= "n", cex = 0.5, 
-       col = c("black", "cornflowerblue", "lightgray"), 
+legend("bottomright", pch = 20, bty= "n", col = c("black", "hotpink", "lightgray"), 
        legend = c("Graphs with only siblings in the first episode and inter-episode clones",
                   "Graphs with only siblings in the first episode and inter-episode clones and siblings",
                   "All other graphs"))
@@ -626,8 +626,15 @@ cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
 
 for(case in cases){
   
-  rm(list = "output")
-  load(sprintf("../MyDevFiles/RelationshipStudy/%s.rda", case))
+  if( case == "Stranger") {
+    exp_state <- "reinfection"    
+  } else if (case == "Clone") {
+    exp_state <- "recrudescence"
+  } else {
+    exp_state <- "relapse"
+  }
+  
+  output <- output_Cln.Str.Sib[[case]]
   cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colour repeats
   
   # Compute effective cardinality cumulatively
@@ -639,7 +646,7 @@ for(case in cases){
   
   # Plot trajectories
   plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
-       xaxt = "n", xlab = "", ylab = "Posterior expected state probability")
+       xaxt = "n", xlab = "", ylab = sprintf("Posterior %s probability", exp_state))
   
   # Horioutputontal axis
   axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
@@ -664,15 +671,16 @@ for(case in cases){
 
 When the initial infection contains three meiotic siblings and the recurrent
 parasite is either a stranger or a clone, posterior probabilities converge
-correctly to probable reinfection and probable recrudescence, respectively, 
+correctly to probable reinfection and probable recrudescence, respectively. 
 
 ```{r echo = FALSE}
 MOIs <- "3_1"
 cases <- c("Stranger", "Clone")
+
 for(case in cases){
-  
-  rm(list = "output")  
-  load(sprintf("../MyDevFiles/RelationshipStudy/%s.rda", case))
+
+  rm(list = "output")
+  output <- output_Cln.Str.Sib[[case]]
   cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colour repeats
   
   # Compute effective cardinality cumulatively
@@ -731,10 +739,11 @@ episode when the correct MOIs (unknowable in practice) are provided externally.
 ```{r echo = FALSE}
 MOIs <- "3_1"
 cases <- c("Regular_sibling", "Meiotic_sibling")
+
 for(case in cases){
   
   rm(list = "output")
-  load(sprintf("../MyDevFiles/RelationshipStudy/%s.rda", case))
+  output <- output_Cln.Str.Sib[[case]]
   cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colour repeats
   
   # Compute effective cardinality cumulatively
@@ -793,7 +802,7 @@ genotyped.
 
 ```{r echo = FALSE, fig.height = 4}
 rm(list = "output")
-load("../MyDevFiles/RelationshipStudy/Half_siblings.rda") 
+output <- output_HalfSib.PClikeSib[["Half"]]
 cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colours for repeats
 
 # Compute effective cardinality cumulatively
@@ -831,7 +840,7 @@ When intra-episode parasites systematically share rare alleles (admixture AND
 imbalanced allele frequencies), the frequency of probable reinfection increases
 erratically with the number of markers genotyped.
 
-```{r echo = FALSE, fig.height=4}
+```{r echo = FALSE}
 # Plot the posterior relapse probability trajectories
 plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
      xaxt = "n", xlab = "Marker count (effective cardinality)",
@@ -893,6 +902,8 @@ frequency of certain relapse increases erratically with the number of markers
 genotyped.
 
 ```{r echo = FALSE}
+output <- output_HalfSib.PClikeSib[["ParentChildLike"]]
+
 # Colours for repeats
 cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") 
 
