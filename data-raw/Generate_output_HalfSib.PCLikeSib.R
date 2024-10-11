@@ -41,7 +41,7 @@ seed <- 1 # For reproducibility
 #===============================================================================
 # Stores for data, frequencies & results
 #===============================================================================
-output_HalfSib.PClikeSib <- list()
+output_HalfSib.PCLikeSib <- list()
 ys_store <- list() # y for data
 fs_store <- list() # f for frequency
 ps_store <- list() # p for posterior
@@ -247,7 +247,7 @@ for(case in cases) {
                  ps_store_all_ms = ps_store_all_ms,
                  ps_store_all_ms_admix_rare = ps_store_all_ms_admix_rare)
 
-  output_HalfSib.PClikeSib[[case]] <- output
+  output_HalfSib.PCLikeSib[[case]] <- output
 }
 
 # Save as exported data
