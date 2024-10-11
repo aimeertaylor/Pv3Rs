@@ -4,6 +4,8 @@
 # either a stranger, a clone, a regular sibling, or a meiotic sibling. For each
 # case, generate results for all marker counts when alleles are equifrequent,
 # and for a subset of marker counts otherwise.
+#
+# Doesn't take two long to run: minute or two on 32 GB RAM laptop
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
@@ -50,6 +52,8 @@ no_clone_subset <- marker_subsets[[min_n_markers]]
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
 
 for(case in cases){
+
+  print(case)
 
   #===============================================================================
   # Generate data
@@ -149,7 +153,6 @@ for(case in cases){
   }
 
   for(i in 1:n_repeats){
-    print(i)
     for(MOIs in MOIs_per_infection) {
       y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[as.character(i)]]
       for(m in 1:max_n_markers){
@@ -172,13 +175,12 @@ for(case in cases){
         for(m in n_markers){
           marker_subset <- marker_subsets[[m]]
           y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = F)
-
           if(provide_correct_MOIs) {
             ps <- suppressMessages(compute_posterior(y, fs, MOIs = as.numeric(strsplit(MOIs, "_")[[1]]), return.RG = TRUE, return.logp = TRUE))
           } else {
             ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
           }
-
+          ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
           ps_store[[as.character(c)]][[MOIs]][[as.character(i)]][[as.character(m)]] <- ps
         }
       }
@@ -207,6 +209,7 @@ for(case in cases){
   # Bundle magic numbers, data, and results
   #=============================================================================
   output <- list(MOIs_per_infection = MOIs_per_infection,
+                 provide_correct_MOIs = provide_correct_MOIs,
                  n_alleles = n_alleles,
                  n_repeats = n_repeats,
                  n_markers = n_markers,

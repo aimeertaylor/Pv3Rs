@@ -6,11 +6,15 @@
 # across episodes (admixture_TRUE).
 # ==============================================================================
 rm(list = ls())
-par_default <- par(no.readonly = TRUE)
+
 attached <- search()
-if(exists("ys_store")) detach(output)
-load("ParentChildLike_siblings.rda")
+if("output" %in% attached) detach(output)
+if(exists("output")) rm("output")
+load("../../data/output_HalfSib.PClikeSib.rda")
+output <- output_HalfSib.PClikeSib[["PCLike"]]
 attach(output)
+
+par_default <- par(no.readonly = TRUE)
 if (n_repeats != 10) stop("Plots assume 10 repeats")
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 

@@ -350,7 +350,7 @@ per-episode MOIs increases parasite genotype counts within infections and thus
 changes maximal probabilities of recrudescence and reinfection. However,
 increasing per-episode MOIs adds data inextricably.
 
-#### Dependence on the number of recurrences
+#### Dependence on the number of subsequent recurrences
 
 ```{r echo=FALSE}
 marker_count <- 100
@@ -648,7 +648,7 @@ for(case in cases){
   plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
        xaxt = "n", xlab = "", ylab = sprintf("Posterior %s probability", exp_state))
   
-  # Horioutputontal axis
+  # Horizontal axis
   axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
   axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
   axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
@@ -967,11 +967,14 @@ across episodes. Meanwhile, when intra-episode parasites systematically share ra
 the maximum likelihood graph is the one with one intra-episode sibling edge.
 
 
-#===============================================================================
 
+# Assymetry 
 
 The marginal probabilities of relapse / reinfection of different recurrences
-with the same data differ slightly because XXX [discuss with YS]
+with the same data differ slightly because of the asymmetry in relationship
+graphs: a reinfection at the end of a sequence requires all edges reaching
+backward from the terminal episode to be stranger edges; at the start of a
+sequence, there are no backward reaching edges to constrain.
 
 ```{r}
 suppressMessages(compute_posterior(y = list(enroll = list(m1 = "A"), 
@@ -979,10 +982,122 @@ suppressMessages(compute_posterior(y = list(enroll = list(m1 = "A"),
                                             recur2 = list(m1 = "A"), 
                                             recur3 = list(m1 = "A")), 
                                    fs = list(m1 = c("A" = 0.1,"B" = 0.9))))$marg
+
+
+
+
 ```
 
 
+```{r}
+marker_count <- 100
+ms <- paste0("m", 1:marker_count)
+match <- as.list(sapply(ms, function(t) "A"))
+mismatch <- as.list(sapply(ms, function(t) "B"))
+no_data <- as.list(sapply(ms, function(t) NA))
+fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
 
+ys_match <- list("OON" = list(enroll = match, 
+                              recur1 = match,
+                              recur2 = no_data),
+                 "ONO" = list(enroll = match, 
+                              recur1 = no_data,
+                              recur2 = match), 
+                 "NOO" = list(enroll = no_data, 
+                              recur1 = match,
+                              recur2 = match)
+)
+
+ys_match <- list("OON" = list(enroll = match, 
+                              recur1 = mismatch,
+                              recur2 = no_data),
+                 "ONO" = list(enroll = match, 
+                              recur1 = no_data,
+                              recur2 = mismatch), 
+                 "NOO" = list(enroll = no_data, 
+                              recur1 = match,
+                              recur2 = mismatch)
+)
+# ------------------------------------------------------------------------------
+# Posterior based on model
+# ------------------------------------------------------------------------------
+results_match <- lapply(ys_match, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+results_mismatch <- lapply(ys_mismatch, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+
+# Extract results for the first recurrence
+results_match_recur1 <- sapply(results_match, function(x) x["recur1",])
+results_mismatch_recur1 <- sapply(results_mismatch, function(x) x["recur1",])
+
+# ------------------------------------------------------------------------------
+# Posterior approximation based on graphs only
+# ------------------------------------------------------------------------------
+MOIs <- lapply(ys_mismatch, determine_MOIs) # MOIs, same for match and mismatch 
+approximation <- lapply(1:length(MOIs), FUN = function(i) {
+  
+  # Get graphs and the state sequence compatibilities
+  gd <- get_graph_dist(MOIs[[i]])
+  
+  # Recurrent state sequences strings and characters
+  sqstr <- unique(unlist(gd$CIL_gvn_RGs)) 
+  sqchr <- do.call(cbind, sapply(sqstr, function(x) strsplit(x, split = "")))
+  
+  # Recurrent state sequences with first episode recrudescence / reinfection 
+  sqstr_C_1st <- sqstr[which(sqchr[1,] == "C")] 
+  sqstr_I_1st <- sqstr[which(sqchr[1,] == "I")] 
+  
+  # Graphs compatible with first episode recrudescence / reinfection 
+  RGs_C_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_C_1st %in% x))
+  RGs_I_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_I_1st %in% x))
+  
+  # Numbers of graphs compatible with each recurrent state sequence
+  num_comp <- sapply(sqstr, function(seq) { # All graphs
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x))})
+  num_comp_RGs_I_1st <- sapply(sqstr, function(seq) { # With reinfection 1st
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_I_1st)})
+  num_comp_RGs_C_1st <- sapply(sqstr, function(seq) { # With recrudesc. 1st 
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_C_1st)})
+  
+  # Joint probabilities unnormalised and normalised
+  joint_match_un <- num_comp_RGs_C_1st / num_comp
+  joint_mismatch_un <- num_comp_RGs_I_1st / num_comp
+  joint_match <- joint_match_un/sum(joint_match_un)
+  joint_mismatch <- joint_mismatch_un/sum(joint_mismatch_un)
+  
+  # Marginal probabilities
+  C_match <- sum(joint_match[sqstr_C_1st])
+  I_mismatch <- sum(joint_mismatch[sqstr_I_1st])
+  approx <- rbind(c(C = C_match, L = 1 - C_match, I = 0), 
+                  c(C = 0, L = 1 - I_mismatch, I = I_mismatch))
+})
+
+# ------------------------------------------------------------------------------
+# Plot probabilities
+# ------------------------------------------------------------------------------
+par(mar = c(0,0,0,0))
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
+
+xy <- apply(results_match_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:4) # Plot projections
+text(mean(xy["x", ]), mean(xy["y", ]), "match data", pos = 3, offset = 1) 
+
+xy <- apply(results_mismatch_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:4) # Plot projections
+text(mean(xy["x", ]), mean(xy["y", ]), "mismatch data", pos = 3, offset = 1) 
+
+# Add approximations based on graphs only
+xys <- lapply(approximation, function(x) apply(x, 1, project2D)) 
+for(i in 1:length(xys)) {
+  xy <- xys[[i]]
+  points(x = xy["x", ], y = xy["y", ], col = i, cex = 2) 
+}
+
+legend("left", pch = c(20, 1), pt.cex = c(1, 2), bty = "n", inset = 0, 
+       legend = c("Posterior probability", "Posterior approximation"))
+legend("right", col = c(1,3,5), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
+       legend = 1:4, title = "Recurrence\ncount") 
+```
 
 
 

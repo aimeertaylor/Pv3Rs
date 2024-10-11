@@ -30,7 +30,7 @@ library(MCMCpack) # For rdirichlet
 #===============================================================================
 # Magic numbers / quantities
 #===============================================================================
-cases <- c("ParentChildLike", "Half")
+cases <- c("PCLike", "Half")
 n_alleles <- 5 # Number of alleles per marker (marker cardinality)
 n_repeats <- 10 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100, 150) # Number of markers for which RG likelihood returned
@@ -68,6 +68,8 @@ chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
 
 for(case in cases) {
 
+  print(case)
+
   #===============================================================================
   # Generate data
   # When admixture is TRUE, draw rare alleles with high probability for the
@@ -91,7 +93,7 @@ for(case in cases) {
     for(admixture in c(TRUE, FALSE)) {
       for(i in 1:n_repeats) {
 
-        if (case == "ParentChildLike") {
+        if (case == "PCLike") {
           # Sample parental genotypes
           parent_clones <- TRUE
           while (parent_clones) {
@@ -170,7 +172,7 @@ for(case in cases) {
           relapse <- rbind(child23)
 
         } else {
-          stop('case should either be "ParentChildLike" or "Half"')
+          stop('case should either be "PCLike" or "Half"')
         }
 
         y <- list(initial = apply(initial, 2, unique, simplify = F),
@@ -190,7 +192,6 @@ for(case in cases) {
   admixture <- FALSE # For parents from the same population
   fs <- fs_store[[as.character(c)]] # Extract frequencies
   for(i in 1:n_repeats){
-    print(i)
     y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
     for(m in 1:max_n_markers){
       marker_subset <- marker_subsets[[m]]
@@ -204,7 +205,6 @@ for(case in cases) {
   admixture <- TRUE # For parents from different populations
   fs <- fs_store[[as.character(c)]] # Extract frequencies
   for(i in 1:n_repeats){
-    print(i)
     y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
     for(m in 1:max_n_markers){
       marker_subset <- marker_subsets[[m]]
@@ -218,7 +218,6 @@ for(case in cases) {
   # Generate results with return.logp = TRUE
   #=============================================================================
   for(i in 1:n_repeats){
-    print(i)
     for(c in c_params) {
       fs <- fs_store[[as.character(c)]]
       for(admixture in c(TRUE, FALSE)) {
