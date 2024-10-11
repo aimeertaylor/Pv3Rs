@@ -251,4 +251,4 @@ for(case in cases) {
 }
 
 # Save as exported data
-usethis::use_data(output_HalfSib.PClikeSib, overwrite = TRUE)
+usethis::use_data(output_HalfSib.PCLikeSib, overwrite = TRUE)
