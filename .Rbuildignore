@@ -1,6 +1,6 @@
 ^Pv3Rs\.R$proj$
 ^\.R$proj\.user$
-MyDevFiles*
+DevFiles*
 ^data-raw$
 
 # Deprecated files from previous implementation
