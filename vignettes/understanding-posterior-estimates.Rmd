@@ -1,4 +1,3 @@
----
 title: "Understanding posterior estimates"
 output: rmarkdown::html_vignette
 vignette: >
@@ -58,6 +57,18 @@ We have not yet characterised model misspecification due to inbred parasites.
 However, we intuit inter-marker dependence will lead to overconfident posterior
 probabilities, while population structure could lead to the misclassification of
 reinfection as relapse.
+
+Consequently, the Pv3Rs model is misspecified when data come from
+
+- parent-child-like siblings (not transitive),
+- half siblings (inherit from three parents),
+- mieotic siblings (not independent),
+
+all of which could be present in a brood because gametocytes can self (necessary
+for parent-child-like siblings), sporozoites can come from different oocysts
+(necessary for parent-child-like siblings and for half siblings), and
+sporozoites can come from a single oocyst (necessary for mieotic siblings); see
+Figure XXX.
 
 ```{r echo = FALSE}
 # get RG vertex labels, RGs, recurrent state sequences RGs are compatible with
@@ -350,124 +361,7 @@ per-episode MOIs increases parasite genotype counts within infections and thus
 changes maximal probabilities of recrudescence and reinfection. However,
 increasing per-episode MOIs adds data inextricably.
 
-#### Dependence on the number of subsequent recurrences
-
-```{r echo=FALSE}
-marker_count <- 100
-ms <- paste0("m", 1:marker_count)
-match <- as.list(sapply(ms, function(t) "A"))
-mismatch <- as.list(sapply(ms, function(t) "B"))
-no_data <- as.list(sapply(ms, function(t) NA))
-fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
-
-ys_match <- list("1_recurrence" = list(enroll = match, 
-                                       recur1 = match),
-                 "3_recurrence" = list(enroll = match, 
-                                       recur1 = match,
-                                       recur2 = no_data,
-                                       recur3 = no_data),
-                 "5_recurrence" = list(enroll = match, 
-                                       recur1 = match,
-                                       recur2 = no_data,
-                                       recur3 = no_data,
-                                       recur4 = no_data,
-                                       recur5 = no_data))
-
-ys_mismatch <- list("1_recurrence" = list(enroll = match, 
-                                          recur1 = mismatch),
-                    "3_recurrence" = list(enroll = match, 
-                                          recur1 = mismatch,
-                                          recur2 = no_data,
-                                          recur3 = no_data),
-                    "5_recurrence" = list(enroll = match, 
-                                          recur1 = mismatch,
-                                          recur2 = no_data,
-                                          recur3 = no_data,
-                                          recur4 = no_data,
-                                          recur5 = no_data))
-
-# ------------------------------------------------------------------------------
-# Posterior based on model
-# ------------------------------------------------------------------------------
-results_match <- lapply(ys_match, function(y) {
-  suppressMessages(compute_posterior(y, fs)$marg)})
-results_mismatch <- lapply(ys_mismatch, function(y) {
-  suppressMessages(compute_posterior(y, fs)$marg)})
-
-# Extract results for the first recurrence
-results_match_recur1 <- sapply(results_match, function(x) x["recur1",])
-results_mismatch_recur1 <- sapply(results_mismatch, function(x) x["recur1",])
-
-# ------------------------------------------------------------------------------
-# Posterior approximation based on graphs only
-# ------------------------------------------------------------------------------
-MOIs <- lapply(ys_mismatch, determine_MOIs) # MOIs, same for match and mismatch 
-approximation <- lapply(1:length(MOIs), FUN = function(i) {
-  
-  # Get graphs and the state sequence compatibilities
-  gd <- get_graph_dist(MOIs[[i]])
-  
-  # Recurrent state sequences strings and characters
-  sqstr <- unique(unlist(gd$CIL_gvn_RGs)) 
-  sqchr <- do.call(cbind, sapply(sqstr, function(x) strsplit(x, split = "")))
-  
-  # Recurrent state sequences with first episode recrudescence / reinfection 
-  sqstr_C_1st <- sqstr[which(sqchr[1,] == "C")] 
-  sqstr_I_1st <- sqstr[which(sqchr[1,] == "I")] 
-  
-  # Graphs compatible with first episode recrudescence / reinfection 
-  RGs_C_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_C_1st %in% x))
-  RGs_I_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_I_1st %in% x))
-  
-  # Numbers of graphs compatible with each recurrent state sequence
-  num_comp <- sapply(sqstr, function(seq) { # All graphs
-    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x))})
-  num_comp_RGs_I_1st <- sapply(sqstr, function(seq) { # With reinfection 1st
-    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_I_1st)})
-  num_comp_RGs_C_1st <- sapply(sqstr, function(seq) { # With recrudesc. 1st 
-    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_C_1st)})
-  
-  # Joint probabilities unnormalised and normalised
-  joint_match_un <- num_comp_RGs_C_1st / num_comp
-  joint_mismatch_un <- num_comp_RGs_I_1st / num_comp
-  joint_match <- joint_match_un/sum(joint_match_un)
-  joint_mismatch <- joint_mismatch_un/sum(joint_mismatch_un)
-  
-  # Marginal probabilities
-  C_match <- sum(joint_match[sqstr_C_1st])
-  I_mismatch <- sum(joint_mismatch[sqstr_I_1st])
-  approx <- rbind(c(C = C_match, L = 1 - C_match, I = 0), 
-                  c(C = 0, L = 1 - I_mismatch, I = I_mismatch))
-})
-
-# ------------------------------------------------------------------------------
-# Plot probabilities
-# ------------------------------------------------------------------------------
-par(mar = c(0,0,0,0))
-plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
-
-xy <- apply(results_match_recur1, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:4) # Plot projections
-text(mean(xy["x", ]), mean(xy["y", ]), "match data", pos = 3, offset = 1) 
-
-xy <- apply(results_mismatch_recur1, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:4) # Plot projections
-text(mean(xy["x", ]), mean(xy["y", ]), "mismatch data", pos = 3, offset = 1) 
-
-# Add approximations based on graphs only
-xys <- lapply(approximation, function(x) apply(x, 1, project2D)) 
-for(i in 1:length(xys)) {
-  xy <- xys[[i]]
-  points(x = xy["x", ], y = xy["y", ], col = i, cex = 2) 
-}
-
-legend("left", pch = c(20, 1), pt.cex = c(1, 2), bty = "n", inset = 0, 
-       legend = c("Posterior probability", "Posterior approximation"))
-legend("right", col = c(1,3,5), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
-       legend = 1:4, title = "Recurrence\ncount") 
-```
-
-#### Dependence on per-episode MOIs
+#### Increasing per-episode MOIs
 
 ```{r}
 MOIs <- list(c(1,1), c(3,1), c(2,2), c(3,3), c(4,2))
@@ -565,6 +459,271 @@ legend("bottomright", pch = 20, bty= "n", col = c("black", "hotpink", "lightgray
                   "All other graphs"))
 ```
 
+#### Adding recurrences without adding data
+
+```{r echo=FALSE}
+marker_count <- 100
+ms <- paste0("m", 1:marker_count)
+match <- as.list(sapply(ms, function(t) "A"))
+mismatch <- as.list(sapply(ms, function(t) "B"))
+no_data <- as.list(sapply(ms, function(t) NA))
+fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
+
+ys_match <- list("1_recurrence" = list(enroll = match, 
+                                       recur1 = match),
+                 "3_recurrence" = list(enroll = match, 
+                                       recur1 = match,
+                                       recur2 = no_data,
+                                       recur3 = no_data),
+                 "5_recurrence" = list(enroll = match, 
+                                       recur1 = match,
+                                       recur2 = no_data,
+                                       recur3 = no_data,
+                                       recur4 = no_data,
+                                       recur5 = no_data))
+
+ys_mismatch <- list("1_recurrence" = list(enroll = match, 
+                                          recur1 = mismatch),
+                    "3_recurrence" = list(enroll = match, 
+                                          recur1 = mismatch,
+                                          recur2 = no_data,
+                                          recur3 = no_data),
+                    "5_recurrence" = list(enroll = match, 
+                                          recur1 = mismatch,
+                                          recur2 = no_data,
+                                          recur3 = no_data,
+                                          recur4 = no_data,
+                                          recur5 = no_data))
+
+# ------------------------------------------------------------------------------
+# Posterior based on model
+# ------------------------------------------------------------------------------
+results_match <- lapply(ys_match, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+results_mismatch <- lapply(ys_mismatch, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+
+# Extract results for the first recurrence
+results_match_recur1 <- sapply(results_match, function(x) x["recur1",])
+results_mismatch_recur1 <- sapply(results_mismatch, function(x) x["recur1",])
+
+# ------------------------------------------------------------------------------
+# Posterior approximation based on graphs only
+# ------------------------------------------------------------------------------
+MOIs <- lapply(ys_mismatch, determine_MOIs) # MOIs, same for match and mismatch 
+approximation <- lapply(1:length(MOIs), FUN = function(i) {
+  
+  # Get graphs and the state sequence compatibilities
+  gd <- get_graph_dist(MOIs[[i]])
+  
+  # Recurrent state sequences strings and characters
+  sqstr <- unique(unlist(gd$CIL_gvn_RGs)) 
+  sqchr <- do.call(cbind, sapply(sqstr, function(x) strsplit(x, split = "")))
+  
+  # Recurrent state sequences with first episode recrudescence / reinfection 
+  sqstr_C_1st <- sqstr[which(sqchr[1,] == "C")] 
+  sqstr_I_1st <- sqstr[which(sqchr[1,] == "I")] 
+  
+  # Graphs compatible with first episode recrudescence / reinfection 
+  RGs_C_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_C_1st %in% x))
+  RGs_I_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_I_1st %in% x))
+  
+  # Numbers of graphs compatible with each recurrent state sequence
+  num_comp <- sapply(sqstr, function(seq) { # All graphs
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x))})
+  num_comp_RGs_I_1st <- sapply(sqstr, function(seq) { # With reinfection 1st
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_I_1st)})
+  num_comp_RGs_C_1st <- sapply(sqstr, function(seq) { # With recrudesc. 1st 
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_C_1st)})
+  
+  # Joint probabilities unnormalised and normalised
+  joint_match_un <- num_comp_RGs_C_1st / num_comp
+  joint_mismatch_un <- num_comp_RGs_I_1st / num_comp
+  joint_match <- joint_match_un/sum(joint_match_un)
+  joint_mismatch <- joint_mismatch_un/sum(joint_mismatch_un)
+  
+  # Marginal probabilities
+  C_match <- sum(joint_match[sqstr_C_1st])
+  I_mismatch <- sum(joint_mismatch[sqstr_I_1st])
+  approx <- rbind(c(C = C_match, L = 1 - C_match, I = 0), 
+                  c(C = 0, L = 1 - I_mismatch, I = I_mismatch))
+})
+
+# ------------------------------------------------------------------------------
+# Plot probabilities
+# ------------------------------------------------------------------------------
+par(mar = c(0,0,0,0))
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
+
+xy <- apply(results_match_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:3) # Plot projections
+text(mean(xy["x", ]), mean(xy["y", ]), "match data", pos = 3, offset = 1) 
+
+xy <- apply(results_mismatch_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:3) # Plot projections
+text(mean(xy["x", ]), mean(xy["y", ]), "mismatch data", pos = 3, offset = 1) 
+
+# Add approximations based on graphs only
+xys <- lapply(approximation, function(x) apply(x, 1, project2D)) 
+for(i in 1:length(xys)) {
+  xy <- xys[[i]]
+  points(x = xy["x", ], y = xy["y", ], col = i, cex = 2) 
+}
+
+legend("left", pch = c(20, 1), pt.cex = c(1, 2), bty = "n", inset = 0, 
+       legend = c("Posterior probability", "Posterior approximation"))
+legend("right", col = c(1:3), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
+       legend = c(1,3,5), title = "Recurrence\ncount") 
+```
+
+# Assymetry 
+
+Due to asymmetry, the position of a "no-data" episode in a sequence of episodes
+has a bearing on posterior estimates.
+
+Below, for example, the first recurrence in the sequence OON (downward purple 1
+triangle) has a higher probability of reinfection than the second recurrence in
+the sequence ONO (downward orange 2 triangle) when the observations are
+mismatched.
+
+Meanwhile, for the the first recurrence in the sequence OON (upward purple 1
+triangle) has a higher probability of recrudescence than the second recurrence
+in the sequence ONO (upward orange 2 triangle) when the observations are
+matched.
+
+```{r}
+marker_count <- 100
+ms <- paste0("m", 1:marker_count)
+match <- as.list(sapply(ms, function(t) "A"))
+mismatch <- as.list(sapply(ms, function(t) "B"))
+no_data <- as.list(sapply(ms, function(t) NA))
+fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
+
+ys_match <- list("NOO" = list(enroll = no_data, 
+                              recur1 = match,
+                              recur2 = match),
+                 "ONO" = list(enroll = match, 
+                              recur1 = no_data,
+                              recur2 = match),
+                 "OON" = list(enroll = match, 
+                              recur1 = match,
+                              recur2 = no_data))
+
+ys_mismatch <- list("NOO" = list(enroll = no_data, 
+                                 recur1 = match,
+                                 recur2 = mismatch),
+                    "ONO" = list(enroll = match, 
+                                 recur1 = no_data,
+                                 recur2 = mismatch), 
+                    "OON" = list(enroll = match, 
+                                 recur1 = mismatch,
+                                 recur2 = no_data))
+# ------------------------------------------------------------------------------
+# Posterior based on model
+# ------------------------------------------------------------------------------
+results_match <- lapply(ys_match, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+results_mismatch <- lapply(ys_mismatch, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+
+# Extract results for the first recurrence
+results_match_recur1 <- sapply(results_match, function(x) x["recur1",])
+results_mismatch_recur1 <- sapply(results_mismatch, function(x) x["recur1",])
+results_match_recur2 <- sapply(results_match, function(x) x["recur2",])
+results_mismatch_recur2 <- sapply(results_mismatch, function(x) x["recur2",])
+
+# ------------------------------------------------------------------------------
+# Plot probabilities
+# ------------------------------------------------------------------------------
+par(mar = c(0,0,0,0))
+cols <- RColorBrewer::brewer.pal(3, "Dark2")
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
+
+n_points <- length(ys_match)
+xy <- apply(results_match_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 24, bg = cols, col = cols) 
+points(x = xy["x", ], y = xy["y", ], pch = "1", cex = 0.4) 
+xy <- apply(results_match_recur2, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 24, bg = cols, col = cols) # Plot 
+points(x = xy["x", ], y = xy["y", ], pch = "2", cex = 0.4) 
+
+n_points <- length(ys_mismatch)
+xy <- apply(results_mismatch_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 25, bg = cols, col = cols) 
+points(x = xy["x", ], y = xy["y", ], pch = "1", cex = 0.4) 
+xy <- apply(results_mismatch_recur2, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 25, bg = cols, col = cols) # Plot 
+points(x = xy["x", ], y = xy["y", ], pch = "2", cex = 0.4) # Plot 
+
+legend("topleft", pch = c("1", "2"), bty = "n", inset = 0.1,
+       legend = c(": 1st recurrence", ": 2nd recurrence"))
+legend("left", pch = c(24, 25), bty = "n", inset = 0.1, pt.bg = "black", 
+       legend = c("Match", "Mismatch"), title = "Observation type")
+legend("right", col = cols, pch = 20, bty = "n", legend = names(ys_mismatch), 
+       title = "Position of no observation (N) \namong observations (Os)") 
+```
+
+Unsurprisingly, the posterior of the first recurrence in the sequence NOO is
+close to the prior, likewise for the second recurrence in the sequence of OON.
+More surprisingly, the posterior of the first recurrence of the sequence ONO is
+not close to the prior.
+
+For match data, this is because strong evidence for a clonal edge between
+episodes one and three is incompatible with all three recurrence sequences
+ending with reinfection plus reinfection followed by recrudescence. Meanwhile,
+strong evidence for a clonal edge between episodes two and three is 
+incompatible with all the three recurrence sequences ending with reinfection; and
+strong evidence for a clonal edge between episodes one and two is 
+incompatible with all three recurrence sequences starting with reinfection. 
+
+```{r}
+epsilon <- .Machine$double.eps # Very small probability
+
+names(which(suppressMessages(compute_posterior(y = ys_match[["ONO"]], 
+                                               fs))$joint > epsilon))
+
+names(which(suppressMessages(compute_posterior(y = ys_match[["NOO"]], 
+                                               fs))$joint > epsilon))
+
+names(which(suppressMessages(compute_posterior(y = ys_match[["OON"]], 
+                                               fs))$joint > epsilon))
+```
+
+
+For mismatch data, strong evidence for a stranger edge between episodes one and
+three is only incompatible with a double recrudescence. Meanwhile, strong
+evidence for a stranger edge between episodes two and three is incompatible with
+all three recurrence sequences ending with recrudescence; and strong evidence
+for a clonal edge between episodes one and two is incompatible with all three
+recurrence sequences starting with recrudescence.
+
+```{r}
+epsilon <- .Machine$double.eps # Very small probability
+
+names(which(suppressMessages(compute_posterior(y = ys_mismatch[["ONO"]], 
+                                               fs))$joint < epsilon))
+
+names(which(suppressMessages(compute_posterior(y = ys_mismatch[["NOO"]], 
+                                               fs))$joint < epsilon))
+
+names(which(suppressMessages(compute_posterior(y = ys_mismatch[["OON"]], 
+                                               fs))$joint < epsilon))
+```
+
+The marginal probabilities of relapse / reinfection of different recurrences
+with the same data differ slightly because of the asymmetry in relationship
+graphs: a reinfection at the end of a sequence requires all edges reaching
+backward from the terminal episode to be stranger edges; at the start of a
+sequence, there are no backward reaching edges to constrain.
+
+```{r}
+suppressMessages(compute_posterior(y = list(enroll = list(m1 = "A"), 
+                                            recur1 = list(m1 = "A"), 
+                                            recur2 = list(m1 = "A"), 
+                                            recur3 = list(m1 = "A")), 
+                                   fs = list(m1 = c("A" = 0.1,"B" = 0.9))))$marg
+
+```
 
 ## Interpreting uncertainty
 
@@ -967,158 +1126,6 @@ across episodes. Meanwhile, when intra-episode parasites systematically share ra
 the maximum likelihood graph is the one with one intra-episode sibling edge.
 
 
-
-# Assymetry 
-
-The marginal probabilities of relapse / reinfection of different recurrences
-with the same data differ slightly because of the asymmetry in relationship
-graphs: a reinfection at the end of a sequence requires all edges reaching
-backward from the terminal episode to be stranger edges; at the start of a
-sequence, there are no backward reaching edges to constrain.
-
-```{r}
-suppressMessages(compute_posterior(y = list(enroll = list(m1 = "A"), 
-                                            recur1 = list(m1 = "A"), 
-                                            recur2 = list(m1 = "A"), 
-                                            recur3 = list(m1 = "A")), 
-                                   fs = list(m1 = c("A" = 0.1,"B" = 0.9))))$marg
-
-
-
-
-```
-
-Due to asymmetry, the position of a "no-data" episode in a sequence of episodes
-has a bearing on posterior estimates.
-
-Below, for example, the first recurrence in the sequence OON (downward purple 1
-triangle) has a higher probability of reinfection than the second recurrence in
-the sequence ONO (downward orange 2 triangle) when the observations are
-mismatched.
-
-Meanwhile, for the the first recurrence in the sequence OON (upward purple 1
-triangle) has a higher probability of recrudescence than the second recurrence
-in the sequence ONO (upward orange 2 triangle) when the observations are
-matched.
-
-```{r}
-marker_count <- 100
-ms <- paste0("m", 1:marker_count)
-match <- as.list(sapply(ms, function(t) "A"))
-mismatch <- as.list(sapply(ms, function(t) "B"))
-no_data <- as.list(sapply(ms, function(t) NA))
-fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
-
-ys_match <- list("NOO" = list(enroll = no_data, 
-                              recur1 = match,
-                              recur2 = match),
-                 "ONO" = list(enroll = match, 
-                              recur1 = no_data,
-                              recur2 = match),
-                 "OON" = list(enroll = match, 
-                              recur1 = match,
-                              recur2 = no_data))
-
-ys_mismatch <- list("NOO" = list(enroll = no_data, 
-                                 recur1 = match,
-                                 recur2 = mismatch),
-                    "ONO" = list(enroll = match, 
-                                 recur1 = no_data,
-                                 recur2 = mismatch), 
-                    "OON" = list(enroll = match, 
-                                 recur1 = mismatch,
-                                 recur2 = no_data))
-# ------------------------------------------------------------------------------
-# Posterior based on model
-# ------------------------------------------------------------------------------
-results_match <- lapply(ys_match, function(y) {
-  suppressMessages(compute_posterior(y, fs)$marg)})
-results_mismatch <- lapply(ys_mismatch, function(y) {
-  suppressMessages(compute_posterior(y, fs)$marg)})
-
-# Extract results for the first recurrence
-results_match_recur1 <- sapply(results_match, function(x) x["recur1",])
-results_mismatch_recur1 <- sapply(results_mismatch, function(x) x["recur1",])
-results_match_recur2 <- sapply(results_match, function(x) x["recur2",])
-results_mismatch_recur2 <- sapply(results_mismatch, function(x) x["recur2",])
-
-# ------------------------------------------------------------------------------
-# Plot probabilities
-# ------------------------------------------------------------------------------
-par(mar = c(0,0,0,0))
-cols <- RColorBrewer::brewer.pal(3, "Dark2")
-plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
-
-n_points <- length(ys_match)
-xy <- apply(results_match_recur1, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 24, bg = cols, col = cols) 
-points(x = xy["x", ], y = xy["y", ], pch = "1", cex = 0.4) 
-xy <- apply(results_match_recur2, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 24, bg = cols, col = cols) # Plot 
-points(x = xy["x", ], y = xy["y", ], pch = "2", cex = 0.4) 
-
-n_points <- length(ys_mismatch)
-xy <- apply(results_mismatch_recur1, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 25, bg = cols, col = cols) 
-points(x = xy["x", ], y = xy["y", ], pch = "1", cex = 0.4) 
-xy <- apply(results_mismatch_recur2, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 25, bg = cols, col = cols) # Plot 
-points(x = xy["x", ], y = xy["y", ], pch = "2", cex = 0.4) # Plot 
-
-legend("topleft", pch = c("1", "2"), bty = "n", inset = 0.1,
-       legend = c(": 1st recurrence", ": 2nd recurrence"))
-legend("left", pch = c(24, 25), bty = "n", inset = 0.1, pt.bg = "black", 
-       legend = c("Match", "Mismatch"), title = "Observation type")
-legend("right", col = cols, pch = 20, bty = "n", legend = names(ys_mismatch), 
-       title = "Position of no observation (N) \namong observations (Os)") 
-```
-
-Unsurprisingly, the posterior of the first recurrence in the sequence NOO is
-close to the prior, likewise for the second recurrence in the sequence of OON.
-More surprisingly, the posterior of the first recurrence of the sequence ONO is
-not close to the prior.
-
-For match data, this is because strong evidence for a clonal edge between
-episodes one and three is incompatible with all three recurrence sequences
-ending with reinfection plus reinfection followed by recrudescence. Meanwhile,
-strong evidence for a clonal edge between episodes two and three is 
-incompatible with all the three recurrence sequences ending with reinfection; and
-strong evidence for a clonal edge between episodes one and two is 
-incompatible with all three recurrence sequences starting with reinfection. 
-
-```{r}
-epsilon <- .Machine$double.eps # Very small probability
-
-names(which(suppressMessages(compute_posterior(y = ys_match[["ONO"]], 
-                                               fs))$joint > epsilon))
-
-names(which(suppressMessages(compute_posterior(y = ys_match[["NOO"]], 
-                                               fs))$joint > epsilon))
-
-names(which(suppressMessages(compute_posterior(y = ys_match[["OON"]], 
-                                               fs))$joint > epsilon))
-```
-
-
-For mismatch data, strong evidence for a stranger edge between episodes one and
-three is only incompatible with a double recrudescence. Meanwhile, strong
-evidence for a stranger edge between episodes two and three is incompatible with
-all three recurrence sequences ending with recrudescence; and strong evidence
-for a clonal edge between episodes one and two is incompatible with all three
-recurrence sequences starting with recrudescence.
-
-```{r}
-epsilon <- .Machine$double.eps # Very small probability
-
-names(which(suppressMessages(compute_posterior(y = ys_mismatch[["ONO"]], 
-                                               fs))$joint < epsilon))
-
-names(which(suppressMessages(compute_posterior(y = ys_mismatch[["NOO"]], 
-                                               fs))$joint < epsilon))
-
-names(which(suppressMessages(compute_posterior(y = ys_mismatch[["OON"]], 
-                                               fs))$joint < epsilon))
-```
 
 
 
