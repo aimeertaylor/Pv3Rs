@@ -53,9 +53,9 @@ on the output of `compute_posterior` when the model is misspecified
 because of
 
 - meiotic siblings,
-- half siblings,
-- parent child-like siblings,
-- genotyping errors or *de novo* mutations. 
+- half siblings [sort bounds],
+- parent child-like siblings [sort bounds],
+- genotyping errors or *de novo* mutations [To-do]. 
 
 We have not yet characterised model misspecification due to inbred parasites.
 However, we intuit inter-marker dependence will lead to overconfident posterior
@@ -580,18 +580,24 @@ legend("right", col = c(1:3), pch = "-", pt.cex = 2, bty = "n", inset = 0.2,
 
 ## Position in a sequence  
 
-Due to asymmetry [XXX — elaborate], the position of a recurrence in a sequence
-of episodes has a bearing on posterior estimates.
+Because the distribution over relationship graphs is not invariant to different
+episode orderings (more graphs are compatible with a reinfection at the
+beginning than at the end of a sequence of three episodes, for example), the
+position of a recurrence in a sequence of episodes has a bearing on posterior
+estimates.
 
-Below, for example, the first recurrence in the sequence OON (downward purple 1
-triangle) has a higher probability of reinfection than the second recurrence in
-the sequence ONO (downward orange 2 triangle) when the observations are
-mismatched.
+This effect is negligable when all episodes have the same data on many markers:
 
-Meanwhile, for the the first recurrence in the sequence OON (upward purple 1
-triangle) has a higher probability of recrudescence than the second recurrence
-in the sequence ONO (upward orange 2 triangle) when the observations are
-matched.
+```{r}
+y <- list(enroll = match, 
+          recur1 = match, 
+          recur2 = match, 
+          recur3 = match)
+sm(compute_posterior(y, fs))$marg
+```
+
+Instead, consider sequences of episodes with observations (Os) and episodes with
+no data (N). 
 
 ```{r}
 ys_match <- list("NOO" = list(enroll = no_data, 
@@ -613,8 +619,17 @@ ys_mismatch <- list("NOO" = list(enroll = no_data,
                     "OON" = list(enroll = match, 
                                  recur1 = mismatch,
                                  recur2 = no_data))
-```
+``` 
 
+The second recurrence in the sequence NOO (upward green 2 triangle) has a higher
+probability of recrudescence than the first recurrence in the sequence OON
+(upward purple 1 triangle) despite both recurrences having the same rare
+observations that match the directly preceding episode.
+
+The second recurrence in the sequence NOO (downward green 2 triangle) has a
+lower probability of reinfection than the first recurrence in the sequence OON
+(downward purple 1 triangle) despite both recurrences having observations that
+mismatch the directly preceding episode.
 
 ```{r echo = FALSE}
 # ------------------------------------------------------------------------------
@@ -663,23 +678,24 @@ legend("right", col = cols, pch = 20, bty = "n", legend = names(ys_mismatch),
 ```
 
 Unsurprisingly, the posterior of the first recurrence in the sequence NOO is
-close to the prior, likewise for the second recurrence in the sequence of OON.
-More surprisingly, the posterior of the first recurrence of the sequence ONO is
-not close to the prior.
+close to the prior (it has no preceding data), likewise for the second
+recurrence in the sequence of OON (it has no data). More surprisingly, for
+reasons explain below, the posterior of the first recurrence of the sequence ONO
+is not close to the prior, despite having no data.
 
-For match data, this is because strong evidence for a clonal edge between
-episodes one and three is incompatible with all three recurrence sequences
-ending with reinfection plus reinfection followed by recrudescence. Meanwhile,
-strong evidence for a clonal edge between episodes two and three is 
-incompatible with all the three recurrence sequences ending with reinfection; and
-strong evidence for a clonal edge between episodes one and two is 
-incompatible with all three recurrence sequences starting with reinfection. 
+For match data, strong evidence for a clonal edge between episodes one and three
+is incompatible with all three recurrence sequences ending with reinfection
+*plus* reinfection followed by recrudescence. Meanwhile, strong evidence for a
+clonal edge between episodes two and three is incompatible with all three
+recurrence sequences ending with reinfection; and strong evidence for a clonal
+edge between episodes one and two is incompatible with all three recurrence
+sequences starting with reinfection.
 
 ```{r}
 epsilon <- .Machine$double.eps # Very small probability
-names(which(sm(compute_posterior(y = ys_match[["ONO"]], fs))$joint > epsilon))
-names(which(sm(compute_posterior(y = ys_match[["NOO"]], fs))$joint > epsilon))
-names(which(sm(compute_posterior(y = ys_match[["OON"]], fs))$joint > epsilon))
+names(which(sm(compute_posterior(y = ys_match[["ONO"]], fs))$joint < epsilon))
+names(which(sm(compute_posterior(y = ys_match[["NOO"]], fs))$joint < epsilon))
+names(which(sm(compute_posterior(y = ys_match[["OON"]], fs))$joint < epsilon))
 ```
 
 
@@ -702,21 +718,21 @@ names(which(sm(compute_posterior(y = ys_mismatch[["OON"]], fs))$joint < epsilon)
 # Interpreting uncertainty
 
 The uniform prior over relationship graphs compatible with a given sequence of
-recurrent states is **NOT** uninformative. When recurrent states are
+recurrent states is not uninformative. When recurrent states are
 equally likely *a priori*, maximal probabilities of recrudescence and of
 reinfection depend on the number of episodes an individual experiences and on
 the per-episode MOIs. Otherwise stated, the posterior recurrent
 state space is a function of the prior on the recurrent states, the number of
 episodes and their MOIs (Figure XXX).
 
-Consequently, if we use a common threshold to classify reinfection /
+Consequently, if we use a common threshold to classify probable reinfection /
 recrudescence based on genetic data alone (i.e., assuming recurrence states are
 equally likely *a priori*), we can discount some individuals based on their
-vector of per-episode MOIs alone. For example, with a common threshold of 0.8,
+per-episode MOIs alone. For example, with a common reinfection threshold of 0.8,
 we can discount all people with a single monoclonal recurrence following a
-monoclonal enrolment episode, because their posterior reinfection probabilities
-will never exceed 0.75, even if their data are highly informative. An
-non-uniform prior on recurrent states circumvents this issue:
+monoclonal enrollment episode because their posterior reinfection probabilities
+will never exceed 0.75, even if their data are highly informative of
+reinfection.
 
 ```{r}
 y <- list(enrol = match, recur = mismatch)
@@ -724,7 +740,11 @@ fs <- sapply(ms, FUN = function(m) c("A" = 0.5, "B" = 0.5), simplify = FALSE)
 
 # Using the default uniform prior on recurrent states
 sm(compute_posterior(y, fs))$marg
+```
 
+A non-uniform prior on recurrent states circumvents this issue:
+
+```{r}
 # Using an informative prior on recurrent states
 prior <- as.matrix(data.frame("C" = 0.1, "L" = 0.2, "I" = 0.7))
 sm(compute_posterior(y, fs, prior))$marg
@@ -811,6 +831,14 @@ MOIs <- "3_1"
 cases <- c("Stranger", "Clone")
 
 for(case in cases){
+  
+   if( case == "Stranger") {
+    exp_state <- "reinfection"    
+  } else if (case == "Clone") {
+    exp_state <- "recrudescence"
+  } else {
+    exp_state <- "relapse"
+  }
 
   rm(list = "output")
   output <- output_Cln.Str.Sib[[case]]
@@ -824,8 +852,9 @@ for(case in cases){
   equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
   
   # Plot trajectories
-  plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
-       xaxt = "n", xlab = "", ylab = "Posterior expected state probability")
+  plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", 
+       las = 1, xaxt = "n", xlab = "", 
+       ylab = sprintf("Posterior %s probability", exp_state))
   
   # Horioutputontal axis
   axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
@@ -852,15 +881,14 @@ However, relationship graphs (not shown) are wrong for two reasons:
 
 - all the relationship graphs have two, not three, parasites in the initial 
 infection because there are at most two alleles per marker
-- the maximum likelihood relationship graphs have stranger parasites in the
+- the highest likelihood relationship graphs have stranger parasites in the
 initial episode because prevalence data from three or four meiotic siblings are
-identical to bulk data from parents who are strangers.
+identical to bulk data from parents and the parents are strangers.
 
 We can force the graphs to have the correct parasite count by specifying
 external MOIs. Doing so recovers maximum likelihood on true relationship graphs.
 However, the correct MOIs are unknowable in practice: a collection of siblings
-from the same two parents can only ever have two alleles at a given marker
-[could var genes be helpful?].
+from the same two parents can only ever have two alleles at a given marker.
 
 When the initial infection contains three meiotic siblings and the recurrent
 parasite is a regular or meiotic sibling, posterior probabilities converge to
@@ -1009,7 +1037,7 @@ the maximum likelihood graph is the one with one intra-episode sibling edge.
 
 # Parent-child like siblings
 
-# Methods 
+## Methods 
 We simulated data for three parent-child like siblings: 
 
 - child of selfed parent 1 in the initial episode
@@ -1028,7 +1056,7 @@ parent 1 draws alleles disproportionally to parents 2 and 3. The admixture
 scenario is likely infrequent. We explore it because it is a worse case
 scenario: it is contrived to maximally hamper relapse classification.
 
-# Results
+## Results
 
 When parental parasites draw from the same allele distribution, the
 frequency of certain relapse increases erratically with the number of markers
@@ -1094,10 +1122,12 @@ for(i in 1:output$n_repeats){
 legend("right", col = cols, lwd = 2, inset = 0.1, legend = 1:output$n_repeats,
        bty = "n", title = "Repeats", cex = 0.5)
 ```
-In general, when all parasites draw from the same allele distribution, the maximum
-likelihood graph is the true graph with with siblings within and
-across episodes. Meanwhile, when intra-episode parasites systematically share rare alleles,
-the maximum likelihood graph is the one with one intra-episode sibling edge.
+
+In general, when all parasites draw from the same allele distribution, the
+maximum likelihood graph is the true graph with siblings within and across
+episodes. Meanwhile, when intra-episode parasites systematically share rare
+alleles, the maximum likelihood graph is the one with one intra-episode sibling
+edge.
 
 
 
