@@ -50,8 +50,7 @@ y_parents <- list(initial = apply(t(parents), 2, unique, simplify = F),
 suppressMessages(compute_posterior(y = y_parents, fs)$marg)
 suppressMessages(compute_posterior(y = y_meitotic, fs)$marg)
 
-# Providing the true but unknowable MOI makes little difference (unknowable
-# without single-cell sequences)
+# Providing the true but unknowable MOI makes little difference
 suppressMessages(compute_posterior(y = y_meitotic, fs, MOIs = c(3,1))$marg)
 
 # Because we assume no error, a single error is enough to solve the problem:
