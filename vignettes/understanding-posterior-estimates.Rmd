@@ -417,7 +417,7 @@ for(i in 1:length(xys)) {
 # Add legends
 legend("left", pch = c(20, 1), pt.cex = c(1, 2), bty = "n", inset = 0,
        legend = c("Posterior probability", 
-                  "Posterior probability \nbased on summation \nover graphs only"))
+                  "Posterior approximation \nbased on summation \nover graphs only"))
 legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs), 
        legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
 ```
@@ -573,7 +573,7 @@ for(i in 1:length(xys)) {
 
 legend("left", pch = c(20, 1), pt.cex = c(1, 2), bty = "n", inset = 0, 
        legend = c("Posterior probability", 
-                  "Posterior probability \nbased on summation \nover graphs only"))
+                  "Posterior approximation \nbased on summation \nover graphs only"))
 legend("right", col = c(1:3), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
        legend = c(1,3,5), title = "Recurrence\ncount") 
 ```
