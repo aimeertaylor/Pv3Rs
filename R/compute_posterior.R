@@ -316,7 +316,7 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
   if (!is.null(names_y) &
       !is.null(names_prior) &
       !all(names_y[-1] == names_prior)) {
-    warning("Data (y) and prior episode names disagree")
+    warning("Data and prior episode names disagree\n")
   }
 
   # Warn if there is only allele information for < 2 episodes (unpaired)
@@ -324,14 +324,16 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
     # boolean vector for whether each episode has allele information for marker m
     has.allele <- sapply(y, function(y.epi) any(!is.na(y.epi[[m]])))
     if(sum(has.allele) < 2) {
-      warning(paste("Allele information for marker", m, "does not span 2 episodes"))
+      warning(paste("Marker", m, "has data on one episode only"))
     }
   }
 
   # Warn users if any episodes have no data
   na_episodes <- sapply(y, function(x) all(is.na(x)))
-  if (any(na_episodes)) {
-    warning(sprintf("Episode/s %s have no data", names(which(na_episodes))))
+  if (sum(na_episodes) == 1) {
+    warning(sprintf("Episode %s has no data\n", names(which(na_episodes))))
+  } else if (sum(na_episodes) > 1) {
+    warning(sprintf("Episodes %s have no data\n", paste(names(which(na_episodes)), collapse = " & ")))
   }
 
   gs_count <- sum(MOIs)
