@@ -1024,10 +1024,10 @@ for(i in 1:output$n_repeats){
   lines(x = 1:max(output$n_markers), y = y, col = cols[i], lwd = 2)
 }
 ```
-The system behaves erratically because ??? 
+The system behaves erratically because XXX [add link to latex file]
 
-<!-- (The proportion of intra versus inter matches does not explain the erratic
-nature of repeats 1 and 3 MyDevFiles/RelationshipStudy/Results_HalfSib.R) -->
+<!-- (The proportion of intra versus inter matches does not match the erratic
+nature of some repeats in MyDevFiles/RelationshipStudy/Results_HalfSib.R) -->
 
 In both scenarios, the likelihood of the true graph with siblings within and
 across episodes is quashed as soon as distinct alleles from all three parents
