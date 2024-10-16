@@ -10,8 +10,8 @@ rm(list = ls())
 attached <- search()
 if("output" %in% attached) detach(output)
 if(exists("output")) rm("output")
-load("../../data/output_HalfSib.PClikeSib.rda")
-output <- output_HalfSib.PClikeSib[["Half"]]
+load("../../data/output_HalfSib.PCLikeSib.rda")
+output <- output_HalfSib.PCLikeSib[["Half"]]
 attach(output)
 
 par_default <- par(no.readonly = TRUE)
@@ -85,6 +85,18 @@ for(i in n_repeats:1){
         col = cols[i], lwd = 2)
 }
 
+# Plot inter-to-intra-match ratio
+plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,2), bty = "n", las = 1,
+     xaxt = "n", xlab = "Marker count", ylab = "Intra-to-inter match ratio")
+abline(h = 0.5*log2(5/2), lty = "dashed") # See latex file
+text(x = max(n_markers)-10, y = 0.5*log2(5/2), labels = "0.5*log2(5/2)", pos = 3) # See latex file
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+for(i in n_repeats:1){
+  ratio <- locus_types_props[[i]]["Intra-match", ]/locus_types_props[[i]]["Inter-match", ]
+  lines(x = 1:max(n_markers), y = ratio, col = cols[i], lwd = 2)
+}
 
 # Plot all match to all different ratio
 plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,2), bty = "n", las = 1,
@@ -96,18 +108,6 @@ axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
 for(i in n_repeats:1){
   ratio <- locus_types_props[[i]]["All diff.", ]/locus_types_props[[i]]["All match", ]
   lines(x = 1:150, y = ratio, col = cols[i], lwd = 2)
-}
-
-# Plot inter-to-intra-match ratio
-plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,2), bty = "n", las = 1,
-     xaxt = "n", xlab = "Marker count", ylab = "Intra-to-inter match ratio")
-abline(h = 0.5*log2(5/2), lty = "dashed")
-axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
-axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
-     tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
-for(i in n_repeats:1){
-  ratio <- locus_types_props[[i]]["Intra-match", ]/locus_types_props[[i]]["Inter-match", ]
-  lines(x = 1:max(n_markers), y = ratio, col = cols[i], lwd = 2)
 }
 
 # Plot locus type proportion given all markers

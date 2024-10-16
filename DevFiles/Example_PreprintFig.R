@@ -67,22 +67,23 @@ plot_data(ys = list(example = y_phased), fs = fs, marker_annotate = F)
 plot_data(ys = list(example = y), fs = fs, marker_annotate = F)
 
 # Reduce the number of markers evaluated
-n_markers_eval <- 8
+for(n_markers_eval in 1:10){
+  y_eval <- sapply(y, function(x) x[1:n_markers_eval], USE.NAMES = T, simplify = F)
 
-y_eval <- sapply(y, function(x) x[1:n_markers_eval], USE.NAMES = T, simplify = F)
+  # Compute results
+  post <- compute_posterior(y_eval, fs, return.RG=TRUE, return.logp=TRUE)
+  colnames(post$marg) <- c("Recrudesence", "Relapse", "Reinfection")
 
-# Compute results
-post <- compute_posterior(y_eval, fs, return.RG=TRUE, return.logp=TRUE)
-colnames(post$marg) <- c("Recrudesence", "Relapse", "Reinfection")
+  # Extract results
+  round(post$marg,4) # Marginal probabilities
+  which.max(post$joint) # Most likely sequence
 
-# Extract results
-round(post$marg,4) # Marginal probabilities
-which.max(post$joint) # Most likely sequence
-
-# Plot result on the simplex:
-xy <- apply(post$marg, 1, project2D)
-plot_simplex(v_labels = c("", "", ""), 0.75, c("blue", "purple", "red")) # make it so can pass more information
-points(x = xy["x",], xy["y",], pch = 20, cex = 4)
+  # Plot result on the simplex:
+  xy <- apply(post$marg, 1, project2D)
+  plot_simplex(v_labels = c("", "", ""), 0.75, c("blue", "purple", "red")) # make it so can pass more information
+  points(x = xy["x",], xy["y",], pch = 21, cex = 4, bg = c("purple", "blue", "red"))
+  text(x = xy["x",], xy["y",], labels = rep(n_markers_eval, 3), col = "white")
+}
 
 # Most likely graph
 RGlogp <- sapply(post$RGs, function(RG) RG$logp)
@@ -94,3 +95,9 @@ par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0, vertex.size=20, vertex_palette = "Blues")
 seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
 
+y <- list(list(m1 = c("A", "B")), list(m1 = "A"))
+fs <- list(m1 = c("A" = 0.9, "B" = 0.1))
+ps <- compute_posterior(y, fs, return.logp = T)
+ps$marg
+plot_RG(RG_to_igraph(ps$RGs[[which.max(sapply(ps$RGs, function(x) x$logp))]],
+             gs = paste0("g", 1:3), ts_per_gs = c(1,1,2)))

@@ -10,8 +10,8 @@ rm(list = ls())
 attached <- search()
 if("output" %in% attached) detach(output)
 if(exists("output")) rm("output")
-load("../../data/output_HalfSib.PClikeSib.rda")
-output <- output_HalfSib.PClikeSib[["PCLike"]]
+load("../../data/output_HalfSib.PCLikeSib.rda")
+output <- output_HalfSib.PCLikeSib[["PCLike"]]
 attach(output)
 
 par_default <- par(no.readonly = TRUE)

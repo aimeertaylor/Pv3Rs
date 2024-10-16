@@ -53,8 +53,8 @@ on the output of `compute_posterior` when the model is misspecified
 because of
 
 - meiotic siblings,
-- half siblings [sort bounds],
-- parent child-like siblings [sort bounds],
+- half siblings [sort bounds!],
+- parent child-like siblings [sort bounds!],
 - genotyping errors or *de novo* mutations [To-do]. 
 
 We have not yet characterised model misspecification due to inbred parasites.
@@ -777,6 +777,9 @@ Posterior probabilities converge to
 MOIs <- "2_1"
 cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
 
+
+
+
 for(case in cases){
   
   if( case == "Stranger") {
@@ -1079,7 +1082,7 @@ equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
 plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
      xaxt = "n", xlab = "Marker count (effective cardinality)", 
      ylab = "Posterior relapse probability")
-abline(h = 2/11, lty = "dashed") # What is this 
+abline(h = 2/11, lty = "dashed") # What is this ??? 
 text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 3)
 legend("right", col = cols, lwd = 2, inset = 0.1, legend = 1:output$n_repeats,
        bty = "n", title = "Repeats", cex = 0.5)
@@ -1099,9 +1102,9 @@ for(i in 1:output$n_repeats) {
 
 When intra-episode parasites systematically share rare alleles (admixture AND
 imbalanced allele frequencies), the frequency of probable reinfection increases
-very erratically with the number of markers genotyped.
+erratically with the number of markers genotyped.
 
-```{r}
+```{r echo = FALSE}
 # Plot the posterior relapse probability trajectories
 plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1, 
      xaxt = "n",  xlab = "Marker count (effective cardinality)", 

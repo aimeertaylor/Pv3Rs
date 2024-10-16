@@ -17,7 +17,7 @@ library(MCMCpack) # For rdirichlet
 provide_correct_MOIs <- FALSE # Toggle for inference with correct external MOIs
 cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
 MOIs_per_infection <- c("2_1", "3_1") # Change num. of meiotic sibs in 1st epi.
-n_alleles <- 5 # Number of alleles per marker (marker cardinality)
+n_alleles <- 3 # Number of alleles per marker (marker cardinality)
 n_repeats <- 5 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100) # Number of markers for which RG likelihood returned
 c_params <- c(0.5, 1, 100) # Dirichlet concentration parameter

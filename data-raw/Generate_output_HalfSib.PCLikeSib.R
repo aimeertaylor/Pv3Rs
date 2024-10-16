@@ -31,7 +31,7 @@ library(MCMCpack) # For rdirichlet
 # Magic numbers / quantities
 #===============================================================================
 cases <- c("PCLike", "Half")
-n_alleles <- 5 # Number of alleles per marker (marker cardinality)
+n_alleles <- 3 # Number of alleles per marker (marker cardinality)
 n_repeats <- 10 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100, 150) # Number of markers for which RG likelihood returned
 c_params <- c(0.5, 1, 10, 100) # Dirichlet concentration parameter
