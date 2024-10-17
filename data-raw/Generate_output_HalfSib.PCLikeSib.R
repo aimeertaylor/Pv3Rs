@@ -1,15 +1,11 @@
 ################################################################################
-# Simulate data and generate results for a initial infection of MOI=2 siblings
-# and a MOI=1 recurrence of a sibling, where siblings are either parent
-# child-like siblings or half siblings.
+# Simulate data and generate results for a initial infection of two siblings and
+# a recurrent sibling, where siblings are either parent child-like siblings or
+# half siblings.
 #
-# In the ParentChildLike case, the recombinant is in the MOI=2 initial
-# infection.
-#
-# In both cases, explore two scenarios. One without admixture where parents draw
-# from the same allele distribution. Another with admixture where the first
-# parent who parents initial parasites only, draws alleles disproportionally.
-# Otherwise stated:
+# In both cases, explore two scenarios. One where parents draw from the same
+# allele distribution. Another with admixture where the first parent who parents
+# intra-episode parasites draws alleles disproportionally:
 #
 # Half siblings:
 # initial <- rbind(child12, child13) # migrant is 1
@@ -18,6 +14,11 @@
 # Parent child-like siblings:
 # initial <- rbind(child1, child12) # migrant is 1
 # relapse <- rbind(child2)
+#
+# The alternative scenario parent-child like scenario with two selfed parasites
+# in the initial infection is covered by the meiotic sibling case with MOIs 3 &
+# 1 and no extenal MOI specification (see vignette on understanding posterior
+# estimates).
 #
 # For each case, generate results for data on all marker counts when alleles are
 # equifrequent, and for a subset of marker counts when alleles are not.
@@ -29,8 +30,8 @@ library(MCMCpack) # For rdirichlet
 #===============================================================================
 # Magic numbers / quantities
 #===============================================================================
-cases <- c("ParentChildLike", "Half")
-n_alleles <- 5 # Number of alleles per marker (marker cardinality)
+cases <- c("PCLike", "Half")
+n_alleles <- 3 # Number of alleles per marker (marker cardinality)
 n_repeats <- 10 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100, 150) # Number of markers for which RG likelihood returned
 c_params <- c(0.5, 1, 10, 100) # Dirichlet concentration parameter
@@ -40,12 +41,12 @@ seed <- 1 # For reproducibility
 #===============================================================================
 # Stores for data, frequencies & results
 #===============================================================================
-output_HalfPCSib <- list()
+output_HalfSib.PCLikeSib <- list()
 ys_store <- list() # y for data
 fs_store <- list() # f for frequency
 ps_store <- list() # p for posterior
 ps_store_all_ms <- list() # all_ms for all marker counts
-ps_store_all_ms_admix_rare <- list() # all_ms for all marker counts
+ps_store_all_ms_admix_rare <- list() # for admixed case with some rare freqs
 
 #===============================================================================
 # Set the seed, name markers and get alleles, maker subsets etc.
@@ -55,11 +56,8 @@ min_n_markers <- min(n_markers)
 max_n_markers <- max(n_markers)
 alleles <- letters[1:n_alleles]
 all_markers <- paste0("m", 1:max_n_markers) # Marker names
-
-# Create marker subsets, randomly sampled over chromosomes
-marker_subsets <- list(sample(all_markers, 1))
-rorder <- sample(all_markers, size = max_n_markers)
-for(m in 2:max_n_markers) marker_subsets[[m]] <- rorder[1:m]
+rorder <- sample(all_markers, size = max_n_markers) # Many markers, random order
+marker_subsets <- lapply(1:max_n_markers, function(m) rorder[1:m]) # Subsets
 # smallest subset over which clones are disallowed (ensures the set of RGs is
 # the same for all n_markers):
 no_clone_subset <- marker_subsets[[min_n_markers]]
@@ -69,6 +67,8 @@ no_clone_subset <- marker_subsets[[min_n_markers]]
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
 
 for(case in cases) {
+
+  print(case)
 
   #===============================================================================
   # Generate data
@@ -93,13 +93,12 @@ for(case in cases) {
     for(admixture in c(TRUE, FALSE)) {
       for(i in 1:n_repeats) {
 
-        if (case == "ParentChildLike") {
+        if (case == "PCLike") {
           # Sample parental genotypes
           parent_clones <- TRUE
           while (parent_clones) {
 
-            # draw rare alleles with high probability
-            if (admixture) {
+            if (admixture) {  # Draw rare alleles with high probability
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
             } else {
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
@@ -135,7 +134,7 @@ for(case in cases) {
           # Sample parental genotypes
           parent_clones <- TRUE
           while (parent_clones) {
-            if (admixture) { # draw rare alleles with high probability
+            if (admixture) { # Draw rare alleles with high probability
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
             } else {
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
@@ -173,7 +172,7 @@ for(case in cases) {
           relapse <- rbind(child23)
 
         } else {
-          stop('case should either be "ParentChildLike" or "Half"')
+          stop('case should either be "PCLike" or "Half"')
         }
 
         y <- list(initial = apply(initial, 2, unique, simplify = F),
@@ -193,7 +192,6 @@ for(case in cases) {
   admixture <- FALSE # For parents from the same population
   fs <- fs_store[[as.character(c)]] # Extract frequencies
   for(i in 1:n_repeats){
-    print(i)
     y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
     for(m in 1:max_n_markers){
       marker_subset <- marker_subsets[[m]]
@@ -207,7 +205,6 @@ for(case in cases) {
   admixture <- TRUE # For parents from different populations
   fs <- fs_store[[as.character(c)]] # Extract frequencies
   for(i in 1:n_repeats){
-    print(i)
     y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
     for(m in 1:max_n_markers){
       marker_subset <- marker_subsets[[m]]
@@ -221,7 +218,6 @@ for(case in cases) {
   # Generate results with return.logp = TRUE
   #=============================================================================
   for(i in 1:n_repeats){
-    print(i)
     for(c in c_params) {
       fs <- fs_store[[as.character(c)]]
       for(admixture in c(TRUE, FALSE)) {
@@ -251,8 +247,8 @@ for(case in cases) {
                  ps_store_all_ms = ps_store_all_ms,
                  ps_store_all_ms_admix_rare = ps_store_all_ms_admix_rare)
 
-  output_HalfPCSib[[case]] <- output
+  output_HalfSib.PCLikeSib[[case]] <- output
 }
 
 # Save as exported data
-usethis::use_data(output_HalfPCSib, overwrite = TRUE)
+usethis::use_data(output_HalfSib.PCLikeSib, overwrite = TRUE)

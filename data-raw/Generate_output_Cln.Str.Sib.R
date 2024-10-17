@@ -1,9 +1,11 @@
 ################################################################################
 # Simulate data and generate results for a initial episode with MOI 2 or 3
-# meiotic siblings and an monoclonal recurrence, where the recurrent parasite is
+# meiotic siblings and a monoclonal recurrence, where the recurrent parasite is
 # either a stranger, a clone, a regular sibling, or a meiotic sibling. For each
 # case, generate results for all marker counts when alleles are equifrequent,
 # and for a subset of marker counts otherwise.
+#
+# Doesn't take two long to run: minute or two on 32 GB RAM laptop
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
@@ -14,8 +16,8 @@ library(MCMCpack) # For rdirichlet
 #===============================================================================
 provide_correct_MOIs <- FALSE # Toggle for inference with correct external MOIs
 cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
-MOIs_per_infection <- c("2_1", "3_1") # Number of meiotic sibs in 1st epi.
-n_alleles <- 5 # Number of alleles per marker (marker cardinality)
+MOIs_per_infection <- c("2_1", "3_1") # Change num. of meiotic sibs in 1st epi.
+n_alleles <- 3 # Number of alleles per marker (marker cardinality)
 n_repeats <- 5 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100) # Number of markers for which RG likelihood returned
 c_params <- c(0.5, 1, 100) # Dirichlet concentration parameter
@@ -25,7 +27,7 @@ seed <- 1 # For reproducibility
 #===============================================================================
 # Stores for data, frequencies & results
 #===============================================================================
-output_ClnStrSib <- list()
+output_Cln.Str.Sib <- list() # For output
 ys_store <- list() # y for data
 fs_store <- list() # f for frequency
 ps_store <- list() # p for posterior
@@ -39,12 +41,9 @@ min_n_markers <- min(n_markers)
 max_n_markers <- max(n_markers)
 alleles <- letters[1:n_alleles]
 all_markers <- paste0("m", 1:max_n_markers) # Marker names
-
-# Create marker subsets, randomly sampled over chromosomes
-marker_subsets <- list(sample(all_markers, 1))
-rorder <- sample(all_markers, size = max_n_markers)
-for(m in 2:max_n_markers) marker_subsets[[m]] <- rorder[1:m]
-# smallest subset over which clones are disallowed (ensures the set of RGs is
+rorder <- sample(all_markers, size = max_n_markers) # Many markers, random order
+marker_subsets <- lapply(1:max_n_markers, function(m) rorder[1:m]) # Subset
+# Smallest subset for which clones are disallowed (ensures the set of RGs is
 # the same for all n_markers):
 no_clone_subset <- marker_subsets[[min_n_markers]]
 
@@ -53,6 +52,8 @@ no_clone_subset <- marker_subsets[[min_n_markers]]
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
 
 for(case in cases){
+
+  print(case)
 
   #===============================================================================
   # Generate data
@@ -115,6 +116,7 @@ for(case in cases){
           initial <- children[1:3,] # Three of four meiotic siblings
         }
 
+        # Get recurrent parasite
         if (case == "Clone") {
           relapse <- rbind(children[1,])
         } else if (case == "Stranger") {
@@ -124,7 +126,7 @@ for(case in cases){
           relapse <- rbind(children[4,]) # Sibling
         }
 
-        # Format parasite infection data for compute_posterior
+        # Format parasite episode data for compute_posterior
         y <- list(initial = apply(initial, 2, unique, simplify = F),
                   relapse = apply(relapse, 2, unique, simplify = F))
 
@@ -151,12 +153,11 @@ for(case in cases){
   }
 
   for(i in 1:n_repeats){
-    print(i)
     for(MOIs in MOIs_per_infection) {
       y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[as.character(i)]]
       for(m in 1:max_n_markers){
         marker_subset <- marker_subsets[[m]]
-        y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
+        y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = F)
         ps <- suppressMessages(compute_posterior(y, fs))
         ps_store_all_ms[[MOIs]][[as.character(i)]][[paste0("m",m)]] <- ps$marg
       }
@@ -173,14 +174,13 @@ for(case in cases){
         y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[as.character(i)]]
         for(m in n_markers){
           marker_subset <- marker_subsets[[m]]
-          y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
-
+          y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = F)
           if(provide_correct_MOIs) {
             ps <- suppressMessages(compute_posterior(y, fs, MOIs = as.numeric(strsplit(MOIs, "_")[[1]]), return.RG = TRUE, return.logp = TRUE))
           } else {
             ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
           }
-
+          ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
           ps_store[[as.character(c)]][[MOIs]][[as.character(i)]][[as.character(m)]] <- ps
         }
       }
@@ -196,31 +196,6 @@ for(case in cases){
     }, simplify = F)
   }, simplify = F)
 
-  # Aside: check graphs are all ordered the same [make into a unit test?]
-  # Extract graph summary (i.e., discard logp)
-  justRGs <- sapply(ps_store, function(X) {
-    sapply(X, function(XX) {
-      sapply(XX, function(XXX) {
-        sapply(XXX, function(post) {
-          sapply(post$RGs, function(RG) c(RG$clone, RG$sib))
-        }, simplify = F)
-      }, simplify = F)
-    }, simplify = F)
-  }, simplify = F)
-
-  # # Check all the graphs are returned in the same order
-  # justRG <- justRGs[[1]][[1]][[1]][[1]]
-  # RGcheck <- sapply(c_params, function(c) {
-  #   sapply(MOIs_per_infection, function(MOIs) {
-  #     sapply(1:n_repeats, function(i) {
-  #       sapply(n_markers, function(m) {
-  #         identical(justRG, justRGs[[as.character(c)]][[MOIs]][[i]][[as.character(m)]])
-  #       })
-  #     })
-  #   })
-  # })
-  # if (!all(RGcheck)) stop("graphs not returned in the same order")
-
   # Extract probability of the data given the relationship graph
   llikeRGs <- sapply(ps_store, function(X) {
     sapply(X, function(XX) {
@@ -234,6 +209,7 @@ for(case in cases){
   # Bundle magic numbers, data, and results
   #=============================================================================
   output <- list(MOIs_per_infection = MOIs_per_infection,
+                 provide_correct_MOIs = provide_correct_MOIs,
                  n_alleles = n_alleles,
                  n_repeats = n_repeats,
                  n_markers = n_markers,
@@ -248,8 +224,8 @@ for(case in cases){
                  post_S = post_S,
                  llikeRGs = llikeRGs)
 
-  output_ClnStrSib[[case]] <- output
+  output_Cln.Str.Sib[[case]] <- output
 }
 
 # Save as exported data
-usethis::use_data(output_ClnStrSib, overwrite = TRUE)
+usethis::use_data(output_Cln.Str.Sib, overwrite = TRUE)

@@ -240,24 +240,19 @@
 #' title = "Recurrence \n count") # legend
 #'
 #' @export
-compute_posterior <- function(
-    y, fs, prior = NULL, MOIs = NULL,
-    return.RG = FALSE, return.logp = FALSE) {
-
-  # Episode names
-  names_y <- names(y) # NULL if no names
-  names_prior <- rownames(prior) # Null if prior = NULL
-
-  # Check if episode names are liable to cause confusion
-  if (!is.null(names_y) &
-      !is.null(names_prior) &
-      !all(names_y[-1] == names_prior)) {
-    warning("Data (y) and prior episode names disagree")
-  }
+compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
+                              return.RG = FALSE, return.logp = FALSE) {
 
   # Check y is a list of lists:
-  if (!isa(y, "list") | !all(unlist(lapply(y, isa, "list")))) {
-    stop("Data y must be a list of lists, even if only one marker is typed per infection")
+  if (!is.list(y) | !all(sapply(y, is.list))) {
+    stop("Data y must be a list of lists,
+         even if only one marker is typed per infection")
+  }
+
+  # Check there are at least 2 episodes
+  infection_count <- length(y)
+  if (!infection_count > 1) {
+    stop("Need more than 1 episode")
   }
 
   # Check frequencies sum to one:
@@ -265,32 +260,35 @@ compute_posterior <- function(
     stop('For a given marker, allele frequencies must sum to one')
   }
 
-  # Check priors sum to one
+  # Check prior
+  causes <- c("C", "L", "I")
   if (!is.null(prior)) {
-    if (!all(abs(1 - rowSums(prior)) < .Machine$double.eps^0.5)) {
+    if (!identical(colnames(prior), causes)) { # Column names
+      stop('The prior should have colnames "C", "L" and "I"')
+    }
+    if (!all(abs(1 - rowSums(prior)) < .Machine$double.eps^0.5)) { # Sums to one
       stop('Prior probabilities for a given recurrence must sum to one')
     }
+  } else {
+    prior <- matrix(rep(1 / 3, 3 * (infection_count - 1)), ncol = 3)
+    colnames(prior) <- causes
   }
 
-  # remove repeats and NAs
-  y <- prep_data(y)
-
-  # Extract marker names
-  ms <- unique(do.call(c, lapply(y, names)))
+  y <- prep_data(y) # Process data: remove repeats and NAs
+  ms <- unique(do.call(c, lapply(y, names))) # Extract marker names
+  names_y <- names(y) # NULL if no episode names
+  names_prior <- rownames(prior) # Null if prior = NULL
 
   # Check all episodes have the same marker names
-  stopifnot(
-    "Markers are inconsistent across episodes.
-    NB: If not all markers are typed per episode,
-    data on untyped markers can be encoded as missing using NAs."=all(
-      all(sapply(y, function(y_m) identical(sort(names(y_m)), sort(ms))))
-    )
-  )
+  if (!all(all(sapply(y, function(y_m) identical(sort(names(y_m)), sort(ms)))))){
+    stop("Markers are inconsistent across episodes.
+    NB: If not all markers are typed per episode, data on untyped markers can be encoded as missing using NAs.")
+  }
 
   # Check all markers have allele frequencies
-  stopifnot(
-    "Some markers are missing allele frequencies"=all(ms %in% names(fs))
-  )
+  if (!all(ms %in% names(fs))) {
+    stop("Some markers are missing allele frequencies")
+  }
 
   # Check all alleles have a named frequency
   # For each marker, list allele names
@@ -298,45 +296,51 @@ compute_posterior <- function(
   names(as) <- ms # Name list entries by marker
   # For each marker, check all alleles have a named frequency:
   have_freq <- all(sapply(ms, function(m) all(as[[m]][!is.na(as[[m]])] %in% names(fs[[m]]))))
-  stopifnot("Not all alleles have a named frequency"=have_freq)
+  if (!have_freq) {
+    stop("Not all alleles have a named frequency")
+  }
 
-  # Check there are at least 2 episodes
-  infection_count <- length(y)
-  stopifnot("Need more than 1 episode"=infection_count > 1)
-
+  # Check external MOIs are compatible with data if provided
   min_MOIs <- determine_MOIs(y)
   if (is.null(MOIs)) {
     MOIs <- min_MOIs
   } else {
-    stopifnot("MOIs provided do not support the observed allelic diversity" = all(MOIs >= min_MOIs))
+    if(!all(MOIs >= min_MOIs)) {
+      stop("MOIs provided do not support the observed allelic diversity")
+    }
+  }
+
+  # PROCEED TO WARNINGS
+
+  # Warn if episode names are liable to cause confusion
+  if (!is.null(names_y) &
+      !is.null(names_prior) &
+      !all(names_y[-1] == names_prior)) {
+    warning("Data and prior episode names disagree\n")
+  }
+
+  # Warn if there is only allele information for < 2 episodes (unpaired)
+  for (m in ms) {
+    # boolean vector for whether each episode has allele information for marker m
+    has.allele <- sapply(y, function(y.epi) any(!is.na(y.epi[[m]])))
+    if(sum(has.allele) < 2) {
+      warning(paste("Marker", m, "has data on one episode only"))
+    }
+  }
+
+  # Warn users if any episodes have no data
+  na_episodes <- sapply(y, function(x) all(is.na(x)))
+  if (sum(na_episodes) == 1) {
+    warning(sprintf("Episode %s has no data\n", names(which(na_episodes))))
+  } else if (sum(na_episodes) > 1) {
+    warning(sprintf("Episodes %s have no data\n", paste(names(which(na_episodes)), collapse = " & ")))
   }
 
   gs_count <- sum(MOIs)
   gs <- paste0("g", 1:gs_count)
   ts_per_gs <- rep(1:infection_count, MOIs)
   gs_per_ts <- split(gs, ts_per_gs)
-
   n_recur <- infection_count - 1
-  causes <- c("C", "L", "I")
-
-  # use uniform prior if prior not given
-  if (is.null(prior)) {
-    prior <- matrix(rep(1 / 3, 3 * (infection_count - 1)),
-                    ncol = 3
-    )
-    colnames(prior) <- causes
-  } else {
-    stopifnot('The prior should have colnames "C", "L" and "I"'=identical(colnames(prior), causes))
-  }
-
-  # Warn user if there is only allele information for < 2 episodes (unpaired)
-  for (m in ms) {
-    # boolean vector for whether each episode has allele information for marker m
-    has.allele <- sapply(y, function(y.epi) any(!is.na(y.epi[[m]])))
-    if(sum(has.allele) < 2) {
-      message(paste("Allele information for marker", m, "does not span 2 episodes"))
-    }
-  }
 
   # Setting return.logp=T will enforce return.RG=T
   if (return.logp & !return.RG) {

@@ -1,40 +1,39 @@
 ################################################################################
-# Plot results for an initial infection of MOI=2 meiotic siblings (plus MOI=3 in
-# a sibling case) and a MOI=1 case recurrence which is either a stranger, clone,
-# regular sibling, or meiotic sibling.
+# Plot results for an initial infection of two or three meiotic siblings and a
+# recurrent stranger, clone, regular sibling, or meiotic sibling.
 #
 # For each case, plot results when alleles are equifrequent and data are
-# available on all marker counts, and when alleles are not equifrequent and data
-# are on a subset of marker counts.
+# available on all marker counts (trajectories and simplex plots), and when
+# alleles are not equifrequent and data are on a subset of marker counts (line
+# plots and pie charts).
 #
 # For equifrequent alleles across all marker counts, plot the trajectory of the
 # posterior probability of the expected state (line plot), and of all states
 # (simplex plot), the latter showing where the posterior probability goes when
 # it evades the expected state.
 #
-# For different allele frequencies (generated using different Dirichlet
-# concentration parameters) and a subset of marker counts, plot the
-# trajectory of the posterior probability of the expected state (line plot), and
-# the relative likelihood of the relationship graphs.
-#
 # Bulk prevalence data from three or four meiotic siblings are identical to bulk
 # data from parents. As such, infections with three meiotic siblings are liable
 # to be classified as infections of strangers with a clonal edge to a sibling
-# relapse (regular or meiotic).
+# relapse (regular or meiotic). And also show what happens in the two selfed
+# followed by one recombinant parent-child-like sibling case.
 ################################################################################
 
 # Set working directory to source file location
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
 cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
+load("../../data/output_Cln.Str.Sib.rda")
 
 for(case in cases){
 
-  par(par_default)
   attached <- search()
-  if(exists("ys_store")) detach("output")
-  load(sprintf("./%s.rda", case))
+  if("output" %in% attached) detach("output")
+  if(exists("output")) rm("output")
+  output <- output_Cln.Str.Sib[[case]]
   attach(output)
+
+  par(par_default)
   cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colour repeats
 
   # Compute effective cardinality cumulatively
@@ -114,7 +113,12 @@ for(case in cases){
 
   for(MOIs in MOIs_per_infection) {
 
-    MOIs_num <- as.numeric(strsplit(MOIs, "_")[[1]])
+    if (provide_correct_MOIs) {
+      MOIs_num <- as.numeric(strsplit(MOIs, "_")[[1]])
+    } else {
+      MOIs_num <- determine_MOIs(ys_store[[as.character(c)]][[MOIs]][[as.character(i)]])
+    }
+
     ts_per_gs <- rep(1:length(MOIs_num), MOIs_num)
     gs <- paste0("g", 1:sum(MOIs_num))
     RGs <- enumerate_RGs(MOIs = MOIs_num, igraph = T)
@@ -127,8 +131,6 @@ for(case in cases){
     par(mfrow = c(ceiling(sqrt(length(RGs))),ceiling(sqrt(length(RGs)))))
 
     for(g in graph_plot_order) {
-      # ps <- ps_store[[1]][[1]][[1]][[1]]
-      # RG <- ps$RGs[[g]]
       RG <- RGs[[g]]
       par(mar = c(0.5, 0.5, 0.5, 0.5))
       igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
@@ -155,7 +157,6 @@ for(case in cases){
       }
     }
   }
-  detach("output")
 }
 
 
