@@ -31,12 +31,12 @@ library(MCMCpack) # For rdirichlet
 # Magic numbers / quantities
 #===============================================================================
 cases <- c("PCLike", "Half")
-n_alleles <- 3 # Number of alleles per marker (marker cardinality)
+n_alleles <- 3 # Number of alleles per marker (at least three needed)
 n_repeats <- 10 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100, 150) # Number of markers for which RG likelihood returned
 c_params <- c(0.5, 1, 10, 100) # Dirichlet concentration parameter
 c_cutoff <- 99 # Switch from Dirichlet r.v. to 1/n_alleles above c_cutoff
-seed <- 1 # For reproducibility
+seed <- 2 # For reproducibility
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -56,10 +56,14 @@ min_n_markers <- min(n_markers)
 max_n_markers <- max(n_markers)
 alleles <- letters[1:n_alleles]
 all_markers <- paste0("m", 1:max_n_markers) # Marker names
-rorder <- sample(all_markers, size = max_n_markers) # Many markers, random order
+rorder <- sample(all_markers[-1], size = max_n_markers-1) # Many markers, random order
 marker_subsets <- lapply(1:max_n_markers, function(m) rorder[1:m]) # Subsets
+marker_subsets <- lapply(marker_subsets, function(x) { # Start every subset with m1
+  x[1] <- "m1"
+  return(x)
+})
 # smallest subset over which clones are disallowed (ensures the set of RGs is
-# the same for all n_markers):
+# the same for all n_markers) — applies to PCLike siblings only
 no_clone_subset <- marker_subsets[[min_n_markers]]
 
 # Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
@@ -132,40 +136,36 @@ for(case in cases) {
         } else if (case == "Half") {
 
           # Sample parental genotypes
-          parent_clones <- TRUE
-          while (parent_clones) {
-            if (admixture) { # Draw rare alleles with high probability
-              parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
-            } else {
-              parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
-            }
-            parent2 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
-            parent3 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
-            parent_clones <- any(identical(parent1[no_clone_subset], parent2[no_clone_subset]),
-                                 identical(parent1[no_clone_subset], parent3[no_clone_subset]),
-                                 identical(parent2[no_clone_subset], parent3[no_clone_subset]))
+          if (admixture) { # Draw rare alleles with high probability
+            parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
+          } else {
+            parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
           }
+          parent2 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
+          parent3 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
+
+          # Make sure parents all differ at allele one (eq. 4 of halfsib.tex)
+          parent1[1] <- alleles[1]
+          parent2[1] <- alleles[2]
+          parent3[1] <- alleles[3]
 
           parents12 <- cbind(parent1, parent2)
           parents13 <- cbind(parent1, parent3)
           parents23 <- cbind(parent2, parent3)
 
-          # Sample children genotypes
-          children_clones <- TRUE
-          while (children_clones) {
+          # Sample parental allocations independently
+          cs <- sapply(1:3, function(i) recombine_parent_ids(chrs_per_marker)[,1])
+          rownames(cs) <- all_markers
 
-            # Sample parental allocations independently
-            cs <- sapply(1:3, function(i) recombine_parent_ids(chrs_per_marker)[,1])
-            rownames(cs) <- all_markers
+          # Construct children genotypes from parental allocations
+          child12 <- sapply(all_markers, function(i) parents12[[i,cs[i, 1]]])
+          child13 <- sapply(all_markers, function(i) parents13[[i,cs[i, 2]]])
+          child23 <- sapply(all_markers, function(i) parents23[[i,cs[i, 3]]])
 
-            # Construct children genotypes from parental allocations
-            child12 <- sapply(all_markers, function(i) parents12[[i,cs[i,1]]])
-            child13 <- sapply(all_markers, function(i) parents13[[i,cs[i,2]]])
-            child23 <- sapply(all_markers, function(i) parents23[[i,cs[i,3]]])
-
-            # Check for clones in MOI = 2 infection only
-            children_clones <- identical(child12[no_clone_subset], child13[no_clone_subset])
-          }
+          # Make sure children all differ at allele one (eq. 4 of halfsib.tex)
+          child12[1] <- parent1[1]
+          child13[1] <- parent3[1]
+          child23[1] <- parent2[1]
 
           # Make parasite infection and data
           initial <- rbind(child12, child13)
