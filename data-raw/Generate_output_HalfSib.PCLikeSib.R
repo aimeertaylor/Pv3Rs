@@ -30,13 +30,13 @@ library(MCMCpack) # For rdirichlet
 #===============================================================================
 # Magic numbers / quantities
 #===============================================================================
-cases <- c("PCLike", "Half")
+cases <- "Half" #c("PCLike", "Half")
 n_alleles <- 3 # Number of alleles per marker (at least three needed)
 n_repeats <- 10 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100, 150) # Number of markers for which RG likelihood returned
 c_params <- c(0.5, 1, 10, 100) # Dirichlet concentration parameter
 c_cutoff <- 99 # Switch from Dirichlet r.v. to 1/n_alleles above c_cutoff
-seed <- 2 # For reproducibility
+seed <- 1 # For reproducibility
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -56,15 +56,11 @@ min_n_markers <- min(n_markers)
 max_n_markers <- max(n_markers)
 alleles <- letters[1:n_alleles]
 all_markers <- paste0("m", 1:max_n_markers) # Marker names
-rorder <- sample(all_markers[-1], size = max_n_markers-1) # Many markers, random order
-marker_subsets <- lapply(1:max_n_markers, function(m) rorder[1:m]) # Subsets
-marker_subsets <- lapply(marker_subsets, function(x) { # Start every subset with m1
-  x[1] <- "m1"
-  return(x)
-})
+# Many markers, random order after m1
+marker_rorder <- c("m1", sample(all_markers[-1], size = (max_n_markers-1)))
 # smallest subset over which clones are disallowed (ensures the set of RGs is
 # the same for all n_markers) — applies to PCLike siblings only
-no_clone_subset <- marker_subsets[[min_n_markers]]
+no_clone_subset <- marker_rorder[1:min_n_markers]
 
 # Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
 # providing we later assume an equal number of crossovers per chromosome
@@ -194,7 +190,7 @@ for(case in cases) {
   for(i in 1:n_repeats){
     y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
     for(m in 1:max_n_markers){
-      marker_subset <- marker_subsets[[m]]
+      marker_subset <- marker_rorder[1:m]
       y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
       ps <- suppressMessages(compute_posterior(y, fs))
       ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg
@@ -207,7 +203,7 @@ for(case in cases) {
   for(i in 1:n_repeats){
     y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
     for(m in 1:max_n_markers){
-      marker_subset <- marker_subsets[[m]]
+      marker_subset <- marker_rorder[1:m]
       y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
       ps <- suppressMessages(compute_posterior(y, fs))
       ps_store_all_ms_admix_rare[[as.character(i)]][[paste0("m",m)]] <- ps$marg
@@ -223,7 +219,7 @@ for(case in cases) {
       for(admixture in c(TRUE, FALSE)) {
         y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
         for(m in n_markers){
-          marker_subset <- marker_subsets[[m]]
+          marker_subset <- marker_rorder[1:m]
           y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
           ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
           ps_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[as.character(i)]][[as.character(m)]] <- ps
@@ -238,6 +234,7 @@ for(case in cases) {
   output <- list(n_alleles = n_alleles,
                  n_repeats = n_repeats,
                  n_markers = n_markers,
+                 marker_rorder = marker_rorder,
                  c_params = c_params,
                  c_cutoff = c_cutoff,
                  seed = seed,

@@ -17,7 +17,7 @@ cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 
 # Compute effective cardinality cumulatively
 cum_card_eff <- sapply(fs_store, function(fs) {
-  cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  cumsum(sapply(fs[marker_rorder], function(x) 1/sum(x^2)))})
 
 # Determine which fs in cum_card_eff are equifrequent
 equifs <- which(as.numeric(colnames(cum_card_eff)) > c_cutoff)
@@ -36,13 +36,15 @@ locus_types <- sapply(1:n_repeats, function(i) {
   y <- ys_store[[as.character(tail(c_params, 1))]][["admixture_FALSE"]][[i]]
   y_summary <- locus_type_summary(y)
 })
+rownames(locus_types) <- paste0("m", 1:max(n_markers))
+
 
 # Compute summary statistics of the data: locus type proportions
 locus_types_props <- sapply(1:n_repeats, function(i) {
   types <- c("All diff.", "All match", "Intra-match", "Inter-match")
   exp_locus_type_props <- setNames(rep(0,4), types)
   sapply(1:max(n_markers), function(m) {
-    x <- table(locus_types[1:m, i])/m
+    x <- table(locus_types[marker_rorder[1:m], i])/m
     exp_locus_type_props[names(x)] <- x
     return(exp_locus_type_props)
   })
@@ -63,11 +65,11 @@ exp_locus_type_props <- table(halfsib_locus_types)/nrow(halfsib_alleles)
 
 # Find first "All diff.' from which to compute odds: should be one for all
 m_min_diff <- sapply(1:n_repeats, function(i) {
-  min(which(locus_types[,i] == "All diff."))})
+  min(which(locus_types[marker_rorder,i] == "All diff."))})
 
 # Are m-2m2, 2m3, m4 close to (4/9)*m for large m? Yes
 exp_4on9m <- sapply(1:n_repeats, function(i) {
-  x <- locus_types[,i]
+  x <- locus_types[marker_rorder,i]
   m2 <- sum(x == "All match")
   m3 <- sum(x == "Intra-match")
   m4 <- sum(x == "Inter-match")
@@ -80,8 +82,8 @@ abline(v = (4/9)*max(n_markers))
 
 # Compute odds of relapse:reinfection based on locus types
 odds_equ4 <- sapply(1:n_repeats, function(i) {
-  sapply(m_min_diff[i]:max(n_markers), function(m) {
-    x <- locus_types[1:m,i]
+  sapply(1:max(n_markers), function(m) {
+    x <- locus_types[marker_rorder[1:m],i]
     m2 <- sum(x == "All match")
     m3 <- sum(x == "Intra-match")
     m4 <- sum(x == "Inter-match")
@@ -101,8 +103,8 @@ odds_pv3r <- sapply(1:n_repeats, function(i) {
 
 # Denominator condition that 2^(2*m3) >> 2^(m - 2*m3)
 denm_equ4 <- sapply(1:n_repeats, function(i) {
-  sapply(m_min_diff[i]:max(n_markers), function(m) {
-    x <- locus_types[1:m,i]
+  sapply(1:max(n_markers), function(m) {
+    x <- locus_types[marker_rorder[1:m],i]
     m2 <- sum(x == "All match")
     m3 <- sum(x == "Intra-match")
     x <- c(2^(2*m3), 2^(m - 2*m3))
