@@ -90,11 +90,7 @@ odds_equ4 <- sapply(1:n_repeats, function(i) {
 })
 
 # Posterior probabilities based on locus types
-post_equ4 <- sapply(1:n_repeats, function(i) {
-  x <- cbind(odds_equ4[,i], 1/odds_equ4[,i])
-  x <- apply(x, 1, function(z) z/sum(z))
-  x[1,]
-})
+post_equ4 <- odds_equ4 / (1 + odds_equ4)
 
 # Compute odds of relapse:reinfection based on posterior probabilities
 odds_pv3r <- sapply(1:n_repeats, function(i) {
