@@ -133,7 +133,7 @@ axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
      tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
 legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats, bty = "n",
        cex = 0.5, horiz = TRUE)
-for(i in n_repeats:1){
+for(i in 1:n_repeats){
   lines(x = 1:max_markers, col = cols[i], lwd = 2,
         y = sapply(ps_store_all_ms_uniform[[as.character(i)]], function(x) x[,"L"]))
 }
@@ -150,10 +150,8 @@ legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats,
 axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
 axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
      tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
-for(i in n_repeats:1){
-  lines(x = 1:max_markers,a
-        y = post_equ4[,i],
-        col = cols[i], lwd = 2)
+for(i in 1:n_repeats){
+  lines(x = 1:max_markers, y = post_equ4[,i], col = cols[i], lwd = 2)
 }
 
 # Plot inter-to-intra-match ratio when the first element of
