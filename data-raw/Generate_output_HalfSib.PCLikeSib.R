@@ -3,6 +3,9 @@
 # a recurrent sibling, where siblings are either parent child-like siblings or
 # half siblings.
 #
+# For consistency with theoretical results, when siblings are half siblings, the
+# first marker is forced to have three different alleles.
+#
 # In both cases, explore two scenarios. One where parents draw from the same
 # allele distribution. Another with admixture where the first parent who parents
 # intra-episode parasites draws alleles disproportionally:
@@ -17,7 +20,7 @@
 #
 # The alternative scenario parent-child like scenario with two selfed parasites
 # in the initial infection is covered by the meiotic sibling case with MOIs 3 &
-# 1 and no extenal MOI specification (see vignette on understanding posterior
+# 1 and no external MOI specification (see vignette on understanding posterior
 # estimates).
 #
 # For each case, generate results for data on all marker counts when alleles are
@@ -30,13 +33,13 @@ library(MCMCpack) # For rdirichlet
 #===============================================================================
 # Magic numbers / quantities
 #===============================================================================
-cases <- "Half" #c("PCLike", "Half")
+cases <- c("PCLike", "Half")
 n_alleles <- 3 # Number of alleles per marker (at least three needed)
 n_repeats <- 10 # Number of simulations per parameter combination
 n_markers <- c(10, 50, 100, 150) # Number of markers for which RG likelihood returned
 c_params <- c(0.5, 1, 10, 100) # Dirichlet concentration parameter
 c_cutoff <- 99 # Switch from Dirichlet r.v. to 1/n_alleles above c_cutoff
-seed <- 1 # For reproducibility
+seed <- 10 # For reproducibility
 
 #===============================================================================
 # Stores for data, frequencies & results
@@ -45,7 +48,7 @@ output_HalfSib.PCLikeSib <- list()
 ys_store <- list() # y for data
 fs_store <- list() # f for frequency
 ps_store <- list() # p for posterior
-ps_store_all_ms <- list() # all_ms for all marker counts
+ps_store_all_ms_uniform <- list() # all_ms for all marker counts
 ps_store_all_ms_admix_rare <- list() # for admixed case with some rare freqs
 
 #===============================================================================
@@ -57,10 +60,11 @@ max_n_markers <- max(n_markers)
 alleles <- letters[1:n_alleles]
 all_markers <- paste0("m", 1:max_n_markers) # Marker names
 # Many markers, random order after m1
-marker_rorder <- c("m1", sample(all_markers[-1], size = (max_n_markers-1)))
-# smallest subset over which clones are disallowed (ensures the set of RGs is
-# the same for all n_markers) — applies to PCLike siblings only
-no_clone_subset <- marker_rorder[1:min_n_markers]
+m_rorder <- c("m1", sample(all_markers[-1], size = (max_n_markers-1)))
+# Smallest subset over which clones are disallowed (ensures the set of RGs is
+# the same for all n_markers) — applies to PCLike siblings only; half sibs are
+# all different from m1 (see below)
+no_clone_subset <- m_rorder[1:min_n_markers]
 
 # Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
 # providing we later assume an equal number of crossovers per chromosome
@@ -77,7 +81,7 @@ for(case in cases) {
   #===============================================================================
   for(c in c_params) {
 
-    # Sample allele frequencies
+    # Sample allele frequencies, order m1 to m150
     fs <- sapply(all_markers, function(m) {
       if(c > c_cutoff) {
         fs_unnamed <- rep(1/n_alleles, n_alleles)
@@ -96,7 +100,7 @@ for(case in cases) {
         if (case == "PCLike") {
           # Sample parental genotypes
           parent_clones <- TRUE
-          while (parent_clones) {
+          while (parent_clones) { # parents are clones over the no_clone_subset
 
             if (admixture) {  # Draw rare alleles with high probability
               parent1 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = 1-fs[[t]]))
@@ -113,7 +117,7 @@ for(case in cases) {
           children_clones <- TRUE
           while (children_clones) {
 
-            # Sample parental allocations
+            # Sample parental allocations for a single recombinant
             cs <- recombine_parent_ids(chrs_per_marker)[,1]
             names(cs) <- all_markers
 
@@ -140,10 +144,10 @@ for(case in cases) {
           parent2 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
           parent3 <- sapply(all_markers, function(t) sample(alleles, size = 1, prob = fs[[t]]))
 
-          # Make sure parents all differ at allele one (eq. 4 of halfsib.tex)
-          parent1[1] <- alleles[1]
-          parent2[1] <- alleles[2]
-          parent3[1] <- alleles[3]
+          # Force parents to have different alleles at m1 (eq. 4 of halfsib.tex)
+          parent1["m1"] <- alleles[1]
+          parent2["m1"] <- alleles[2]
+          parent3["m1"] <- alleles[3]
 
           parents12 <- cbind(parent1, parent2)
           parents13 <- cbind(parent1, parent3)
@@ -158,10 +162,10 @@ for(case in cases) {
           child13 <- sapply(all_markers, function(i) parents13[[i,cs[i, 2]]])
           child23 <- sapply(all_markers, function(i) parents23[[i,cs[i, 3]]])
 
-          # Make sure children all differ at allele one (eq. 4 of halfsib.tex)
-          child12[1] <- parent1[1]
-          child13[1] <- parent3[1]
-          child23[1] <- parent2[1]
+          # Force parents to have different alleles at m1 (eq. 4 of halfsib.tex)
+          child12["m1"] <- parent1["m1"]
+          child13["m1"] <- parent3["m1"]
+          child23["m1"] <- parent2["m1"]
 
           # Make parasite infection and data
           initial <- rbind(child12, child13)
@@ -184,16 +188,16 @@ for(case in cases) {
   #=============================================================================
   # Generate results for markers 1:max_n_markers
   #=============================================================================
-  c <- 100 # For uniform allele frequencies only
+  c <- 100 # For uniform allele frequencies and all markers
   admixture <- FALSE # For parents from the same population
   fs <- fs_store[[as.character(c)]] # Extract frequencies
   for(i in 1:n_repeats){
     y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
-    for(m in 1:max_n_markers){
-      marker_subset <- marker_rorder[1:m]
+    for(j in 1:max_n_markers){
+      marker_subset <- m_rorder[1:j]
       y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
       ps <- suppressMessages(compute_posterior(y, fs))
-      ps_store_all_ms[[as.character(i)]][[paste0("m",m)]] <- ps$marg
+      ps_store_all_ms_uniform[[as.character(i)]][[j]] <- ps$marg
     }
   }
 
@@ -202,11 +206,11 @@ for(case in cases) {
   fs <- fs_store[[as.character(c)]] # Extract frequencies
   for(i in 1:n_repeats){
     y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
-    for(m in 1:max_n_markers){
-      marker_subset <- marker_rorder[1:m]
+    for(j in 1:max_n_markers){
+      marker_subset <- m_rorder[1:j]
       y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
       ps <- suppressMessages(compute_posterior(y, fs))
-      ps_store_all_ms_admix_rare[[as.character(i)]][[paste0("m",m)]] <- ps$marg
+      ps_store_all_ms_admix_rare[[as.character(i)]][[j]] <- ps$marg
     }
   }
 
@@ -218,11 +222,11 @@ for(case in cases) {
       fs <- fs_store[[as.character(c)]]
       for(admixture in c(TRUE, FALSE)) {
         y_all_markers <- ys_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[i]]
-        for(m in n_markers){
-          marker_subset <- marker_rorder[1:m]
+        for(j in n_markers){
+          marker_subset <- m_rorder[1:j]
           y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = FALSE)
           ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
-          ps_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[as.character(i)]][[as.character(m)]] <- ps
+          ps_store[[as.character(c)]][[sprintf("admixture_%s", admixture)]][[as.character(i)]][[as.character(j)]] <- ps
         }
       }
     }
@@ -234,14 +238,14 @@ for(case in cases) {
   output <- list(n_alleles = n_alleles,
                  n_repeats = n_repeats,
                  n_markers = n_markers,
-                 marker_rorder = marker_rorder,
+                 m_rorder = m_rorder,
                  c_params = c_params,
                  c_cutoff = c_cutoff,
                  seed = seed,
                  fs_store = fs_store,
                  ys_store = ys_store,
                  ps_store = ps_store,
-                 ps_store_all_ms = ps_store_all_ms,
+                 ps_store_all_ms_uniform = ps_store_all_ms_uniform,
                  ps_store_all_ms_admix_rare = ps_store_all_ms_admix_rare)
 
   output_HalfSib.PCLikeSib[[case]] <- output
