@@ -31,7 +31,7 @@ output_Cln.Str.Sib <- list() # For output
 ys_store <- list() # y for data
 fs_store <- list() # f for frequency
 ps_store <- list() # p for posterior
-ps_store_all_ms <- list() # for all marker counts (ms)
+ps_store_all_ms_uniform <- list() # for all marker counts (ms)
 
 #===============================================================================
 # Set the seed, name markers and get alleles, maker subsets etc.
@@ -41,11 +41,10 @@ min_n_markers <- min(n_markers)
 max_n_markers <- max(n_markers)
 alleles <- letters[1:n_alleles]
 all_markers <- paste0("m", 1:max_n_markers) # Marker names
-rorder <- sample(all_markers, size = max_n_markers) # Many markers, random order
-marker_subsets <- lapply(1:max_n_markers, function(m) rorder[1:m]) # Subset
+m_rorder <- sample(all_markers, size = max_n_markers) # Many markers, random order
 # Smallest subset for which clones are disallowed (ensures the set of RGs is
 # the same for all n_markers):
-no_clone_subset <- marker_subsets[[min_n_markers]]
+no_clone_subset <- m_rorder[1:min_n_markers]
 
 # Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
 # providing we later assume an equal number of crossovers per chromosome
@@ -155,11 +154,11 @@ for(case in cases){
   for(i in 1:n_repeats){
     for(MOIs in MOIs_per_infection) {
       y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[as.character(i)]]
-      for(m in 1:max_n_markers){
-        marker_subset <- marker_subsets[[m]]
+      for(j in 1:max_n_markers){
+        marker_subset <- m_rorder[1:j]
         y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = F)
         ps <- suppressMessages(compute_posterior(y, fs))
-        ps_store_all_ms[[MOIs]][[as.character(i)]][[paste0("m",m)]] <- ps$marg
+        ps_store_all_ms_uniform[[MOIs]][[as.character(i)]][[paste0("m",j)]] <- ps$marg
       }
     }
   }
@@ -172,8 +171,8 @@ for(case in cases){
       fs <- fs_store[[as.character(c)]]
       for(MOIs in MOIs_per_infection) {
         y_all_markers <- ys_store[[as.character(c)]][[MOIs]][[as.character(i)]]
-        for(m in n_markers){
-          marker_subset <- marker_subsets[[m]]
+        for(j in n_markers){
+          marker_subset <- m_rorder[1:j]
           y <- sapply(y_all_markers, function(x) x[marker_subset], simplify = F)
           if(provide_correct_MOIs) {
             ps <- suppressMessages(compute_posterior(y, fs, MOIs = as.numeric(strsplit(MOIs, "_")[[1]]), return.RG = TRUE, return.logp = TRUE))
@@ -181,7 +180,7 @@ for(case in cases){
             ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
           }
           ps <- suppressMessages(compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE))
-          ps_store[[as.character(c)]][[MOIs]][[as.character(i)]][[as.character(m)]] <- ps
+          ps_store[[as.character(c)]][[MOIs]][[as.character(i)]][[as.character(j)]] <- ps
         }
       }
     }
@@ -213,6 +212,7 @@ for(case in cases){
                  n_alleles = n_alleles,
                  n_repeats = n_repeats,
                  n_markers = n_markers,
+                 m_rorder = m_rorder,
                  c_params = c_params,
                  c_cutoff = c_cutoff,
                  seed = seed,
@@ -220,7 +220,7 @@ for(case in cases){
                  fs_store = fs_store,
                  ys_store = ys_store,
                  ps_store = ps_store,
-                 ps_store_all_ms = ps_store_all_ms,
+                 ps_store_all_ms_uniform = ps_store_all_ms_uniform,
                  post_S = post_S,
                  llikeRGs = llikeRGs)
 

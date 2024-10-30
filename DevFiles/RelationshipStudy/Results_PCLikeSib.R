@@ -18,9 +18,9 @@ par_default <- par(no.readonly = TRUE)
 if (n_repeats != 10) stop("Plots assume 10 repeats")
 cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colours for repeats
 
-# Compute effective cardinality cumulatively
+# Compute effective cardinality cumulatively in m_rorder
 cum_card_eff <- sapply(fs_store, function(fs) {
-  cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  cumsum(sapply(fs[m_rorder], function(x) 1/sum(x^2)))})
 
 # Determine which fs in cum_card_eff are equifrequent
 equifs <- which(as.numeric(colnames(cum_card_eff)) > c_cutoff)
@@ -36,16 +36,23 @@ par(mfrow = c(2,1))
 plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1, xaxt = "n",
      xlab = "Marker count (effective cardinality)",
      ylab = "Posterior relapse probability")
-abline(h = 2/11, lty = "dashed"); text(x = max(n_markers), y = 2/11, labels = "2/11", pos = 3)
 legend("right", col = cols, lwd = 2, inset = 0.1, legend = 1:n_repeats,
        bty = "n", title = "Repeats", cex = 0.5)
+
+# Add expected lower bound derived from theoretical odds
+abline(h = 2/11, lty = "dashed")
+text(x = max(n_markers), y = 2/11, labels = "2/11", pos = 3)
+
+# Add horizontal axis
 axis_at <- c(1, seq(0, max(n_markers), 50)[-1])
 axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
 axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
      tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+
+# Add trajectories
 for(i in 1:n_repeats){
   lines(x = 1:max(n_markers),
-        y = sapply(ps_store_all_ms[[as.character(i)]], function(x) x[,"L"]),
+        y = sapply(ps_store_all_ms_uniform[[as.character(i)]], function(x) x[,"L"]),
         col = cols[i], lwd = 2)
 }
 
@@ -54,7 +61,7 @@ par(mar = c(0,0,0,0))
 plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5)
 for(i in 1:n_repeats){
   xy_post <- cbind(c(0,0), apply(do.call(rbind,
-                                         ps_store_all_ms[[as.character(i)]]), 1, project2D))
+                                         ps_store_all_ms_uniform[[as.character(i)]]), 1, project2D))
   lines(x = xy_post["x",], y = xy_post["y",], col = cols[i])
   points(x = xy_post["x",], y = xy_post["y",], pch = 20)}
 par(par_default)

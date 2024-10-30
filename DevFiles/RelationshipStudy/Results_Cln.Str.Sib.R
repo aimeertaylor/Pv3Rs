@@ -36,9 +36,9 @@ for(case in cases){
   par(par_default)
   cols <- RColorBrewer::brewer.pal(n = n_repeats, "Paired") # Colour repeats
 
-  # Compute effective cardinality cumulatively
+  # Compute effective cardinality cumulatively in m_rorder
   cum_card_eff <- sapply(fs_store, function(fs) {
-    cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+    cumsum(sapply(fs[m_rorder], function(x) 1/sum(x^2)))})
 
   # Determine which fs in cum_card_eff are equifrequent
   equifs <- which(as.numeric(colnames(cum_card_eff)) > c_cutoff)
@@ -51,17 +51,20 @@ for(case in cases){
   # Plot trajectories
   plot(NULL, xlim = c(1,max(n_markers)), ylim = c(0,1), bty = "n", las = 1,
        xaxt = "n", xlab = "", ylab = "Posterior expected state probability")
+
+
   axis_at <- c(1, seq(0, max(n_markers), 10)[-1])
   axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
   axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
        tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
   title(main = gsub("_", " ", case))
   title(xlab = "Marker count (cumulative effective cardinality)", line = 3.5)
+
   for(MOIs in MOIs_per_infection) {
     LTY = ifelse(MOIs == "2_1", 1, 2)
     for(i in 1:n_repeats){
       lines(x = 1:max(n_markers),
-            y = sapply(ps_store_all_ms[[MOIs]][[as.character(i)]], function(x) x[,exp_state]),
+            y = sapply(ps_store_all_ms_uniform[[MOIs]][[as.character(i)]], function(x) x[,exp_state]),
             col = cols[i], lwd = 2, lty = LTY)
     }
   }
@@ -80,7 +83,7 @@ for(case in cases){
   for(MOIs in MOIs_per_infection) {
     LTY = ifelse(MOIs == "2_1", 1, 2)
     for(i in 1:n_repeats){
-      xy_post <- cbind(c(0,0), apply(do.call(rbind, ps_store_all_ms[[MOIs]][[as.character(i)]]), 1, project2D))
+      xy_post <- cbind(c(0,0), apply(do.call(rbind, ps_store_all_ms_uniform[[MOIs]][[as.character(i)]]), 1, project2D))
       lines(x = xy_post["x",], y = xy_post["y",], lty = LTY, col = cols[i])
       points(x = xy_post["x",], y = xy_post["y",], pch = "-")
     }
@@ -99,7 +102,7 @@ for(case in cases){
     title(main = sprintf("Concentration parameter: %s", c), line = 0)
     axis(side = 1, at = n_markers, cex.axis = 0.7)
     axis(side = 1, line = 1, at = n_markers, cex.axis = 0.7, tick = F,
-         labels = sprintf("(%s)", round(cum_card_eff[,as.character(c)][n_markers])))
+         labels = sprintf("(%s)", round(cum_card_eff[n_markers,as.character(c)])))
     for(MOIs in MOIs_per_infection) {
       for(i in 1:n_repeats) {
         lines(y = post_S[[as.character(c)]][[MOIs]][,i], x = n_markers,

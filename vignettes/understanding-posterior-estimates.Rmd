@@ -816,8 +816,8 @@ for(case in cases){
   # Add trajectories
   for(i in 1:output$n_repeats){
     lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
-          y = sapply(output$ps_store_all_ms[[MOIs]][[as.character(i)]], function(x) 
-            x[,output$exp_state]))
+          y = sapply(output$ps_store_all_ms_uniform[[MOIs]][[as.character(i)]],
+                     function(x) x[,output$exp_state]))
   }
   
   legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
@@ -871,8 +871,8 @@ for(case in cases){
   # Add trajectories
   for(i in 1:output$n_repeats){
     lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
-          y = sapply(output$ps_store_all_ms[[MOIs]][[as.character(i)]], function(x) 
-            x[,output$exp_state]))
+          y = sapply(output$ps_store_all_ms_uniform[[MOIs]][[as.character(i)]],
+                     function(x) x[,output$exp_state]))
   }
   
   legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
@@ -933,8 +933,8 @@ for(case in cases){
   # Add trajectories
   for(i in 1:output$n_repeats){
     lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
-          y = sapply(output$ps_store_all_ms[[MOIs]][[as.character(i)]], function(x) 
-            x[,"C"]))
+          y = sapply(output$ps_store_all_ms_uniform[[MOIs]][[as.character(i)]],
+                     function(x) x[,"C"]))
   }
   
   legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
@@ -962,16 +962,23 @@ to maximally hamper relapse classification.
 
 In general, when parental parasites draw from the same allele distribution, the
 frequency of certain relapse increases erratically with the number of markers
-genotyped.
+genotyped. 
+
+For this particular case where there are three equifrequent alleles per marker,
+we can show theoretically that the system behaves erratically because a small
+perturbation to the ratios of observations (all alleles match across
+the three half siblings etc.) can lead to a large deviation in the odds of
+relapse versus reinfection.
+
 
 ```{r echo = FALSE, fig.height = 4}
 rm(list = "output")
 output <- output_HalfSib.PCLikeSib[["Half"]]
-cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colours for repeats
+cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # For repeats
 
-# Compute effective cardinality cumulatively
+# Compute effective cardinality cumulatively in the order of markers genotyped
 cum_card_eff <- sapply(output$fs_store, function(fs) {
-  cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  cumsum(sapply(fs[output$m_rorder], function(x) 1/sum(x^2)))})
 
 # Determine which fs in cum_card_eff are equifrequent
 equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
@@ -980,14 +987,14 @@ equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
 plot(NULL, bty = "n", las = 1, xaxt = "n", xlim = c(1,max(output$n_markers)), 
      xlab = "Marker count (effective cardinality)", 
      ylim = c(0,1), ylab = "Posterior relapse probability")
-
-# Where does this 2/11 come from - correct Results_HalfSib.R accordingly
-abline(h = 2/11, lty = "dashed")
-text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 3)
-legend("center", lwd = 2, col = cols, legend = 1:output$n_repeats, bty = "n", 
+legend("right", lwd = 2, col = cols, legend = 1:output$n_repeats, bty = "n", 
        cex = 0.5, title = "Repeat")
 
-# Add horioutputontal axis
+# Add expected probability based on normalised odds from on theoretical results
+abline(h = 2/11, lty = "dashed") 
+text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 3)
+
+# Add horizontal axis
 axis_at <- c(1, seq(0, max(output$n_markers), 50)[-1])
 axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
 axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
@@ -996,7 +1003,8 @@ axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
 # Add trajectories
 for(i in 1:output$n_repeats){
   lines(x = 1:max(output$n_markers),
-        y = sapply(output$ps_store_all_ms[[as.character(i)]], function(x) x[,"L"]),
+        y = sapply(output$ps_store_all_ms_uniform[[as.character(i)]], 
+                   function(x) x[,"L"]),
         col = cols[i], lwd = 2)
 }
 ```
@@ -1013,22 +1021,18 @@ plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
 legend("right", col = cols, lwd = 2, inset = 0.1, legend = (1:output$n_repeats)-1, 
        bty = "n", cex = 0.5, title = "Repeats")
 
-# Add horsioutputontal axis
+# Add horizontal axis
 axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
 axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
      tick = F, labels = sprintf("(%s)", round(cum_card_eff[,"0.5"][axis_at])))
 
 # Add trajectories
 for(i in 1:output$n_repeats){
-  y <- sapply(output$ps_store_all_ms_admix_rare[[as.character(i)]],function(x) x[,"I"])
+  y <- sapply(output$ps_store_all_ms_admix_rare[[as.character(i)]],
+              function(x) x[,"I"])
   lines(x = 1:max(output$n_markers), y = y, col = cols[i], lwd = 2)
 }
 ```
-The system behaves erratically because XXX [add link to latex file]
-
-<!-- (The proportion of intra versus inter matches does not match the erratic
-nature of some repeats in MyDevFiles/RelationshipStudy/Results_HalfSib.R) -->
-
 In both scenarios, the likelihood of the true graph with siblings within and
 across episodes is quashed as soon as distinct alleles from all three parents
 are observed at a given marker. In general, 
@@ -1096,7 +1100,8 @@ axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
 # Add trajectories
 for(i in 1:output$n_repeats) {
   lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
-        y = sapply(output$ps_store_all_ms[[as.character(i)]], function(x) x[,"L"]))
+        y = sapply(output$ps_store_all_ms_uniform[[as.character(i)]], 
+                   function(x) x[,"L"]))
 }
 ```
 
@@ -1117,7 +1122,8 @@ axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
 
 # Add trajectories
 for(i in 1:output$n_repeats){
-  y <- sapply(output$ps_store_all_ms_admix_rare[[as.character(i)]],function(x) x[,"I"])
+  y <- sapply(output$ps_store_all_ms_admix_rare[[as.character(i)]],
+              function(x) x[,"I"])
   lines(x = 1:max(output$n_markers), y = y, col = cols[i], lwd = 2)
 }
 
