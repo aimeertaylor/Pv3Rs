@@ -19,13 +19,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup} 
+```{r setup, include = FALSE} 
 devtools::load_all(".") #library(Pv3Rs)
 options(warn = -1) # Suppress warnings about missing and limited data
 sm <- function(...) suppressMessages(...) # Rename to shorten function call
 ```
 
-# Summary
+# Summary of contents
 
 In this vignette we document the output of `compute_posterior` when the
 statistical model underpinning it is well specified and misspecified. More
@@ -39,18 +39,20 @@ well specified but
 - data are limited to only one marker. 
 
 When the model is well specified and there are data on many markers, we show how
-the maximal probability of probable recrudescence / reinfection depends on 1 to 3 as follows and thus has a bearing on 4 as follows.
+the maximal probability of recrudescence / reinfection depends on the following
 
-1) per-episode MOIs
-2) episode count (regardless of data)
-3) position of the recurrence in the sequence of episodes
-4) interpreting uncertainty
+- per-episode MOIs,
+- episode count, 
+- position of the recurrence in the sequence of episodes,
 
-Finally, we summarise some [results stored in the development files of the Pv3Rs
-source
-package](https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy)
-on the output of `compute_posterior` when the model is misspecified
-because of
+and thus the 
+
+- impact on how uncertainty is interpreted. 
+
+Finally, we summarise results (for more details; see [development files
+of the Pv3Rs source
+package](https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy))
+on the output of `compute_posterior` when the model is misspecified because of
 
 - meiotic siblings,
 - half siblings [sort bounds!],
@@ -58,9 +60,14 @@ because of
 - genotyping errors or *de novo* mutations [To-do]. 
 
 We have not yet characterised model misspecification due to inbred parasites.
-However, we intuit inter-marker dependence will lead to overconfident posterior
-probabilities, while population structure could lead to the misclassification of
-reinfection as relapse.
+However, we intuit 
+- inter-marker dependence (linkage disequilibrium) will lead to overconfident posterior
+probabilities, 
+- population structure could lead to the misclassification of
+reinfection as relapse / recrudescence, 
+- population relatedness is encoded in allele frequency estimates locus-by-locus 
+[Mehra et al. preprint 2024](https://www.biorxiv.org/content/10.1101/2024.04.16.588675v1)
+and thus likely unimportant
 
 ```{r echo = FALSE}
 # get RG vertex labels, RGs, recurrent state sequences RGs are compatible with
@@ -107,7 +114,7 @@ sm(compute_posterior(y, fs))$marg # Posterior
 
 # Data on only one episode 
 
-## Monoclonal data
+## Homoallelic data without user-specified MOIs > 1
 
 When only one episode has data and its MOI is one, `compute_posterior` returns
 the prior.
@@ -118,14 +125,14 @@ y <- list(enroll = list(m1 = NA), recur1 = list(m1 = "A")) # No enrolment data
 sm(compute_posterior(y, fs))$marg # Posterior
 ```
 
-## Multiclonal heteroallelic data 
+## Heteroallelic data 
 
 When only one episode has data and they are heteroallelic, the MOI necessarily
 exceeds one because the model assumes no false positivity. The posterior is 
-close to (but not equal to) the prior because, for relationship graphs with
+close to the prior but not equal to it because, for relationship graphs with
 intra-episode siblings, heteroallelic data limit summation over
 identity-by-descent partitions to partitions with at least two cells for the
-episode with data. The lower bound on the cell count increases with the number
+episode with data. Moreover, the lower bound on the cell count increases with the number
 of distinct alleles observed.
 
 ```{r}
@@ -145,18 +152,16 @@ y <- list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data
 do.call(rbind, lapply(MOIs, function(x)sm(compute_posterior(y,fs,MOIs=x))$marg)) 
 ```
 
-## Multiclonal homoallelic data 
+## Homoallelic data with user-specified MOIs > 1 and rare observations
 
-If the data are homoallelic, but the MOI is greater than one because of external
-input, and the observed allele is rare, the posterior departs from the prior
-because rare intra-episode allelic repeats limit the likelihood to summation
-over relationship graphs with intra-episode relatedness. We can use different
-MOIs to demonstrate this: changing the MOIs changes the summation over
-relationship graphs, and thus the posterior output.
+If the data are homoallelic, but the user specifies MOIs greater than one, and
+the observed allele is rare, the posterior departs from the prior because rare
+intra-episode allelic repeats are more probable given relationship graphs with
+intra-episode relatedness.
 
 ```{r}
 y <- list(enroll = list(m1 = 'A'), recur = list(m1 = NA)) # Homoallelic data
-MOIs <- list(c(2,1), c(2,2), c(3,2)) # Different MOIs with first MOI > 1
+MOIs <- list(c(2,1), c(3,2), c(5,1)) # Different MOIs with first MOI > 1
 fs = list(m1 = c("A" = 0.01, "B" = 0.99)) # Rare observed allele
 ```
 
@@ -205,13 +210,16 @@ xy <- apply(approximation, 2, project2D) # Project probabilities and plot:
 points(x = xy["x", ], y = xy["y", ], col = 1:length(MOIs), cex = 2)
 legend("left", pch = c(20, 1), pt.cex = c(1, 2), bty = "n", inset = 0, 
        legend = c("Posterior probability", 
-                  "Posterior approximation \nbased only on summation \nover graphs"))
+"Posterior approximation 
+based on summation over 
+graphs with siblings
+only in the first episode"))
 legend("right", col = 1:length(MOIs), pch = 20, bty = "n", inset = 0.2,
        legend = sapply(MOIs, paste, collapse = " & "), title = "MOIs")
 ```
 
-The likelihood is only appreciable for relationship graphs where all parasites
-in the first episode are siblings.
+The per-graph likelihood is only appreciable for relationship graphs where all
+parasites in the first episode are siblings.
 
 ```{r echo = FALSE}
 # ------------------------------------------------------------------------------
@@ -245,8 +253,8 @@ legend("topleft", pch = 20, bty= "n", col = c("black", "hotpink", "lightgray"),
                   "Graphs with no siblings in the first episode"))
 ```
 
-Adding recurrences without adding data hardly changes the posterior for a single
-recurrence.
+Adding recurrences without adding data changes the posterior of the first
+recurrence only slightly.
 
 ```{r}
 # Data with different recurrence counts but only the first recurrence has data
@@ -259,7 +267,9 @@ ys <- list("1_recurrence" = list(enroll = list(m1 = "A"),
                                  recur1 = list(m1 = NA), 
                                  recur2 = list(m1 = NA), 
                                  recur3 = list(m1 = NA)))
+```
 
+```{r, echo = F}
 # Posterior for different recurrence counts
 t(sapply(ys, function(y) { 
   extra_MOIs <- rep(1, length(y)-2)
@@ -272,10 +282,10 @@ t(sapply(ys, function(y) {
 When there are data on multiple episodes but no comparable data across episodes,
 `compute_posterior` behaves similarly to when data are on only one episode:
 
-- it returns the prior when episodes with data are monoclonal, 
-- its output remains close to the prior when calls are heteroallelic,
-- its output departs from the prior when the call is multiclonal homoallelic and
-the observed allele is rare.
+- it returns the prior when data are homoallelic without user-specified MOIs > 1, 
+- its output remains close to the prior when data are heteroallelic,
+- its output departs from the prior when data are homoallelic with user-specified MOIs > 1
+and a rare observation.
 
 ```{r}
 # Allele frequencies
@@ -338,29 +348,25 @@ text(x = xy["x", ], y = xy["y", ], pos = 3, cex = 0.75, labels) # Annotate
 
 # Data on many markers
 
-As the data increase with the number of markers genotyped, given equally likely
-recurrent states *a priori*, posterior probabilities converge to either
+Given equally likely recurrent states *a priori*, as the data increase with the number of markers genotyped posterior probabilities converge to either
 
 - relapse with posterior probability one, 
-- recrudescence with maximal posterior probability less than one, 
-- reinfection with maximal posterior probability less than one.
+- recrudescence with posterior probability less than one, 
+- reinfection with posterior probability less than one.
 
 The maximal posterior probabilities of recrudescence and reinfection depend on
-the number of parasite genotypes within and across episodes, and the position of
-the recurrence the sequence of episodes. 
+number of genotypes per episode, the number of episodes, and on the position of
+the recurrence in the sequence of episodes.
 
-Using rare matched and mismatched data on 100 markers, we demonstrate the dependence
-of maximal probabilities of probable recrudescence and probable reinfection on
-parasite genotype counts by increasing per-episode MOIs, thereby increasing
-parasite genotype counts within episodes, while adding data inextricably; and by
-increasing the number of recurrences, thereby increasing parasite genotype
-counts across infections, without adding any data.
+Using rare matched and mismatched data on 100 markers, we demonstrate these
+dependencies by increasing per-episode MOIs, which adds data inextricably, and
+by increasing the number of recurrences without adding any data.
 
 ```{r}
 marker_count <- 100 # Number of markers
 ms <- paste0("m", 1:marker_count) # Marker names 
-match <- as.list(sapply(ms, function(t) "A")) # List of As for all markers
-mismatch <- as.list(sapply(ms, function(t) "B")) # List of Bs for all markers
+all_As <- as.list(sapply(ms, function(t) "A")) # List of As for all markers
+all_Bs <- as.list(sapply(ms, function(t) "B")) # List of Bs for all markers
 no_data <- as.list(sapply(ms, function(t) NA)) # List of NAs for all markers
 ```
 
@@ -369,8 +375,8 @@ no_data <- as.list(sapply(ms, function(t) NA)) # List of NAs for all markers
 ```{r}
 MOIs <- list(c(1,1), c(3,1), c(2,2), c(3,3), c(4,2)) 
 fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
-y_match <- list(enrol = match, recur = match)
-y_mismatch <- list(enrol = match, recur = mismatch)
+y_match <- list(enrol = all_As, recur = all_As)
+y_mismatch <- list(enrol = all_As, recur = all_Bs)
 ```
 
 ```{r echo = FALSE}
@@ -468,27 +474,27 @@ legend("bottomright", pch = 20, bty= "n", cex = 0.75,
 ## Adding recurrences without adding data
 
 ```{r}
-ys_match <- list("1_recurrence" = list(enroll = match, 
-                                       recur1 = match),
-                 "3_recurrence" = list(enroll = match, 
-                                       recur1 = match,
+ys_match <- list("1_recurrence" = list(enroll = all_As, 
+                                       recur1 = all_As),
+                 "3_recurrence" = list(enroll = all_As, 
+                                       recur1 = all_As,
                                        recur2 = no_data,
                                        recur3 = no_data),
-                 "5_recurrence" = list(enroll = match, 
-                                       recur1 = match,
+                 "5_recurrence" = list(enroll = all_As, 
+                                       recur1 = all_As,
                                        recur2 = no_data,
                                        recur3 = no_data,
                                        recur4 = no_data,
                                        recur5 = no_data))
 
-ys_mismatch <- list("1_recurrence" = list(enroll = match, 
-                                          recur1 = mismatch),
-                    "3_recurrence" = list(enroll = match, 
-                                          recur1 = mismatch,
+ys_mismatch <- list("1_recurrence" = list(enroll = all_As, 
+                                          recur1 = all_Bs),
+                    "3_recurrence" = list(enroll = all_As, 
+                                          recur1 = all_Bs,
                                           recur2 = no_data,
                                           recur3 = no_data),
-                    "5_recurrence" = list(enroll = match, 
-                                          recur1 = mismatch,
+                    "5_recurrence" = list(enroll = all_As, 
+                                          recur1 = all_Bs,
                                           recur2 = no_data,
                                           recur3 = no_data,
                                           recur4 = no_data,
@@ -589,10 +595,10 @@ estimates.
 This effect is negligable when all episodes have the same data on many markers:
 
 ```{r}
-y <- list(enroll = match, 
-          recur1 = match, 
-          recur2 = match, 
-          recur3 = match)
+y <- list(enroll = all_As, 
+          recur1 = all_As, 
+          recur2 = all_As, 
+          recur3 = all_As)
 sm(compute_posterior(y, fs))$marg
 ```
 
@@ -601,23 +607,23 @@ no data (N).
 
 ```{r}
 ys_match <- list("NOO" = list(enroll = no_data, 
-                              recur1 = match,
-                              recur2 = match),
-                 "ONO" = list(enroll = match, 
+                              recur1 = all_As,
+                              recur2 = all_As),
+                 "ONO" = list(enroll = all_As, 
                               recur1 = no_data,
-                              recur2 = match),
-                 "OON" = list(enroll = match, 
-                              recur1 = match,
+                              recur2 = all_As),
+                 "OON" = list(enroll = all_As, 
+                              recur1 = all_As,
                               recur2 = no_data))
 
 ys_mismatch <- list("NOO" = list(enroll = no_data, 
-                                 recur1 = match,
-                                 recur2 = mismatch),
-                    "ONO" = list(enroll = match, 
+                                 recur1 = all_As,
+                                 recur2 = all_Bs),
+                    "ONO" = list(enroll = all_As, 
                                  recur1 = no_data,
-                                 recur2 = mismatch), 
-                    "OON" = list(enroll = match, 
-                                 recur1 = mismatch,
+                                 recur2 = all_Bs), 
+                    "OON" = list(enroll = all_As, 
+                                 recur1 = all_Bs,
                                  recur2 = no_data))
 ``` 
 
@@ -776,9 +782,6 @@ Posterior probabilities converge to
 ```{r echo = FALSE}
 MOIs <- "2_1"
 cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
-
-
-
 
 for(case in cases){
   
