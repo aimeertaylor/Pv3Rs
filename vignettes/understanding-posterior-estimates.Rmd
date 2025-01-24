@@ -353,13 +353,23 @@ text(x = xy["x", ], y = xy["y", ], pos = 3, cex = 0.75, labels) # Annotate
 Given equally likely recurrent states *a priori*, as the data increase with the
 number of markers genotyped posterior probabilities converge to either
 
-- relapse with posterior probability one, 
-- recrudescence with posterior probability less than one, 
-- reinfection with posterior probability less than one.
+- relapse with posterior probability one when the data suggest some parasites
+across infections are regular siblings
 
-The maximal posterior probabilities of recrudescence and reinfection depend on
-number of genotypes per episode, the number of episodes, and on the position of
-the recurrence in the sequence of episodes.
+- recrudescence with posterior probability less than one when the data are
+compatible with recrudescence (because data compatible with a recrudescence is
+also compatible with relapse)
+
+- reinfection with posterior probability less than one when the data are
+compatible with reinfection (because data compatible with a reinfection is also
+compatible with relapse)
+
+When the data are compatible with recrudescence and relapse (or reinfection and
+relapse) the maximal posterior probability of recrudescence (or reinfection)
+depends on the the prior over relationships graphs. The prior over relationship
+is uniform over all graphs compatible with a given recurrent state, and thus on
+the number of relationship graphs. The total number of graphs depends on the
+number of genotypes per episode and the number of episodes. 
 
 Using rare matched and mismatched data on 100 markers, we demonstrate these
 dependencies by increasing per-episode MOIs, which adds data inextricably, and
@@ -606,7 +616,7 @@ beginning versus the end of a sequence of three episodes, for example), the
 position of a recurrence in a sequence of episodes has a bearing on posterior
 estimates.
 
-This effect is negligable when all episodes have the same data on many markers:
+This effect is negligible when all episodes have the same data on many markers:
 
 ```{r}
 y <- list(enroll = all_As, 
