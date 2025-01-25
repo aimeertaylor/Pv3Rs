@@ -43,7 +43,7 @@ the maximal probability of recrudescence / reinfection depends on the following
 
 - per-episode MOIs,
 - episode count, 
-- position of the recurrence in the sequence of episodes,
+- position of the recurrence in the sequence of episodes [finish and check colors],
 
 and thus the 
 
@@ -351,25 +351,34 @@ text(x = xy["x", ], y = xy["y", ], pos = 3, cex = 0.75, labels) # Annotate
 # Data on many markers
 
 Given equally likely recurrent states *a priori*, as the data increase with the
-number of markers genotyped posterior probabilities converge to either
+number of markers genotyped, posterior probabilities converge to either
 
 - relapse with posterior probability one when the data suggest some parasites
 across infections are regular siblings
 
 - recrudescence with posterior probability less than one when the data are
-compatible with recrudescence (because data compatible with a recrudescence is
-also compatible with relapse)
+compatible with recrudescence (less than one because data compatible with
+recrudescence are also compatible with relapse)
 
 - reinfection with posterior probability less than one when the data are
-compatible with reinfection (because data compatible with a reinfection is also
-compatible with relapse)
+compatible with reinfection (less than one because data compatible with
+reinfection are also compatible with relapse)
 
 When the data are compatible with recrudescence and relapse (or reinfection and
 relapse) the maximal posterior probability of recrudescence (or reinfection)
-depends on the the prior over relationships graphs. The prior over relationship
-is uniform over all graphs compatible with a given recurrent state, and thus on
-the number of relationship graphs. The total number of graphs depends on the
-number of genotypes per episode and the number of episodes. 
+depends on the prior over relationships graphs. Otherwise stated, when two of
+the three recurrent states are non-identifiable despite informative data, the
+model returns a prior estimate based on the distribution over relationship
+graphs.
+
+For convenience, the prior over relationship is uniform over all graphs
+compatible with a given recurrent state. As such, the maximal posterior
+probability of recrudescence (or reinfection) depends on the number of
+relationship graphs, which in turn depends on the number of genotypes per
+episode and the number of episodes. Because the distribution over relationship
+graphs is not invariant to different episode orderings, when there are two or
+more recurrences, the position of a recurrence in the sequence of recurrences
+has a bearing on posterior estimates.
 
 Using rare matched and mismatched data on 100 markers, we demonstrate these
 dependencies by increasing per-episode MOIs, which adds data inextricably, and
@@ -495,6 +504,9 @@ legend("bottomright", pch = 20, bty= "n", cex = 0.75,
 ```{r}
 ys_match <- list("1_recurrence" = list(enroll = all_As, 
                                        recur1 = all_As),
+                 "2_recurrence" = list(enroll = all_As, 
+                                       recur1 = all_As,
+                                       recur2 = no_data),
                  "3_recurrence" = list(enroll = all_As, 
                                        recur1 = all_As,
                                        recur2 = no_data,
@@ -508,6 +520,9 @@ ys_match <- list("1_recurrence" = list(enroll = all_As,
 
 ys_mismatch <- list("1_recurrence" = list(enroll = all_As, 
                                           recur1 = all_Bs),
+                    "2_recurrence" = list(enroll = all_As, 
+                                          recur1 = all_Bs,
+                                          recur2 = no_data),
                     "3_recurrence" = list(enroll = all_As, 
                                           recur1 = all_Bs,
                                           recur2 = no_data,
@@ -574,7 +589,9 @@ approximation <- lapply(1:length(MOIs), FUN = function(i) {
   approx <- rbind(c(C = C_match, L = 1 - C_match, I = 0), 
                   c(C = 0, L = 1 - I_mismatch, I = I_mismatch))
 })
+```
 
+```{r echo = FALSE}
 # ------------------------------------------------------------------------------
 # Plot probabilities
 # ------------------------------------------------------------------------------
@@ -582,11 +599,11 @@ par(mar = c(0,0,0,0))
 plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
 
 xy <- apply(results_match_recur1, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:3) # Plot projections
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(ys_match)) # Plot projections
 text(mean(xy["x", ]), mean(xy["y", ]), "match data", pos = 3, offset = 1) 
 
 xy <- apply(results_mismatch_recur1, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:3) # Plot projections
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(ys_mismatch)) # Plot projections
 text(mean(xy["x", ]), mean(xy["y", ]), "mismatch data", pos = 3, offset = 1) 
 
 # Add approximations based on graphs only
@@ -604,8 +621,8 @@ prior probabilities of
 graphs compatible with 
 recrudescence first (match) / 
 reinfection first (mismatch)", "Posterior probability"))
-legend("right", col = c(1:3), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
-       legend = c(1,3,5), title = "Recurrence\ncount") 
+legend("right", col = c(1:length(xys)), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
+       legend = c(1,2,3,5), title = "Recurrence\ncount") 
 ```
 
 ## Position in a sequence  
@@ -651,15 +668,20 @@ ys_mismatch <- list("NOO" = list(enroll = no_data,
                                  recur2 = no_data))
 ``` 
 
-The second recurrence in the sequence NOO (upward green 2 triangle) has a higher
-probability of recrudescence than the first recurrence in the sequence OON
-(upward purple 1 triangle) despite both recurrences having the same rare
+
+The first recurrence in the sequence <span style="color: purple;">**O**ON</span>
+(downward purple 1 triangle) has a higher probability of reinfection than the
+second recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
+(downward green 2 triangle) despite both recurrences having the same
+observations that mismatch the directly preceding episode.
+
+The first recurrence in the sequence <span style="color: purple;">**O**ON</span>
+(upward purple 1 triangle) has a lower probability of recrudescence than second
+recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
+(upward green 2 triangle) despite both recurrences having the same rare
 observations that match the directly preceding episode.
 
-The second recurrence in the sequence NOO (downward green 2 triangle) has a
-lower probability of reinfection than the first recurrence in the sequence OON
-(downward purple 1 triangle) despite both recurrences having the same
-observations that mismatch the directly preceding episode.
+
 
 ```{r echo = FALSE}
 # ------------------------------------------------------------------------------
@@ -707,23 +729,27 @@ legend("right", col = cols, pch = 20, bty = "n", legend = names(ys_mismatch),
        title = "Position of no observation (N) \namong observations (Os)") 
 ```
 
-Unsurprisingly, the posterior of the first recurrence in the sequence NOO is
+Unsurprisingly, the posterior of the first recurrence in the sequence N**O**O is
 close to the prior (it has no preceding data), likewise for the second
-recurrence in the sequence of OON (it has no data). More surprisingly, for
-reasons explain below, the posterior of the first recurrence of the sequence ONO
-is not close to the prior, despite having no data.
+recurrence in the sequence of <span style="color: purple;">OO**N**</span> (it
+has no data). More surprisingly, for reasons explain below, the posterior of the
+first recurrence of the sequence <span style="color: darkorange;">O**N**O</span> is
+not close to the prior, despite having no data. On closer inspection, this is
+not so surprising.
 
 For match data, strong evidence for a clonal edge between episodes one and three
-(ONO, match) is incompatible with sequences of recurrences ending with
-reinfection *and* reinfection followed by recrudescence, pushing the first
-upward orange triangle away from the prior and second upward orange triangle to
-the simplex edge. Meanwhile, strong evidence for a clonal edge between episodes
-two and three (NOO, match) is incompatible sequences of recurrences ending with
-reinfection, pushing the second upward green triangle away from the prior but
-not the first upward green triangle; and strong evidence for a clonal edge
-between episodes one and two (OON, match) is incompatible with sequences of
-recurrences starting with reinfection, pushing the first recurrence (first
-upward purple triangle) away from the prior but not the second.
+(<span style="color: darkorange;">ONO</span>, match) is incompatible with all
+recurrence sequences ending with reinfection *and* reinfection followed by
+recrudescence, pushing the second upward orange triangle to the simplex edge
+*and* the first upward orange triangle away from the prior.
+
+By comparison, strong evidence for a clonal edge between
+episodes two and three (NO**O**, match) is incompatible with all sequences of
+recurrences ending with reinfection, pushing the second upward green triangle
+away from the prior, but not the first upward green triangle; likewise, strong evidence
+for a clonal edge between episodes one and two (OON, match) is incompatible with
+all sequences of recurrences starting with reinfection, pushing the first upward
+purple triangle away from the prior but not the second.
 
 ```{r}
 epsilon <- .Machine$double.eps # Very small probability
@@ -732,13 +758,20 @@ names(which(sm(compute_posterior(y = ys_match[["NOO"]], fs))$joint < epsilon))
 names(which(sm(compute_posterior(y = ys_match[["OON"]], fs))$joint < epsilon))
 ```
 
+On close inspection the upward orange 1 triangle makes sense: if you know a
+first recurrence is followed by a second MOI = 1 recurrence that is a clone of
+the MOI = 1 enrolment episode, it is very unlikely the second recurrence is a
+clone drawn from a new mosquito as it would be if it were a recrudescence of a
+reinfection. As such, the data on the enrolment episode and the second
+recurrence tell us something about the first recurrence, and thus the posterior
+estimate of the first recurrence deviates from the prior even though the first
+recurrence has no data.
 
-For mismatch data, strong evidence for a stranger edge between episodes one and
-three is only incompatible with a double recrudescence. Meanwhile, strong
-evidence for a stranger edge between episodes two and three (NOO, green) is
-incompatible with sequences ending with recrudescence; and strong evidence for a
-stranger edge between episodes one and two (OON, purple) is incompatible with
-sequences starting with recrudescence.
+The explanation for mismatch data in the sequence ONO is similar as that for
+match data: strong evidence for a stranger edge between episodes one and three
+is incompatible with a double recrudescence, so the posterior of the first
+recurrence (downward orange 1 triangle) deviates from the prior despite the
+first recurrence having no data.
 
 ```{r}
 epsilon <- .Machine$double.eps # Very small probability
@@ -747,9 +780,9 @@ names(which(sm(compute_posterior(y = ys_mismatch[["NOO"]], fs))$joint < epsilon)
 names(which(sm(compute_posterior(y = ys_mismatch[["OON"]], fs))$joint < epsilon))
 ```
 
-
-
 # Interpreting uncertainty
+
+
 
 The uniform prior over relationship graphs compatible with a given sequence of
 recurrent states is not uninformative. When recurrent states are
