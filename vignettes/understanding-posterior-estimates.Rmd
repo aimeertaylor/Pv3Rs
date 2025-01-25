@@ -543,7 +543,9 @@ results_match <- lapply(ys_match, function(y) {
   sm(compute_posterior(y, fs)$marg)})
 results_mismatch <- lapply(ys_mismatch, function(y) {
   sm(compute_posterior(y, fs)$marg)})
+```
 
+```{r echo = FALSE}
 # Extract results for the first recurrence
 results_match_recur1 <- sapply(results_match, function(x) x["recur1",])
 results_mismatch_recur1 <- sapply(results_mismatch, function(x) x["recur1",])
@@ -681,8 +683,6 @@ recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
 (upward green 2 triangle) despite both recurrences having the same rare
 observations that match the directly preceding episode.
 
-
-
 ```{r echo = FALSE}
 # ------------------------------------------------------------------------------
 # Posterior based on model
@@ -780,11 +780,19 @@ names(which(sm(compute_posterior(y = ys_mismatch[["NOO"]], fs))$joint < epsilon)
 names(which(sm(compute_posterior(y = ys_mismatch[["OON"]], fs))$joint < epsilon))
 ```
 
-# Interpreting uncertainty
+# Interpreting uncertainty [re-do]
 
+Non-certain posterior estimates can be uncertain for two not mutually exclusive
+inclusive reasons,
 
+- more data are needed 
+- the states are not identifiable 
 
-The uniform prior over relationship graphs compatible with a given sequence of
+To tease these two factors apart, we could report relative uncertainty? e.g.,
+the posterior estimate relative to the posterior approximation of the maximal
+probability.
+
+[re-write] The uniform prior over relationship graphs compatible with a given sequence of
 recurrent states is not uninformative. When recurrent states are
 equally likely *a priori*, maximal probabilities of recrudescence and of
 reinfection depend on the number of episodes an individual experiences and on
@@ -797,9 +805,11 @@ recrudescence based on genetic data alone (i.e., assuming recurrence states are
 equally likely *a priori*), we can discount some individuals based on their
 per-episode MOIs alone. For example, with a common reinfection threshold of 0.8,
 we can discount all people with a single monoclonal recurrence following a
-monoclonal enrollment episode because their posterior reinfection probabilities
+monoclonal enrolment episode because their posterior reinfection probabilities
 will never exceed 0.75, even if their data are highly informative of
 reinfection.
+
+
 
 ```{r}
 y <- list(enrol = all_As, recur = all_Bs)
