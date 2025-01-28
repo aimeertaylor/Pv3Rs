@@ -47,7 +47,7 @@ the maximal probability of recrudescence / reinfection depends on the following
 
 and thus the 
 
-- impact on how uncertainty is interpreted. 
+- impact on how uncertainty is interpreted [re-write, explain bounds, referencing theoretical results]. 
 
 Finally, we summarise results (for more details; see [development files
 of the Pv3Rs source
@@ -55,8 +55,8 @@ package](https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipSt
 on the output of `compute_posterior` when the model is misspecified because of
 
 - meiotic siblings,
-- half siblings [sort bounds!],
-- parent child-like siblings [sort bounds!],
+- half siblings [add results based on 0.5*log2(5/2)],
+- parent child-like siblings,
 - genotyping errors or *de novo* mutations [To-do]. 
 
 We have not yet characterised model misspecification due to inbred parasites.
@@ -878,6 +878,18 @@ for(case in cases){
   plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
        xaxt = "n", xlab = "", ylab = sprintf("Posterior %s probability", exp_state))
   
+  if(case == "Stranger") {
+    # Add expected probability based on normalised odds from on theoretical results
+    abline(h = 9/11, lty = "dashed") 
+    text(x = 10, y = 9/11, labels = "9/11", pos = 3)
+  }
+  
+  if(case == "Clone") {
+    # Add expected probability based on normalised odds from on theoretical results
+    abline(h = 9/13, lty = "dashed") 
+    text(x = 10, y = 9/13, labels = "9/13", pos = 3)
+  }
+  
   # Horizontal axis
   axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
   axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
@@ -901,7 +913,9 @@ for(case in cases){
 
 When the initial infection contains three meiotic siblings and the recurrent
 parasite is either a stranger or a clone, posterior probabilities converge
-correctly to probable reinfection and probable recrudescence, respectively. 
+correctly to probable reinfection and probable recrudescence, respectively, but
+with maximal values given by graphs over relationships between two, not three,
+parasites in the initial infection.
 
 ```{r echo = FALSE}
 MOIs <- "3_1"
@@ -933,7 +947,19 @@ for(case in cases){
        las = 1, xaxt = "n", xlab = "", 
        ylab = sprintf("Posterior %s probability", exp_state))
   
-  # Horioutputontal axis
+   if(case == "Stranger") {
+    # Add expected probability based on graphs over n = 3 genotypes
+    abline(h = 9/11, lty = "dashed") 
+    text(x = 10, y = 9/11, labels = "9/11", pos = 3)
+  }
+  
+  if(case == "Clone") {
+    # Add expected probability based on graphs over n = 3 genotypes
+    abline(h = 9/13, lty = "dashed") 
+    text(x = 10, y = 9/13, labels = "9/13", pos = 3)
+  }
+  
+  # Horizontal axis
   axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
   axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
   axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
@@ -995,7 +1021,11 @@ for(case in cases){
   plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
        xaxt = "n", xlab = "", ylab = "Posterior recrudescence probability")
   
-  # Horioutputontal axis
+  # Add expected probability based on graphs over n = 3 genotypes
+  abline(h = 9/13, lty = "dashed") 
+  text(x = 10, y = 9/13, labels = "9/13", pos = 3)
+  
+  # Horizontal axis
   axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
   axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
   axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
@@ -1066,7 +1096,7 @@ legend("right", lwd = 2, col = cols, legend = 1:output$n_repeats, bty = "n",
 
 # Add expected probability based on normalised odds from on theoretical results
 abline(h = 2/11, lty = "dashed") 
-text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 3)
+text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 1)
 
 # Add horizontal axis
 axis_at <- c(1, seq(0, max(output$n_markers), 50)[-1])
@@ -1094,6 +1124,10 @@ plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
 
 legend("right", col = cols, lwd = 2, inset = 0.1, legend = (1:output$n_repeats)-1, 
        bty = "n", cex = 0.5, title = "Repeats")
+
+# Add expected probability based on normalised odds from on theoretical results
+abline(h = 9/11, lty = "dashed") 
+text(x = max(output$n_markers), y = 9/11, labels = "9/11", pos = 3)
 
 # Add horizontal axis
 axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
@@ -1161,11 +1195,11 @@ plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
      xaxt = "n", xlab = "Marker count (effective cardinality)", 
      ylab = "Posterior relapse probability")
 abline(h = 2/11, lty = "dashed") # What is this ??? 
-text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 3)
+text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 1)
 legend("right", col = cols, lwd = 2, inset = 0.1, legend = 1:output$n_repeats,
        bty = "n", title = "Repeats", cex = 0.5)
 
-# Add horioutputontal axis
+# Add Horizontal axis
 axis_at <- c(1, seq(0, max(output$n_markers), 50)[-1])
 axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
 axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
@@ -1189,7 +1223,11 @@ plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
      xaxt = "n",  xlab = "Marker count (effective cardinality)", 
      ylab = "Posterior reinfection probability")
 
-# Add horioutputontal axis 
+# Add expected probability based on normalised odds from on theoretical results
+abline(h = 9/11, lty = "dashed") 
+text(x = max(output$n_markers), y = 9/11, labels = "9/11", pos = 3)
+
+# Add horizontal axis 
 axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
 axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
      tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
