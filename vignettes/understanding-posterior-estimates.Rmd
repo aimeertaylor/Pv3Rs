@@ -55,7 +55,7 @@ package](https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipSt
 on the output of `compute_posterior` when the model is misspecified because of
 
 - meiotic siblings,
-- half siblings [add results based on 0.5*log2(5/2)],
+- half siblings,
 - parent child-like siblings,
 - genotyping errors or *de novo* mutations [To-do]. 
 
@@ -1070,10 +1070,13 @@ genotyped.
 
 For this particular case where there are three equifrequent alleles per marker,
 we can show theoretically that the system behaves erratically because a small
-perturbation to the ratios of observations (all alleles match across
-the three half siblings etc.) can lead to a large deviation in the odds of
-relapse versus reinfection.
-
+perturbation to the ratios of observations (all alleles match across the three
+half siblings etc.) can lead to a large deviation in the odds of relapse versus
+reinfection. The purple, red, and green trajectories below have higher than the
+expected 0.5 intra-to-inter match ratios; moreover, the purple trajectory's
+intra-to-inter match ratio consistently exceeds $0.5\times log_2(2/5)*  — a
+condition found theoretically to concentrate posterior probability on
+reinfection under certain conditions. <!-- 2^(2m3) >> 2^(m-2m2) -->
 
 ```{r echo = FALSE, fig.height = 4}
 rm(list = "output")
