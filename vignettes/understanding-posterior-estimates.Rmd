@@ -47,7 +47,7 @@ the maximal probability of recrudescence / reinfection depends on the following
 
 and thus the 
 
-- impact on how uncertainty is interpreted [re-write, explain bounds, referencing theoretical results]. 
+- impact on how uncertainty is interpreted. 
 
 Finally, we summarise results (for more details; see [development files
 of the Pv3Rs source
@@ -320,8 +320,7 @@ reinfection.
 *a posteriori*.
 - A partial match with a common allele is not very informative: all states are 
 possible *a posteriori*.
-- A mismatch is informative because the model assumes there are no genotyping 
-errors: it quashes the posterior probability of recrudescence.
+- A mismatch quashes the posterior probability of recrudescence.
 
 ```{r echo=FALSE}
 # Allele frequencies
@@ -350,39 +349,42 @@ text(x = xy["x", ], y = xy["y", ], pos = 3, cex = 0.75, labels) # Annotate
 
 # Data on many markers
 
-Given equally likely recurrent states *a priori*, as the data increase with the
-number of markers genotyped, posterior probabilities converge to either
+As the data increase with the number of markers genotyped, posterior
+probabilities for a given recurrence converge to either
 
-- relapse with posterior probability one when the data suggest some parasites
-across infections are regular siblings
+1) relapse with posterior probability one when the data suggest the episode of
+interest is linked to previous episodes by regular sibling relationships
 
-- recrudescence with posterior probability less than one when the data are
-compatible with recrudescence (less than one because data compatible with
-recrudescence are also compatible with relapse)
+2) recrudescence with posterior probability less than one when the data suggest
+the episode of interest is linked to the previous episode by clonal
+relationships
 
-- reinfection with posterior probability less than one when the data are
-compatible with reinfection (less than one because data compatible with
-reinfection are also compatible with relapse)
+3) reinfection with posterior probability less than one when the data suggest
+the episode or interest is not linked to previous episodes by regular sibling or
+clonal relationships
 
-When the data are compatible with recrudescence and relapse (or reinfection and
-relapse) the maximal posterior probability of recrudescence (or reinfection)
-depends on the prior over relationships graphs. Otherwise stated, when two of
-the three recurrent states are non-identifiable despite informative data, the
-model returns a prior estimate based on the distribution over relationship
-graphs.
+Because we assume *a priori* that relationship graphs compatible with a given
+recurrent state sequence are uniformly distributed, and because relationship
+graphs compatible with sequences of recrudescence / reinfection are a subset of
+those compatible with sequences of relapse, the maximum posterior probability of
+recrudescence / reinfection for a given recurrence can be computed *a priori* as
+a function of the prior on the recurrent state sequences and the prior on the
+relationship graphs; see XXX. 
 
-For convenience, the prior over relationship is uniform over all graphs
-compatible with a given recurrent state. As such, the maximal posterior
-probability of recrudescence (or reinfection) depends on the number of
-relationship graphs, which in turn depends on the number of genotypes per
-episode and the number of episodes. Because the distribution over relationship
-graphs is not invariant to different episode orderings, when there are two or
-more recurrences, the position of a recurrence in the sequence of recurrences
-has a bearing on posterior estimates.
+Otherwise stated, when two of three states for a given recurrence are
+non-identifiable despite ample data, the model returns a probability that can be
+expressed as a function of the prior over recurrent state sequences and the
+prior over relationship graphs, demonstrating clearly the impact of our prior
+assumptions. 
 
-Using rare matched and mismatched data on 100 markers, we demonstrate these
-dependencies by increasing per-episode MOIs, which adds data inextricably, and
-by increasing the number of recurrences without adding any data.
+Because the prior on a uniformly distributed graph is a function of the
+number of graphs, and that graph count depends on the number of genotypes within
+and across episodes, the maximal probability of recrudescence / reinfection
+depends on the number of genotypes within and across episodes, and thus varies
+across trial participants. Using rare matched and mismatched data on 100
+markers, we demonstrate this dependency by increasing per-episode MOIs, which
+adds data inextricably, and by increasing the number of recurrences without
+adding any data.
 
 ```{r}
 marker_count <- 100 # Number of markers
@@ -402,11 +404,14 @@ y_mismatch <- list(enrol = all_As, recur = all_Bs)
 ```
 
 ```{r echo = FALSE}
+# Assuming recurrent state sequences are equally likely a priori
 results_match <- sapply(MOIs, function(x) 
   sm(compute_posterior(y = y_match, fs, MOIs = x)$marg))
 results_mismatch <- sapply(MOIs, function(x) 
   sm(compute_posterior(y = y_mismatch, fs, MOIs = x)$marg))
+```
 
+```{r echo = FALSE}
 #------------------------------------------------------------------------------
 # Posterior approximation based on graphs only
 #------------------------------------------------------------------------------
@@ -414,8 +419,11 @@ approximation <- lapply(1:length(MOIs), FUN = function(i) {
   gd <- get_graph_dist(MOIs[[i]])
   RGs_I <- sapply(gd$CIL_gvn_RGs, function(RG) "I" %in% RG)
   RGs_C <- sapply(gd$CIL_gvn_RGs, function(RG) "C" %in% RG)
-  x_match <- c(C = 1/sum(RGs_C), L = 1/length(gd$RGs), I = 0)
-  x_mismatch <- c(C = 0, L = 1/length(gd$RGs), I = 1/sum(RGs_I))
+  num_RGs_C <- sum(RGs_C)
+  num_RGs_I <- sum(RGs_I)
+  num_RGs_L <- length(gd$RGs)
+  x_match <- c(C = 1/num_RGs_C, L = 1/num_RGs_L, I = 0)
+  x_mismatch <- c(C = 0, L = 1/num_RGs_L, I = 1/num_RGs_I)
   approx <- rbind(x_match/sum(x_match), x_mismatch/sum(x_mismatch))
 })
 
@@ -445,9 +453,8 @@ for(i in 1:length(xys)) {
 # Add legends
 legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0,
        legend = c(
-"Posterior approximation 
-based on summation over 
-prior probabilities of 
+"Maximum probability 
+based on prior over 
 graphs compatible with 
 recrudescence (match) /
 reinfection (mismatch)", 
@@ -486,12 +493,12 @@ llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
 # Plot log likelihoods by graph classification
 plot(llikes_sorted$x, pch = 20, cex = 0.5, col = "lightgray", bty = "n",
      ylab = "Log-likelihood", xlab = "Relationship Graphs for MOIs 3 & 3")
-points(y = llikes_sorted$x[(RGs_C & RGs_edges_within)[llikes_sorted$ix]], 
-       x = which((RGs_C & RGs_edges_within)[llikes_sorted$ix]), 
-       col = "black", pch = 20, cex  = 0.5)
 points(y = llikes_sorted$x[(RGs_not_I & RGs_edges_within)[llikes_sorted$ix]], 
        x = which((RGs_not_I & RGs_edges_within)[llikes_sorted$ix]),
        col = "hotpink", pch = 20, cex  = 0.5)
+points(y = llikes_sorted$x[(RGs_C & RGs_edges_within)[llikes_sorted$ix]], 
+       x = which((RGs_C & RGs_edges_within)[llikes_sorted$ix]), 
+       col = "black", pch = 20, cex  = 0.5)
 legend("bottomright", pch = 20, bty= "n", cex = 0.75,
        col = c("black", "hotpink", "lightgray"), 
        legend = c("Graphs with intra-episode siblings and inter-episode clones",
@@ -617,9 +624,8 @@ for(i in 1:length(xys)) {
 
 legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
        legend = c(
-"Posterior approximation 
-based on summation over
-prior probabilities of 
+"Maximum probability  
+based on prior over  
 graphs compatible with 
 recrudescence first (match) / 
 reinfection first (mismatch)", "Posterior probability"))
@@ -646,7 +652,7 @@ sm(compute_posterior(y, fs))$marg
 ```
 
 Instead, consider sequences of episodes with observations (Os) and episodes with
-no data (Ns). 
+no data (Ns):
 
 ```{r}
 ys_match <- list("NOO" = list(enroll = no_data, 
@@ -780,36 +786,29 @@ names(which(sm(compute_posterior(y = ys_mismatch[["NOO"]], fs))$joint < epsilon)
 names(which(sm(compute_posterior(y = ys_mismatch[["OON"]], fs))$joint < epsilon))
 ```
 
-# Interpreting uncertainty [re-do]
+# Interpreting uncertainty
 
-Non-certain posterior estimates can be uncertain for two not mutually exclusive
-inclusive reasons,
+Uncertain posterior estimates can be uncertain for two reasons that are not
+mutually exclusive:
 
-- more data are needed 
-- the states are not identifiable 
+1) more data are needed 
+2) the states are not identifiable
 
-To tease these two factors apart, we could report relative uncertainty? e.g.,
-the posterior estimate relative to the posterior approximation of the maximal
-probability.
+To assess data requirements, we could report relative uncertainty: how uncertain
+a posterior estimate is from its maximum, which can be computed *a priori*
+because we assume relationship graphs compatible with a given recurrent state
+sequence are equally likely.
 
-[re-write] The uniform prior over relationship graphs compatible with a given sequence of
-recurrent states is not uninformative. When recurrent states are
-equally likely *a priori*, maximal probabilities of recrudescence and of
-reinfection depend on the number of episodes an individual experiences and on
-the per-episode MOIs. Otherwise stated, the posterior recurrent
-state space is a function of the prior on the recurrent states, the number of
-episodes and their MOIs (Figure XXX).
-
-Consequently, if we use a common threshold to classify probable reinfection /
-recrudescence based on genetic data alone (i.e., assuming recurrence states are
-equally likely *a priori*), we can discount some individuals based on their
-per-episode MOIs alone. For example, with a common reinfection threshold of 0.8,
-we can discount all people with a single monoclonal recurrence following a
-monoclonal enrolment episode because their posterior reinfection probabilities
-will never exceed 0.75, even if their data are highly informative of
-reinfection.
-
-
+Trial participants have maximum probabilities of recrudescence / reinfection
+that are unequal *a priori* (because of the conditional uniform assumption on
+relationship graphs, they depend on the number of genotypes within and across
+infections, and thus vary across trial participants). This is important to bear in
+mind when comparing estimates across people. For example, if we use a common
+threshold of 0.8 to classify probable reinfection assuming recurrence states are
+equally likely *a priori*, we can discount *a priori* all trail participants
+with a single monoclonal recurrence following a monoclonal enrolment episode
+because their posterior reinfection probabilities will never exceed 0.75, even
+if their data are highly informative of reinfection.
 
 ```{r}
 y <- list(enrol = all_As, recur = all_Bs)
@@ -817,13 +816,9 @@ fs <- sapply(ms, FUN = function(m) c("A" = 0.5, "B" = 0.5), simplify = FALSE)
 
 # Using the default uniform prior on recurrent states
 sm(compute_posterior(y, fs))$marg
-```
 
-A non-uniform prior on recurrent states circumvents this issue:
-
-```{r}
-# Using an informative prior on recurrent states
-prior <- as.matrix(data.frame("C" = 0.1, "L" = 0.2, "I" = 0.7))
+# Using a non-uniform prior on recurrent states
+prior <- as.matrix(data.frame("C" = 0.25, "L" = 0.25, "I" = 0.5))
 sm(compute_posterior(y, fs, prior))$marg
 ```
 
