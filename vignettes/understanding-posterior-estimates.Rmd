@@ -735,27 +735,29 @@ legend("right", col = cols, pch = 20, bty = "n", legend = names(ys_mismatch),
        title = "Position of no observation (N) \namong observations (Os)") 
 ```
 
-Unsurprisingly, the posterior of the first recurrence in the sequence N**O**O is
-close to the prior (it has no preceding data), likewise for the second
-recurrence in the sequence of <span style="color: purple;">OO**N**</span> (it
-has no data). More surprisingly, for reasons explain below, the posterior of the
-first recurrence of the sequence <span style="color: darkorange;">O**N**O</span> is
-not close to the prior, despite having no data. On closer inspection, this is
-not so surprising.
+Unsurprisingly, the posterior of the first recurrence in the sequence <span
+style="color: darkgreen;">N**O**O</span> is close to the prior (it has no
+preceding data), likewise for the second recurrence in the sequence of <span
+style="color: purple;">OO**N**</span> (it has no data). More surprisingly
+(initially at least), the posterior of the first recurrence of the sequence
+<span style="color: darkorange;">O**N**O</span> is not close to the prior,
+despite having no data. On closer inspection, this is not so surprising for
+reasons explained below.
 
-For match data, strong evidence for a clonal edge between episodes one and three
-(<span style="color: darkorange;">ONO</span>, match) is incompatible with all
-recurrence sequences ending with reinfection *and* reinfection followed by
-recrudescence, pushing the second upward orange triangle to the simplex edge
+<span style="color: darkorange;">ONO</span>: For match data (upward triangles),
+strong evidence for a clonal edge between episodes one and three is incompatible
+with all recurrence sequences ending with reinfection *and* reinfection followed
+by recrudescence, pushing the second upward orange triangle to the simplex edge
 *and* the first upward orange triangle away from the prior.
 
-By comparison, strong evidence for a clonal edge between
-episodes two and three (NO**O**, match) is incompatible with all sequences of
-recurrences ending with reinfection, pushing the second upward green triangle
-away from the prior, but not the first upward green triangle; likewise, strong evidence
-for a clonal edge between episodes one and two (OON, match) is incompatible with
-all sequences of recurrences starting with reinfection, pushing the first upward
-purple triangle away from the prior but not the second.
+By comparison, strong evidence for a clonal edge between episodes two and three
+(style="color: darkgreen;">NO**O**</span>, match) is incompatible with all
+sequences of recurrences ending with reinfection, pushing the second upward
+green triangle away from the prior, but not the first upward green triangle;
+likewise, strong evidence for a clonal edge between episodes one and two (<span
+style="color: purple;">OON</span>, match) is incompatible with all sequences of
+recurrences starting with reinfection, pushing the first upward purple triangle
+away from the prior but not the second.
 
 ```{r}
 epsilon <- .Machine$double.eps # Very small probability
@@ -773,11 +775,11 @@ recurrence tell us something about the first recurrence, and thus the posterior
 estimate of the first recurrence deviates from the prior even though the first
 recurrence has no data.
 
-The explanation for mismatch data in the sequence ONO is similar as that for
-match data: strong evidence for a stranger edge between episodes one and three
-is incompatible with a double recrudescence, so the posterior of the first
-recurrence (downward orange 1 triangle) deviates from the prior despite the
-first recurrence having no data.
+The explanation for mismatch data in the sequence <span style="color:
+darkorange;">ONO</span>: is similar as that for match data: strong evidence for
+a stranger edge between episodes one and three is incompatible with a double
+recrudescence, so the posterior of the first recurrence (downward orange 1
+triangle) deviates from the prior despite the first recurrence having no data.
 
 ```{r}
 epsilon <- .Machine$double.eps # Very small probability
