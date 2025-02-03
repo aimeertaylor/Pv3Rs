@@ -104,13 +104,13 @@ for(i in 1:n_repeats) points(y = odds_equ4[,i], x = odds_pv3r[,i])
 # Odds = P(R) / P(I) where P(I) = 1 - P(R) s.t. P(R) = Odds / (1 + Odds)
 post_equ4 <- odds_equ4 / (1 + odds_equ4)
 
-# Denominator condition that 2^(2*m3) >> 2^(m - 2*m3)
+# Compute 2^(2*m3) / (2^(2*m3) + 2^(m - 2*m2)) for conditioning below
 denm_equ4 <- sapply(1:n_repeats, function(i) {
   sapply(1:max_markers, function(j) {
     x <- locus_types[m_rorder[1:j],i]
     m2 <- sum(x == "All match")
     m3 <- sum(x == "Intra-match")
-    x <- c(2^(2*m3), 2^(j - 2*m3))
+    x <- c(2^(2*m3), 2^(j - 2*m2))
     (x/sum(x))[1]
   })
 })
@@ -143,7 +143,7 @@ plot(NULL, xlim = c(1,max_markers), ylim = c(0,1), bty = "n", las = 1,
      xaxt = "n", xlab = "Marker count (effective cardinality)",
      ylab = "Probability")
 title(main = "Posterior relapse probability: eq. 4", cex.main = 0.5, line = 0.5)
-abline(h = 2/9, lty = "dashed")
+abline(h = 2/11, lty = "dashed")
 text(x = max_markers, y = 2/11, labels = "2/11", pos = 3) # based on 2/9 odds
 legend("bottom", col = cols, lwd = 3, inset = 0, legend = 1:n_repeats,
        bty = "n", cex = 0.5, horiz = TRUE)
@@ -155,22 +155,24 @@ for(i in 1:n_repeats){
 }
 
 # Plot inter-to-intra-match ratio when the first element of
-# (2^2m3, 2^(m - 2m2)) normalised exceeds 0.75
+# (2^2m3, 2^(m - 2m2)) normalised exceeds 0.5
 plot(NULL, xlim = c(1,max_markers), ylim = c(0,2), bty = "n", las = 1,
      xaxt = "n", xlab = "Marker count (effective cardinality)",
      ylab = "Ratio")
-title(main = "Intra-to-inter match ratio | 2^2m3 > 2^(m - 2m2)", cex.main = 0.5,
+title(main = "Intra-to-inter match ratio (opaque if 2^2m3 > 2^(m - 2m2))", cex.main = 0.5,
       line = 0.5)
-abline(h = 0.5*log2(5/2), lty = "dashed") # See latex file
-text(x = max_markers-10, y = 0.5*log2(5/2), labels = "0.5*log2(5/2)", pos = 1) # See latex file
 axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
 axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
      tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
 for(i in n_repeats:1){
   ratio <- locus_types_props[[i]]["Intra-match", ]/locus_types_props[[i]]["Inter-match", ]
-  lines(x = (1:max_markers)[denm_equ4[,i] > 0.75],
-        y = ratio[denm_equ4[,i] > 0.75], col = cols[i], lwd = 2)
+  points(x = (1:max_markers)[denm_equ4[,i] > 0], pch = 20,
+        y = ratio[denm_equ4[,i] > 0], col = adjustcolor(cols[i], alpha.f = 0.15), lwd = 2)
+  points(x = (1:max_markers)[denm_equ4[,i] > 0.5], pch = 20,
+         y = ratio[denm_equ4[,i] > 0.5], col = cols[i], lwd = 2)
 }
+abline(h = 0.5*log2(5/2), lty = "dashed") # See latex file
+text(x = max_markers-10, y = 0.5*log2(5/2), labels = "0.5*log2(5/2)", pos = 1) # See latex file
 
 
 # Plot locus type proportion given all markers
