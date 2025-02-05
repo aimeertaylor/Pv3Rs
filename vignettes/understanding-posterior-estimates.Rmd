@@ -8,7 +8,7 @@ vignette: >
 ---
   
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
+  knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   out.width = "100%", # Line width taken up by plot
@@ -16,11 +16,11 @@ knitr::opts_chunk$set(
   fig.width = 7, # Increase to zoom out
   fig.height = 4, 
   cache = TRUE
-)
+  )
 ```
-
+  
 ```{r setup, include = FALSE} 
-devtools::load_all(".") #library(Pv3Rs)
+  devtools::load_all(".") #library(Pv3Rs)
 options(warn = -1) # Suppress warnings about missing and limited data
 sm <- function(...) suppressMessages(...) # Rename to shorten function call
 ```
@@ -120,10 +120,10 @@ sm(compute_posterior(y, fs))$marg # Posterior
 
 # Data on only one episode 
 
-## Homoallelic data without user-specified MOIs > 1
+## Homoallelic data without user-specified MOIs
 
-When only one episode has data and its MOI is one, `compute_posterior` returns
-the prior.
+When only one episode has homoallelic data and the user does not specify an MOI
+> 1, `compute_posterior` returns the prior.
 
 ```{r}
 fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
@@ -133,13 +133,14 @@ sm(compute_posterior(y, fs))$marg # Posterior
 
 ## Heteroallelic data 
 
-When only one episode has data and they are heteroallelic, the MOI necessarily
-exceeds one because the model assumes no false positivity. The posterior is 
-close to the prior but not equal to it because, for relationship graphs with
-intra-episode siblings, heteroallelic data limit summation over
-identity-by-descent partitions to partitions with at least two cells for the
-episode with data. Moreover, the lower bound on the cell count increases with the number
-of distinct alleles observed.
+When only one episode has heteroallelic data, the MOI under the model
+necessarily exceeds one because the model assumes no false positivity. The
+posterior is close to the prior but not equal to it because the data are
+slightly informative: for relationship graphs with intra-episode siblings,
+heteroallelic data limit summation over identity-by-descent partitions to
+partitions with at least two cells for the episode with data. Moreover, the
+lower bound on the cell count increases with the number of distinct alleles
+observed.
 
 ```{r}
 # Allele frequencies 
@@ -158,7 +159,7 @@ y <- list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data
 do.call(rbind, lapply(MOIs, function(x)sm(compute_posterior(y,fs,MOIs=x))$marg)) 
 ```
 
-## Homoallelic data with user-specified MOIs > 1 and rare observations
+## Rare homoallelic data with user-specified MOIs > 1 
 
 If the data are homoallelic, but the user specifies MOIs greater than one, and
 the observed allele is rare, the posterior departs from the prior because rare
@@ -216,10 +217,10 @@ xy <- apply(approximation, 2, project2D) # Project probabilities and plot:
 points(x = xy["x", ], y = xy["y", ], col = 1:length(MOIs), cex = 2)
 legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
        legend = c(
-"Posterior approximation 
+         "Posterior approximation 
 based on summation over 
 prior probabilities of
-graphs with entirely 
+graphs with only 
 siblings in the 
 first episode",
 "Posterior probability"))
@@ -288,12 +289,11 @@ t(sapply(ys, function(y) {
 # Data are incomparable across episodes
 
 When there are data on multiple episodes but no comparable data across episodes,
-`compute_posterior` behaves similarly to when data are on only one episode:
+`compute_posterior` behaves similarly to when data are limited to one episode:
 
 - it returns the prior when data are homoallelic without user-specified MOIs > 1, 
 - its output remains close to the prior when data are heteroallelic,
-- its output departs from the prior when data are homoallelic with user-specified MOIs > 1
-and a rare observation.
+- its output departs from the prior when data are homoallelic and rare with user-specified MOIs > 1.
 
 ```{r}
 # Allele frequencies
@@ -317,16 +317,18 @@ sm(compute_posterior(y_hom, fs, MOIs = c(2,2)))$marg # Prior departure
 # Data on only one marker
 
 When data on a single marker are comparable across episodes, the output of
-`compute_posterior` depends on the observation and the frequencies of the
+`compute_posterior` depends on the observation type and the frequencies of the
 observed alleles. For example,
 
 - A rare match is informative: it quashes the posterior probability of 
+reinfection.
+- A partial rare match is also informative, quashing the posterior probability of 
 reinfection.
 - A match with a common allele is not very informative: all states are possible 
 *a posteriori*.
 - A partial match with a common allele is not very informative: all states are 
 possible *a posteriori*.
-- A mismatch quashes the posterior probability of recrudescence.
+- A mismatch is informative: it quashes the posterior probability of recrudescence.
 
 ```{r echo=FALSE}
 # Allele frequencies
@@ -342,15 +344,71 @@ parmatch <- list(enroll = list(m1 = c("A", "B")), recur1 = list(m1 = "A"))
 posteriors <- rbind(sm(compute_posterior(match, fs_rare))$marg, 
                     sm(compute_posterior(match, fs_comn))$marg, 
                     sm(compute_posterior(mismatch, fs_comn))$marg,
-                    sm(compute_posterior(parmatch, fs_comn))$marg)
+                    sm(compute_posterior(parmatch, fs_comn))$marg,
+                    sm(compute_posterior(parmatch, fs_rare))$marg)
 
 # Visualise the change in the marginal probability of the first recurrence
 par(mar = c(0,0,0,0))
 plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
 xy <- apply(posteriors, 1, project2D) # Project probabilities
 points(x = xy["x", ], y = xy["y", ], pch = 20) # Plot projections
-labels <- c("rare match", "common match", "mismatch", "partial common match")
+labels <- c("rare match", "common match", "mismatch", 
+            "partial common match", "partial rare match")
 text(x = xy["x", ], y = xy["y", ], pos = 3, cex = 0.75, labels) # Annotate 
+```
+# Data on only two markers
+
+When data on a second marker are added to the data on the first above, the
+posterior updates depend on the observation types and the frequencies of the
+observed alleles. When the second observation is consistent with the first the
+strength of inference generally increases (see arrows entering regions of
+posterior probability greater than 0.5). An exception being the addition of a
+common match to a common partial match, which is not very informative (central
+arrow). When a mismatch is added to a rare match (diamond), relapse becomes the
+most probable state. This demonstrates the dependence of identifiable relapse
+inference on data on multiple markers.
+
+
+```{r echo=FALSE}
+# Allele frequencies
+fs_rare <- list(m1 = c("A" = 0.01, "B" = 0.99), m2 = c("A" = 0.01, "B" = 0.99))
+fs_comn <- list(m1 = c("A" = 0.6, "B" = 0.4), m2 = c("A" = 0.6, "B" = 0.4)) 
+
+A_A <- list(m1 = "A", m2 = "A")
+B_B <- list(m1 = "B", m2 = "B")
+A_B <- list(m1 = "A", m2 = "B")
+AB_A <- list(m1 = c("A", "B"), m2 = "A")
+
+# Data 
+match <- list(enroll = A_A, recur1 = A_A)
+mismatch <- list(enroll = A_A, recur1 = B_B)
+parmatch <- list(enroll = AB_A, recur1 = A_A)
+match_mismatch <- list(enroll = A_A, recur1 = A_B)
+
+# Update extant probabilities and extract marginal probabilities
+posteriors_ext <- rbind(sm(compute_posterior(match, fs_rare))$marg, 
+                        sm(compute_posterior(match, fs_comn))$marg, 
+                        sm(compute_posterior(mismatch, fs_comn))$marg,
+                        sm(compute_posterior(parmatch, fs_comn))$marg,
+                        sm(compute_posterior(parmatch, fs_rare))$marg)
+
+posteriors_new <- sm(compute_posterior(match_mismatch, fs_rare))$marg
+
+# Visualise the change in the marginal probability of the first recurrence
+par(mar = c(0,0,0,0))
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
+xy_ext <- apply(posteriors_ext, 1, project2D) # Project probabilities
+xy_new <- apply(posteriors_new, 1, project2D) # Project probabilities
+arrows(x0 = xy["x", ], y0 = xy["y", ], 
+       x1 = xy_ext["x", ], y1 = xy_ext["y", ], length = 0.08, lwd = 2)
+points(x = xy_new["x", ], y = xy_new["y", ], pch = 18, cex = 2) # Plot projections
+
+# Annotate 
+labels <- c("rare match + rare match", "common match + common match", 
+            "mismatch + mismatch", "partial common match + common match", 
+            "partial rare match + rare match", "rare match + mismatch")
+xy_all <- cbind(xy_ext, xy_new)
+text(x = xy_all["x", ], y = xy_all["y", ], pos = c(rep(4,5),3), cex = 0.75, labels) 
 ```
 
 # Data on many markers
@@ -383,14 +441,16 @@ expressed as a function of the prior over recurrent state sequences and the
 prior over relationship graphs, demonstrating clearly the impact of our prior
 assumptions. 
 
-Because the prior on a uniformly distributed graph is a function of the
-number of graphs, and that graph count depends on the number of genotypes within
-and across episodes, the maximal probability of recrudescence / reinfection
-depends on the number of genotypes within and across episodes, and thus varies
-across trial participants. Using rare matched and mismatched data on 100
-markers, we demonstrate this dependency by increasing per-episode MOIs, which
-adds data inextricably, and by increasing the number of recurrences without
-adding any data.
+Because the prior on a uniformly distributed graph is a function of the number
+of graphs, and that graph count depends on the number of genotypes within and
+across episodes, the maximum probability of recrudescence / reinfection depends
+on per-episode MOIs and episode counts, which vary across trial participants.
+Using rare matched and mismatched data on 100 markers, we demonstrate this
+dependency by increasing per-episode MOIs, which adds data inextricably, and by
+increasing the number of recurrences. Recurrences can be added without adding
+data, thereby demonstrating the impact on the maximum probability of
+recrudescence / reinfection of the prior on graphs in isolation, i.e., without
+additional information from data.
 
 ```{r}
 marker_count <- 100 # Number of markers
@@ -459,7 +519,7 @@ for(i in 1:length(xys)) {
 # Add legends
 legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0,
        legend = c(
-"Maximum probability 
+         "Maximum probability 
 based on prior over 
 graphs compatible with 
 recrudescence (match) /
@@ -471,7 +531,7 @@ legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs),
 
 For rare matched data, the likelihood is only appreciable for relationship
 graphs where all intra-episode relationships are sibling and the inter-episode
-relationships are clonal.
+relationships are clonal, demonstrating the impact of information in the data. 
 
 ```{r echo = FALSE}
 # ------------------------------------------------------------------------------
@@ -630,7 +690,7 @@ for(i in 1:length(xys)) {
 
 legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
        legend = c(
-"Maximum probability  
+         "Maximum probability  
 based on prior over  
 graphs compatible with 
 recrudescence first (match) / 
@@ -647,7 +707,8 @@ beginning versus the end of a sequence of three episodes, for example), the
 position of a recurrence in a sequence of episodes has a bearing on posterior
 estimates.
 
-This effect is negligible when all episodes have the same data on many markers:
+That said, this effect is negligible when all episodes have the same data on
+many markers:
 
 ```{r}
 y <- list(enroll = all_As, 
@@ -681,19 +742,6 @@ ys_mismatch <- list("NOO" = list(enroll = no_data,
                                  recur1 = all_Bs,
                                  recur2 = no_data))
 ``` 
-
-
-The first recurrence in the sequence <span style="color: purple;">**O**ON</span>
-(downward purple 1 triangle) has a higher probability of reinfection than the
-second recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
-(downward green 2 triangle) despite both recurrences having the same
-observations that mismatch the directly preceding episode.
-
-The first recurrence in the sequence <span style="color: purple;">**O**ON</span>
-(upward purple 1 triangle) has a lower probability of recrudescence than second
-recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
-(upward green 2 triangle) despite both recurrences having the same rare
-observations that match the directly preceding episode.
 
 ```{r echo = FALSE}
 # ------------------------------------------------------------------------------
@@ -741,6 +789,24 @@ legend("right", col = cols, pch = 20, bty = "n", legend = names(ys_mismatch),
        title = "Position of no observation (N) \namong observations (Os)") 
 ```
 
+### Highly informed recurrences  
+
+Highly informed matched recurrence (upward purple and green triangles): The first
+recurrence in the sequence <span style="color: purple;">**O**ON</span> (upward
+purple 1 triangle) has a lower probability of recrudescence than second
+recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
+(upward green 2 triangle) despite both recurrences having the same rare
+observations that match the directly preceding episode.
+
+Highly informed mismatched recurrence (downward purple and green triangles): The first
+recurrence in the sequence <span style="color: purple;">**O**ON</span> (downward
+purple 1 triangle) has a higher probability of reinfection than the second
+recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
+(downward green 2 triangle) despite both recurrences having the same
+observations that mismatch the directly preceding episode.
+
+### Weakly and uninformed recurrences  
+
 Unsurprisingly, the posterior of the first recurrence in the sequence <span
 style="color: darkgreen;">N**O**O</span> is close to the prior (it has no
 preceding data), likewise for the second recurrence in the sequence of <span
@@ -750,20 +816,17 @@ style="color: purple;">OO**N**</span> (it has no data). More surprisingly
 despite having no data. On closer inspection, this is not so surprising for
 reasons explained below.
 
-<span style="color: darkorange;">ONO</span>: For match data (upward triangles),
-strong evidence for a clonal edge between episodes one and three is incompatible
-with all recurrence sequences ending with reinfection *and* reinfection followed
-by recrudescence, pushing the second upward orange triangle to the simplex edge
-*and* the first upward orange triangle away from the prior.
-
-By comparison, strong evidence for a clonal edge between episodes two and three
-(style="color: darkgreen;">NO**O**</span>, match) is incompatible with all
-sequences of recurrences ending with reinfection, pushing the second upward
-green triangle away from the prior, but not the first upward green triangle;
-likewise, strong evidence for a clonal edge between episodes one and two (<span
-style="color: purple;">OON</span>, match) is incompatible with all sequences of
-recurrences starting with reinfection, pushing the first upward purple triangle
-away from the prior but not the second.
+For match data (upward triangles), strong evidence for a clonal edge between
+episodes one and three in <span style="color: darkorange;">ONO</span> is
+incompatible with all recurrence sequences ending with reinfection *and*
+reinfection followed by recrudescence, informing the second strongly and the
+first recurrence weakly. By comparison, strong evidence for a clonal edge
+between episodes two and three in <span style="color: darkgreen;">NO**O**</span>
+is incompatible with all sequences of recurrences ending with reinfection,
+informing the second recurrence only; likewise, strong evidence for a clonal
+edge between episodes one and two in <span style="color: purple;">OON</span> is
+incompatible with all sequences of recurrences starting with reinfection,
+informing the first recurrence only.
 
 ```{r}
 epsilon <- .Machine$double.eps # Very small probability
@@ -772,17 +835,17 @@ names(which(sm(compute_posterior(y = ys_match[["NOO"]], fs))$joint < epsilon))
 names(which(sm(compute_posterior(y = ys_match[["OON"]], fs))$joint < epsilon))
 ```
 
-On close inspection the upward orange 1 triangle makes sense: if you know a
-first recurrence is followed by a second MOI = 1 recurrence that is a clone of
-the MOI = 1 enrolment episode, it is very unlikely the second recurrence is a
-clone drawn from a new mosquito as it would be if it were a recrudescence of a
-reinfection. As such, the data on the enrolment episode and the second
-recurrence tell us something about the first recurrence, and thus the posterior
-estimate of the first recurrence deviates from the prior even though the first
-recurrence has no data.
+On close inspection the upward orange 1 triangle makes intuitive sense: if you
+know a first recurrence is followed by a second MOI = 1 recurrence that is a
+clone of the MOI = 1 enrolment episode, it is very unlikely the second
+recurrence is a clone drawn from a new mosquito as it would be if it were a
+recrudescence of a reinfection. As such, the data on the enrolment episode and
+the second recurrence tell us something about the first recurrence, and thus the
+posterior estimate of the first recurrence deviates from the prior even though
+the first recurrence has no data.
 
-The explanation for mismatch data in the sequence <span style="color:
-darkorange;">ONO</span>: is similar as that for match data: strong evidence for
+The explanation for mismatch data (downward triangles) in the sequence <span style="color:
+darkorange;">ONO</span> is similar to that for match data: strong evidence for
 a stranger edge between episodes one and three is incompatible with a double
 recrudescence, so the posterior of the first recurrence (downward orange 1
 triangle) deviates from the prior despite the first recurrence having no data.
@@ -800,7 +863,7 @@ Uncertain posterior estimates can be uncertain for two reasons that are not
 mutually exclusive:
 
 1) more data are needed 
-2) the states are not identifiable
+2) the states are not fully identifiable
 
 To assess data requirements, we could report relative uncertainty: how uncertain
 a posterior estimate is from its maximum, which can be computed *a priori*
@@ -809,14 +872,15 @@ sequence are equally likely.
 
 Trial participants have maximum probabilities of recrudescence / reinfection
 that are unequal *a priori* (because of the conditional uniform assumption on
-relationship graphs, they depend on the number of genotypes within and across
-infections, and thus vary across trial participants). This is important to bear in
-mind when comparing estimates across people. For example, if we use a common
-threshold of 0.8 to classify probable reinfection assuming recurrence states are
-equally likely *a priori*, we can discount *a priori* all trail participants
-with a single monoclonal recurrence following a monoclonal enrolment episode
-because their posterior reinfection probabilities will never exceed 0.75, even
-if their data are highly informative of reinfection.
+relationship graphs, the maximum probabilities of recrudescence / reinfection
+depend on the number of genotypes within and across infections, and thus vary
+across trial participants). This is important to bear in mind when comparing
+estimates across people. For example, if we use a common threshold of 0.8 to
+classify probable reinfection assuming recurrence states are equally likely *a
+priori*, we can discount *a priori* all trail participants with a single
+monoclonal recurrence following a monoclonal enrolment episode because their
+posterior reinfection probabilities will never exceed 0.75, even if their data
+are highly informative of reinfection.
 
 ```{r}
 y <- list(enrol = all_As, recur = all_Bs)
@@ -830,6 +894,10 @@ prior <- as.matrix(data.frame("C" = 0.25, "L" = 0.25, "I" = 0.5))
 sm(compute_posterior(y, fs, prior))$marg
 ```
 
+For a given trial participant, maximum probabilities of recrudescence /
+reinfection vary with the position of a recurrence in a sequence, especially if
+one or more episodes has no data.
+
 # Meiotic siblings
 
 ## Methods 
@@ -841,6 +909,9 @@ or three meiotic siblings and a recurrent
 - clone
 - regular sibling 
 - meiotic sibling
+
+Posterior probabilities are computed assuming recurrent states are equally
+likely *a priori*.
 
 ## Results
 
@@ -926,14 +997,14 @@ cases <- c("Stranger", "Clone")
 
 for(case in cases){
   
-   if( case == "Stranger") {
+  if( case == "Stranger") {
     exp_state <- "reinfection"    
   } else if (case == "Clone") {
     exp_state <- "recrudescence"
   } else {
     exp_state <- "relapse"
   }
-
+  
   rm(list = "output")
   output <- output_Cln.Str.Sib[[case]]
   cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Repeats
@@ -950,7 +1021,7 @@ for(case in cases){
        las = 1, xaxt = "n", xlab = "", 
        ylab = sprintf("Posterior %s probability", exp_state))
   
-   if(case == "Stranger") {
+  if(case == "Stranger") {
     # Add expected probability based on graphs over n = 3 genotypes
     abline(h = 9/11, lty = "dashed") 
     text(x = 10, y = 9/11, labels = "9/11", pos = 3)
@@ -1061,9 +1132,9 @@ in a recurrence:
 
 We explored two scenarios: one where all parental parasites draw from the same
 allele distribution. Another with admixture where parent 1 draws alleles
-disproportionally to parents 2 and 3.  The admixture scenario is likely
-infrequent. We explore it because it is a worse case scenario: it is contrived
-to maximally hamper relapse classification.
+disproportionally to parents 2 and 3.  The admixture scenario is improbable. We
+explore it because it is a worse case scenario: it is contrived to maximally
+hamper relapse classification.
 
 ## Results
 
@@ -1073,13 +1144,15 @@ genotyped.
 
 For this particular case where there are three equifrequent alleles per marker,
 we can show theoretically that the system behaves erratically because a small
-perturbation to the ratios of observations (all alleles match across the three
-half siblings etc.) can lead to a large deviation in the odds of relapse versus
-reinfection. The purple, red, and green trajectories below have higher than the
-expected 0.5 intra-to-inter match ratios; moreover, the purple trajectory's
-intra-to-inter match ratio consistently exceeds $0.5\times log_2(2/5)*  — a
-condition found theoretically to concentrate posterior probability on
-reinfection under certain conditions. <!-- 2^(2m3) >> 2^(m-2m2) -->
+perturbation to the ratio of observations (all alleles match across the three
+half siblings, all alleles are different, intra-episode alleles match,
+inter-episode alleles match) can lead to a large deviation in the odds of
+relapse versus reinfection. The purple, red, and green trajectories below have
+higher than the expected 0.5 intra-to-inter match ratios; moreover, the purple
+trajectory's intra-to-inter match ratio consistently exceeds $0.5\times
+\text{log}_2(\dfrac{2}{5})$  — a condition found theoretically to concentrate posterior
+probability on reinfection under certain conditions. <!-- 2^(2m3) >> 2^(m-2m2)
+-->
 
 ```{r echo = FALSE, fig.height = 4}
 rm(list = "output")
@@ -1174,7 +1247,7 @@ recrudescence rather than certain relapse with the number of markers genotyped.
 As for half-siblings, we explored two scenarios: one where all parental
 parasites draw from the same allele distribution. Another with admixture where
 parent 1 draws alleles disproportionally to parents 2 and 3. The admixture
-scenario is likely infrequent. We explore it because it is a worse case
+scenario is improbable. We explore it because it is a worse case
 scenario: it is contrived to maximally hamper relapse classification.
 
 ## Results
