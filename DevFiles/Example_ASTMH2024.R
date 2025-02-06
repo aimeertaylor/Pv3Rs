@@ -81,5 +81,11 @@ gs <- paste0("g", 1:sum(MOIs))
 ts_per_gs <- rep(1:length(MOIs), MOIs)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs),
-        edge.curved=0.08, vertex.size=20, vertex_palette = "Blues")
+        vertex_palette = "Greys",
+        edge.curved = 0.08,
+        vertex.size = 40,
+        edge.width = 3,
+        vertex.frame.width = 2,
+        vertex.label.cex = 4,
+        vertex.label.color = "black")
 seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
