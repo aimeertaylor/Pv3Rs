@@ -20,7 +20,7 @@
 #'   that represent parasite genotypes from different infections are distributed
 #'   horizontally and vertices that represent genotypes within infections are
 #'   distributed vertically.
-#' @param edge.width Overrides the default \code{edge.width} of
+#' @param edge_width Overrides the default \code{edge.width} of
 #'   \code{\link[igraph]{plot.igraph}}.
 #' @param ... Additional arguments to pass to \code{\link[igraph]{plot.igraph}}, e.g.
 #'   \code{edge.curved}.
@@ -45,8 +45,9 @@ plot_RG <- function(RG,
                     vertex_palette = "Set2",
                     edge_lty = c("0.5" = "dashed", "1" = "solid"),
                     edge_col = c("0.5" = "black", "1" = "black"),
-                    edge.width = 1.5,
+                    edge_width = 1.5,
                     ...) {
+
   ts_per_gs <- igraph::vertex_attr(RG)$group
   if (is.null(ts_per_gs)) stop("RG vertices need a group attribute")
   MOIs <- as.vector(table(ts_per_gs)) # extract MOIs
@@ -85,6 +86,7 @@ plot_RG <- function(RG,
     vertex.color = infection_colours[igraph::vertex_attr(RG)$group],
     edge.color = edge_col[as.character(igraph::edge_attr(RG)$weight)],
     edge.lty = edge_lty[as.character(igraph::edge_attr(RG)$weight)],
+    edge.width = edge_width,
     ...
   )
 }
