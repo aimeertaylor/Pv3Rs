@@ -413,8 +413,9 @@ text(x = xy_all["x", ], y = xy_all["y", ], pos = c(rep(4,5),3), cex = 0.75, labe
 
 # Data on many markers
 
-As the data increase with the number of markers genotyped, posterior
-probabilities for a given recurrence converge to either
+Given non-zero prior probabilities, as the data increase with the number of
+markers genotyped, posterior probabilities for a given recurrence converge to
+either
 
 1) relapse with posterior probability one when the data suggest the episode of
 interest is linked to previous episodes by regular sibling relationships
@@ -426,6 +427,11 @@ relationships
 3) reinfection with posterior probability less than one when the data suggest
 the episode or interest is not linked to previous episodes by regular sibling or
 clonal relationships
+
+Recrudescence / reinfection probabilities necessarily converge to uncertain
+values because genetic data compatible with recrudescence / reinfection are also
+compatible with relapse (recrudescence and reinfection not fully identifiable
+given genetic data alone). 
 
 Because we assume *a priori* that relationship graphs compatible with a given
 recurrent state sequence are uniformly distributed, and because relationship
@@ -441,30 +447,31 @@ expressed as a function of the prior over recurrent state sequences and the
 prior over relationship graphs, demonstrating clearly the impact of our prior
 assumptions. 
 
-Because the prior on a uniformly distributed graph is a function of the number
-of graphs, and that graph count depends on the number of genotypes within and
-across episodes, the maximum probability of recrudescence / reinfection depends
-on per-episode MOIs and episode counts, which vary across trial participants.
-Using rare matched and mismatched data on 100 markers, we demonstrate this
-dependency by increasing per-episode MOIs, which adds data inextricably, and by
-increasing the number of recurrences. Recurrences can be added without adding
-data, thereby demonstrating the impact on the maximum probability of
-recrudescence / reinfection of the prior on graphs in isolation, i.e., without
-additional information from data.
+Because the probability mass function of a uniformly distributed discrete random
+variable depends on the size of the support, the prior on a uniformly
+distributed graph, and thus the the maximum probability of recrudescence /
+reinfection, depends on per-episode MOIs and episode counts, which vary across
+trial participants. Using rare matched and mismatched data on 100 markers, we
+demonstrate this dependency by increasing per-episode MOIs and by increasing the
+number of recurrences. Recurrences can be added without adding data, thereby
+demonstrating the impact on the maximum probability of recrudescence /
+reinfection of the prior on graphs in isolation, i.e., without additional
+information from data.
 
 ```{r}
 marker_count <- 100 # Number of markers
 ms <- paste0("m", 1:marker_count) # Marker names 
-all_As <- as.list(sapply(ms, function(t) "A")) # As for all markers
-all_Bs <- as.list(sapply(ms, function(t) "B")) # Bs for all markers
-no_data <- as.list(sapply(ms, function(t) NA)) # NAs for all markers
+all_As <- sapply(ms, function(t) "A", simplify = F) # As for all markers
+all_Bs <- sapply(ms, function(t) "B", simplify = F) # Bs for all markers
+all_ACs <- sapply(ms, function(t) c("A", "C"), simplify = F) # As for all markers
+no_data <- sapply(ms, function(t) NA, simplify = F) # NAs for all markers
 ```
 
 ## Increasing per-episode MOIs
 
 ```{r}
 MOIs <- list(c(1,1), c(3,1), c(2,2), c(3,3), c(4,2)) 
-fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
+fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.01, "C" = 0.98), simplify = FALSE)
 y_match <- list(enrol = all_As, recur = all_As)
 y_mismatch <- list(enrol = all_As, recur = all_Bs)
 ```
@@ -529,7 +536,18 @@ legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs),
        legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
 ```
 
-For rare matched data, the likelihood is only appreciable for relationship
+The data do not change the maxima:
+
+```{r}
+sm(compute_posterior(y = list(enrol = all_As, recur = all_As), fs, MOIs = c(2,1))$marg)
+sm(compute_posterior(y = list(enrol = all_ACs, recur = all_As), fs)$marg)
+sm(compute_posterior(y = list(enrol = all_As, recur = all_Bs), fs, MOIs = c(2,1))$marg)
+sm(compute_posterior(y = list(enrol = all_ACs, recur = all_Bs), fs)$marg)
+```
+
+But they do change the probability of the data given different graphs. 
+
+[update] For rare matched data, the likelihood is only appreciable for relationship
 graphs where all intra-episode relationships are sibling and the inter-episode
 relationships are clonal, demonstrating the impact of information in the data. 
 
