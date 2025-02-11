@@ -20,7 +20,7 @@ vignette: >
 ```
   
 ```{r setup, include = FALSE} 
-  devtools::load_all(".") #library(Pv3Rs)
+devtools::load_all(".") #library(Pv3Rs)
 options(warn = -1) # Suppress warnings about missing and limited data
 sm <- function(...) suppressMessages(...) # Rename to shorten function call
 ```
@@ -462,15 +462,17 @@ all_As <- sapply(ms, function(t) "A", simplify = F) # As for all markers
 all_Bs <- sapply(ms, function(t) "B", simplify = F) # Bs for all markers
 all_ACs <- sapply(ms, function(t) c("A", "C"), simplify = F) # A&C for all 
 no_data <- sapply(ms, function(t) NA, simplify = F) # NAs for all markers
+fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.01, "C" = 0.98), simplify = FALSE)
 ```
 
 ## Increasing per-episode MOIs
 
 ```{r}
-MOIs <- list(c(1,1), c(3,1), c(2,2), c(3,3), c(4,2)) 
-fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.01, "C" = 0.98), simplify = FALSE)
+MOIs <- list(c(1,1), c(2,2), c(3,3), c(2,1), c(3,1), c(3,2)) 
 y_match <- list(enrol = all_As, recur = all_As)
 y_mismatch <- list(enrol = all_As, recur = all_Bs)
+
+Recur_prob_correlate <- sapply(MOIs, function(x) x[2]/(0.5 + (x[1] - x[2])))
 ```
 
 ```{r echo = FALSE}
@@ -533,9 +535,14 @@ legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs),
        legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
 ```
 
-To change per-episode MOIs, we either provide user-specified MOIs, or increase
-the polyclonality of the data, s.t. the MOIs modelled under Pv3Rs increase.
-Either way, we get the same maximal probabilities:
+The maximum probability of recrudescence increases with the number of
+inter-episode edges but decreases with the imbalance between the MOI at
+enrolment and the MOI of recurrence. [XXX]
+
+To increase per-episode MOIs, we can do as above and increase user-specified
+MOIs explicitly, which amplifies the data implicitly, or we can increase the
+polyclonality of the data explicitly, s.t. MOIs modelled under Pv3Rs increase
+implicitly. Either way, we get the same maximum probabilities:
 
 ```{r}
 MOI11_match_data <- list(enrol = all_As, MOIs11_match_data = all_As)
@@ -549,57 +556,100 @@ rbind(sm(compute_posterior(MOI11_match_data, fs, MOIs = c(2,1))$marg),
       sm(compute_posterior(MOI21_mismatch_data, fs)$marg))
 ```
 
-But they do change the probability of the data given different graphs. 
-
-[update] For rare matched data, the likelihood is only appreciable for relationship
+Meanwhile, the graph likelihoods change. For example, consider a MOI = 2 enrolment
+episode followed by a MOI = 1 recurrence: for monoclonal enrolment data with a
+user specified MOI of 2, the likelihood is only appreciable for relationship
 graphs where all intra-episode relationships are sibling and the inter-episode
-relationships are clonal, demonstrating the impact of information in the data. 
+relationships are clonal. Whereas for polyclonal data, the likelihood is only
+appreciable for relationship graphs where all intra-episode relationships are
+stranger and the inter-episode relationships are clonal.
 
 ```{r echo = FALSE}
-# ------------------------------------------------------------------------------
-# Maximum likelihood graphs for illustrative case with MOIs 3 & 3
-# ------------------------------------------------------------------------------
 # Classify graphs by state
-gd <- get_graph_dist(c(3,3))
+MOIs <- c(2,1)
+gd <- get_graph_dist(MOIs)
 RGs_not_I <- sapply(gd$CIL_gvn_RGs, function(CIL_gvn_RG) !("I" %in% CIL_gvn_RG))
 RGs_C <- sapply(gd$CIL_gvn_RGs, function(CIL_gvn_RG) "C" %in% CIL_gvn_RG)
 RGs_edges <- lapply(gd$RGs, function(RG) igraph::as_ids(igraph::E(RG)))
 
 # Make a vector of intra-infection edges by first creating a block diag. matrix
-mat <- Matrix::bdiag(lapply(c(3,3),function(x) matrix(1, ncol=x, nrow=x)))
+mat <- Matrix::bdiag(lapply(MOIs, function(x) matrix(1, ncol=x, nrow=x)))
 colnames(mat) <- gd$gs; rownames(mat) <- gd$gs
 graph <- igraph::graph_from_adjacency_matrix(mat, diag = F, mode = "undirected")
 edges_within <- igraph::as_ids(igraph::E(graph))
 RGs_edges_within <- sapply(RGs_edges, function(x) all(edges_within %in% x))
 
-# Get graph log likelihoods
-y <- y_match
-post <- sm(compute_posterior(y, fs, MOIs = c(3,3), return.logp=T))
+# Get graph log likelihoods for monoclonal data with user-specified MOIs
+y <- MOI11_match_data
+post <- sm(compute_posterior(y, fs, MOIs = MOIs, return.logp=T))
 llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
 llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
 
 # Plot log likelihoods by graph classification
-plot(llikes_sorted$x, pch = 20, cex = 0.5, col = "lightgray", bty = "n",
+plot(llikes_sorted$x, pch = 20, col = "lightgray", bty = "n",
      ylab = "Log-likelihood", xlab = "Relationship Graphs for MOIs 3 & 3")
 points(y = llikes_sorted$x[(RGs_not_I & RGs_edges_within)[llikes_sorted$ix]], 
        x = which((RGs_not_I & RGs_edges_within)[llikes_sorted$ix]),
-       col = "hotpink", pch = 20, cex  = 0.5)
+       col = "hotpink", pch = 20)
 points(y = llikes_sorted$x[(RGs_C & RGs_edges_within)[llikes_sorted$ix]], 
        x = which((RGs_C & RGs_edges_within)[llikes_sorted$ix]), 
-       col = "black", pch = 20, cex  = 0.5)
+       col = "black", pch = 20)
 legend("bottomright", pch = 20, bty= "n", cex = 0.75,
        col = c("black", "hotpink", "lightgray"), 
        legend = c("Graphs with intra-episode siblings and inter-episode clones",
                   "Graphs with intra-episode siblings and inter-episode clones and siblings",
                   "All other graphs"))
+title(main = sprintf("Recrudescence with probability %s", 
+                     round(post$marg[,"C"],4)))
+
+# Get graph log likelihoods for polyclonal data without user-specified MOIs
+y <- MOI21_match_data
+post <- sm(compute_posterior(y, fs, return.logp=T))
+llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
+llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
+
+# Plot log likelihoods by graph classification
+plot(llikes_sorted$x, pch = 20, col = "lightgray", bty = "n",
+     ylab = "Log-likelihood", xlab = "Relationship Graphs")
+points(y = llikes_sorted$x[(RGs_not_I & !RGs_edges_within)[llikes_sorted$ix]], 
+       x = which((RGs_not_I & !RGs_edges_within)[llikes_sorted$ix]),
+       col = "hotpink", pch = 20)
+points(y = llikes_sorted$x[(RGs_C & !RGs_edges_within)[llikes_sorted$ix]], 
+       x = which((RGs_C & !RGs_edges_within)[llikes_sorted$ix]), 
+       col = "black", pch = 20)
+legend("bottomright", pch = 20, bty= "n", cex = 0.75,
+       col = c("black", "hotpink", "lightgray"), 
+       legend = c("Graphs with intra-episode strangers and inter-episode clones",
+                  "Graphs with intra-episode strangers and inter-episode clones and siblings",
+                  "All other graphs"))
+title(main = sprintf("Recrudescence with probability %s", 
+                     round(post$marg[,"C"],4)))
+```
+
+
+
+```{r echo = FALSE}
+# ------------------------------------------------------------------------------
+# Maximum likelihood graphs for illustrative case with MOIs 2 & 1
+# ------------------------------------------------------------------------------
+# Classify graphs by state
+MOIs <- c(2,1)
+gd <- get_graph_dist(MOIs)
+RGs_not_I <- sapply(gd$CIL_gvn_RGs, function(CIL_gvn_RG) !("I" %in% CIL_gvn_RG))
+RGs_C <- sapply(gd$CIL_gvn_RGs, function(CIL_gvn_RG) "C" %in% CIL_gvn_RG)
+RGs_edges <- lapply(gd$RGs, function(RG) igraph::as_ids(igraph::E(RG)))
+
+# Make a vector of intra-infection edges by first creating a block diag. matrix
+mat <- Matrix::bdiag(lapply(MOIs, function(x) matrix(1, ncol=x, nrow=x)))
+colnames(mat) <- gd$gs; rownames(mat) <- gd$gs
+graph <- igraph::graph_from_adjacency_matrix(mat, diag = F, mode = "undirected")
+edges_within <- igraph::as_ids(igraph::E(graph))
+RGs_edges_within <- sapply(RGs_edges, function(x) all(edges_within %in% x))
 ```
 
 ## Adding recurrences 
 
-Recurrences can be added without adding data, thereby
-demonstrating the impact on the maximum probability of recrudescence /
-reinfection of the prior on graphs in isolation, i.e., without additional
-information from data.
+Recurrences can be added without adding data
 
 ```{r}
 ys_match <- list("1_recurrence" = list(enroll = all_As, 
@@ -607,10 +657,6 @@ ys_match <- list("1_recurrence" = list(enroll = all_As,
                  "2_recurrence" = list(enroll = all_As, 
                                        recur1 = all_As,
                                        recur2 = no_data),
-                 "3_recurrence" = list(enroll = all_As, 
-                                       recur1 = all_As,
-                                       recur2 = no_data,
-                                       recur3 = no_data),
                  "5_recurrence" = list(enroll = all_As, 
                                        recur1 = all_As,
                                        recur2 = no_data,
@@ -623,10 +669,6 @@ ys_mismatch <- list("1_recurrence" = list(enroll = all_As,
                     "2_recurrence" = list(enroll = all_As, 
                                           recur1 = all_Bs,
                                           recur2 = no_data),
-                    "3_recurrence" = list(enroll = all_As, 
-                                          recur1 = all_Bs,
-                                          recur2 = no_data,
-                                          recur3 = no_data),
                     "5_recurrence" = list(enroll = all_As, 
                                           recur1 = all_Bs,
                                           recur2 = no_data,
@@ -725,6 +767,7 @@ reinfection first (mismatch)", "Posterior probability"))
 legend("right", col = c(1:length(xys)), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
        legend = c(1,2,3,5), title = "Recurrence\ncount") 
 ```
+
 
 ## Position in a sequence  
 
