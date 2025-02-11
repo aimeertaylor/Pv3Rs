@@ -452,18 +452,15 @@ variable depends on the size of the support, the prior on a uniformly
 distributed graph, and thus the the maximum probability of recrudescence /
 reinfection, depends on per-episode MOIs and episode counts, which vary across
 trial participants. Using rare matched and mismatched data on 100 markers, we
-demonstrate this dependency by increasing per-episode MOIs and by increasing the
-number of recurrences. Recurrences can be added without adding data, thereby
-demonstrating the impact on the maximum probability of recrudescence /
-reinfection of the prior on graphs in isolation, i.e., without additional
-information from data.
+demonstrate this dependency by increasing per-episode MOIs, which adds data
+inextricably, and by increasing the number of recurrences without adding data.
 
 ```{r}
 marker_count <- 100 # Number of markers
 ms <- paste0("m", 1:marker_count) # Marker names 
 all_As <- sapply(ms, function(t) "A", simplify = F) # As for all markers
 all_Bs <- sapply(ms, function(t) "B", simplify = F) # Bs for all markers
-all_ACs <- sapply(ms, function(t) c("A", "C"), simplify = F) # As for all markers
+all_ACs <- sapply(ms, function(t) c("A", "C"), simplify = F) # A&C for all 
 no_data <- sapply(ms, function(t) NA, simplify = F) # NAs for all markers
 ```
 
@@ -536,13 +533,20 @@ legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs),
        legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
 ```
 
-The data do not change the maxima:
+To change per-episode MOIs, we either provide user-specified MOIs, or increase
+the polyclonality of the data, s.t. the MOIs modelled under Pv3Rs increase.
+Either way, we get the same maximal probabilities:
 
 ```{r}
-sm(compute_posterior(y = list(enrol = all_As, recur = all_As), fs, MOIs = c(2,1))$marg)
-sm(compute_posterior(y = list(enrol = all_ACs, recur = all_As), fs)$marg)
-sm(compute_posterior(y = list(enrol = all_As, recur = all_Bs), fs, MOIs = c(2,1))$marg)
-sm(compute_posterior(y = list(enrol = all_ACs, recur = all_Bs), fs)$marg)
+MOI11_match_data <- list(enrol = all_As, MOIs11_match_data = all_As)
+MOI21_match_data <- list(enrol = all_ACs, MOIs21_match_data = all_As)
+MOI11_mismatch_data <- list(enrol = all_As, MOIs11_mismatch_data = all_Bs)
+MOI21_mismatch_data <- list(enrol = all_ACs, MOIs21_mismatch_data = all_Bs)
+
+rbind(sm(compute_posterior(MOI11_match_data, fs, MOIs = c(2,1))$marg), 
+      sm(compute_posterior(MOI21_match_data, fs)$marg), 
+      sm(compute_posterior(MOI11_mismatch_data, fs, MOIs = c(2,1))$marg),
+      sm(compute_posterior(MOI21_mismatch_data, fs)$marg))
 ```
 
 But they do change the probability of the data given different graphs. 
@@ -590,7 +594,12 @@ legend("bottomright", pch = 20, bty= "n", cex = 0.75,
                   "All other graphs"))
 ```
 
-## Adding recurrences without adding data
+## Adding recurrences 
+
+Recurrences can be added without adding data, thereby
+demonstrating the impact on the maximum probability of recrudescence /
+reinfection of the prior on graphs in isolation, i.e., without additional
+information from data.
 
 ```{r}
 ys_match <- list("1_recurrence" = list(enroll = all_As, 
