@@ -358,15 +358,13 @@ text(x = xy["x", ], y = xy["y", ], pos = 3, cex = 0.75, labels) # Annotate
 ```
 # Data on only two markers
 
-When data on a second marker are added to the data on the first above, the
-posterior updates depend on the observation types and the frequencies of the
-observed alleles. When the second observation is consistent with the first the
-strength of inference generally increases (see arrows entering regions of
-posterior probability greater than 0.5). An exception being the addition of a
-common match to a common partial match, which is not very informative (central
-arrow). When a mismatch is added to a rare match (diamond), relapse becomes the
-most probable state. This demonstrates the dependence of identifiable relapse
-inference on data on multiple markers.
+When data on a second marker are added and the second observation is consistent
+with the first the strength of inference generally increases (see arrows in or
+entering regions of posterior probability greater than 0.5). An exception being
+the addition of a common match to a common partial match, which is not very
+informative (central arrow). When a mismatch is added to a rare match (diamond),
+relapse becomes the most probable state. This demonstrates the requirement of
+multiple markers for relapse inference.
 
 
 ```{r echo=FALSE}
@@ -430,8 +428,8 @@ clonal relationships
 
 Recrudescence / reinfection probabilities necessarily converge to uncertain
 values because genetic data compatible with recrudescence / reinfection are also
-compatible with relapse (recrudescence and reinfection not fully identifiable
-given genetic data alone). 
+compatible with relapse. Otherwise stated, recrudescence and reinfection are not
+fully identifiable given genetic data alone.
 
 Because we assume *a priori* that relationship graphs compatible with a given
 recurrent state sequence are uniformly distributed, and because relationship
@@ -439,17 +437,14 @@ graphs compatible with sequences of recrudescence / reinfection are a subset of
 those compatible with sequences of relapse, the maximum posterior probability of
 recrudescence / reinfection for a given recurrence can be computed *a priori* as
 a function of the prior on the recurrent state sequences and the prior on the
-relationship graphs; see XXX. 
-
-Otherwise stated, when two of three states for a given recurrence are
-non-identifiable despite ample data, the model returns a probability that can be
-expressed as a function of the prior over recurrent state sequences and the
-prior over relationship graphs, demonstrating clearly the impact of our prior
-assumptions. 
+relationship graphs; see XXX. Otherwise stated, when two of three states for a
+given recurrence are non-identifiable despite ample data, the model returns a
+probability that can be expressed as a function of the prior over recurrent
+state sequences and the prior over relationship graphs.
 
 Because the probability mass function of a uniformly distributed discrete random
-variable depends on the size of the support, the prior on a uniformly
-distributed graph, and thus the the maximum probability of recrudescence /
+variable depends on the size of its support, the prior on a uniformly
+distributed graph, and thus the maximum probability of recrudescence /
 reinfection, depends on per-episode MOIs and episode counts, which vary across
 trial participants. Using rare matched and mismatched data on 100 markers, we
 demonstrate this dependency by increasing per-episode MOIs, which adds data
@@ -535,9 +530,9 @@ legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs),
        legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
 ```
 
-The maximum probability of recrudescence increases with the number of
-inter-episode edges but decreases with the imbalance between the MOI at
-enrolment and the MOI of recurrence. [XXX]
+The maximum probability of recrudescence decreases with the imbalance between the MOI at
+enrolment and the MOI of recurrence increases with the number of
+inter-episode edges but. [XXX]
 
 To increase per-episode MOIs, we can do as above and increase user-specified
 MOIs explicitly, which amplifies the data implicitly, or we can increase the
@@ -936,9 +931,7 @@ mutually exclusive:
 2) the states are not fully identifiable
 
 To assess data requirements, we could report relative uncertainty: how uncertain
-a posterior estimate is from its maximum, which can be computed *a priori*
-because we assume relationship graphs compatible with a given recurrent state
-sequence are equally likely.
+a posterior estimate is from its maximum, which can be computed *a priori*.
 
 Trial participants have maximum probabilities of recrudescence / reinfection
 that are unequal *a priori* (because of the conditional uniform assumption on
@@ -946,8 +939,8 @@ relationship graphs, the maximum probabilities of recrudescence / reinfection
 depend on the number of genotypes within and across infections, and thus vary
 across trial participants). This is important to bear in mind when comparing
 estimates across people. For example, if we use a common threshold of 0.8 to
-classify probable reinfection assuming recurrence states are equally likely *a
-priori*, we can discount *a priori* all trail participants with a single
+classify probable reinfection assuming recurrence states are equally likely 
+*a priori*, we can discount *a priori* all trail participants with a single
 monoclonal recurrence following a monoclonal enrolment episode because their
 posterior reinfection probabilities will never exceed 0.75, even if their data
 are highly informative of reinfection.

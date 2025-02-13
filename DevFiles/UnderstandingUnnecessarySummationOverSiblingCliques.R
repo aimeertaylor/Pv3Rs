@@ -9,9 +9,15 @@
 rm(list = ls())
 set.seed(1)
 n <- 10000
-many_MOIs <- list(c(1,1), c(2,1), c(2,2), c(1,1,1), c(2,2,2), # Should all be indifferent
-                  c(3,1), c(3,2), c(3,3), c(3,1,1), c(3,3,2),
-                  c(4,1), c(4,2), c(4,3), c(4,4), c(4,3,1))
+many_MOIs <- list(c(1,1), c(2,1), c(2,2), c(1,1,1), # Should all be indifferent
+                  c(3,1), c(3,2), c(3,3), c(3,3,2),
+                  c(4,1), c(4,2), c(4,3), c(4,3,1))
+
+all_MOIs <- c(do.call(c, sapply(2:7, function(x) { # 254 different vectors of MOIs
+  y <- gtools::permutations(n = 7, r = x, repeats.allowed = T)
+  z <- y[rowSums(y) < 9, ]
+  lapply(1:nrow(z), function(i) z[i,])
+})), list(rep(1,8)))
 
 # Function to get size of largest sibling clique
 get_max_clique_size <- function(RG, intra_edges) {
@@ -37,8 +43,8 @@ sample_graph <- function(r, RGs_ind, RGs_C_ind, RGs_I_ind) {
   }
 }
 
-
-max_probs <- sapply(many_MOIs, function(MOIs){
+tictoc::tic()
+max_probs <- sapply(all_MOIs, function(MOIs){
 
   #=============================================================================
   # Get requisite information for maximum probability computation
@@ -56,7 +62,6 @@ max_probs <- sapply(many_MOIs, function(MOIs){
 
   RGs <- enumerate_RGs(MOIs) # Get graphs
   CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts) # compatible states
-
 
   if (all(ts < 3)) {
     RGs_C_log <- sapply(CIL_gvn_RGs, function(x) "C" %in% x) # C compatible
@@ -84,29 +89,45 @@ max_probs <- sapply(many_MOIs, function(MOIs){
   #=============================================================================
   # Compute theoretical maximum probabilities with and w/out summation over all
   #=============================================================================
-  theory_C_with <- nRGs_with/(sum(RGs_C_log) + nRGs_with)
+  if(sum(RGs_C_log) == 0){
+    theory_C_with <- 0
+    theory_C_wout <- 0
+  } else {
+    theory_C_with <- nRGs_with/(sum(RGs_C_log) + nRGs_with)
+    theory_C_wout <- nRGs_wout/(sum(RGs_C_log & keep_log) + nRGs_wout)
+  }
+
   theory_I_with <- nRGs_with/(sum(RGs_I_log) + nRGs_with)
-  theory_C_wout <- nRGs_wout/(sum(RGs_C_log & keep_log) + nRGs_wout)
   theory_I_wout <- nRGs_wout/(sum(RGs_I_log & keep_log) + nRGs_wout)
 
   #=============================================================================
   # Compute numerical maximum probabilities with and w/out summation over all
   #=============================================================================
-  CIL <- sample(c("C", "I", "L"), n, replace = T) # sample recurrence
+  if(sum(RGs_C_log) == 0) {
+    CIL <- sample(c("I", "L"), n, replace = T) # sample recurrence
+  } else {
+    CIL <- sample(c("C", "I", "L"), n, replace = T) # sample recurrence
+  }
+
   graphs_with <- sapply(CIL, sample_graph, RGs_with, RGs_C_with, RGs_I_with)
   graphs_wout <- sapply(CIL, sample_graph, RGs_wout, RGs_C_wout, RGs_I_wout)
 
-  # simulation C with
-  ind <- graphs_with %in% RGs_C_with # Among graphs compatible with C
-  sim_C_with <- (table(names(graphs_with[ind]))/sum(ind))["C"]
+  if(sum(RGs_C_log) == 0) {
+    sim_C_with <- 0
+    sim_C_wout <- 0
+  } else {
+    # simulation C with
+    ind <- graphs_with %in% RGs_C_with # Among graphs compatible with C
+    sim_C_with <- (table(names(graphs_with[ind]))/sum(ind))["C"]
+
+    # simulation C with
+    ind <- graphs_wout %in% RGs_C_wout # Among graphs compatible with C
+    sim_C_wout <- (table(names(graphs_wout[ind]))/sum(ind))["C"]
+  }
 
   # simulation I with
   ind <- graphs_with %in% RGs_I_with # Among graphs compatible with I
   sim_I_with <- (table(names(graphs_with[ind]))/sum(ind))["I"]
-
-  # simulation C with
-  ind <- graphs_wout %in% RGs_C_wout # Among graphs compatible with C
-  sim_C_wout <- (table(names(graphs_wout[ind]))/sum(ind))["C"]
 
   # simulation I with
   ind <- graphs_wout %in% RGs_I_wout # Among graphs compatible with I
@@ -121,6 +142,7 @@ max_probs <- sapply(many_MOIs, function(MOIs){
            theory_I_wout = theory_I_wout,
            sim_I_wout = as.numeric(sim_I_wout)))
 })
+tictoc::toc()
 
 # Name by MOIs
 colnames(max_probs) <- sapply(many_MOIs, function(x) paste(x, collapse = ""))
