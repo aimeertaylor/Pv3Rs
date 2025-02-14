@@ -1,6 +1,7 @@
 ################################################################################
 # Script to explore effect of summation over sibling cliques of 3 and larger on
-# maximum probabilities. NB: Takes a minute or two to run
+# maximum probabilities. NB: Takes a minute or two to run many MOIs; 5 hours to
+# run all.
 #
 # Take-away: including / excluding sibling cliques of 3 or larger makes very
 # little difference: order of difference equivalent to stochastic variation with
@@ -144,9 +145,11 @@ max_probs <- sapply(all_MOIs, function(MOIs){
 })
 tictoc::toc()
 
+#save(max_probs, file = "max_probs.RData")
+
 # Name by MOIs
-colnames(max_probs) <- sapply(many_MOIs, function(x) paste(x, collapse = ""))
-maxMOIs <- sapply(many_MOIs, function(x) max(x))
+colnames(max_probs) <- sapply(all_MOIs, function(x) paste(x, collapse = ""))
+maxMOIs <- sapply(all_MOIs, function(x) max(x))
 
 #===============================================================================
 # First, sanity check for cases that should not change
@@ -215,3 +218,27 @@ max_stoch_diff_interest <- max(abs(c(max_probs["theory_C_with", maxMOIs > 2] - m
 max_stoch_diff_sanity
 max_stoch_diff_interest
 max_theory_diff_withwout
+
+
+# ==============================================================================
+# General understanding of bounds
+# ==============================================================================
+
+max_probs["theory_C_with", maxMOIs > 2]
+nMOIs <- sapply(all_MOIs, function(x) length(x))
+MOI12 <- sapply(all_MOIs, function(x) x[2])
+MOI12diff <- sapply(all_MOIs, function(x) x[1] - x[2])
+
+plot(x = nMOIs, y = max_probs["theory_C_with", ], ylim = c(0.5, 1))
+plot(x = nMOIs, y = max_probs["theory_I_with", ], ylim = c(0.5, 1))
+plot(x = maxMOIs, y = max_probs["theory_C_with", ], ylim = c(0.5, 1))
+plot(x = maxMOIs, y = max_probs["theory_I_with", ], ylim = c(0.5, 1))
+plot(x = MOI2, y = max_probs["theory_C_with", ], ylim = c(0.5, 1))
+plot(x = MOI2, y = max_probs["theory_I_with", ], ylim = c(0.5, 1))
+plot(x = MOI12diff, y = max_probs["theory_C_with", ], ylim = c(0.5, 1))
+plot(x = MOI12diff, y = max_probs["theory_I_with", ], ylim = c(0.5, 1))
+
+# What is the smallest non-zero maximum probability?
+ind1 <- max_probs[grep("theory", rownames(max_probs)), ] > 0
+ind2 <- max_probs[grep("theory", rownames(max_probs)), ] < 0.6
+all_MOIs[which(colSums(ind1 & ind2) > 0)]
