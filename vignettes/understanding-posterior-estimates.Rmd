@@ -529,8 +529,7 @@ legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs),
 ```
 
 The maximum probability of recrudescence decreases with the imbalance between
-the MOI at enrolment and the MOI of recurrence increases with the number of
-inter-episode edges but. [XXX]
+the MOI at enrolment and the MOI of recurrence increases with the number of possibly independent inter-episode edges. [Check always case XXX]
 
 To increase per-episode MOIs, we can do as above and increase user-specified
 MOIs without changing the data, or we can increase the polyclonality of the
@@ -611,35 +610,41 @@ title(main = sprintf("Recrudescence with probability %s", round(post$marg[,"C"],
 
 For the monoclonal data with elevated user-specified MOIs, all intra-episode
 parasites in maximum likelihood graphs are siblings. For the polyclonal data,
-all intra-episode parasites in maximum likelihood graphs are strangers.
+all intra-episode parasites in maximum likelihood graphs are strangers. Both
+have the same maximum probabilities of recrudescence.
 
-This means that maximum probabilities increase with increasing counts of
-intra-episode genotypes, be they independent strangers or inter-dependent
-siblings. Arguable, maximum probabilities should not increase with intra-episode
-siblings (more lines of evidence strengthen a case, but only if they are
-independent). In practice, Pv3Rs behaves accordingly because modelled MOIs are
-based on estimates from bulk (not single-cell) parasite genetic data:
-
-- MOI estimates based on maximum per-marker allele counts conform because groups
-of not-half siblings can contribute at most two alleles per marker.
+This means that maximum probabilities can be increased by increasing the number
+of possibly independent inter-episode edges, and thus with additional
+intra-episode genotypes regardless of their nature (intra-episode strangers,
+which are independent, versus intra-episode siblings, which are are dependent).
+Arguably, maximum probabilities should not increase with more than two
+intra-episode siblings (more lines of evidence strengthen a case, but only if
+they are independent). In practice, Pv3Rs behaves accordingly: groups of three
+or more siblings are modelled as groups of two because modelled MOIs are based
+on estimates from bulk (not single-cell) parasite genetic data:
+ 
+- MOI estimates based on maximum per-marker allele counts count at most two for
+groups of three or more not-half siblings because groups of not-half siblings 
+can contribute at most two alleles per marker.
 
 - MOI estimates based on heteroallelic marker counts (e.g., those estimated by
-TheRealMcCOIL, coiaf and MOIRE [AT-to-add-REFS]) conform because data from a
-group of not-half siblings can be at most as diverse across markers as the MOI =
-2 parental data from which they draw (check).
+TheRealMcCOIL, coiaf and MOIRE [AT-to-add-REFS]) count at most two for groups of
+three or more not-half siblings because data from a group of not-half siblings
+can be at most as diverse across markers as the two parental genotypes from
+which they draw (check).
 
-When data-based MOI estimates are user-specified and the analysed data are less
-diverse, Pv3Rs sums over graphs with cliques of three or more intra-episode MOIs
-(because there is nothing in the analysed data to suggest otherwise); whereas
-when the analysed data are as diverse as the MOIs, graphs with cliques of three
-or more intra-sibling parasites have zero likelihood. In either case, the true
-number of siblings per group collapses to two per group, circumventing elevated
-maximum probabilities:
+When user specified MOI estimates are more diverse than the analaysed data (the
+data used for recurrent state inference), Pv3Rs sums over graphs with cliques of
+three or more intra-episode MOIs (there is nothing in the analysed data to
+suggest otherwise); when the analysed data are as diverse as the MOIs, graphs
+with cliques of three or more intra-sibling parasites have zero likelihood. In
+either case, the true number of siblings per group collapses to two per group,
+capping elevated maximum probabilities:
 
 ```{r echo = FALSE}
 # Magic numbers / quantities
 set.seed(5) # For reproducibility
-n_alleles <- 10 # Number of alleles per marker (marker cardinality)
+n_alleles <- 2 # Number of alleles per marker (marker cardinality) # XXX Change to illustrate case
 n_markers <- 100 # Number of markers
 n_strangers <- 3 # Number of stranger parasites
 c_param <- 1 # Dirichlet concentration parameter
@@ -663,31 +668,33 @@ strangers <- sapply(1:n_strangers, function(i) {
 parents <- strangers[, 1:2]
 
 # Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
-# providing we later assume an equal number of crossovers per chromosome
+# if and only if we later assume an equal number of crossovers per chromosome
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = n_markers))
 
-# Sample parental allocations dependently (generates meiotic siblings)
-cs <- recombine_parent_ids(chrs_per_marker)
+# Sample parental allocations dependently (generates meiotic siblings) per call
+cs1 <- recombine_parent_ids(chrs_per_marker)
+cs2 <- recombine_parent_ids(chrs_per_marker) 
 
-# Construct children from parental allocations
-children <- sapply(1:n_markers, function(i) {
+# Construct children from parental allocations (streamline XXX; and cs above)
+children1 <- sapply(1:n_markers, function(i) {
   sapply(1:ncol(cs), function(j) parents[i,cs[i,j]])
 })
-colnames(children) <- markers
+children2 <- sapply(1:n_markers, function(i) {
+  sapply(1:ncol(cs), function(j) parents[i,cs[i,j]])
+})
+colnames(children1) <- markers
+colnames(children2) <- markers
 
 # Make parasite infections
-initial <- apply(children[3:4,], 2, unique, simplify = F)
-relapse <- apply(rbind(children[1:2,], strangers[,3]), 2, unique, simplify = F)
-
+initial <- apply(rbind(children1[1:2,], 
+                       children2[1:2,], 
+                       strangers[,3]), 2, unique, simplify = F)
 
 # Add one highly diverse marker 
-biallelic_plus_one_diverse <- list(enrol = c(all_As, m101 = list(c("A","B","C"))),  
-                                   recur = c(all_As, m101 = list("A")))
-fs <- c(sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE), 
-        m101 = list(c("A" = 1/3, "B" = 1/3, "C" = 1/3)))
-post <- sm(compute_posterior(y = biallelic_plus_one_diverse, fs, return.logp=T))
+data <- list(enrol = initial, recur = as.list(children1[1,]))
+post <- sm(compute_posterior(y = data, MOIs = c(3,1), fs, return.logp=T))
 llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
-MOIs <- determine_MOIs(biallelic_plus_one_diverse)
+MOIs <- c(3,1) #determine_MOIs(data)
 gs <- paste0("g", 1:sum(MOIs))
 ts_per_gs <- rep(1:length(MOIs), MOIs)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
@@ -702,14 +709,14 @@ plot_RG(RG_to_igraph(RG, gs, ts_per_gs),
         vertex.label.cex = 1,
         vertex.label.color = "black")
 }
+post$marg
 ```
 
-
-These graphs do still contribute
-to maximum probabilities of recrudescence / reinfection (through the
-conditionally uniform prior on graphs), which is arguably less appropriate,
-given they have no support. However, the contribution is generally very small
-(less than 2.5\%). % See XXX; 
+The summation over graphs with cliques or three or more siblings is possibly
+redundant given these graphs have no practical support. Even when these graphs
+have zero likelihood, they contribute to maximum probabilities of
+recrudescence / reinfection through the conditionally uniform prior on graphs.
+However, the contribution is generally very small (less than 2.5\%). % See (import data? XXX) 
 
 ## Adding recurrences 
 
