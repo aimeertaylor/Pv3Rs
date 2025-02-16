@@ -639,60 +639,82 @@ three or more intra-episode MOIs (there is nothing in the analysed data to
 suggest otherwise); when the analysed data are as diverse as the MOIs, graphs
 with cliques of three or more intra-sibling parasites have zero likelihood. In
 either case, the true number of siblings per group collapses to two per group,
-capping elevated maximum probabilities:
+capping elevated maximum probabilities, 
+
+For example, let's write a function to simulate an enrolment episode comprising
+a stranger plus a group of four siblings, two from one oocyst, two from another,
+all drawing from the same two unrelated parental genotypes, and a recurrence
+with one sibling. Technically, the enrolment episode contains five genetically
+distinct genotypes and thus has a MOI of five.
 
 ```{r echo = FALSE}
-# Magic numbers / quantities
-set.seed(5) # For reproducibility
-n_alleles <- 2 # Number of alleles per marker (marker cardinality) # XXX Change to illustrate case
-n_markers <- 100 # Number of markers
-n_strangers <- 3 # Number of stranger parasites
-c_param <- 1 # Dirichlet concentration parameter
-
-# Derived quantities
-alleles <- letters[1:n_alleles]
-markers <- paste0("m", 1:n_markers) # Marker names
-
-# Sample allele frequencies
-fs <- sapply(markers, function(m) {
-  sort(setNames(MCMCpack::rdirichlet(1, rep(c_param, n_alleles)), alleles), decreasing = T)
+simulate_data <- function(n_alleles){
+  
+  # Magic numbers / quantities
+  set.seed(5) # For reproducibility
+  n_markers <- 100 # Number of markers
+  n_strangers <- 3 # Number of stranger parasites
+  n_oocysts <- 2 # Number of oocysts to draw from
+  c_param <- 1 # Dirichlet concentration parameter
+  
+  # Derived quantities
+  alleles <- letters[1:n_alleles]
+  markers <- paste0("m", 1:n_markers) # Marker names
+  
+  # Sample allele frequencies
+  fs <- sapply(markers, function(m) {
+    sort(setNames(MCMCpack::rdirichlet(1, rep(c_param, n_alleles)), 
+                  alleles), decreasing = T)
   }, USE.NAMES = T, simplify = F)
-rm(alleles)
-
-# Sample strangers
-strangers <- sapply(1:n_strangers, function(i) {
-  sapply(markers, function(t) sample(names(fs[[t]]), size = 1, prob = fs[[t]]))
-})
-
-# Designate strangers
-parents <- strangers[, 1:2]
-
-# Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
-# if and only if we later assume an equal number of crossovers per chromosome
-chrs_per_marker <- round(seq(0.51, 14.5, length.out = n_markers))
-
-# Sample parental allocations dependently (generates meiotic siblings) per call
-cs1 <- recombine_parent_ids(chrs_per_marker)
-cs2 <- recombine_parent_ids(chrs_per_marker) 
-
-# Construct children from parental allocations (streamline XXX; and cs above)
-children1 <- sapply(1:n_markers, function(i) {
-  sapply(1:ncol(cs), function(j) parents[i,cs[i,j]])
-})
-children2 <- sapply(1:n_markers, function(i) {
-  sapply(1:ncol(cs), function(j) parents[i,cs[i,j]])
-})
-colnames(children1) <- markers
-colnames(children2) <- markers
-
-# Make parasite infections
-initial <- apply(rbind(children1[1:2,], 
-                       children2[1:2,], 
+  rm(alleles)
+  
+  # Sample strangers
+  strangers <- sapply(1:n_strangers, function(i) {
+    sapply(markers, function(t) sample(names(fs[[t]]), size = 1, prob = fs[[t]]))
+  })
+  
+  # Designate strangers
+  parents <- strangers[, 1:2]
+  
+  # Map the markers to chromosomes. Assume equally sized chromosomes — reasonable
+  # if and only if we later assume an equal number of crossovers per chromosome
+  chrs_per_marker <- round(seq(0.51, 14.5, length.out = n_markers))
+  
+  # Sample parental allocations dependently per-oocyst 
+  cs <- lapply(1:n_oocysts, function(o) recombine_parent_ids(chrs_per_marker))
+  
+  # Construct children from parental allocations (streamline XXX; and cs above)
+  all_children <- lapply(1:n_oocysts, function(o) {
+    oocyst_chidren <- sapply(1:n_markers, function(i) {
+      sapply(1:ncol(cs[[o]]), function(j) parents[i,cs[[o]][i,j]])
+    })
+    colnames(oocyst_chidren) <- markers
+    return(oocyst_chidren)
+  })
+  
+  # Make enrolment infection
+  enrol <- apply(rbind(all_children[[1]][1:2,], 
+                       all_children[[2]][1:2,], 
                        strangers[,3]), 2, unique, simplify = F)
+  
+  # Make paired data
+  data <- list(enrol = enrol, recur = as.list(all_children[[1]][1,]))
+  
+  return(list(data = data, fs = fs))
+}
+```
 
-# Add one highly diverse marker 
-data <- list(enrol = initial, recur = as.list(children1[1,]))
-post <- sm(compute_posterior(y = data, MOIs = c(3,1), fs, return.logp=T))
+However, MOI estimates based on maximum per-marker allele counts are at most three and one when markers are highly multiallelic:
+
+```{r echo = FALSE}
+multiallelic <- simulate_data(10)
+determine_MOIs(multiallelic$data)
+```
+
+
+```{r echo = FALSE}
+post <- sm(compute_posterior(y = multiallelic$data, 
+                             fs = multiallelic$fs, return.logp=T))
 llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
 MOIs <- c(3,1) #determine_MOIs(data)
 gs <- paste0("g", 1:sum(MOIs))
