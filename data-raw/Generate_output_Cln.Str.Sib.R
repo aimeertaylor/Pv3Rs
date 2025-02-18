@@ -5,7 +5,7 @@
 # case, generate results for all marker counts when alleles are equifrequent,
 # and for a subset of marker counts otherwise.
 #
-# Doesn't take two long to run: minute or two on 32 GB RAM laptop
+# Doesn't take too long to run: minute or two on 32 GB RAM laptop
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
