@@ -10,7 +10,7 @@ plot_RG(
   vertex_palette = "Set2",
   edge_lty = c(`0.5` = "dashed", `1` = "solid"),
   edge_col = c(`0.5` = "black", `1` = "black"),
-  edge.width = 1.5,
+  edge_width = 1.5,
   ...
 )
 }
@@ -33,7 +33,7 @@ relationships, where 0.5 represents a sibling and 1 represents a clone.}
 \item{edge_col}{A vector of edge colours corresponding to different
 relationships, where 0.5 represents a sibling and 1 represents a clone.}
 
-\item{edge.width}{Overrides the default \code{edge.width} of
+\item{edge_width}{Overrides the default \code{edge.width} of
 \code{\link[igraph]{plot.igraph}}.}
 
 \item{...}{Additional arguments to pass to \code{\link[igraph]{plot.igraph}}, e.g.
