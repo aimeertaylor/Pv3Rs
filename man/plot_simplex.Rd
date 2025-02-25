@@ -17,7 +17,7 @@ top. If NULL (default), vertices are not annotated.}
 \item{v_cutoff}{An arbitrary number between 0.5 and 1 that separates regions
 of lower and higher probability. Beware the use of cut-offs for probable
 recrudescence classification and probable reinfection classification; see
-\link{vignette("understand-posterior")}.}
+\link{vignette("understand-posterior", package = "Pv3Rs")}.}
 
 \item{v_colours}{A vector of colours associated with the vertices
 anticlockwise from top; see example below.}
