@@ -1,8 +1,8 @@
 ---
-title: "Understanding posterior estimates"
+title: "Understand posterior estimates"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Understanding posterior estimates}
+  %\VignetteIndexEntry{Understand posterior estimates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
