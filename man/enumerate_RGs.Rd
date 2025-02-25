@@ -2,7 +2,7 @@
 % Please edit documentation in R/enumerate_RGs.R
 \name{enumerate_RGs}
 \alias{enumerate_RGs}
-\title{Enumerate transitive relationship graphs}
+\title{Enumerate relationship graphs}
 \usage{
 enumerate_RGs(MOIs, igraph = TRUE)
 }
@@ -31,9 +31,9 @@ the weight matrix contains information equivalent to that of the four
 attributes.
 }
 \description{
-A relationship graph is a complete graph on all genotypes, where each edge
-is annotated as a clone, sibling, or stranger edge. The enumerated
-relationship graphs satisfy the following constraints:
+A relationship graph is a complete graph on all genotypes (one per vertex),
+where each edge is annotated as a clone, sibling, or stranger edge. The
+enumerated relationship graphs satisfy the following constraints:
 \itemize{
 \item{The subgraph induced by the clone edges is a cluster graph.}
 \item{The subgraph induced by the clone edges and sibling edges is a cluster
@@ -44,16 +44,18 @@ infections.}
 }
 \details{
 Relationship graphs are enumerated by generating nested set partitions that
-meet certain constraints. Since the clone edges induce a cluster graph, the
-information encoded by clonal relationships is equivalent to a partition of
-the genotypes. Note that genotypes from the same infection cannot belong to
-the same partition cell. Subsequent information encoded by sibling
-relationships is equivalent to further partitioning the clonal partition.
-There are no constraints when enumerating the sibling partitions. The data
-structure returned encodes each graph as a nested set partition. Each
-partition is represented in the form of a list of vectors (\code{clone} and
-\code{sib}) and as a membership vector (\code{clone.vec} and \code{sib.vec}), where each
-entry identifies the partition cell the corresponding index belongs to.
+meet certain constraints; see vignette("enumerate", package = "Pv3Rs") for a
+detailed description. In summary, since the clone edges induce a cluster
+graph, the information encoded by clonal relationships is equivalent to a
+partition of the genotypes. Note that genotypes from the same infection
+cannot belong to the same clonal partition cell. Subsequent information
+encoded by sibling relationships is equivalent to further partitioning the
+clonal partition. There are no constraints when enumerating the sibling
+partitions. The data structure returned encodes each graph as a nested set
+partition. Each partition is represented in the form of a list of vectors
+(\code{clone} and \code{sib}) and as a membership vector (\code{clone.vec} and \code{sib.vec}),
+where each entry identifies the partition cell that the corresponding index
+belongs to.
 }
 \examples{
 graphs <- enumerate_RGs(c(2, 1, 2), igraph=TRUE) # 250 graphs

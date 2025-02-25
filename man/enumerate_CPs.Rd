@@ -2,7 +2,7 @@
 % Please edit documentation in R/enumerate_RGs.R
 \name{enumerate_CPs}
 \alias{enumerate_CPs}
-\title{Enumerate partitions induced by clonal relationships}
+\title{Enumerate clonal partitions}
 \usage{
 enumerate_CPs(MOIs)
 }
@@ -19,7 +19,8 @@ corresponding to genotypes being int he same partition cell.
 A clonal partition is a partition of genotypes where a pair of genotypes of
 the same partition cell have a clonal relationship. Genotypes from the same
 infection cannot be clones. This code enumerates all clonal partitions,
-accounting for this intra-infection restriction.
+accounting for this intra-infection restriction; see
+vignette("enumerate", package = "Pv3Rs" for more details).
 }
 \examples{
 enumerate_CPs(c(2, 2))

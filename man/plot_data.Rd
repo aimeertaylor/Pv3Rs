@@ -42,7 +42,6 @@ given marker has more than 12 alleles. The names of the alleles are printed
 on top of their colours if marker_annotate.
 }
 \examples{
-# Examples
 
 # Plot example Plasmodium vivax data set
 plot_data(ys = ys_VHX_BPD)

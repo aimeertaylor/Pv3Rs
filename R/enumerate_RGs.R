@@ -1,8 +1,8 @@
-#' Enumerate transitive relationship graphs
+#' Enumerate relationship graphs
 #'
-#' A relationship graph is a complete graph on all genotypes, where each edge
-#' is annotated as a clone, sibling, or stranger edge. The enumerated
-#' relationship graphs satisfy the following constraints:
+#' A relationship graph is a complete graph on all genotypes (one per vertex),
+#' where each edge is annotated as a clone, sibling, or stranger edge. The
+#' enumerated relationship graphs satisfy the following constraints:
 #' \itemize{
 #'   \item{The subgraph induced by the clone edges is a cluster graph.}
 #'   \item{The subgraph induced by the clone edges and sibling edges is a cluster
@@ -12,16 +12,18 @@
 #' }
 #'
 #' Relationship graphs are enumerated by generating nested set partitions that
-#' meet certain constraints. Since the clone edges induce a cluster graph, the
-#' information encoded by clonal relationships is equivalent to a partition of
-#' the genotypes. Note that genotypes from the same infection cannot belong to
-#' the same partition cell. Subsequent information encoded by sibling
-#' relationships is equivalent to further partitioning the clonal partition.
-#' There are no constraints when enumerating the sibling partitions. The data
-#' structure returned encodes each graph as a nested set partition. Each
-#' partition is represented in the form of a list of vectors (`clone` and
-#' `sib`) and as a membership vector (`clone.vec` and `sib.vec`), where each
-#' entry identifies the partition cell the corresponding index belongs to.
+#' meet certain constraints; see vignette("enumerate", package = "Pv3Rs") for a
+#' detailed description. In summary, since the clone edges induce a cluster
+#' graph, the information encoded by clonal relationships is equivalent to a
+#' partition of the genotypes. Note that genotypes from the same infection
+#' cannot belong to the same clonal partition cell. Subsequent information
+#' encoded by sibling relationships is equivalent to further partitioning the
+#' clonal partition. There are no constraints when enumerating the sibling
+#' partitions. The data structure returned encodes each graph as a nested set
+#' partition. Each partition is represented in the form of a list of vectors
+#' (`clone` and `sib`) and as a membership vector (`clone.vec` and `sib.vec`),
+#' where each entry identifies the partition cell that the corresponding index
+#' belongs to.
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
@@ -112,12 +114,13 @@ enumerate_RGs <- function(MOIs, igraph = TRUE) {
   RGs
 }
 
-#' Enumerate partitions induced by clonal relationships
+#' Enumerate clonal partitions
 #'
 #' A clonal partition is a partition of genotypes where a pair of genotypes of
 #' the same partition cell have a clonal relationship. Genotypes from the same
 #' infection cannot be clones. This code enumerates all clonal partitions,
-#' accounting for this intra-infection restriction.
+#' accounting for this intra-infection restriction; see
+#' vignette("enumerate", package = "Pv3Rs" for more details).
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
