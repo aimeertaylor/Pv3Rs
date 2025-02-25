@@ -1,7 +1,7 @@
 #' Enumerate IBD partitions consistent with a given relationship graph
 #'
 #' Enumerate IBD partitions consistent with a given relationship graph; see
-#' vignette("enumerate", package = "Pv3Rs") for more details.
+#' `vignette("enumerate", package = "Pv3Rs")` for more details.
 #'
 #' @details
 #' For a IBD partition to be consistent with the relationship graph given, it
@@ -18,7 +18,7 @@
 #'
 #' @param RG A relationship graph; see \code{\link{enumerate_RGs}} for details.
 #' @param compat Logical, if true, a list of \code{partitions} equivalence
-#' objects are returned. Otherwise, returns a list of IBD parititon vectors in
+#' objects are returned. Otherwise, returns a list of IBD partition vectors in
 #' reference to the sibling clusters.
 #'
 #' @examples

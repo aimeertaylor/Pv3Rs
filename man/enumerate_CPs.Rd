@@ -20,7 +20,7 @@ A clonal partition is a partition of genotypes where a pair of genotypes of
 the same partition cell have a clonal relationship. Genotypes from the same
 infection cannot be clones. This code enumerates all clonal partitions,
 accounting for this intra-infection restriction; see
-vignette("enumerate", package = "Pv3Rs" for more details).
+\verb{vignette("enumerate", package = "Pv3Rs" for more details)}.
 }
 \examples{
 enumerate_CPs(c(2, 2))

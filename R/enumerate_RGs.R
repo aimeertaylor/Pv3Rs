@@ -12,7 +12,7 @@
 #' }
 #'
 #' Relationship graphs are enumerated by generating nested set partitions that
-#' meet certain constraints; see vignette("enumerate", package = "Pv3Rs") for a
+#' meet certain constraints; see `vignette("enumerate", package = "Pv3Rs")` for a
 #' detailed description. In summary, since the clone edges induce a cluster
 #' graph, the information encoded by clonal relationships is equivalent to a
 #' partition of the genotypes. Note that genotypes from the same infection
@@ -120,7 +120,7 @@ enumerate_RGs <- function(MOIs, igraph = TRUE) {
 #' the same partition cell have a clonal relationship. Genotypes from the same
 #' infection cannot be clones. This code enumerates all clonal partitions,
 #' accounting for this intra-infection restriction; see
-#' vignette("enumerate", package = "Pv3Rs" for more details).
+#' `vignette("enumerate", package = "Pv3Rs" for more details)`.
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
