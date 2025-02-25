@@ -32,7 +32,6 @@
 #'  are printed on top of their colours in the legend.
 #'
 #' @examples
-#' # Examples
 #'
 #' # Plot example Plasmodium vivax data set
 #' plot_data(ys = ys_VHX_BPD)
