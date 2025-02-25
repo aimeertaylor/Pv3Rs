@@ -2,8 +2,7 @@
 % Please edit documentation in R/enumerate_IPs_RG.R
 \name{enumerate_IPs_RG}
 \alias{enumerate_IPs_RG}
-\title{Enumerate IBD partitions consistent with a given relationship graph; see
-vignette("enumerate", package = "Pv3Rs") for more details.}
+\title{Enumerate IBD partitions consistent with a given relationship graph}
 \usage{
 enumerate_IPs_RG(RG, compat = TRUE)
 }
