@@ -26,9 +26,10 @@ Suggests:
     codetools,
     gtools,
     plyr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    R.rsp
 Config/testthat/edition: 3
-VignetteBuilder: knitr
+VignetteBuilder: knitr, R.rsp
 Depends: 
     R (>= 3.5)
 LazyData: true
