@@ -11,7 +11,7 @@
 #' @param v_cutoff An arbitrary number between 0.5 and 1 that separates regions
 #'   of lower and higher probability. Beware the use of cut-offs for probable
 #'   recrudescence classification and probable reinfection classification; run
-#'   `vignette("understand-posterior")`.
+#'   [vignette("understand-posterior")](library/Pv3Rs/doc/understand-posterior.html).
 #'
 #' @param v_colours A vector of colours associated with the vertices
 #'   anticlockwise from top; see example below.
