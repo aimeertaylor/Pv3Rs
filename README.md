@@ -127,7 +127,10 @@ frequencies, assuming they are not biased by experimental artefacts.
 # otherwise, you might encounter problems rendering documentation
 install.packages("devtools")
 
-# Install paneljudge from GitHub 
+# Install R.rsp, a vignette builder used to build LaTeX vignettes in Pv3Rs
+install.packages("R.rsp")
+
+# Install Pv3Rs from GitHub 
 # I highly recommend doing this in RStudio as RStudio installs pandoc needed to build vignettes
 # If you're working in R outside of RStudio you might need to install pandoc and check its path; 
 # otherwise set build_vignettes = FALSE
