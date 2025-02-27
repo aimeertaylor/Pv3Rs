@@ -21,15 +21,14 @@ Imports:
     purrr,
     RColorBrewer
 Suggests: 
-    knitr,
-    rmarkdown,
     codetools,
     gtools,
+    knitr,
+    Matrix,
     plyr,
-    testthat (>= 3.0.0),
+    rmarkdown,
     R.rsp,
-    Matrix, 
-    pkgdown
+    testthat (>= 3.0.0),
 Config/testthat/edition: 3
 VignetteBuilder: knitr, R.rsp
 Depends: 
