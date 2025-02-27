@@ -1332,12 +1332,13 @@ we can show theoretically that the system behaves erratically because a small
 perturbation to the ratio of observations (all alleles match across the three
 half siblings, all alleles are different, intra-episode alleles match,
 inter-episode alleles match) can lead to a large deviation in the odds of
-relapse versus reinfection. The purple, red, and green trajectories below have
-higher than the expected 0.5 intra-to-inter match ratios; moreover, the purple
-trajectory's intra-to-inter match ratio consistently exceeds $0.5\times
-\text{log}_2(\dfrac{2}{5})$  — a condition found theoretically to concentrate posterior
-probability on reinfection under certain conditions. <!-- 2^(2m3) >> 2^(m-2m2)
--->
+relapse versus reinfection; see
+[vignette("understand-half-siblings")](understand-half-siblings.pdf). The
+purple, red, and green trajectories below have higher than the expected 0.5
+intra-to-inter match ratios; moreover, the purple trajectory's intra-to-inter
+match ratio consistently exceeds $0.5\times \text{log}_2(\dfrac{2}{5})$, a
+condition found theoretically to concentrate posterior probability on
+reinfection under certain conditions; again, see [vignette("understand-half-siblings")](understand-half-siblings.pdf). 
 
 ```{r echo = FALSE, fig.height = 4}
 rm(list = "output")
