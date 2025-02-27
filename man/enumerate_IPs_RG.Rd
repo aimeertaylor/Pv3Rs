@@ -15,7 +15,7 @@ reference to the sibling clusters.}
 }
 \description{
 Enumerate IBD partitions consistent with a given relationship graph; see
-\code{vignette("enumerate", package = "Pv3Rs")} for more details.
+\href{library/Pv3Rs/doc/enumerate.pdf}{vignette("enumerate")} for more details.
 }
 \details{
 For a IBD partition to be consistent with the relationship graph given, it
