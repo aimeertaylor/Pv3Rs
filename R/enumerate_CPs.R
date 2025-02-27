@@ -4,7 +4,7 @@
 #' the same partition cell have a clonal relationship. Genotypes from the same
 #' infection cannot be clones. This code enumerates all clonal partitions,
 #' accounting for this intra-infection restriction; see
-#' [vignette("enumerate")](library/Pv3Rs/doc/enumerate.pdf) for more details.
+#' [vignette("enumerate")](../doc/enumerate.pdf) for more details.
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).

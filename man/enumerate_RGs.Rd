@@ -45,7 +45,7 @@ infections.}
 \details{
 Relationship graphs are enumerated by generating nested set partitions that
 meet certain constraints; see
-\href{library/Pv3Rs/doc/enumerate.pdf}{vignette("enumerate")} for a detailed
+\href{../doc/enumerate.pdf}{vignette("enumerate")} for a detailed
 description. In summary, since the clone edges induce a cluster graph, the
 information encoded by clonal relationships is equivalent to a
 partition of the genotypes. Note that genotypes from the same infection
