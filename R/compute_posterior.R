@@ -320,13 +320,20 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
   }
 
   # Warn if there is only allele information for < 2 episodes (unpaired)
-  for (m in ms) {
-    # boolean vector for whether each episode has allele information for marker m
-    has.allele <- sapply(y, function(y.epi) any(!is.na(y.epi[[m]])))
-    if(sum(has.allele) < 2) {
-      warning(paste("Marker", m, "has data on one episode only"))
-    }
+  na_markers <- sapply(ms, function(m)
+    sum(sapply(y, function(y.epi) any(!is.na(y.epi[[m]])))) < 2
+  )
+  if (sum(na_markers) == 1) {
+    warning(sprintf("Markers %s has data on one episode only\n",
+                    names(which(na_markers))))
+  } else if (sum(na_markers) > 1) {
+    warning(sprintf("Markers %s have data on one episode only\n",
+                    paste(names(which(na_markers)), collapse = " & ")))
   }
+
+  # NB: The previous warning does necessarily trigger when the next warning does,
+  #     because there can be a total of >2 episodes, with one episode without
+  #     data, but every marker still has data on multiple episodes.
 
   # Warn users if any episodes have no data
   na_episodes <- sapply(y, function(x) all(is.na(x)))
