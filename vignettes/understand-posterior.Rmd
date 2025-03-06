@@ -8,7 +8,7 @@ vignette: >
 ---
   
 ```{r, include = FALSE}
-  knitr::opts_chunk$set(
+knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   out.width = "100%", # Line width taken up by plot
@@ -356,6 +356,7 @@ labels <- c("rare match", "common match", "mismatch",
             "partial common match", "partial rare match")
 text(x = xy["x", ], y = xy["y", ], pos = 3, cex = 0.75, labels) # Annotate 
 ```
+
 # Data on only two markers
 
 When data on a second marker are added and the second observation is consistent
@@ -437,12 +438,15 @@ graphs compatible with sequences of recrudescence / reinfection are a subset of
 those compatible with sequences of relapse, the maximum posterior probability of
 recrudescence / reinfection for a given recurrence can be computed *a priori* as
 a function of the prior on the recurrent state sequences and the prior on the
-relationship graphs; see XXX. 
+relationship graphs; see 
+[vignette("understand-maxima")](understand-maxima.pdf). 
 
 Because the probability mass function of a uniformly distributed discrete random
 variable depends on the size of its support, the prior on a uniformly
 distributed graph, and thus the maximum probability of recrudescence /
-reinfection, depends on per-episode MOIs and episode counts, which vary across
+reinfection, depends on the size of the graph space, which depends on the size
+of the graphs within the graph space (for a given space, all graphs are the same
+size), which depends on per-episode MOIs and episode counts, which vary across
 trial participants. Using rare matched and mismatched data on 100 markers, we
 demonstrate this dependency by increasing per-episode MOIs, which adds data
 inextricably, and by increasing the number of recurrences without adding data.
@@ -484,7 +488,7 @@ approximation <- lapply(1:length(MOIs), FUN = function(i) {
   num_RGs_C <- sum(RGs_C)
   num_RGs_I <- sum(RGs_I)
   num_RGs_L <- length(gd$RGs)
-  x_match <- c(C = 1/num_RGs_C, L = 1/num_RGs_L, I = 0)
+  x_match <- c(C = 1, L = num_RGs_C/num_RGs_L, I = 0)
   x_mismatch <- c(C = 0, L = 1/num_RGs_L, I = 1/num_RGs_I)
   approx <- rbind(x_match/sum(x_match), x_mismatch/sum(x_mismatch))
 })
@@ -518,16 +522,21 @@ legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0,
          "Maximum probability 
 based on prior over 
 graphs compatible with 
-recrudescence (match) /
-reinfection (mismatch)", 
+with recrudescence (match)
+and reinfection (mismatch)", 
 "Posterior probability"))
 legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs), 
        legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
 ```
+```{r}
+results_match
+results_mismatch
+```
 
-The maximum probabilities increase with balanced per-episode MOIs (see XXX) and
-thus with the number of possibly independent inter-episode edges (multiple lines
-of independent evidence strengthen a case). 
+The maximum probabilities of reinfection increase with the size of the graph 
+(see Table 1 of [vignette("understand-maxima")](understand-maxima.pdf)). 
+
+[reword XXX and thus with the number of possibly independent inter-episode edges (multiple lines of independent evidence strengthen a case).]
 
 To increase per-episode MOIs, we can do as above and increase user-specified
 MOIs without changing the data, or we can increase the polyclonality of the
@@ -612,8 +621,7 @@ all intra-episode parasites in maximum likelihood graphs are strangers. Both
 have the same maximum probabilities of recrudescence.
 
 This means that maximum probabilities can be increased by increasing the number
-of possibly independent inter-episode edges, and thus with additional
-intra-episode genotypes regardless of their nature (intra-episode strangers,
+of intra-episode genotypes regardless of their nature (intra-episode strangers,
 which are independent, versus intra-episode siblings, which are are dependent).
 Arguably, maximum probabilities should not increase with more than two
 intra-episode siblings (more lines of evidence strengthen a case, but only if
@@ -632,7 +640,7 @@ can be at most as diverse across markers as the two parental genotypes from
 which they draw (check).
 
 When user specified MOI estimates are more diverse than the data, Pv3Rs sums
-over graphs with cliques of three or more intra-episode MOIs (there is nothing
+over graphs with cliques of three or more intra-episode siblings (there is nothing
 in the data to suggest otherwise); when the analysed data are as diverse as the
 MOIs, graphs with cliques of three or more intra-sibling parasites have zero
 likelihood. In either case, the true number of siblings per group collapses to
@@ -710,13 +718,12 @@ determine_MOIs(biallelic$data)
 
 Suppose we estimate MOIs of 3 and 1 for the biallelic data using a software that
 exploits heteroallelic marker counts (rather than the maximum number of
-per-marker alleles). We recover the same probability of recrudescence using both
+per-marker alleles). Providing data are simulated on a large number of markers 
+(200 here), we recover the same probability of recrudescence using both
 the
 
 - multiallelic data without user-specified MOIs
 - biallelic data with user-specified MOIs based on heteroallelic marker counts 
-
-because we simulate data for a large number of markers (200):
 
 ```{r echo = FALSE}
 multi <- sm(compute_posterior(y = multiallelic$data, 
@@ -771,24 +778,20 @@ ys_match <- list("1_recurrence" = list(enroll = all_As,
                  "2_recurrence" = list(enroll = all_As, 
                                        recur1 = all_As,
                                        recur2 = no_data),
-                 "5_recurrence" = list(enroll = all_As, 
+                 "3_recurrence" = list(enroll = all_As, 
                                        recur1 = all_As,
                                        recur2 = no_data,
-                                       recur3 = no_data,
-                                       recur4 = no_data,
-                                       recur5 = no_data))
+                                       recur3 = no_data))
 
 ys_mismatch <- list("1_recurrence" = list(enroll = all_As, 
                                           recur1 = all_Bs),
                     "2_recurrence" = list(enroll = all_As, 
                                           recur1 = all_Bs,
                                           recur2 = no_data),
-                    "5_recurrence" = list(enroll = all_As, 
+                    "3_recurrence" = list(enroll = all_As, 
                                           recur1 = all_Bs,
                                           recur2 = no_data,
-                                          recur3 = no_data,
-                                          recur4 = no_data,
-                                          recur5 = no_data))
+                                          recur3 = no_data))
 ```
 
 ```{r echo = FALSE}
@@ -815,11 +818,9 @@ approximation <- lapply(1:length(MOIs), FUN = function(i) {
   # Get graphs and the state sequence compatibilities
   gd <- get_graph_dist(MOIs[[i]])
   
-  # Recurrent state sequences strings and characters
+  # Recurrent state sequence strings 
   sqstr <- unique(unlist(gd$CIL_gvn_RGs)) 
   sqchr <- do.call(cbind, sapply(sqstr, function(x) strsplit(x, split = "")))
-  
-  # Recurrent state sequences with first episode recrudescence / reinfection 
   sqstr_C_1st <- sqstr[which(sqchr[1,] == "C")] 
   sqstr_I_1st <- sqstr[which(sqchr[1,] == "I")] 
   
@@ -836,7 +837,7 @@ approximation <- lapply(1:length(MOIs), FUN = function(i) {
     sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_C_1st)})
   
   # Joint probabilities unnormalised and normalised
-  joint_match_un <- num_comp_RGs_C_1st / num_comp
+  joint_match_un <- num_comp_RGs_C_1st / num_comp # Odds 
   joint_mismatch_un <- num_comp_RGs_I_1st / num_comp
   joint_match <- joint_match_un/sum(joint_match_un)
   joint_mismatch <- joint_mismatch_un/sum(joint_mismatch_un)
@@ -873,13 +874,141 @@ for(i in 1:length(xys)) {
 
 legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
        legend = c(
-         "Maximum probability  
-based on prior over  
-graphs compatible with 
-recrudescence first (match) / 
-reinfection first (mismatch)", "Posterior probability"))
+         "Maximum probability based on prior 
+         over graphs compatible with 
+         reinfection first (mismatch), 
+         recrudescence first (match)", "Posterior probability"))
 legend("right", col = c(1:length(xys)), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
-       legend = c(1,2,3,5), title = "Recurrence\ncount") 
+       legend = c(1,2,3), title = "Recurrence\ncount") 
+```
+An example of how recrudescence probabilities converge to their maxima: 
+
+```{r, echo = F}
+ms <- paste0("m", 1:100)
+fm <- c("A" = 0.6, "B" = 0.4)
+fs <- sapply(ms, function(m) fm, simplify = F)
+A100 <- sapply(ms, function(m) "A", simplify = F)
+NA100 <- sapply(ms, function(m) NA, simplify = F)
+
+# Data on all 100 markers
+ys100 <- list("1_recurrence" = list(enroll = A100,
+                                    recur1 = A100),
+              "2_recurrence" = list(enroll = A100,
+                                    recur1 = A100,
+                                    #recur2 = NA100,
+                                    recur3 = NA100),
+              "3_recurrence" = list(enroll = A100,
+                                    recur1 = A100,
+                                    recur2 = NA100,
+                                    #recur3 = NA100,
+                                    #recur4 = NA100,
+                                    recur5 = NA100))
+
+# Down-sampled data on only first 5, 2 and 1 markers
+ys5 <- sapply(ys100, function(y) sapply(y, function(x) x[1:5], simplify = F))
+ys2 <- sapply(ys100, function(y) sapply(y, function(x) x[1:2], simplify = F))
+ys1 <- sapply(ys100, function(y) sapply(y, function(x) x[1], simplify = F))
+
+# Compute posterior
+p1 <- sapply(ys1, function(y) sm(compute_posterior(y = y, fs))$marg["recur1",])
+p2 <- sapply(ys2, function(y) sm(compute_posterior(y = y, fs))$marg["recur1",])
+p5 <- sapply(ys5, function(y) sm(compute_posterior(y = y, fs))$marg["recur1",])
+p100 <- sapply(ys100, function(y) sm(compute_posterior(y = y, fs))$marg["recur1",])
+
+# Visualise the change in the marginal probability of the first recurrence
+par(mar = c(0,0,0,0))
+plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Plot simplex
+xy1 <- apply(p1, 2, project2D) # Project probabilities
+xy2 <- apply(p2, 2, project2D) # Project probabilities
+xy5 <- apply(p5, 2, project2D) # Project probabilities
+xy100 <- apply(p100, 2, project2D) # Project probabilities
+points(x = xy1["x", ], y = xy1["y", ], pch = 20, cex = 1, col = 1:3) # Plot
+points(x = xy2["x", ], y = xy2["y", ], pch = 20, cex = 1, col = 1:3) # Plot
+points(x = xy5["x", ], y = xy5["y", ], pch = 20, cex = 1, col = 1:3) # Plot
+points(x = xy100["x", ], y = xy100["y", ], pch = 20, cex = 1, col = 1:6) # Plot
+legend("left", legend = 1:3, title = "Number of recurrences", fill = 1:3,
+       bty = "n")
+```
+
+```{r}
+p100
+```
+
+
+Checking maxima when recurrences have data.. 
+
+```{r}
+fm <- c("A" = 0.1, "B" = 0.9)
+fs <- sapply(ms, function(m) fm, simplify = F)
+
+# For seqs CC, CI, CL, LC, LI, LL
+# there are 1, 1,  3,  3,  3,  12 compatible graphs 
+# there are 1, 1,  3,  1,  1,  3 compatible graphs with first pair as clones
+# when MOIs are 1, 1, 1
+
+# CC, CL, CI should be equal 
+post <- sm(compute_posterior(y = list(enroll = all_As, 
+                                      recur1 = all_As,
+                                      recur2 = no_data), fs = fs))
+c("Estimate" =  post$marg["recur1","C"], 
+  "Maximum" = 3 / (3 + 1/3 + 1/3 + 3/12))
+
+# CC should be at its maximum
+post <- sm(compute_posterior(y = list(enroll = all_As, 
+                                      recur1 = all_As,
+                                      recur2 = all_As), fs = fs))
+c("Estimate" = as.numeric(post$joint["CC"]), 
+  "Maximum" = 1 / (1 + 1/3 + 1/3 + 1/12))
+
+# CL should be at its maximum
+post <- sm(compute_posterior(y = list(enroll = all_As, 
+                                      recur1 = all_As,
+                                      recur2 = c(all_As[1:50], all_Bs[51:100])), 
+                             fs = fs))
+c("Estimate" = as.numeric(post$joint["CL"]),
+  "Maximum" = 1 / (1 + 3/12))
+```
+
+The prior probability distribution over the first two genotypes changes with the
+addition of recurrences due to the uniformity of the prior over graphs
+
+```{r echo = F}
+# Number of clonal, sibling and stranger edges given L, LL, and LLL
+n_recur <- 2:4
+names(n_recur) <- paste0(n_recur, " recurrence")
+counts <- sapply(n_recur, function(k){
+
+  MOIs <- rep(1,k+1)
+
+  # Get requisite information for maximum probability computation
+  gs <- paste0("g", 1:sum(MOIs)) # genotype names (graph vertices)
+  ts <- 1:length(MOIs) # episode indices
+  ts_per_gs <- rep(ts, MOIs) # episode index of each genotype
+  gs_per_ts <- split(gs, ts_per_gs) # genotypes grouped by episode
+  RGs <- enumerate_RGs(MOIs, igraph = F) # Get graphs
+  CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts) # compatible states
+
+  # C / I compatibility with first recur (g1 to g2 edge clone / stranger)
+  if (all(ts < 3)) {
+    RGs_C_log <- sapply(CIL_gvn_RGs, function(x) "C" %in% x) # g1--g2 C
+    RGs_I_log <- sapply(CIL_gvn_RGs, function(x) "I" %in% x) # g1--g2 I
+  } else {
+    First_CIL_gvn_RGs <- sapply(CIL_gvn_RGs, function(x) {
+      do.call(rbind, strsplit(x, split = ""))[,1]
+    })
+    RGs_C_log <- sapply(First_CIL_gvn_RGs, function(x) "C" %in% x) # g1--g2 C
+    RGs_I_log <- sapply(First_CIL_gvn_RGs, function(x) "I" %in% x) # g1--g2 I
+  }
+
+  # Edge count
+  return(c("Clone" = sum(RGs_C_log),
+           "Sibling" = (length(RGs)-sum(RGs_C_log)-sum(RGs_I_log)),
+           "Stranger" = (sum(RGs_I_log))))
+
+})
+
+rbind(counts, total = colSums(counts)) # As fraction
+t(t(counts)/colSums(counts)) # As probability
 ```
 
 
@@ -1050,7 +1179,8 @@ mutually exclusive:
 2) the states are not fully identifiable
 
 To assess data requirements, we could report relative uncertainty: how uncertain
-a posterior estimate is from its maximum, which can be computed *a priori*.
+a posterior estimate is from its maximum, which can be computed *a priori* when 
+there is only one recurrence; [vignette("understand-maxima")](understand-maxima.pdf). 
 
 Trial participants have maximum probabilities of recrudescence / reinfection
 that are unequal *a priori* (because of the conditional uniform assumption on

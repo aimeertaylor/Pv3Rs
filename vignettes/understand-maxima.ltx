@@ -1,0 +1,319 @@
+\documentclass{article}
+\usepackage[margin=2cm]{geometry}
+
+\usepackage{amsmath}
+\usepackage{booktabs} % For table
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{parskip}
+\usepackage{bm}
+\usepackage{xfrac} % supercedes nicefrac
+\usepackage{amsfonts}
+\usepackage{setspace}
+\usepackage{xr}
+\usepackage{pv3rs} % For notation
+
+\newcommand\headercell[1]{% for first row of table
+   \smash[b]{\begin{tabular}[t]{@{}c@{}} #1 \end{tabular}}}
+
+\title{Understand maximum probabilities of reinfection and recrudescence: DRAFT}
+\date{}
+\author{}
+
+\begin{document}
+\maketitle
+
+In this document we discuss maximum probabilities of reinfection and recrudescence. When the prior on relapse is non-zero, maximum probabilities of reinfection and recrudescence are never one, because data compatible with either recrudescence or reinfection are also compatible with relapse. Data compatible with reinfection are incompatible with recrudescence and vice versa, however. 
+
+
+\subsection*{How maxima are derived}
+
+We start by making some observations about the posterior odds of relapse to reinfection / recrudescence; odds hold regardless of the posterior probability on the remaining state. 
+
+\subsubsection*{Single recurrence}
+
+For clarity of exposition, we start with the case of a single recurrent episode. Let $\RG_\recru, \RG_\relap,$ and $\RG_\reinf$ denote subsets of the graph space $\RG$, containing the relationship graphs compatible with recrudescence, relapse, and reinfection respectively. The posterior odds of relapse to reinfection is given by
+
+\small
+\begin{equation*}
+o_{\relap:\reinf} \coloneqq 
+\frac{\mathbb{P}(\bm{y} | \relap)\mathbb{P}(\relap)}{\mathbb{P}(\bm{y} | \reinf)\mathbb{P}(\reinf)} =
+\frac{\mathbb{P}(\relap)}{\mathbb{P}(\reinf)}
+\frac{\sum_{\rg\in\RG_\relap}\mathbb{P}(\bm{y} | \rg)\mathbb{P}(\rg | \relap)}{\sum_{\rg\in\RG_\reinf}\mathbb{P}(\bm{y} | \rg)\mathbb{P}(\rg | \reinf)} =
+\frac{\mathbb{P}(\relap)}{\mathbb{P}(\reinf)}
+\frac{| \RG_\reinf |}{| \RG_\relap |} \frac{\sum_{\rg\in\RG_\relap}\mathbb{P}(\bm{y} | \rg)}{\sum_{\rg\in\RG_\reinf}\mathbb{P}(\bm{y} | \rg)} = 
+\frac{\mathbb{P}(\relap)}{\mathbb{P}(\reinf)}
+\frac{| \RG_\reinf |}{| \RG_\relap |} \left(1 + \frac{\sum_{\rg\in\RG_\relap\setminus\RG_\reinf}\mathbb{P}(\bm{y} | \rg)}{\sum_{\rg\in\RG_\reinf}\mathbb{P}(\bm{y} | \rg)}\right), 
+\end{equation*}
+\normalsize
+
+where $\RG_\relap\setminus\RG_\reinf$ is the subset of graphs compatible with relapse but not reinfection (graphs that have at least one non-stranger inter-episode edge). Similarly, the posterior odds of relapse to recrudescence is given by
+\begin{equation*}
+o_{\relap:\recru} \coloneqq 
+\frac{\mathbb{P}(\bm{y} | \relap)\mathbb{P}(\relap)}{\mathbb{P}(\bm{y} | \recru)\mathbb{P}(\recru)} = 
+\frac{\mathbb{P}(\relap)}{\mathbb{P}(\recru)}
+\frac{| \RG_\recru |}{| \RG_\relap |} \left(1 + \frac{\sum_{\rg\in\RG_\relap\setminus\RG_\recru}\mathbb{P}(\bm{y} | \rg)}{\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg)}\right).
+\end{equation*}
+
+It follows from these results that 
+$o_{\relap:\reinf} \ge 
+\sfrac{\mathbb{P}(\relap)| \RG_\reinf |} 
+{\mathbb{P}(\reinf)| \RG_\relap |}$ and 
+$o_{\relap:\recru} \ge 
+\sfrac{\mathbb{P}(\relap)| \RG_\recru |}
+{\mathbb{P}(\recru)| \RG_\relap |}$ and that
+%
+\begin{align} 
+\mathbb{P}(\reinf | \bm{y}) &\leq  \label{eq:reinf_prob_max}
+\dfrac
+{\mathbb{P}(\reinf)}
+{\mathbb{P}(\reinf) + 
+\mathbb{P}(\relap)\frac{|\RG_\reinf|}{|\RG_\relap|}}, \\
+\mathbb{P}(\recru | \bm{y}) &\leq \label{eq:recru_prob_max} 
+\dfrac{\mathbb{P}(\recru)}
+{\mathbb{P}(\recru) + \mathbb{P}(\relap)
+\frac{|\RG_\recru|}{|\RG_\relap|}},  
+\end{align}
+because 
+\begin{itemize}
+\item $\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg) 
+\text{ is negligible when }
+\sum_{\rg\in\RG_\reinf}\mathbb{P}(\bm{y} | \rg) >> \sum_{\rg\in\RG_\relap\setminus\RG_\reinf}\mathbb{P}(\bm{y} | \rg)$,
+\item $\sum_{\rg\in\RG_\reinf}\mathbb{P}(\bm{y} | \rg) 
+\text{ is negligible when }
+\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg) >> \sum_{\rg\in\RG_\relap\setminus\RG_\recru}\mathbb{P}(\bm{y} | \rg)$.
+\end{itemize}
+For example, 
+\begin{align*}
+ \mathbb{P}(\recru | \bm{y}) 
+ &= 
+ \dfrac 
+ {\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg)
+ \mathbb{P}(\rg | \RG_\recru)\mathbb{P}(\recru)}
+ {\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg)
+ \mathbb{P}(\rg | \RG_\recru)\mathbb{P}(\recru) + 
+ \sum_{\rg\in\RG_\relap}\mathbb{P}(\bm{y} | \rg)
+ \mathbb{P}(\rg | \RG_\relap)\mathbb{P}(\relap) + 
+ \sum_{\rg\in\RG_\reinf}\mathbb{P}(\bm{y} | \rg)
+ \mathbb{P}(\rg | \RG_\reinf)\mathbb{P}(\reinf)}, \\
+ &= 
+ \dfrac 
+ {\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg)
+ \sfrac{\mathbb{P}(\recru)}{|\RG_\recru|}}
+ {\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg)
+ \sfrac{\mathbb{P}(\recru)}{|\RG_\recru|} + 
+ \left(\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg) + 
+ \sum_{\rg\in\RG_\relap\setminus\RG_\recru}\mathbb{P}(\bm{y} | \rg)\right) 
+ \sfrac{\mathbb{P}(\relap)}{|\RG_\relap|} +
+ \sum_{\rg\in\RG_\reinf}\mathbb{P}(\bm{y} | \rg)
+ \sfrac{\mathbb{P}(\reinf)}{|\RG_\reinf|}}.
+\end{align*}
+which simplifies to
+$ \mathbb{P}(\recru | \bm{y}) = 
+ \mathbb{P}(\recru)|\RG_\relap| \left\{
+ {\mathbb{P}(\recru)|\RG_\relap| +  
+ \mathbb{P}(\relap)|\RG_\recru|} \right\}^{-1}
+$
+when $\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg) >>
+\sum_{\rg\in\RG_\relap\setminus\RG_\recru}\mathbb{P}(\bm{y} | \rg)$
+because $\sum_{\rg\in\RG_\reinf}\mathbb{P}(\bm{y} | \rg)$ 
+is negligible when $\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg) >> \sum_{\rg\in\RG_\relap\setminus\RG_\recru}\mathbb{P}(\bm{y} | \rg)$. 
+
+Table~\ref{tab:|GI|/|GL|} shows that the values of $| \RG_\reinf |/| \RG_\relap |$ for different sized  graphs, each with a single recurrence. When recrurrent states are equally likely $a priori$, they define a feasible set of posterior probabilities, without any information about the genetic data beyond that used to dervive the multiplicities of infection. For example, in the case of two genotypes in the initial episode and one genotype in the recurrent episode, we have $o_{\relap:\reinf} \ge \sfrac{2}{9}$ and $o_{\relap:\recru} \ge \sfrac{4}{9}$. The resulting feasible set of posterior probabilities is shown in Figure%~\ref{fig:feasible_set}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{} *{6}{c} @{}}
+\headercell{Number of genotypes\\in initial episode} & \multicolumn{5}{c@{}}{Number of genotypes in recurrent episode}\\
+\cmidrule(l){2-6}
+& 1 &  2 & 3 & 4 & 5   \\ 
+\midrule
+   1  & 0.3333 & 0.2222 & 0.1667 & 0.1339 & 0.1123 \\
+   2  & 0.2222 & 0.1026 & 0.0581 & 0.0375 & 0.0263 \\
+   3  & 0.1667 & 0.0581 & 0.0257 & 0.0135 & 0.0080 \\
+   4  & 0.1339 & 0.0375 & 0.0135 & 0.0059 & 0.0030 \\
+   5  & 0.1123 & 0.0263 & 0.0080 & 0.0030 & 0.0013 \\
+ \end{tabular}
+ \caption{Values for $| \RG_\reinf |/| \RG_\relap |$ for various graph sizes.}\label{tab:|GI|/|GL|}
+ \end{table}
+
+% \begin{figure}[H]
+% \includegraphics[width=0.5\textwidth]{figures/feasible_moi_2_1.PNG}
+% \centering
+% \caption{Feasible set of posterior probabilities in the case of two genotypes in the initial episode and one genotype in the recurrent episode. Dashed lines intersect the left and bottom edges of the simplex at $\frac{4}{9}$ and $\frac{2}{9}$, respectively.}\label{fig:feasible_set}
+% \end{figure}
+
+\subsubsection*{More than one recurrence}
+
+When there is more than one recurrence and prior probabilities are non-zero, the maximum probabilities of all sequences are non-certain with the exception of the relapse-only sequence. We thus compute odds with respect to the relapse-only sequence. For example, for two recurrences the odds of a recrudescence followed by a relapse relative to two relapses is, 
+\begin{align*}
+o_{\relap\relap:\recru\relap} \coloneqq
+\frac{\mathbb{P}(\bm{y} | \relap\relap)\mathbb{P}(\relap\relap)}{\mathbb{P}(\bm{y} | \recru\relap)\mathbb{P}(\recru\relap)} =
+\frac{\mathbb{P}(\relap\relap)}{\mathbb{P}(\recru\relap)}
+\frac{| \RG_{\recru\relap} |}{| \RG_{\relap\relap} |} \frac{\sum_{\rg\in\RG_{\relap\relap}}\mathbb{P}(\bm{y} | \rg)}{\sum_{\rg\in\RG_{\recru\relap}}\mathbb{P}(\bm{y} | \rg)} = 
+\frac{\mathbb{P}(\relap\relap)}{\mathbb{P}(\recru\relap)}
+\frac{| \RG_{\recru\relap} |}{| \RG_{\relap\relap} |} \left(1 + \frac{\sum_{\rg\in\RG_{\relap\relap}\setminus\RG_{\recru\relap}}\mathbb{P}(\bm{y} | \rg)}{\sum_{\rg\in\RG_{\recru\relap}}\mathbb{P}(\bm{y} | \rg)}\right)
+\end{align*}
+
+Because the summation of $\mathbb{P}(\bm{y} | \rg)$ over $\RG_{\recru\relap}$ exceeds the summation over any other subsets of the graph space when the probability of recrudescence followed by a relapse is maximal, it follows that the maximum posterior probability of a recrudescence followed by a relapse is 
+\begin{equation} % Reconcile with code
+   \mathbb{P}(\recru\relap | \bm{y})_{\max} = 
+   \dfrac{\mathbb{P}(\recru\relap)|\RG_{\relap\relap}|}
+   {\mathbb{P}(\recru\relap)|\RG_{\relap\relap}| + 
+   \mathbb{P}(\relap\relap)|\RG_{\recru\relap}|}. 
+\end{equation}
+The maximum probabilities of the other sequences,  
+\begin{align*}
+   \mathbb{P}(\recru\recru | \bm{y})_{\max} &= 
+   \sfrac{\mathbb{P}(\recru\recru)|\RG_{\relap\relap}|}
+   {\mathbb{P}(\recru\recru)|\RG_{\relap\relap}| + 
+   \mathbb{P}(\relap\relap)|\RG_{\recru\recru}|}, \\
+    \mathbb{P}(\recru\reinf | \bm{y})_{\max} &= 
+   \sfrac{\mathbb{P}(\recru\reinf)|\RG_{\relap\relap}|}
+   {\mathbb{P}(\recru\reinf)|\RG_{\relap\relap}| + 
+   \mathbb{P}(\relap\relap)|\RG_{\recru\reinf}|}, \\
+    \mathbb{P}(\reinf\recru | \bm{y})_{\max} &= 
+   \sfrac{\mathbb{P}(\reinf\recru)|\RG_{\relap\relap}|}
+   {\mathbb{P}(\reinf\recru)|\RG_{\relap\relap}| + 
+   \mathbb{P}(\relap\relap)|\RG_{\reinf\recru}|}, \\
+    \mathbb{P}(\reinf\reinf | \bm{y})_{\max} &= 
+   \sfrac{\mathbb{P}(\reinf\reinf)|\RG_{\relap\relap}|}
+   {\mathbb{P}(\reinf\reinf)|\RG_{\relap\relap}| + 
+   \mathbb{P}(\relap\relap)|\RG_{\reinf\reinf}|}, \text{ etc}.,
+\end{align*}
+are likewise derived. The maximum probability of reinfection or recrudescence for a given recurrence depends on the sequence with the maximum probability; for example, 
+\begin{equation} % Check in code
+ \mathbb{P}(s_1 = \recru | \bm{y})_{\max} = 
+ \begin{cases}
+    \mathbb{P}(\recru\recru | \bm{y})_{\max} 
+    \text{ if } \mathbb{P}(\recru\recru | \bm{y}) = \mathbb{P}(\recru\recru | \bm{y})_{\max}, \\
+    \mathbb{P}(\recru\reinf | \bm{y})_{\max} 
+    \text{ if } \mathbb{P}(\recru\reinf | \bm{y}) = \mathbb{P}(\recru\reinf | \bm{y})_{\max}, \\
+    \vdots \\
+    0 \text{ if } \mathbb{P}(\relap\relap | \bm{y}) = 1.
+ \end{cases}
+\end{equation}
+
+\paragraph{Aside} When data are sparse, none of the above cases apply. For example, the probability that the first of two recurrences is a recrudescence,
+\scriptsize
+\begin{align*}
+    \mathbb{P}(s_1 = \recru | \bm{y}) = 
+    &\left\{
+    \sum_{\rg\in\RG_{\recru\recru}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\recru\recru)}{|\RG_{\recru\recru}|} + 
+    \sum_{\rg\in\RG_{\recru\relap}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\recru\relap)}{|\RG_{\recru\relap}|} + 
+    \sum_{\rg\in\RG_{\recru\reinf}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\recru\reinf)}{|\RG_{\recru\reinf}|}
+    \right\} \\
+    &\left\{
+    \sum_{\rg\in\RG_{\recru\recru}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\recru\recru)}{|\RG_{\recru\recru}|} + 
+    \sum_{\rg\in\RG_{\recru\relap}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\recru\relap)}{|\RG_{\recru\relap}|} + 
+    \sum_{\rg\in\RG_{\recru\reinf}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\recru\reinf)}{|\RG_{\recru\reinf}|} 
+    \right. \\ 
+    + &\left. 
+    \left(
+    \sum_{\rg\in\RG_{\recru\recru}} \mathbb{P}(\bm{y} | \rg) + 
+    \smashoperator{\sum_{\rg\in\RG_{\relap\recru}\setminus\RG_{\recru\recru}}} 
+    \mathbb{P}(\bm{y} | \rg)
+    \right) \frac{\mathbb{P}(\relap\recru)}{|\RG_{\relap\recru}|} 
+    + 
+    \left(
+    \sum_{\rg\in\RG_{\recru\relap}} \mathbb{P}(\bm{y} | \rg) +
+    \smashoperator{\sum_{\rg\in\RG_{\relap\relap}\setminus\RG_{\recru\relap}}}
+    \mathbb{P}(\bm{y} | \rg) \right) \frac{\mathbb{P}(\relap\relap)}{|\RG_{\relap\relap}|} 
+    + 
+    \left(
+    \sum_{\rg\in\RG_{\recru\reinf}} \mathbb{P}(\bm{y} | \rg) +
+    \smashoperator{\sum_{\rg\in\RG_{\relap\reinf}\setminus\RG_{\recru\reinf}}}
+    \mathbb{P}(\bm{y} | \rg) \right) \frac{\mathbb{P}(\relap\reinf)}{|\RG_{\relap\reinf}|} 
+    \right. \\ 
+    + &\left.   
+    \sum_{\rg\in\RG_{\reinf\recru}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\reinf\recru)}{|\RG_{\reinf\recru}|} + 
+    \sum_{\rg\in\RG_{\reinf\relap}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\reinf\relap)}{|\RG_{\reinf\relap}|} + 
+    \sum_{\rg\in\RG_{\reinf\reinf}} \mathbb{P}(\bm{y} | \rg) 
+    \sfrac{\mathbb{P}(\reinf\reinf)}{|\RG_{\reinf\reinf}|} 
+    \right\}^{-1}, 
+\end{align*}
+\normalsize
+simplifies to 
+\begin{equation} \label{eq:s1recru_prob_max}
+  \dfrac{
+\mathbb{P}(\recru\recru) + 
+\mathbb{P}(\recru\relap) + 
+\mathbb{P}(\recru\reinf)}{
+\mathbb{P}(\recru\recru) + 
+\mathbb{P}(\recru\relap) + 
+\mathbb{P}(\recru\reinf) + 
+\mathbb{P}(\relap\recru)\frac{|\RG_{\recru\recru}|}{|\RG_{\relap\recru}|} + 
+\mathbb{P}(\relap\relap)\frac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} + 
+\mathbb{P}(\relap\reinf)\frac{|\RG_{\recru\reinf}|}{|\RG_{\relap\reinf}|}}  
+\end{equation}
+when data on the first recurrence support recrudescence but  there are no data on the second recurrence because then
+\begin{itemize}
+    \item $\sum_{\rg\in\RG_{\recru\recru}} \mathbb{P}(\bm{y} | \rg) >> \sum_{\rg\in\RG_{\relap\recru}\setminus\RG_{\recru\recru}}
+    \mathbb{P}(\bm{y} | \rg) \text{ and } \sum_{\rg\in\RG_{\reinf\recru}} \mathbb{P}(\bm{y} | \rg)$
+    \item $\sum_{\rg\in\RG_{\recru\relap}} \mathbb{P}(\bm{y} | \rg) >> \sum_{\rg\in\RG_{\relap\relap}\setminus\RG_{\recru\relap}}
+    \mathbb{P}(\bm{y} | \rg) \text{ and } \sum_{\rg\in\RG_{\reinf\relap}} \mathbb{P}(\bm{y} | \rg)$
+    \item $\sum_{\rg\in\RG_{\recru\reinf}} \mathbb{P}(\bm{y} | \rg) >> \sum_{\rg\in\RG_{\relap\reinf}\setminus\RG_{\recru\reinf}}
+    \mathbb{P}(\bm{y} | \rg) \text{ and } \sum_{\rg\in\RG_{\reinf\reinf}} \mathbb{P}(\bm{y} | \rg)$
+    \item $\sum_{\rg\in\RG_{\recru\recru}} \mathbb{P}(\bm{y} | \rg)= 
+\sum_{\rg\in\RG_{\recru\relap}} \mathbb{P}(\bm{y} | \rg)= 
+\sum_{\rg\in\RG_{\recru\reinf}} \mathbb{P}(\bm{y} | \rg)$
+\end{itemize}
+ 
+
+  
+
+\subsection*{How maxima change with graph size}
+
+The values of $| \RG_\reinf |/| \RG_\relap |$ in Table \ref{tab:|GI|/|GL|} decrease with increasing graph size. This is a consequence of the uniform prior on graphs that are transitive.
+
+The \textit{a priori} assumption that all valid relationships graphs $\rg$ are equally likely given a recurrent state leads to counter-intuitive properties. Specifically, the probability of an edge can vary depending on the graph it is embedded within. Consider the scenario where there is one relapse episode after the initial episode, where the MOIs for both episodes are one
+(Example %\ref{ex:simplest_het}). 
+The probability distribution of the edge between the two genotypes given relapse is
+\begin{align}
+    \mathbb{P}(\text{the two genotypes are clones}\vert\bm{s}=\relap) &= \sfrac{1}{3},
+    \label{eq: 1st two C gvn L}\\
+    \mathbb{P}(\text{the two genotypes are siblings}\vert\bm{s}=\relap) &= \sfrac{1}{3},\\
+    \mathbb{P}(\text{the two genotypes are strangers}\vert\bm{s}=\relap) &= \sfrac{1}{3},
+\end{align}
+because we assume that the three relationship graphs are equally likely. Now consider the scenario in which there are two relapse episodes after the initial episode, where the MOIs for all episodes are one 
+(Example %\ref{ex:multiple_recurs_het}). 
+There are now 12 relationship graphs, which are assumed to be equally likely under relapses. Among them, between the first two genotypes, three have a clonal edge, four have a sibling edge, and five have a stranger edge. The probability distribution of the edge between the first two genotypes given relapses is thus
+\begin{align}
+    \mathbb{P}(\text{the first two genotypes are clones}\vert\bm{s}=\relap\relap) &= \sfrac{3}{12},
+    \label{eq: 1st two C gvn LL}\\
+    \mathbb{P}(\text{the first two genotypes are siblings}\vert\bm{s}=\relap\relap) &= \sfrac{4}{12},\\
+    \mathbb{P}(\text{the first two genotypes are strangers}\vert\bm{s}=\relap\relap) &= \sfrac{5}{12}.
+\end{align}
+
+From equations \eqref{eq: 1st two C gvn L} and \eqref{eq: 1st two C gvn LL} we have $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3} > 
+\sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$. Plugging $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3}$ into equation \eqref{eq:recru_prob_max}, and $\sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$ plus $\sfrac{|\RG_{\recru\recru}|}{|\RG_{\relap\recru}|} = \sfrac{1}{3}$ and $\sfrac{|\RG_{\recru\reinf}|}{|\RG_{\relap\reinf}|} = \sfrac{1}{3}$ into equation \eqref{eq:s1recru_prob_max}, when recurrent states are equally likely \textit{a priori}, we see that the probability that the first recurrence is a recrudescence increases slightly from $\sfrac{3}{4}$ to $\sfrac{3}{\left(3 + \sfrac{11}{12}\right)}$ with the addition of the second recurrence, consistent with the increase seen in XXX vignette XXX. 
+
+An explanation for the change in the probability distribution of this edge upon the addition of the second relapse is that a clonal edge between the first two genotypes imposes a constraint where the two remaining edges must exhibit the same relationship. Similarly, a sibling edge between the first two genotypes is incompatible with a single stranger edge among the two remaining edges. In general, the pattern that stranger edges are more likely \textit{a priori} and clonal edges are less likely \textit{a priori} becomes more prominent when more genotypes are present. 
+%The counter-intuitive feature of the prior varies with the number of genotypes. Presumably, its impact on the posterior also varies with the number of genotypes. However, its impact on the posterior is hard to ascertain; we suspect it might only be sizeable for large graphs. 
+
+Consider a second example with multiple genotypes within an episode. Suppose that there is a reinfection episode with MOI one after an initial episode with MOI $M\ge 2$. Since we have a reinfection, all inter-episode edges must be stranger edges. The number of valid relationship graphs is the $M$-th Bell number $B_M$, since each relationship graph is equivalent to partitioning the genotypes in the initial episode by sibling relationships. We now consider the probability that the first two genotypes in the initial episode are siblings. The number of relationship graphs where the first two genotypes are siblings is $B_{M-1}$, since we can ignore one of the first two genotypes for enumeration purposes. Thus, the probability that the first two genotypes are siblings is $\sfrac{B_{M-1}}{B_M}$, which is asymptotically $\mathcal{O}(1/M)$ as $M\rightarrow\infty$. Arguably, this probability should not vanish as $M\rightarrow\infty$, at least not for a single inoculation of many parasite. (For $M\rightarrow\infty$ with the number of bites $n_b\rightarrow\infty$, the overall proportion of sibling comparisons might approach zero but at a different rate: for example, if on average a mosquito co-transmits $n_s$ siblings among $n_p$ parasites per bite and $M$ increases with the number of bites $n_b$, we could argue the overall proportion of sibling comparisons within an infection should be $\sfrac{\left(n_b \binom{n_p}{2} \right)}{\binom{n_b n_p}{2}}$.)
+
+%Copied comments
+%Jan 24, 2025 8:15 AM 
+%ysfoo: 1. When there is a lot of information in the data, the unintended features of a uniform RG distribution can be drowned out. Recall the likelihood sum p(data|3Rs) = sum of p(data|RG)*p(RG|3Rs) over RG. For the example I wrote in this doc, the fact that p(first pair is X|LL) is different for different X was my "unintended feature". Yet this does not matter for the vignette example because p(data|an RG where first pair are clones) dominates any p(data|an RG where first pair are not clones), given the 100 matching rare alleles. So the feature that clones are less favoured in a uniform RG distribution did not matter here.
+
+%Feb 16, 2025 11:26 AM
+%ysfoo: 2. Yet why did going from 1 to 2 recurrences increase the posterior recrudescence probability? The answer lies in comparing p(first pair are clones|L) = 1/3, which is larger than p(first pair are clones|LL) = 3/12. Since 1/3 > 3/12, that means the posterior relapse probability is lower for 2 recurrences than for 1 recurrence.
+
+%In detail: For the 1 recurrence case, the (posterior) C:L odds are 3. For the 2 recurrence case, there are 1/1/3/3/3/12 graphs compatible with CC, CI, CL, LC, LI, LL. Out of these graphs, 1/1/3/1/1/3 graphs have the first pair as clones. So the marginal posterior C:L odds for the first recurrence is (1/1+1/1+3/3):(1/3+1/3+3/12)=3:11/12, slightly higher than 3:1. All in all, the observations in this doc are consistent with the vignette, but it's tricky to see the connection.
+
+%Feb 16, 2025 11:41 AM
+%ysfoo: 3. So you're right that the size and direction of the 'effect' is hard to determine. If we really wanted to investigate the effect, we can't do it in a data-poor regime where the prior dominates, nor an extreme scenario of 100 matching rare alleles where the RG distribution is drown out. I would opt for simulating many datasets, with a handful of markers, and draw arrows on the simplex for each dataset showing how the posterior probabilities change from 1 recurrence to 2 recurrences. 
+
+%I also have a suspicion that the 'effect' might only be sizable for larger graphs. 
+
+
+\end{document}

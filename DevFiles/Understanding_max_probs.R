@@ -3,6 +3,8 @@
 # effect of summation over cliques of 3 or more intra-episode siblings To-do:
 # finish 2) and Take-away 2): including / excluding sibling cliques makes little
 # difference
+# To-do: elaborate on all ones graph
+# Change: point characters on other graphs
 ################################################################################
 rm(list = ls())
 load("../data/max_probs.rda")
@@ -16,22 +18,33 @@ nMOI <- sapply(all_MOIs, function(x) length(x)) # Number of recurrences
 MOI1 <- sapply(all_MOIs, function(x) x[1]) # MOI of episode one
 MOI2 <- sapply(all_MOIs, function(x) x[2]) # MOI of episode two
 MOI12diff <- sapply(all_MOIs, function(x) x[1] - x[2]) # Difference
+MOI2 <- sapply(all_MOIs, function(x) x[2]) # MOI of episode two
+Episode_counts <- sort(unique(nMOI)) #
+MOI1s_log <- sapply(all_MOIs, function(x) all(x == 1)) # MOI of episode two
 
 # Imbalance between episodes one and two
 plot(x = MOI12diff, y = max_probs["theory_C_with", ], ylim = c(0.5, 1),
-     col = MOI1, pch = nMOI, main = "Recrudescence",
+     col = MOI1, pch = as.character(nMOI), main = "Recrudescence",
      xlab = "MOI episode 1 - MOI episode 2", ylab = "Theoretical maximum probability")
-legend("bottomleft", title = "Number of episodes", bty = "n",
-       legend = unique(nMOI), pch = unique(nMOI))
-legend("bottom", title = "MOI of episode 1", bty = "n",
+text(y = 0.5, x = 0, adj = 1,
+     labels = paste0("Number of episodes: ", paste(Episode_counts, collapse = " ")))
+legend("left", title = "MOI of episode 1", bty = "n",
        legend = unique(MOI1), fill = unique(MOI1))
 plot(x = MOI12diff, y = max_probs["theory_I_with", ], ylim = c(0.5, 1),
-     col = MOI1, pch = nMOI, main = "Reinfection",
+     col = MOI1, pch = as.character(nMOI), main = "Reinfection",
      xlab = "MOI episode 1 - MOI episode 2", ylab = "Theoretical maximum probability")
-legend("bottomleft", title = "Number of episodes", bty = "n",
-       legend = unique(nMOI), pch = unique(nMOI))
-legend("bottomright", title = "MOI of episode 1", bty = "n",
+text(y = 0.5, x = 0, adj = 1,
+     labels = paste0("Number of episodes: ", paste(Episode_counts, collapse = " ")))
+legend("right", title = "MOI of episode 1", bty = "n",
        legend = unique(MOI1), fill = unique(MOI1))
+
+# Focusing in on cases where the MOI is always one
+plot(x = nMOI[MOI1s_log], y = max_probs["theory_C_with", MOI1s_log],
+     type = "b", ylim = c(0.5, 1), main = "", bg = "yellow", pch = 21,
+     xlab = "Number of episodes", ylab = "Theoretical maximum probability")
+lines(x = nMOI[MOI1s_log], y = max_probs["theory_I_with", MOI1s_log],
+      type = "b", bg = "red", pch = 21)
+
 
 # Focusing in on cases where MOI episode 1 - MOI episode a2 = 0
 # Trend is the same for both recrudescence and reinfection
