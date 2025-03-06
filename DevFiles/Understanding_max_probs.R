@@ -7,7 +7,7 @@
 # Change: point characters on other graphs
 ################################################################################
 rm(list = ls())
-load("../data/max_probs.rda")
+load("../data/maxima.rda")
 all_MOIs <- sapply(colnames(max_probs), function(x) as.numeric(strsplit(x, split = "")[[1]]))
 maxMOIs <- sapply(all_MOIs, function(x) max(x))
 
