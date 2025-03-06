@@ -30,7 +30,7 @@ get_max_clique_size <- function(RG, intra_edges) {
 }
 
 tictoc::tic()
-max_probs <- sapply(all_MOIs, function(MOIs){
+maxima <- sapply(all_MOIs, function(MOIs){
 
   #=============================================================================
   # Get requisite information for maximum probability computation
@@ -146,8 +146,8 @@ max_probs <- sapply(all_MOIs, function(MOIs){
 tictoc::toc()
 
 # Name by MOIs
-colnames(max_probs) <- sapply(all_MOIs, function(x) paste(x, collapse = ""))
+colnames(maxima) <- sapply(all_MOIs, function(x) paste(x, collapse = ""))
 
 # Save as exported data
-usethis::use_data(max_probs, overwrite = TRUE)
+usethis::use_data(maxima, overwrite = TRUE)
 
