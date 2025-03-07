@@ -14,9 +14,6 @@ all_MOIs <- c(do.call(c, sapply(2:7, function(x) { # 254 different vectors of MO
   lapply(1:nrow(z), function(i) z[i,])
 })), list(rep(1,8)))
 
-all_MOIs <- list(rep(1,2), rep(1,3), rep(1,4),
-                 c(2,2), c(3,3), c(2,1), c(3,1), c(3,2))
-
 # Function to get size of largest sibling clique
 get_max_clique_size <- function(RG, intra_edges) {
   all_edges <- igraph::as_ids(igraph::E(RG))
