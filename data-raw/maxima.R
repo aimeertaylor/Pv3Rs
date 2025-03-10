@@ -70,13 +70,13 @@ maxima <- sapply(all_MOIs, function(MOIs){
   RGs_C_wout <- which(RGs_C_log & keep_log)
   RGs_I_wout <- which(RGs_I_log & keep_log)
 
-  RGs_gvn_CIL <- sapply(states, function(s) which(sapply(CIL_gvn_RGs, function(x) s%in%x)))
-  RGsC_gvn_CIL <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_C_with))
-  RGsI_gvn_CIL <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_I_with))
+  RGs_gvn_CIL <- sapply(states, function(s) which(sapply(CIL_gvn_RGs, function(x) s%in%x)), simplify = F)
+  RGsC_gvn_CIL <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_C_with), simplify = F)
+  RGsI_gvn_CIL <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_I_with), simplify = F)
 
-  RGs_gvn_CIL_wout <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_wout))
-  RGsC_gvn_CIL_wout <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_C_with))
-  RGsI_gvn_CIL_wout <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_I_with))
+  RGs_gvn_CIL_wout <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_wout), simplify = F)
+  RGsC_gvn_CIL_wout <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_C_with), simplify = F)
+  RGsI_gvn_CIL_wout <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_I_with), simplify = F)
 
 
   #=============================================================================
