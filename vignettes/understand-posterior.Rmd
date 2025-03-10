@@ -440,7 +440,7 @@ graphs compatible with sequences of recrudescence / reinfection are a subset of
 those compatible with sequences of relapse, bounds induced by the prior on
 the posterior can be computed *a priori* as a function of the prior on the
 recurrent state sequences and the prior on the relationship graphs; see
-[vignette("understand-graph-prior")](understand-graph-prior.pdf).
+[vignette("graph-prior")](graph-prior.pdf).
 
 Because the probability mass function of a uniformly distributed discrete random
 variable depends on the size of its support, the prior on a uniformly
@@ -1182,9 +1182,9 @@ mutually exclusive:
 1) more data are needed 
 2) the states are not fully identifiable
 
-To assess data requirements, we could report relative uncertainty: how uncertain
-a posterior estimate is from its maximum, which can be computed *a priori* when 
-there is only one recurrence; [vignette("understand-maxima")](understand-maxima.pdf). 
+To assess data informativeness, we could report relative uncertainty: how far an
+estimate under the joint posterior is from its maximum, which can be computed *a
+priori*; [vignette("graph-prior")](graph-prior.pdf).
 
 Trial participants have maximum probabilities of recrudescence / reinfection
 that are unequal *a priori* (because of the conditional uniform assumption on
@@ -1464,12 +1464,13 @@ perturbation to the ratio of observations (all alleles match across the three
 half siblings, all alleles are different, intra-episode alleles match,
 inter-episode alleles match) can lead to a large deviation in the odds of
 relapse versus reinfection; see
-[vignette("understand-half-siblings")](understand-half-siblings.pdf). The
+[vignette("half-siblings")](half-siblings.pdf). The
 purple, red, and green trajectories below have higher than the expected 0.5
 intra-to-inter match ratios; moreover, the purple trajectory's intra-to-inter
 match ratio consistently exceeds $0.5\times \text{log}_2(\dfrac{2}{5})$, a
 condition found theoretically to concentrate posterior probability on
-reinfection under certain conditions; again, see [vignette("understand-half-siblings")](understand-half-siblings.pdf). 
+reinfection under certain conditions; again, 
+see [vignette("half-siblings")](half-siblings.pdf). 
 
 ```{r echo = FALSE, fig.height = 4}
 rm(list = "output")
