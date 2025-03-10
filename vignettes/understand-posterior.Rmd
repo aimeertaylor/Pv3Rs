@@ -1,7 +1,6 @@
 ---
 title: "Understand posterior estimates"
 output: rmarkdown::html_vignette
-  toc: true
 vignette: >
   %\VignetteIndexEntry{Understand posterior estimates}
   %\VignetteEngine{knitr::rmarkdown}
