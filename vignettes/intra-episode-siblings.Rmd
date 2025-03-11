@@ -14,19 +14,20 @@ knitr::opts_chunk$set(
   out.width = "100%", # Line width taken up by plot
   fig.dpi = 300, # For quality 
   fig.width = 7, # Increase to zoom out
-  fig.height = 4, 
+  fig.height = 2, 
   cache = TRUE
 )
 ```
 
-```{r setup}
+```{r setup, echo = FALSE}
 library(Pv3Rs)
 #options(warn = -1) # Suppress warnings about missing and limited data
 sm <- function(...) suppressMessages(...) # Rename to shorten function call
 ```
 
-Groups of three or more intra-episode siblings are modelled as pairs of
-intra-episode siblings under Pv3Rs provided modelled MOIs are based on estimates
+When MOIs exceed two, Pv3Rs sums over graphs with cliques of three or more
+intra-episode siblings. However, groups of three or more not-half intra-episode
+siblings collapse to groups of two when modelled MOIs are based on estimates
 from bulk (not single-cell) parasite genetic data because
 
 - MOI estimates based on maximum per-marker allele counts count at most two for
@@ -39,25 +40,28 @@ three or more not-half siblings because data from a group of not-half siblings
 can be at-most as diverse across markers as the two parental genotypes from
 which they draw (check).
 
-When user specified MOI estimates are more diverse than the data input of
-`compute_posterior`, Pv3Rs sums over graphs with cliques of three or more
-intra-episode siblings (there is nothing in the data to suggest otherwise); when
-the data input of `compute_posterior` are as diverse as the MOIs, graphs with
-cliques of three or more intra-sibling parasites have zero likelihood. In either
-case, the true number of siblings per group collapses to two per group, capping
-elevated maximum probabilities; see following example.
+Although Pv3Rs sums over graphs with cliques of three or more intra-episode
+siblings, when the data input of `compute_posterior` are as diverse as the
+modelled MOIs, graphs with cliques of three or more intra-sibling parasites have
+zero likelihood; when modelled MOIs are more diverse than the data input of
+`compute_posterior` (e.g., because the user specifies elavated MOIs), graphs
+with cliques of three or more intra-episode siblings have non-zero liklihoods.
+In either case, provided modelled MOIs are based on estimates from per-episode
+parasite genetic data analysed in bulk (not single-cell) the true number of
+siblings per group collapses to two per group; see following example.
 
-## Example of a group of five intra-episode siblings collapses to two
+## Example of a group of four intra-episode siblings collapsing to two
 
 Before showing how groups of intra-episode siblings collapse to pairs of
-intra-episode siblings, we write a function to simulate an enrolment episode
-comprising a stranger plus a group of four siblings, two from one oocyst, two
-from another, all drawing from the same two unrelated parental genotypes, and a
-recurrence with one sibling. Technically, the enrolment episode contains five
-genetically distinct genotypes and thus has a MOI of five.
+intra-episode siblings, we write a function to simulate data of a given allelic
+richness (marker cardinality) on an enrolment episode comprising a stranger plus
+a group of four siblings, two from one oocyst, two from another, all drawing
+from the same two unrelated parental genotypes, and a recurrence with one
+sibling. Technically, the enrolment episode contains five genetically distinct
+genotypes and thus has a MOI of five.
 
-```{r echo = FALSE}
-simulate_data <- function(n_alleles){
+```{r}
+simulate_data <- function(marker_cardinality){
   
   # Magic numbers / quantities
   set.seed(5) # For reproducibility
@@ -66,12 +70,12 @@ simulate_data <- function(n_alleles){
   n_oocysts <- 2 # Number of oocysts to draw from
   
   # Derived quantities
-  alleles <- letters[1:n_alleles]
+  alleles <- letters[1:marker_cardinality]
   markers <- paste0("m", 1:n_markers) # Marker names
   
   # Uniform allele frequencies 
   fs <- sapply(markers, simplify = FALSE, 
-               function(m) setNames(rep(1/n_alleles, n_alleles), alleles))
+               function(m) setNames(rep(1/marker_cardinality, marker_cardinality), alleles))
   
   # Sample strangers
   strangers <- sapply(1:n_strangers, function(i) {
@@ -108,46 +112,49 @@ simulate_data <- function(n_alleles){
   return(list(data = data, fs = fs))
 }
 ```
+However, MOI estimates based on maximum per-marker allele counts are 
+three and one when markers are polyallelic:
 
-However, MOI estimates based on maximum per-marker allele counts are at most
-three and one when markers are highly multiallelic:
+```{r}
+polyallelic <- simulate_data(10) 
+determine_MOIs(polyallelic$data)
+```
 
-```{r echo = FALSE}
-multiallelic <- simulate_data(10)
-determine_MOIs(multiallelic$data)
+And one and two when markers are biallelic: 
 
-biallelic <- simulate_data(2)
+```{r}
+biallelic <- simulate_data(2) 
 determine_MOIs(biallelic$data)
 ```
 
-Suppose we estimate MOIs of 3 and 1 for the biallelic data using a software that
-exploits heteroallelic marker counts (rather than the maximum number of
-per-marker alleles). Providing data are simulated on a large number of markers 
-(200 here), we recover the same probability of recrudescence using both
-the
+Suppose we estimate MOIs of 3 and 1 for the biallelic data using an external
+software that exploits heteroallelic marker counts (rather than the maximum
+number of per-marker alleles), and input into `compute_posterior` these external
+estimates. Providing data are simulated on a large number of markers (200 above),
+we recover almost exactly the same posterior probabilities using both the
 
-- multiallelic data without user-specified MOIs
-- biallelic data with user-specified MOIs based on heteroallelic marker counts 
+- polyallelic data without user-specified MOIs
+- biallelic data with user-specified MOIs three and one
 
 ```{r echo = FALSE}
-multi <- sm(compute_posterior(y = multiallelic$data, 
-                              fs = multiallelic$fs, return.logp=T))
+poly <- sm(compute_posterior(y = polyallelic$data, 
+                              fs = polyallelic$fs, return.logp=T))
 bi <- sm(compute_posterior(y = biallelic$data, MOIs = c(3,1),
                            fs = biallelic$fs, return.logp=T))
 
-multi$marg
+poly$marg
 bi$marg
 ```
-However, given multiallelic data the likelihoods of graphs with cliques of three
+However, given polyallelic data the likelihoods of graphs with cliques of three
 intra-episode siblings are zero: 
 
 ```{r echo = FALSE, fig.cap="Graphs with zero likelihood"} 
 MOIs <- c(3,1) # MOIs based on data 
 gs <- paste0("g", 1:sum(MOIs)) # Genotype names
 ts_per_gs <- rep(1:length(MOIs), MOIs) # Episode indices per genotype
-llikes <- sapply(multi$RGs, function(RG) RG$logp) # Extract log likelihoods
-par(mar = c(0.5, 0.5, 0.5, 0.5), mfrow = c(1,5)) # Plotting parameters
-for(RG in multi$RGs[which(is.infinite(llikes))]) {
+llikes <- sapply(poly$RGs, function(RG) RG$logp) # Extract log likelihoods
+par(mar = c(0, 0.5, 0, 0.5), mfrow = c(1,5)) # Plotting parameters
+for(RG in poly$RGs[which(is.infinite(llikes))]) {
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs),
         vertex_palette = "Greys",
         edge.curved = 0.08,
@@ -163,11 +170,53 @@ Whereas, given biallelic data, all relationships have non-zero likelihoods:
 
 ```{r} 
 llikes <- sapply(bi$RGs, function(RG) RG$logp) # Extract log likelihoods
-any(is.infinite(llikes))
+any(is.infinite(llikes)) # Are there any minus infinity log likelihoods?
+```
+
+# Graphs with cliques or three or more siblings elevate upper bounds 
+
+```{r}
+all_MOIs <- sapply(colnames(maxima), function(x) as.numeric(strsplit(x, split = "")[[1]]))
+maxMOIs <- sapply(all_MOIs, function(x) max(x))
 ```
 
 The summation over graphs with cliques or three or more siblings is possibly
 redundant given these graphs have no practical support. Even when these graphs
 have zero likelihood, they contribute to maximum probabilities of recrudescence
 / reinfection through the conditionally uniform prior on graphs. However, the
-contribution is generally very small (less than 2.5\%). % See (import data? XXX)
+contribution is generally very small:
+
+```{r}
+# Compare with and without summation
+plot(NULL, xlim = c(0.5, 1), ylim = c(0.5,1),
+     ylab = "without summation", xlab = "with summation"); abline(a = 0, b = 1)
+points(x = maxima["theory_I_with", maxMOIs > 2], 
+       y = maxima["theory_I_wout", maxMOIs > 2], pch = 21, bg = "red")
+diffs <- maxima["theory_I_with", maxMOIs > 2] - maxima["theory_I_wout", maxMOIs > 2]
+title(main = sprintf("Largest difference: %s", 
+                     round(max(abs(diffs), na.rm = TRUE), 4))) # remove na.rm once maxima regenerated
+```
+
+```{r}
+diffs <- maxima["theory_C_with", maxMOIs > 2] - 
+  maxima["theory_C_wout", maxMOIs > 2]
+
+# Compare with and without summation
+plot(NULL, xlim = c(0.5, 1), ylim = c(0.5,1),
+     ylab = "without summation", xlab = "with summation"); abline(a = 0, b = 1)
+points(x = maxima["theory_C_with", maxMOIs > 2][abs(diffs) > 0.015], 
+       y = maxima["theory_C_wout", maxMOIs > 2][abs(diffs) > 0.015],
+       pch = 1, cex = 2)
+points(x = maxima["theory_C_with", maxMOIs > 2], 
+       y = maxima["theory_C_wout", maxMOIs > 2], pch = 21, bg = "yellow")
+
+title(main = sprintf("Largest difference: %s", 
+                     round(max(abs(diffs), na.rm = TRUE), 4))) # remove na.rm once maxima regenerated
+
+text(x = maxima["theory_C_with", maxMOIs > 2][abs(diffs) > 0.015], 
+       y = maxima["theory_C_wout", maxMOIs > 2][abs(diffs) > 0.015], 
+     labels = names(all_MOIs)[maxMOIs > 2][abs(diffs) > 0.015], 
+     pos = c(1,3), cex = 0.3, offset = 1)
+```
+The largest absolute difference is less than 0.03 and only five graphs have an absolute difference greater than 0.015. 
+
