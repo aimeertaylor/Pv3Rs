@@ -2,7 +2,6 @@
 # Script to generate maximum probabilities for all MOI vectors summing to
 # at-most eight assuming recurrent states are equally likely a priori. Takes 5
 # hours to run.
-# Possibly wrong for
 ################################################################################
 rm(list = ls())
 set.seed(1)
@@ -27,7 +26,7 @@ get_max_clique_size <- function(RG, intra_edges) {
 }
 
 tictoc::tic()
-maxima <- sapply(all_MOIs, function(MOIs){
+maxima <- sapply(all_MOIs[1:10], function(MOIs){
 
   #=============================================================================
   # Get requisite information for maximum probability computation
