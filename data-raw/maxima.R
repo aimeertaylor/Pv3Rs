@@ -146,5 +146,5 @@ tictoc::toc()
 colnames(maxima) <- sapply(all_MOIs, function(x) paste(x, collapse = ""))
 
 # Save as exported data
-usethis::use_data(maxima, overwrite = TRUE)
+#usethis::use_data(maxima, overwrite = TRUE)
 
