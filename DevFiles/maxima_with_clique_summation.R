@@ -2,20 +2,26 @@
 # Script to understand the effect on bounds of the summation over cliques of
 # three or more intra-episode siblings
 ################################################################################
+all_MOIs <- sapply(colnames(maxima), function(x) as.numeric(strsplit(x, split = "")[[1]]))
+maxMOIs <- sapply(all_MOIs, function(x) max(x))
 
 # ==============================================================================
 # First, sanity check for cases that should not change
 # ==============================================================================
 # Compare theory with and without for cases that should not change (sanity check)
-plot(NULL, xlim = c(0.5, 1), ylim = c(0.5,1), main = "Theory for graphs with MOI 2 max",
+plot(NULL, xlim = c(0.5, 1), ylim = c(0.5,1),
+     main = "Exact bounds for graphs with MOI 2 max",
      ylab = "without summation", xlab = "with summation"); abline(a = 0, b = 1)
 points(x = maxima["theory_C_with", maxMOIs < 3],
        y = maxima["theory_C_wout", maxMOIs < 3], pch = 21, bg = "yellow")
 points(x = maxima["theory_I_with", maxMOIs < 3],
        y = maxima["theory_I_wout", maxMOIs < 3], pch = 21, bg = "red")
+legend("topleft", pt.bg = c("yellow", "red"), pch = 21, bty = "n",
+       legend = c("Recrudescence", "Reinfection"))
 
 # Stochastic variation for those that should not change (sanity check)
-plot(NULL, xlim = c(0.5, 1), ylim = c(0.5,1), main = "Simulation for graphs with MOI 2 max",
+plot(NULL, xlim = c(0.5, 1), ylim = c(0.5,1),
+     main = "Simulated bounds for graphs with MOI 2 max",
      ylab = "without summation", xlab = "with summation"); abline(a = 0, b = 1)
 points(x = maxima["sim_C_with", maxMOIs < 3],
        y = maxima["sim_C_wout", maxMOIs < 3], pch = 21, bg = "yellow")
@@ -32,7 +38,7 @@ max_stoch_diff_sanity <- max(abs(c(maxima["theory_C_with", maxMOIs < 3] - maxima
 # ==============================================================================
 # Second, explore results for cases that should change
 # ==============================================================================
-# First, compare theory with simulation: looks reasonable
+# First, compare exact with approximate: looks reasonable
 plot(NULL, xlim = c(0.5, 1), ylim = c(0.5,1),
      ylab = "simulation", xlab = "theory"); abline(a = 0, b = 1)
 points(x = maxima["theory_C_with", maxMOIs > 2], y = maxima["sim_C_with", maxMOIs > 2], pch = 21, bg = "yellow")
