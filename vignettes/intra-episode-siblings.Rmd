@@ -1,8 +1,8 @@
 ---
-title: "Intra-episode siblings"
+title: "Explore treatment of intra-episode siblings"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Intra-episode siblings}
+  %\VignetteIndexEntry{Explore treatment of intra-episode siblings}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
