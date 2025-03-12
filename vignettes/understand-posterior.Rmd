@@ -625,7 +625,8 @@ dependent). Arguably, maximum probabilities should not increase with more than
 two intra-episode siblings (more lines of evidence strengthen a case, but only
 if they are independent). In practice, when MOIs under the Pv3Rs modesl are
 based on estimates from bulk (not single-cell) parasite genetic data, groups of
-three or more siblings are modelled as groups of two; see vignette XXX.
+three or more siblings are modelled as groups of two; 
+see [vignetter("intra-episode-siblings")](intra-episode-siblings.html).
 
 ## Adding recurrences 
 
