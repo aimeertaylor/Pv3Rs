@@ -5,7 +5,8 @@
 \alias{fs_VHX_BPD}
 \title{Allele frequencies computed from example Plasmodium vivax data}
 \format{
-A list of nine markers; for each marker a named vector of allele frequencies that sum to one.
+A list of nine markers; for each marker a named vector of allele frequencies
+that sum to one.
 }
 \source{
 \itemize{
