@@ -27,6 +27,7 @@ ts_per_gs <- rep(1:length(y), determine_MOIs(y))
 ## Which RGs have the largest logl?
 
 # `near` accounts for the fact that floating point numbers could be nearly equal
+# or use `abs(...) < .Machine$double.eps^0.5`
 max_idxs <- which(near(lliks, max(lliks))) # 1060, 1112
 # in fact these log-likelihoods are not strictly equal
 lliks[max_idxs[1]] == lliks[max_idxs[2]]
