@@ -149,7 +149,7 @@ post$joint
 If we want to explore relationship graphs and their log likelihoods we need to
 set both `return.RG` and `return.logp` to `TRUE` when computing the posterior;
 they are `FALSE` by default to conserve memory and compute time; see 
-`enumerate_alleles()`
+`enumerate_alleles()`.
 
 ```{r, cache=TRUE}
 post <- compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE)
@@ -162,111 +162,77 @@ post$joint
 ```
 
 The log-likelihood of each relationship graph is also returned in the output.
-We plot the relationship graph with the largest likelihood. 
+We plot the relationship graph/s with the largest likelihood. 
 
 ```{r}
 # Extract all log likelihoods
 lliks <- sapply(post$RGs, function(RG) RG$logp)
 
+# Extract the relationship graphs (RGs) with the largest log likelihood
+RGs <- post$RGs[which(abs(lliks - max(lliks)) < .Machine$double.eps^0.5)]
 
-
-# Extract the relationship graph (RG) with the largest log likelihood
-RG <- post$RGs[[which(lliks == max(lliks))]]
-
-# Generate genotype names for plot_RG()
+# Generate genotype names 
 gs <- paste0("g", 1:6) 
 
-# Generate episode indices for plot RG()
+# Generate episode indices for genotypes
 ts_per_gs <- rep(1:length(y), determine_MOIs(y)) 
 
-# The sequences of states compatible with the relationship graph RG
-seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
+# The sequences of states compatible with RGs
+seqs_comp <- sapply(RGs, compatible_rstrs, gs_per_ts = split(gs, ts_per_gs))
 
 # Plot RG
-par(mar = rep(0.1,4))
-plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
+par(mar = rep(0.1,4), mfrow = c(1,2))
+for(i in 1:length(RGs)) {
+  plot_RG(RG_to_igraph(RGs[[i]], gs, ts_per_gs), vertex.size = 20)
+  box()
+}
 
 # Generate infection colours in order to add a legend
 infection_colours <- RColorBrewer::brewer.pal(n = 8, "Set2") 
 
 # Add a legend
-legend("left", pch = 21, pt.bg = infection_colours[unique(ts_per_gs)], 
+legend("bottomright", pch = 21, pt.bg = infection_colours[unique(ts_per_gs)], 
        bty = "n", legend = names(y), title = "Episode")
 ```
 
-**why** doesn't `which(lliks == max(lliks))` above recover both graphs with 
-largest likelihood; see `head(sort(lliks, decreasing = T))` : 
-`r head(sort(lliks, decreasing = T))`
+N.B. There are two symmetric graphs with maximum likelihood: they are isomorphic
+up to within-episode genotype permutations. The user should note that, as in the
+current example, the relationship graphs with the largest likelihood (e.g.,
+those above) might not be in the equivalence class for which the data are most
+probable when all relationship graphs in that class are summed over (e.g., those
+below), and that graphs in the equivalence class with the largest likelihood
+might be incompatible with the most likely recurrent state sequence (e.g., here
+the class with the largest likelihood contains graphs with sibling edges that
+are incompatible with `r names(which.max(post$joint))`).
 
-N.B. This approach of finding the relationship graph for which the data are most
-probable does not take into account symmetries in the graphs 
-**[is this still true]**. 
-Specifically, relationship graphs that are isomorphic up to
-within-episode genotype permutations have the same likelihood; **[add example]**. 
-The user should note that the relationship graph with the largest
-likelihood might not be in the equivalence class for which the data are most
-probable when all relationship graphs in that class are summed over 
-**[is this still true - I'm struggling to think of an example]**.
 
-The figure below shows histograms of the likelihoods of the relationship graphs
-compatible with each possible sequence of recurrence states, along with the
-likelihood of the sequence of recurrence states (red vertical line). 
+```{r}
+sorted_lliks <- sort(lliks, decreasing = T) # Sort log likelihoods
+adj_equal <- abs(diff(sorted_lliks, lag = 1)) < .Machine$double.eps^0.5 # Find matches
+decr_idxs <- which(adj_equal == FALSE) # Change points: 2, 8, 14, 20, 32, ...
+class_sizes <- c(decr_idxs[1], diff(decr_idxs)) # Number of graphs per class
 
-```{r, fig.height=10}
-# Extract sequences
-seqs <- names(post$joint)
+# log likelihood of representative from each 'equivalence class' (EC)
+lliks_unique <- sorted_lliks[decr_idxs]
 
-# Exponentiate log likelihoods
-prob_data_given_graph <- exp(lliks)
+# EC likelihood
+class_ps <- exp(lliks_unique)*class_sizes
+max_class_p <- which(class_ps == max(class_ps)) # ML EC index 
+max_idx <- decr_idxs[max_class_p] # Index of last graph in ML EC
+max_size <- class_sizes[max_class_p] # Number of graphs in ML EC
 
-# For each graph, extract compatible sequences and store in a list
-gs_per_ts <- split(gs, ts_per_gs)
-seq_per_RG_list <- lapply(post$RGs, compatible_rstrs, gs_per_ts)
-
-# For each sequence, return TRUE if graph ID compatible 
-seq_per_RG_matx <- sapply(seqs, function(seq) sapply(seq_per_RG_list, function(x) seq %in% x))
-
-# Sequences with non-zero posterior probability
-poss_seqs <- names(sort(post$joint[post$joint > 0], decreasing = T))
-
-# For each sequence with non-zero probability, compute compatible graph count
-graph_count_seq <- sapply(poss_seqs, function(s) sum(seq_per_RG_matx[,s]))
-
-# For each sequence with non-zero probability, compute likelihood
-seqliks <- sapply(poss_seqs, function(s) mean(prob_data_given_graph[seq_per_RG_matx[,s]]))
-
-par(mfrow = c(3, 2))
-ML <- max(prob_data_given_graph)
-xlims <- range(prob_data_given_graph)
-for(poss_seq in poss_seqs) {
-  hist(prob_data_given_graph[seq_per_RG_matx[,poss_seq]], breaks = 100, 
-       xlim = xlims, xlab = "Likelihood", col = "cornflowerblue", border = "cornflowerblue", 
-       main = sprintf("%s (compatible with %s relationship graphs)", 
-                      poss_seq, graph_count_seq[poss_seq]))
-  abline(v = seqliks[poss_seq], col = "red")
+# Plot all graphs within the ML EC 
+par(mar = rep(0.1,4), mfrow = c(3,4))
+RG_order <- order(lliks, decreasing = T) # order RGs by logl
+for(i in (max_idx-max_size+1):max_idx) { # EC consists of the RGs with logl rank 21-32
+  RG <- post$RGs[[RG_order[i]]]
+  RG_igraph <- RG_to_igraph(RG, gs, ts_per_gs)
+  plot_RG(RG_igraph, vertex.size = 25, vertex.label = NA)
+  box()
 }
 ```
 
-Although sequences `r names(sort(seqliks[seqs_comp_MLE_RG]))` are all associated 
-with the relationship graph with the largest log-likelihood, we observe that the 
-likelihoods of these sequences of recurrence states, 
-`r signif(sort(seqliks[seqs_comp_MLE_RG]), 2)` , increase as
-the number of compatible relationship graphs decrease, 
-`r graph_count_seq[names(sort(seqliks[seqs_comp_MLE_RG]))]`, for 
-`r names(sort(seqliks[seqs_comp_MLE_RG]))`
-respectively. **[Untrue]** 
-This behaviour is expected due to our choice of a uniform prior over
-relationship graphs.
 
-Note that because the prior on sequences is uniform in the current case, the likelihood is proportional to the posterior, and so the maximum posterior estimate is equivalent to the maximum likelihood estimate (see scatter plot below). 
 
-```{r, echo = FALSE, g.height=5}
-par(mfrow = c(1, 1))
-plot(y = post$joint[names(seqliks)], x = seqliks, bty = "n",
-     ylab = "Posterior", xlab = "Likelihood", pch = 20)
-lmfit <- lm(post$joint[names(seqliks)] ~ seqliks)
-abline(a = 0, b = lmfit$coefficients[2], col = "blue")
-text(y = post$joint[names(seqliks)], x = seqliks, pos = 2, 
-     labels = names(post$joint[post$joint >0][names(seqliks)]))
-```
+
 
