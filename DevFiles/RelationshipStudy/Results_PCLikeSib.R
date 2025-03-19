@@ -171,8 +171,7 @@ for(admixture in c("admixture_FALSE", "admixture_TRUE")) {
     RG <- ps$RGs[[g]]
     par(mar = c(0.5, 0.5, 0.5, 0.5))
     igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
-    igraphRG <- igraph::set_vertex_attr(igraphRG, "name", value = NA) # Remove genotype names
-    plot_RG(RG =  igraphRG, vertex_palette = "Greys", labels = NA)
+    plot_RG(RG =  igraphRG, vertex_palette = "Greys", vertex.label = NA)
     box(col = graph_cols[as.character(g)], lwd = 3)
   }
 
