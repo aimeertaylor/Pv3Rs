@@ -148,8 +148,20 @@ post$joint
 
 If we want to explore relationship graphs and their log likelihoods we need to
 set both `return.RG` and `return.logp` to `TRUE` when computing the posterior;
-they are `FALSE` by default to conserve memory and compute time; see 
-`enumerate_alleles()`.
+they are `FALSE` by default (see below).
+
+To compute the posterior, summations over per-marker allelic assignments that
+are equivalent up to within-episode genotype permutations are redundant. As
+such, by default, `compute_posterior()` does not sum over them, conserving both
+memory and compute time; see `enumerate_alleles()`. The exploitation of
+permutation symmetry requires a scheme to choose a single representative among
+permutations that are otherwise equivalent. When user-specified MOIs are greater
+than those based on per-marker allele counts, `compute_posterior()` sums over
+all permutations because the scheme is too complicated. Likewise, all
+permutations are summed over when `return.logp = TRUE`, rendering the likelihood
+of every graph within an equivalence class equal and not dependent on the
+internal scheme used to pick representatives.
+ 
 
 ```{r, cache=TRUE}
 post <- compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE)
