@@ -160,7 +160,7 @@ than those based on per-marker allele counts, `compute_posterior()` sums over
 all permutations because the scheme is too complicated. Likewise, all
 permutations are summed over when `return.logp = TRUE`, rendering the likelihood
 of every graph within an equivalence class equal and not dependent on the
-internal scheme used to pick representatives.
+internal scheme used when symmetry is exploited.
  
 
 ```{r, cache=TRUE}
