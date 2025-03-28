@@ -221,7 +221,7 @@ The user should also note that,
 - the maximum-likelihood graph(s) might be incompatible with the
 maximum-posterior state sequence (albeit not true of the current example: the
 graphs above are compatible with `r names(which.max(post$joint))`)
-<!-- see example in DevFiles/Investigate_Symmetries for an example --> 
+<!-- see example in DevFiles/Investigate_Symmetries --> 
 
 - the graphs in the maximum-likelihood equivalence class might be incompatible
 with the maximum-posterior state sequence (true of the current example,
@@ -229,7 +229,7 @@ given the class with the largest likelihood contains graphs with sibling edges
 that are incompatible with `r names(which.max(post$joint))`).
 
 <!-- We suspect one of these cases above has to be false, but we cannot rule out
-the possibility that both are true without further -->
+the possibility that both are true without further exploration -->
 
 ```{r}
 sorted_lliks <- sort(lliks, decreasing = T) # Sort log likelihoods
