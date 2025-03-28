@@ -35,9 +35,9 @@ elaborate `Pv3Rs` work flow including examples of
 - how to compute false discovery rates 
 - how to do a sensitivity analysis for genotyping errors
 - how to do a sensitivity analysis for sibling misspecification
-- how probability bounds can be used to assess marker informativeness heuristically
+- how probability bounds could be used heuristically to assess marker informativeness 
 - an alternative genetic distance based approach using WGS data
-- how posterior probabilities are used in efficacy estimations (?) 
+- how posterior probabilities are used in efficacy estimations
 - an estimation of a false negative rate
 
 ## Basic workflow
@@ -158,9 +158,11 @@ permutation symmetry requires a scheme to choose a single representative among
 permutations that are otherwise equivalent. When user-specified MOIs are greater
 than those based on per-marker allele counts, `compute_posterior()` sums over
 all permutations because the scheme is too complicated. Likewise, all
-permutations are summed over when `return.logp = TRUE`, rendering the likelihood
-of every graph within an equivalence class equal and not dependent on the
-internal scheme used when symmetry is exploited.
+permutations are summed over when `return.logp = TRUE`: to compute meaningful
+graph likelihood values (i.e., values that are not dependent on the
+aforementioned representative-choosing scheme) we need to sum over per-marker
+allelic assignments, including those that are equivalent up to within-episode
+genotype permutation.
  
 
 ```{r, cache=TRUE}
@@ -174,7 +176,7 @@ post$joint
 ```
 
 The log-likelihood of each relationship graph is also returned in the output.
-We plot the relationship graph/s with the largest likelihood. 
+We plot the relationship graph(s) with the largest likelihood. 
 
 ```{r}
 # Extract all log likelihoods
@@ -209,14 +211,25 @@ legend("bottomright", pch = 21, pt.bg = infection_colours[unique(ts_per_gs)],
 
 N.B. There are two symmetric graphs with maximum likelihood: they are isomorphic
 up to within-episode genotype permutations. The user should note that, as in the
-current example, the relationship graphs with the largest likelihood (e.g.,
+current example, the relationship graph(s) with the largest likelihood (e.g.,
 those above) might not be in the equivalence class for which the data are most
 probable when all relationship graphs in that class are summed over (e.g., those
-below), and that graphs in the equivalence class with the largest likelihood
-might be incompatible with the most likely recurrent state sequence (e.g., here
-the class with the largest likelihood contains graphs with sibling edges that
-are incompatible with `r names(which.max(post$joint))`).
+below). 
 
+The user should also note that, 
+
+- the maximum-likelihood graph(s) might be incompatible with the
+maximum-posterior state sequence (albeit not true of the current example: the
+graphs above are compatible with `r names(which.max(post$joint))`)
+<!-- see example in DevFiles/Investigate_Symmetries for an example --> 
+
+- the graphs in the maximum-likelihood equivalence class might be incompatible
+with the maximum-posterior state sequence (true of the current example,
+given the class with the largest likelihood contains graphs with sibling edges
+that are incompatible with `r names(which.max(post$joint))`).
+
+<!-- We suspect one of these cases above has to be false, but we cannot rule out
+the possibility that both are true without further -->
 
 ```{r}
 sorted_lliks <- sort(lliks, decreasing = T) # Sort log likelihoods
