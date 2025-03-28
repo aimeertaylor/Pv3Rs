@@ -256,7 +256,7 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
   }
 
   # Check frequencies sum to one:
-  if (!all(abs(1 - round(sapply(fs, sum))) < .Machine$double.eps^0.5)) {
+  if (!all(abs(1 - sapply(fs, sum)) < .Machine$double.eps^0.5)) {
     stop('For a given marker, allele frequencies must sum to one')
   }
 
