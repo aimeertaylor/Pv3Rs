@@ -2,6 +2,9 @@
 # Script to generate maximum probabilities for all MOI vectors summing to
 # at-most eight assuming recurrent states are equally likely a priori. Takes 5
 # hours to run.
+
+# 14th April 2025: error in that summation over graph spaces does not necessarily
+# provide bounds for marginal probabilities — needs fixing
 ################################################################################
 rm(list = ls())
 set.seed(1)
@@ -53,7 +56,7 @@ maxima <- sapply(all_MOIs, function(MOIs){
     RGs_I_log <- sapply(CIL_gvn_RGs, function(x) "I" %in% x) # I compatible
   } else {
     First_CIL_gvn_RGs <- sapply(CIL_gvn_RGs, function(x) {
-      do.call(rbind, strsplit(x, split = ""))[,1]
+      do.call(rbind, strsplit(x, split = ""))[,1] # Get state of 1st recurrence
     })
     RGs_C_log <- sapply(First_CIL_gvn_RGs, function(x) "C" %in% x) # C compatible
     RGs_I_log <- sapply(First_CIL_gvn_RGs, function(x) "I" %in% x) # I compatible
@@ -61,14 +64,15 @@ maxima <- sapply(all_MOIs, function(MOIs){
 
   # Get the size of the largest intra-episode sibling clique per graph
   max_clique_sizes <- sapply(RGs, get_max_clique_size, intra_edges = intra_edges)
-  keep_log <- max_clique_sizes < 3
-  RGs_with <- 1:length(RGs)
-  RGs_wout <- which(keep_log)
-  RGs_C_with <- which(RGs_C_log)
+  keep_log <- max_clique_sizes < 3 # Keep only those with at most sibling pairs
+  RGs_with <- 1:length(RGs) # Count all RGs
+  RGs_wout <- which(keep_log) # Count all RGs with at most sibling pairs
+  RGs_C_with <- which(RGs_C_log) # Repeat for RGs compatible with C 1st
   RGs_I_with <- which(RGs_I_log)
-  RGs_C_wout <- which(RGs_C_log & keep_log)
+  RGs_C_wout <- which(RGs_C_log & keep_log) # Repeat for RGs compatible with I 1st
   RGs_I_wout <- which(RGs_I_log & keep_log)
 
+  # Count RGs for different states
   RGs_gvn_CIL <- sapply(states, function(s) which(sapply(CIL_gvn_RGs, function(x) s%in%x)), simplify = F)
   RGsC_gvn_CIL <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_C_with), simplify = F)
   RGsI_gvn_CIL <- sapply(RGs_gvn_CIL, function(x) intersect(x, RGs_I_with), simplify = F)
@@ -82,18 +86,30 @@ maxima <- sapply(all_MOIs, function(MOIs){
     C_with <- 0
     C_wout <- 0
   } else {
-    s_with_un <- sapply(RGsC_gvn_CIL, length)/
-      sapply(RGs_gvn_CIL, length)
-    s_wout_un <- sapply(RGsC_gvn_CIL_wout, length)/
-      sapply(RGs_gvn_CIL_wout, length)
+
+    # Compute vectors of un-normalised graph space ratios
+    s_with_un <- sapply(RGsC_gvn_CIL, length)/sapply(RGs_gvn_CIL, length)
+    s_wout_un <- sapply(RGsC_gvn_CIL_wout, length)/sapply(RGs_gvn_CIL_wout, length)
+
+    # Example of above for C, L, I given single recurrence:
+    # (|Gc|/|Gc|, |Gc|/|GL|, 0/|GI|) = (1, |Gc|/|GL|, 0)
+
+    # Example of above for CC, IC, LC... LL given two recurrences:
+    # (|Gcc|/|Gcc|, 0/|GIc|, |Gcc|/|GLC|, ..., |GcL|/|GLL|) = (1, 0, |Gcc|/|GLC|, ..., |GcL|/|GLL|)
+
+    # Sum over vectors of normalised graph space ratios (taking marginal)
     C_with <- sum((s_with_un/sum(s_with_un))[states_C_1st])
     C_wout <- sum((s_wout_un/sum(s_wout_un))[states_C_1st])
+
+    # Example of above for C, L, I given single recurrence:
+    # (1, |Gc|/|GL|, 0) / (1 + (|Gc|/|GL|)) = (|GL|/(|GC + GL|), |GC|/(|GC + GL|), 0)
   }
 
-  s_with_un <- sapply(RGsI_gvn_CIL, length)/
-    sapply(RGs_gvn_CIL, length)
-  s_wout_un <- sapply(RGsI_gvn_CIL_wout, length)/
-    sapply(RGs_gvn_CIL_wout, length)
+  # Compute vectors of un-normalised graph space ratios
+  s_with_un <- sapply(RGsI_gvn_CIL, length)/sapply(RGs_gvn_CIL, length)
+  s_wout_un <- sapply(RGsI_gvn_CIL_wout, length)/sapply(RGs_gvn_CIL_wout, length)
+
+  # Sum over vectors of normalised graph space ratios (taking marginal)
   I_with <- sum((s_with_un/sum(s_with_un))[states_I_1st])
   I_wout <- sum((s_wout_un/sum(s_wout_un))[states_I_1st])
 
