@@ -18,8 +18,9 @@ relap.recru <- project2D(c(9,4,0)/(9+4))
 relap.reinf <- project2D(c(0,2,9)/(9+2))
 intersect.pt <- project2D(c(9*2,4*2,9*4)/(9*2+4*2+9*4))
 
-png("vignettes/figures/feasible_moi_2_1.PNG")
-par(mar=rep(0.5,4))
+png("../vignettes/figures/feasible.png", width = 4, height = 4, units = "in", res = 150)
+
+par(mar=rep(0,4))
 V_labels <- c("Recrudescence", "Relapse", "Reinfection")
 plot_simplex(v_labels =  V_labels, v_colours=rep("white",3))
 segments(recru['x'], recru['y'], relap.reinf['x'], relap.reinf['y'], lty=2)

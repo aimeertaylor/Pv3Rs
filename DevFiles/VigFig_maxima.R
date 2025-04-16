@@ -18,7 +18,7 @@ MOI12diff <- sapply(all_MOIs, function(x) x[1] - x[2]) # Difference
 MOI1s_log <- sapply(all_MOIs, function(x) all(x == 1)) # MOI vectors of all 1s
 Episode_counts <- sort(unique(nMOI))
 
-png("../vignettes/figures/maxima%d.png", width = 6, height = 6, units = "in", res = 300)
+png("../vignettes/figures/maxima%d.png", width = 6, height = 6, units = "in", res = 150)
 
 # Single recurrence reinfection
 plot(x = MOI12diff[nMOI < 3], y = maxima["I_with", nMOI < 3], ylim = c(0.6, 1),
