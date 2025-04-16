@@ -30,20 +30,19 @@ participant; i.e.,
 
 And we show how one might explore relationship graphs and their log likelihoods.
 In one or more upcoming scientific publications, we plan to publish a more
-elaborate `Pv3Rs` work flow including examples of
+elaborate study-level `Pv3Rs` work flow including examples of
 
 - how to compute false discovery rates 
 - how to do a sensitivity analysis for genotyping errors
 - how to do a sensitivity analysis for sibling misspecification
-- how probability bounds could be used heuristically to assess marker informativeness 
-- an alternative genetic distance based approach using WGS data
-- how posterior probabilities are used in efficacy estimations
+- an alternative genetic distance based approach using whole-genome sequence data
+- how posterior probabilities (rather than binary classifications) can be used estimate treatment efficacy
 - an estimation of a false negative rate
 
 ## Basic workflow
 
-We first look at a synthetic example of three episodes (names are optional) with
-three markers (names are obligatory) whose alleles have known frequencies.
+We first look at a synthetic example of three episodes (episode names are optional) with
+three markers (marker names are obligatory) whose alleles have known frequencies.
 
 ```{r}
 y <- list("Enrollment" = list(m1 = c('C','G','T'), 
@@ -64,7 +63,7 @@ fs <- list(m1 = c(A = 0.27, C = 0.35, G = 0.18, T = 0.20),
 We plot the data using `plot_data()`. 
 
 ```{r, fig.align='center'}
-plot_data(ys = list("Data" = y), fs = fs)
+plot_data(ys = list("Participant data" = y), fs = fs)
 ```
 
 Different colours in the plotted data (left) represent different alleles. The
@@ -72,17 +71,17 @@ legend (right) shows all alleles per marker with one column per marker. The
 order of the markers in the legend is the same as that in the plotted data (see
 horizontal axis, left). When allele frequencies are specified, the heights of
 differently coloured areas in the legend are proportional to allele frequencies,
-s.t. rare alleles have relatively small legend areas.
+s.t. rare alleles have relatively small legend areas (e.g., T at m2 is rare).
 
 **Aside** Given the maximum number of alleles observed per-episode, the most parsimonious
 explanation is that there are `r determine_MOIs(y)` distinct parasite genotypes
-in the three episodes respectively (a genotype is defined here as a realisation
+in the three episodes respectively (a genotype is here defined as a realisation
 of the haploid parasite genome representing a group of clonal parasites). In
 this synthetic example, markers are quart-allelic for brevity; this imposes a
 rather low upper bound on MOI estimates based on maximum per-marker allele
 counts. In reality, more diverse markers are recommended for recurrent state
 inference. If better MOI estimates were available based on more diverse markers,
-the data from those more diverse markers could be added to the data imput `y` of
+the data from those more diverse markers could be added to the data input `y` of
 `compute_posterior()`. If better MOI estimates based on heteroallelic marker
 counts across many markers were available, they could be used in recurrent state
 inference by specifying the `MOI` argument in the function
@@ -133,11 +132,11 @@ probability greater than 0.5 (it falls in the bright yellow region); the point
 in the red region is most likely a reinfection with posterior probability
 greater than 0.5 (it falls in the bright red region).
 
-Joint posterior probabilities (probabilities of sequences of recrudescence `C`,
-relapse `L`, and reinfection `I` for all recurrences in chronological order) are
-stored in `post$joint`. Here, we find the most likely sequence of recurrence
-states is `r names(which.max(post$joint))` with posterior probability 
-`r post$joint[which.max(post$joint)]`
+Joint posterior probabilities (probabilities of chronological sequences of
+recrudescence `C`, relapse `L`, and reinfection `I`) are stored in `post$joint`.
+Here, we find the most likely sequence of recurrence states is `r
+names(which.max(post$joint))` with posterior probability `r
+post$joint[which.max(post$joint)]`
 
 ```{r}
 post$joint
@@ -157,12 +156,10 @@ memory and compute time; see `enumerate_alleles()`. The exploitation of
 permutation symmetry requires a scheme to choose a single representative among
 permutations that are otherwise equivalent. When user-specified MOIs are greater
 than those based on per-marker allele counts, `compute_posterior()` sums over
-all permutations because the scheme is too complicated. Likewise, all
-permutations are summed over when `return.logp = TRUE`: to compute meaningful
-graph likelihood values (i.e., values that are not dependent on the
-aforementioned representative-choosing scheme) we need to sum over per-marker
-allelic assignments, including those that are equivalent up to within-episode
-genotype permutation.
+all permutations because the scheme is too complicated. Likewise, to compute
+meaningful graph likelihood values (i.e., values that are not dependent on the
+aforementioned representative-choosing scheme), all permutations are summed over
+when `return.logp = TRUE`.
  
 
 ```{r, cache=TRUE}
