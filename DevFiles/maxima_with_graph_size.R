@@ -18,53 +18,34 @@ MOI12diff <- sapply(all_MOIs, function(x) x[1] - x[2]) # Difference
 MOI1s_log <- sapply(all_MOIs, function(x) all(x == 1)) # MOI vectors of all 1s
 Episode_counts <- sort(unique(nMOI))
 
+png("../vignettes/figures/maxima%d.png", width = 6, height = 6, units = "in", res = 300)
+
+# Single recurrence reinfection
+plot(x = MOI12diff[nMOI < 3], y = maxima["I_with", nMOI < 3], ylim = c(0.6, 1),
+     bty = "n", bg = MOI1[nMOI < 3], col = MOI1[nMOI < 3], pch = 25, cex = 2,
+     ylab = "Maximum probability of reinfection",
+     xlab = "MOI episode 1 - MOI episode 2",
+     panel.first = abline(v = 0))
+legend("bottomleft", title = "MOI of episode 1", bty = "n", inset = 0.1,
+       legend = unique(MOI1), fill = unique(MOI1))
+
+# Single recurrence recrudescence
+plot(x = MOI12diff[nMOI < 3], y = maxima["C_with", nMOI < 3], ylim = c(0.6, 1),
+     bty = "n", col = MOI1[nMOI < 3], pch = 17, cex = 2,
+     ylab = "Maximum probability of recrudescence",
+     xlab = "MOI episode 1 - MOI episode 2",
+     panel.first = abline(v = 0))
+legend("bottomleft", title = "MOI of episode 1", bty = "n", inset = 0.1,
+       legend = unique(MOI1), fill = unique(MOI1))
+
 # Cases where the MOI is always one
-plot(x = nMOI[MOI1s_log], y = maxima["C_with", MOI1s_log], bty = "n",
-     type = "b", main = "", bg = "yellow", pch = 24, ylim = c(0.5, 1),
+plot(x = nMOI[MOI1s_log], y = maxima["C_with", MOI1s_log], bty = "n", cex = 2,
+     type = "b", main = "", bg = "yellow", pch = 24, ylim = c(0.65, 0.85),
      xlab = "Number of monoclonal episodes",
      ylab = "Maximum probability of first recurrence")
-lines(x = nMOI[MOI1s_log], y = maxima["I_with", MOI1s_log],
+lines(x = nMOI[MOI1s_log], y = maxima["I_with", MOI1s_log], cex = 2,
       type = "b", bg = "red", pch = 25)
 legend("top", legend = c("Recrudescence", "Reinfection"), pch = c(24, 25),
-       bt = "n", pt.bg = c("red", "yellow"))
+       bt = "n", pt.bg = c("yellow","red"))
 
-# Imbalance between episodes one and two
-plot(x = MOI12diff, y = maxima["C_with", ], ylim = c(0.5, 1), bty = "n",
-     col = MOI1, pch = as.character(nMOI),
-     ylab = "Maximum probability of recrudescence",
-     xlab = "MOI episode 1 - MOI episode 2")
-text(y = 0.5, x = 2, adj = 1,
-     labels = paste0("Number of episodes: ", paste(Episode_counts, collapse = " ")))
-legend("left", title = "MOI of episode 1", bty = "n",
-       legend = unique(MOI1), fill = unique(MOI1))
-
-plot(x = MOI12diff, y = maxima["I_with", ], ylim = c(0.5, 1), bty = "n",
-     col = MOI1, pch = as.character(nMOI), ylab = "Maximum probability of reinfection",
-     xlab = "MOI episode 1 - MOI episode 2")
-text(y = 0.5, x = 2, adj = 1,
-     labels = paste0("Number of episodes: ", paste(Episode_counts, collapse = " ")))
-legend("right", title = "MOI of episode 1", bty = "n",
-       legend = unique(MOI1), fill = unique(MOI1))
-
-# Focusing in on cases where MOI episode 1 - MOI episode a2 = 0
-# Trend is the same for both recrudescence and reinfection
-# (number of potentially independent inter-episode edges for episodes 1 & 2)
-plot(x = MOI2[MOI12diff == 0], bty = "n",
-     y = maxima["C_with", ][MOI12diff == 0],
-     ylim = c(0.5, 1),
-     col = MOI1[MOI12diff == 0], pch = as.character(nMOI[MOI12diff == 0]),
-     xlab = "MOI of episodes 1 = 2", ylab = "Maximum probability of recrudescence")
-text(y = 0.5, x = 2, labels = paste0("Number of episodes: ",
-                                     paste(Episode_counts, collapse = " ")))
-legend("right", title = "MOI of episode 1", fill = unique(nMOI[MOI12diff == 0]),
-       legend = unique(nMOI[MOI12diff == 0]), bty = "n",)
-
-plot(x = MOI2[MOI12diff == 0], bty = "n",
-     y = maxima["I_with", ][MOI12diff == 0],
-     ylim = c(0.5, 1),
-     col = MOI1[MOI12diff == 0], pch = as.character(nMOI[MOI12diff == 0]),
-     xlab = "MOI of episodes 1 = 2", ylab = "Maximum probability of reinfection")
-text(y = 0.5, x = 2, labels = paste0("Number of episodes: ",
-                                     paste(Episode_counts, collapse = " ")))
-legend("right", title = "MOI of episode 1", fill = unique(nMOI[MOI12diff == 0]),
-       legend = unique(nMOI[MOI12diff == 0]), bty = "n")
+dev.off()
