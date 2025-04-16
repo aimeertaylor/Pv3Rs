@@ -1,20 +1,14 @@
 ################################################################################
-# Script to generate maximum probabilities for all MOI vectors summing to
-# at-most eight assuming recurrent states are equally likely a priori. Takes 5
-# hours to run.
-
-# 14th April 2025: error in that summation over graph spaces does not necessarily
-# provide bounds for marginal probabilities — needs fixing
+# Script to generate maximum probabilities for MOI vectors summing to at-most
+# eight assuming recurrent states are equally likely a priori. Run time ~ 20 min
 ################################################################################
 rm(list = ls())
-set.seed(1)
-n <- 10000
 
-all_MOIs <- c(do.call(c, sapply(2:7, function(x) { # 254 different vectors of MOIs
-  y <- gtools::permutations(n = 7, r = x, repeats.allowed = T)
-  z <- y[rowSums(y) < 9, ]
-  lapply(1:nrow(z), function(i) z[i,])
-})), list(rep(1,8)))
+# Generate all MOI combinations given a single recurrence
+y <- gtools::permutations(n = 7, r = 2, repeats.allowed = T)
+z <- y[rowSums(y) < 9, ] # Total genotype count of 8
+all_MOIs <- c(lapply(1:nrow(z), function(i) z[i,]), # Make into a list
+              sapply(3:8, function(x) rep(1,x), simplify = F)) # All monoclonal given two or more recurrences
 
 # Function to get size of largest sibling clique
 get_max_clique_size <- function(RG, intra_edges) {
