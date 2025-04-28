@@ -28,18 +28,20 @@ summation excludes graphs with cliques of three or more intra-episode siblings}
 maxima
 }
 \description{
-Upper bounds on posterior probabilities of recrudescence and reinfection
-(rows) for all MOI vectors that sum to a total genotype count of eight
-(columns). Upper bounds are induced by the prior \emph{plus} knowledge that all but
-the first recurrence has data when the recurrence count exceeds one. We
-report two upper bounds for each recurrent state: one where summation over
-graphs includes graphs with cliques of three or more intra-episode siblings;
-another where summation over graphs excludes graphs with cliques of three or
-more intra-episode siblings. Since graphs with cliques of three or more
+Upper bounds on posterior probabilities of first recurrence recrudescence and
+reinfection (rows) for various MOI vectors (columns) that sum to at most
+eight. For a single recurrence (MOI vectors of length two), upper bounds are
+induced by the prior. For more than one recurrence (MOI vectors of length
+three or more), upper bounds assume all but the first recurrence has data;
+these bounds are only valid for monoclonal episodes. Two upper bounds for
+each recurrent state are reported: one where summation over graphs includes
+graphs with cliques of three or more intra-episode siblings, another where
+summation over graphs excludes graphs with cliques of three or more
+intra-episode siblings. Since graphs with cliques of three or more
 intra-episode siblings only apply when MOI vectors include MOIs of three or
 more, these two bounds only differ for MOI vectors that include MOIs of three
 or more (see example below). The column names represent MOI vectors whose
-MOIs are all less than or equal to seven.
+MOIs are all less than or equal to eight.
 }
 \examples{
 # Convert column names to MOI character vectors

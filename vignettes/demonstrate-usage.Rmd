@@ -17,8 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo = FALSE}
-#library(Pv3Rs)
-devtools::load_all()
+library(Pv3Rs)
 ```
 
 In this vignette we demonstrate the basic `Pv3Rs` work flow for a single study
