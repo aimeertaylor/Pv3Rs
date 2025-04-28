@@ -158,7 +158,7 @@ y <- list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data
 do.call(rbind, lapply(MOIs, function(x)suppressMessages(compute_posterior(y,fs,MOIs=x))$marg)) 
 ```
 
-## Rare homoallelic data with user-specified MOIs > 1: prior departure 
+## Rare homoallelic data with user-specified MOIs exceeding 1: prior departure 
 
 If the data are homoallelic, but the user specifies MOIs greater than one, and
 the observed allele is rare, the posterior departs from the prior because rare
@@ -599,12 +599,12 @@ parasites in maximum likelihood graphs are siblings. For the heteroallelic data,
 all intra-episode parasites in maximum likelihood graphs are strangers. Both
 have the same maximum probabilities of recrudescence.
 
-One upshot of this is that maximum probabilities could be increased by inflating
-the number of intra-episode siblings.  Arguably, maximum probabilities should
-not increase with more than two intra-episode siblings because siblings are not
-independent. In practice, when MOIs under the Pv3Rs model are based on estimates
-from bulk (not single-cell) parasite genetic data, groups of three or more
-siblings are modelled as groups of two; see
+One upshot of this is that maximum probabilities could be increased by
+increasing counts of intra-episode siblings. Arguably, maximum probabilities
+should not increase with more than two intra-episode siblings because siblings
+are not independent. In practice, when MOIs under the Pv3Rs model are based on 
+realistic MOI estimates, groups of three or
+more siblings are modelled as groups of two; see
 [vignette("intra-episode-siblings")](intra-episode-siblings.html).
 
 END OF DIGRESSION
@@ -1127,16 +1127,18 @@ for(case in cases){
 
 Relationship graphs (not shown) are wrong for two reasons:
 
-- all the relationship graphs have two, not three, parasites in the initial 
-infection because there are at most two alleles per marker
+- all the relationship graphs have two, not three, parasites in the initial
+infection because there are at most two alleles per marker. Although technically
+incorrect, this behaviour is arguably desirable (see digression above).
 - the highest likelihood relationship graphs have stranger parasites in the
 initial episode because prevalence data from three or four meiotic siblings are
-identical to bulk data from parents and the parents are strangers.
+identical to bulk data from the parents who are strangers.
 
-We can force the graphs to have the correct parasite count by specifying
-external MOIs. Doing so recovers maximum likelihood on true relationship graphs.
-However, the correct MOIs are unknowable in practice: a collection of siblings
-from the same two parents can only ever have two alleles at a given marker.
+We can force the graphs to have three distinct parasites in the initial episode
+by specifying external MOIs. Doing so recovers maximum likelihood on true
+relationship graphs. However, the correct MOIs are unknowable in practice: a
+collection of siblings from two parents can only ever be as diverse as the two
+parents. 
 
 When the initial infection contains three meiotic siblings and the recurrent
 parasite is a regular or meiotic sibling, posterior probabilities converge to
