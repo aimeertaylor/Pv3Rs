@@ -4,9 +4,9 @@
 \name{Pv3Rs-package}
 \alias{Pv3Rs}
 \alias{Pv3Rs-package}
-\title{Pv3Rs: What the Package Does (One Line, Title Case)}
+\title{Pv3Rs: Estimate the cause of recurrent vivax malaria using genetic data}
 \description{
-What the package does (one paragraph).
+Estimate the per-person posterior probability that a recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse, reinfection (3Rs) using per-person P. vivax genetic data on more than one infection.
 }
 \seealso{
 Useful links:
@@ -17,7 +17,17 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Aimee Taylor \email{aimee.taylor@pasteur.fr} (\href{https://orcid.org/0000-0002-2337-8992}{ORCID})
+
+Authors:
+\itemize{
+  \item Yong See Foo
+}
+
+Other contributors:
+\itemize{
+  \item European Union, Project 101110393 [funder]
+}
 
 }
 \keyword{internal}

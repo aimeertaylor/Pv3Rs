@@ -1,10 +1,14 @@
 Package: Pv3Rs
-Title: What the Package Does (One Line, Title Case)
+Title: Estimate the cause of recurrent vivax malaria using genetic data
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Authors@R: c(person("Aimee", "Taylor", role = c("aut", "cre"), 
+                    email = "aimee.taylor@pasteur.fr", 
+                    comment = c(ORCID = "0000-0002-2337-8992")),
+              person("Yong See", "Foo", role = "aut"),
+              person("European Union, Project 101110393", role = "fnd"))
+Description: Estimate the per-person posterior probability that a recurrent 
+    Plasmodium vivax (Pv) infection is a recrudescence, relapse, reinfection 
+    (3Rs) using per-person P. vivax genetic data on more than one infection.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

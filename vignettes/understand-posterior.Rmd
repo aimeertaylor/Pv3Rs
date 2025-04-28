@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   fig.dpi = 300, # For quality 
   fig.width = 7, # Increase to zoom out
   fig.height = 4, 
-  cache = TRUE
+  cache = FALSE
   )
 ```
   
@@ -70,7 +70,8 @@ and sensitivity analyses.
 
 
 ```{r setup, include = FALSE} 
-library(Pv3Rs)
+#library(Pv3Rs)
+devtools::load_all()
 options(warn = -1) # Suppress warnings about missing and limited data
 ```
 
@@ -127,7 +128,7 @@ When only one episode has homoallelic data and the user does not specify an MOI
 
 ```{r}
 fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
-y <- list(enroll = list(m1 = NA), recur1 = list(m1 = "A")) # No enrolment data
+y <- list(enrol = list(m1 = NA), recur1 = list(m1 = "A")) # No enrolment data
 suppressMessages(compute_posterior(y, fs))$marg # Posterior
 ```
 
@@ -145,17 +146,21 @@ the cell count increases with the number of distinct alleles observed.
 # Allele frequencies 
 fs = list(m1 = c('A' = 0.25, 'B' = 0.25, 'C' = 0.25, 'D' = 0.25)) 
 
-# MOI increases with number of observed alleles 
-ys <- list(list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)), # Data 
-           list(enroll = list(m1 = c('A','B','C')), recur = list(m1 = NA)), 
-           list(enroll = list(m1 = c('A','B','C','D')), recur = list(m1 = NA)))
-do.call(rbind, lapply(ys, function(y) suppressMessages(compute_posterior(y, fs))$marg)) 
+# MOI at enrolment increases with number of observed alleles:  
+yMOI2 <- list(enrol = list(m1 = c('A','B')), recur = list(m1 = NA))
+yMOI3 <- list(enrol = list(m1 = c('A','B','C')), recur = list(m1 = NA))
+yMOI4 <- list(enrol = list(m1 = c('A','B','C','D')), recur = list(m1 = NA))
+ys <- list(yMOI2, yMOI3, yMOI4)
+do.call(rbind, lapply(ys, function(y) {
+  suppressMessages(compute_posterior(y, fs))$marg
+})) 
 
-
-# MOI increases with external input
-MOIs <- list(c(2,1), c(2,2), c(3,2)) 
-y <- list(enroll = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data 
-do.call(rbind, lapply(MOIs, function(x)suppressMessages(compute_posterior(y,fs,MOIs=x))$marg)) 
+# MOI increases with external input:
+MOIs <- list(c(2,1), c(2,2), c(3,2)) # user-specified MOIs
+y <- list(enrol = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data 
+do.call(rbind, lapply(MOIs, function(x) {
+  suppressMessages(compute_posterior(y, fs, MOIs = x))$marg
+})) 
 ```
 
 ## Rare homoallelic data with user-specified MOIs exceeding 1: prior departure 
@@ -166,7 +171,7 @@ intra-episode allelic repeats are more probable given relationship graphs with
 intra-episode relatedness.
 
 ```{r}
-y <- list(enroll = list(m1 = 'A'), recur = list(m1 = NA)) # Homoallelic data
+y <- list(enrol = list(m1 = 'A'), recur = list(m1 = NA)) # Homoallelic data
 MOIs <- list(c(2,1), c(3,2), c(5,1)) # Different MOIs with first MOI > 1
 fs = list(m1 = c("A" = 0.01, "B" = 0.99)) # Rare observed allele
 ```
@@ -316,9 +321,9 @@ fs_rare <- list(m1 = c("A" = 0.01, "B" = 0.99))
 fs_comn <- list(m1 = c("A" = 0.6, "B" = 0.4)) 
 
 # Data 
-match <- list(enroll = list(m1 = "A"), recur1 = list(m1 = "A"))
-mismatch <- list(enroll = list(m1 = c("A")), recur1 = list(m1 = "B"))
-parmatch <- list(enroll = list(m1 = c("A", "B")), recur1 = list(m1 = "A"))
+match <- list(enrol = list(m1 = "A"), recur1 = list(m1 = "A"))
+mismatch <- list(enrol = list(m1 = c("A")), recur1 = list(m1 = "B"))
+parmatch <- list(enrol = list(m1 = c("A", "B")), recur1 = list(m1 = "A"))
 
 # Compute posterior probabilities and extract marginal probabilities
 posteriors <- rbind(suppressMessages(compute_posterior(match, fs_rare))$marg, 
@@ -359,10 +364,10 @@ A_B <- list(m1 = "A", m2 = "B")
 AB_A <- list(m1 = c("A", "B"), m2 = "A")
 
 # Data 
-match <- list(enroll = A_A, recur1 = A_A)
-mismatch <- list(enroll = A_A, recur1 = B_B)
-parmatch <- list(enroll = AB_A, recur1 = A_A)
-match_mismatch <- list(enroll = A_A, recur1 = A_B)
+match <- list(enrol = A_A, recur1 = A_A)
+mismatch <- list(enrol = A_A, recur1 = B_B)
+parmatch <- list(enrol = AB_A, recur1 = A_A)
+match_mismatch <- list(enrol = A_A, recur1 = A_B)
 
 # Update extant probabilities and extract marginal probabilities
 posteriors_ext <- rbind(suppressMessages(compute_posterior(match, fs_rare))$marg, 
@@ -449,7 +454,7 @@ fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
 ## Increasing per-episode MOIs
 
 ```{r}
-MOIs <- list(c(1,1), c(2,2), c(3,3), c(2,1), c(3,1), c(3,2)) 
+MOIs <- list(c(1,1), c(2,1), c(2,2)) 
 y_match <- list(enrol = all_As, recur = all_As)
 y_mismatch <- list(enrol = all_As, recur = all_Bs)
 ```
@@ -529,10 +534,10 @@ all_ACDs <- sapply(ms, function(t) c("A", "C", "D"), simplify = F) # A&C for all
 fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.01, "C" = 0.01, 
                                "D" = 0.01, "E" = 0.96), simplify = FALSE)
 
-hom_match_data <- list(enrol = all_As, MOIs11_match_data = all_As)
-het_match_data <- list(enrol = all_ACDs, MOIs31_match_data = all_ACs)
-hom_mismatch_data <- list(enrol = all_As, MOIs11_mismatch_data = all_Bs)
-het_mismatch_data <- list(enrol = all_ACDs, MOIs31_mismatch_data = all_BEs)
+hom_match_data <- list(enrol = all_As, hom_match_data = all_As)
+het_match_data <- list(enrol = all_ACDs, het_match_data = all_ACs)
+hom_mismatch_data <- list(enrol = all_As, hom_mismatch_data = all_Bs)
+het_mismatch_data <- list(enrol = all_ACDs, het_mismatch_data = all_BEs)
 
 rbind(suppressMessages(compute_posterior(hom_match_data, fs, MOIs = c(3,2))$marg), 
       suppressMessages(compute_posterior(het_match_data, fs)$marg), 
@@ -560,7 +565,7 @@ noRGs_edges_within <- sapply(RGs_edges, function(x) !any(edges_within %in% x))
 
 # Get graph log likelihoods for monoclonal data with user-specified MOIs
 y <- hom_match_data
-post <- suppressMessages(compute_posterior(y, fs, MOIs = MOIs, return.logp=T))
+post <- suppressMessages(compute_posterior(y, fs, MOIs = MOIs, return.logp = T))
 llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
 llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
 
@@ -614,22 +619,22 @@ END OF DIGRESSION
 Recurrences can be added without adding data
 
 ```{r}
-ys_match <- list("1_recurrence" = list(enroll = all_As, 
+ys_match <- list("1_recurrence" = list(enrol = all_As, 
                                        recur1 = all_As),
-                 "2_recurrence" = list(enroll = all_As, 
+                 "2_recurrence" = list(enrol = all_As, 
                                        recur1 = all_As,
                                        recur2 = no_data),
-                 "3_recurrence" = list(enroll = all_As, 
+                 "3_recurrence" = list(enrol = all_As, 
                                        recur1 = all_As,
                                        recur2 = no_data,
                                        recur3 = no_data))
 
-ys_mismatch <- list("1_recurrence" = list(enroll = all_As, 
+ys_mismatch <- list("1_recurrence" = list(enrol = all_As, 
                                           recur1 = all_Bs),
-                    "2_recurrence" = list(enroll = all_As, 
+                    "2_recurrence" = list(enrol = all_As, 
                                           recur1 = all_Bs,
                                           recur2 = no_data),
-                    "3_recurrence" = list(enroll = all_As, 
+                    "3_recurrence" = list(enrol = all_As, 
                                           recur1 = all_Bs,
                                           recur2 = no_data,
                                           recur3 = no_data))
@@ -742,12 +747,12 @@ A100 <- sapply(ms, function(m) "A", simplify = F)
 NA100 <- sapply(ms, function(m) NA, simplify = F)
 
 # Data on all 100 markers
-ys100 <- list("1_recurrence" = list(enroll = A100,
+ys100 <- list("1_recurrence" = list(enrol = A100,
                                     recur1 = A100),
-              "2_recurrence" = list(enroll = A100,
+              "2_recurrence" = list(enrol = A100,
                                     recur1 = A100,
                                     recur2 = NA100),
-              "3_recurrence" = list(enroll = A100,
+              "3_recurrence" = list(enrol = A100,
                                     recur1 = A100,
                                     recur2 = NA100,
                                     recur3 = NA100))
@@ -793,7 +798,7 @@ posterior estimates.
 This effect is negligible when all episodes have the same data on many markers:
 
 ```{r}
-y <- list(enroll = all_As, 
+y <- list(enrol = all_As, 
           recur1 = all_As, 
           recur2 = all_As, 
           recur3 = all_As)
@@ -804,23 +809,23 @@ Instead, consider sequences of episodes with observations (Os) and episodes with
 no data (Ns):
 
 ```{r}
-ys_match <- list("NOO" = list(enroll = no_data, 
+ys_match <- list("NOO" = list(enrol = no_data, 
                               recur1 = all_As,
                               recur2 = all_As),
-                 "ONO" = list(enroll = all_As, 
+                 "ONO" = list(enrol = all_As, 
                               recur1 = no_data,
                               recur2 = all_As),
-                 "OON" = list(enroll = all_As, 
+                 "OON" = list(enrol = all_As, 
                               recur1 = all_As,
                               recur2 = no_data))
 
-ys_mismatch <- list("NOO" = list(enroll = no_data, 
+ys_mismatch <- list("NOO" = list(enrol = no_data, 
                                  recur1 = all_As,
                                  recur2 = all_Bs),
-                    "ONO" = list(enroll = all_As, 
+                    "ONO" = list(enrol = all_As, 
                                  recur1 = no_data,
                                  recur2 = all_Bs), 
-                    "OON" = list(enroll = all_As, 
+                    "OON" = list(enrol = all_As, 
                                  recur1 = all_Bs,
                                  recur2 = no_data))
 ``` 
