@@ -38,6 +38,6 @@ VignetteBuilder: knitr, R.rsp
 Depends: 
     R (>= 3.5)
 LazyData: true
-URL: https://github.com/aimeertaylor/Pv3Rs
+URL: https://github.com/aimeertaylor/Pv3Rs, https://aimeertaylor.github.io/Pv3Rs/
 BugReports: https://github.com/aimeertaylor/Pv3Rs/issues
 Config/Needs/website: rmarkdown
