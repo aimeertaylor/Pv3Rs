@@ -12,6 +12,7 @@ Estimate the per-person posterior probability that a recurrent Plasmodium vivax 
 Useful links:
 \itemize{
   \item \url{https://github.com/aimeertaylor/Pv3Rs}
+  \item \url{https://aimeertaylor.github.io/Pv3Rs/}
   \item Report bugs at \url{https://github.com/aimeertaylor/Pv3Rs/issues}
 }
 
