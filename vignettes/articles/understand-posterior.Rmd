@@ -1,10 +1,5 @@
 ---
 title: "Understand posterior estimates"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Understand posterior estimates}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
   
 ```{r, include = FALSE}
@@ -19,6 +14,10 @@ knitr::opts_chunk$set(
   )
 ```
   
+```{r setup, include = FALSE} 
+library(Pv3Rs)
+options(warn = -1) # Suppress warnings about missing and limited data
+```
 
 # Summary of contents
 
@@ -67,14 +66,6 @@ household effects) could lead to the misclassification of reinfection as relapse
 / recrudescence. In our view, recurrence classification in the presence of
 population structure is best understood using complementary population genetic
 and sensitivity analyses.
-
-
-```{r setup, include = FALSE} 
-#library(Pv3Rs)
-devtools::load_all()
-options(warn = -1) # Suppress warnings about missing and limited data
-```
-
 
 ```{r echo = FALSE}
 # get RG vertex labels, RGs, recurrent state sequences RGs are compatible with
