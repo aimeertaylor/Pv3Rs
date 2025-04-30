@@ -218,11 +218,11 @@ relationship graphs with intra-episode relatedness.</p>
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">'A'</span><span class="op">)</span>, recur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="co"># Homoallelic data</span></span>
 <span><span class="va">MOIs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Different MOIs with first MOI &gt; 1</span></span>
 <span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.01</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span><span class="op">)</span> <span class="co"># Rare observed allele</span></span></code></pre></div>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-9-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-10-1.png" width="100%"></p>
 <p>The per-graph likelihood is only appreciable for relationship graphs
 where all distinct parasite genotypes in the first episode are
 siblings</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-10-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -285,7 +285,7 @@ recrudescence.</li>
 the assumption under the model that there are no genotyping errors: if a
 genotyping error generates a single mismatch, the posterior probability
 of recrudescence is quashed.</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-12-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="data-on-only-two-markers">Data on only two markers<a class="anchor" aria-label="anchor" href="#data-on-only-two-markers"></a>
@@ -298,7 +298,7 @@ partial match, which is not very informative (central arrow). When a
 mismatch is added to a rare match (diamond), relapse becomes the most
 probable state. This demonstrates the requirement of multiple markers
 for relapse inference.</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-14-1.png" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="data-on-many-markers">Data on many markers<a class="anchor" aria-label="anchor" href="#data-on-many-markers"></a>
@@ -362,7 +362,7 @@ priori</em>.</p>
 <code class="sourceCode R"><span><span class="va">MOIs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> </span>
 <span><span class="va">y_match</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, recur <span class="op">=</span> <span class="va">all_As</span><span class="op">)</span></span>
 <span><span class="va">y_mismatch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, recur <span class="op">=</span> <span class="va">all_Bs</span><span class="op">)</span></span></code></pre></div>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-17-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-18-1.png" width="100%"></p>
 <p>The posterior probabilities of recrudescence increase with increasing
 graph size when the MOIs are balanced. The posterior probabilities of
 reinfection increase with increasing graph size.</p>
@@ -396,7 +396,7 @@ probabilities:</p>
 <span><span class="co">#&gt; hom_mismatch_data 0.0000000 0.05494505  9.450549e-01</span></span>
 <span><span class="co">#&gt; het_mismatch_data 0.0000000 0.05494505  9.450549e-01</span></span></code></pre></div>
 <p>But the graph likelihoods change:</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-19-1.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-19-2.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-20-1.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-20-2.png" width="100%"></p>
 <p>For the homoallelic data with elevated user-specified MOIs, all
 intra-episode parasites in maximum likelihood graphs are siblings. For
 the heteroallelic data, all intra-episode parasites in maximum
@@ -437,10 +437,10 @@ three or more siblings are modelled as groups of two; see <a href="intra-episode
 <span>                                          recur3 <span class="op">=</span> <span class="va">no_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The marginal probability that the first recurrence is a recrudescence
 / reinfection depends on the total number of recurrences:</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-23-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-24-1.png" width="100%"></p>
 <p>An example of how recrudescence probabilities converge to their
 maxima over 1, 2, 5 and 100 markers:</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-24-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-25-1.png" width="100%"></p>
 <p>Note that the above maxima are not bounds imposed by the prior: they
 are based on knowledge that there are no recurrent data on all but the
 first recurrence; see <a href="graph-prior.pdf">vignette(“graph-prior”)</a>.</p>
@@ -487,7 +487,7 @@ episodes with no data (Ns):</p>
 <span>                    <span class="st">"OON"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, </span>
 <span>                                 recur1 <span class="op">=</span> <span class="va">all_Bs</span>,</span>
 <span>                                 recur2 <span class="op">=</span> <span class="va">no_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-27-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-28-1.png" width="100%"></p>
 <div class="section level4">
 <h4 id="highly-informed-recurrences">Highly informed recurrences<a class="anchor" aria-label="anchor" href="#highly-informed-recurrences"></a>
 </h4>
@@ -630,14 +630,14 @@ sibling,</li>
 <li>certain relapse when the recurrent parasite is a meiotic
 sibling.</li>
 </ul>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-31-1.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-31-2.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-31-3.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-31-4.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-32-1.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-32-2.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-32-3.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-32-4.png" width="100%"></p>
 <p>When the initial infection contains three meiotic siblings and the
 recurrent parasite is either a stranger or a clone, posterior
 probabilities converge correctly to probable reinfection and probable
 recrudescence, respectively, but with maximal values given by graphs
 over relationships between two, not three, parasites in the initial
 infection.</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-32-1.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-32-2.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-33-1.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-33-2.png" width="100%"></p>
 <p>Relationship graphs (not shown) are wrong for two reasons:</p>
 <ul>
 <li>all the relationship graphs have two, not three, parasites in the
@@ -661,7 +661,7 @@ on graphs with a clonal edge to the sibling relapse, and either two
 stranger parasites in the initial episode when no external MOIs are
 specified, or three sibling parasites in the initial episode when the
 correct MOIs (unknowable in practice) are provided externally.</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-33-1.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-33-2.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-34-1.png" width="100%"><img src="understand-posterior_files/figure-html/unnamed-chunk-34-2.png" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -703,12 +703,12 @@ intra-to-inter match ratio consistently exceeds
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.5</mn><mo>×</mo><msub><mtext mathvariant="normal">log</mtext><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac displaystyle="true"><mn>2</mn><mn>5</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">0.5\times \text{log}_2(\dfrac{2}{5})</annotation></semantics></math>,
 a condition found theoretically to concentrate posterior probability on
 reinfection under certain conditions; again, see <a href="half-siblings.pdf">vignette(“half-siblings”)</a>.</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-34-1.png" width="100%">
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-35-1.png" width="100%">
 When intra-episode parasites systematically share rare alleles
 (admixture AND imbalanced allele frequencies), the frequency of probable
 reinfection increases erratically with the number of markers
 genotyped.</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-35-1.png" width="100%">
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-36-1.png" width="100%">
 In both scenarios, the likelihood of the true graph with siblings within
 and across episodes is quashed as soon as distinct alleles from all
 three parents are observed at a given marker. In general,</p>
@@ -753,12 +753,12 @@ classification.</p>
 <p>When parental parasites draw from the same allele distribution, the
 frequency of certain relapse increases erratically with the number of
 markers genotyped.</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-36-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-37-1.png" width="100%"></p>
 <p>When intra-episode parasites systematically share rare alleles
 (admixture AND imbalanced allele frequencies), the frequency of probable
 reinfection increases erratically with the number of markers
 genotyped.</p>
-<p><img src="understand-posterior_files/figure-html/unnamed-chunk-37-1.png" width="100%"></p>
+<p><img src="understand-posterior_files/figure-html/unnamed-chunk-38-1.png" width="100%"></p>
 <p>In general, when all parasites draw from the same allele
 distribution, the maximum likelihood graph is the true graph with
 siblings within and across episodes. Meanwhile, when intra-episode
