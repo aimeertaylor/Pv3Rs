@@ -251,5 +251,4 @@ for(case in cases) {
   output_HalfSib.PCLikeSib[[case]] <- output
 }
 
-# Save as exported data
-usethis::use_data(output_HalfSib.PCLikeSib, overwrite = TRUE)
+save(output_HalfSib.PCLikeSib, file = "output_HalfSib.PCLikeSib.rda")

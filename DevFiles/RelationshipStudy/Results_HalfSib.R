@@ -8,7 +8,7 @@ rm(list = ls())
 attached <- search()
 if("output" %in% attached) detach(output)
 if(exists("output")) rm("output")
-load("../../data/output_HalfSib.PCLikeSib.rda")
+load("output_HalfSib.PCLikeSib.rda")
 output <- output_HalfSib.PCLikeSib[["Half"]]
 attach(output)
 max_markers <- max(n_markers)

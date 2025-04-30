@@ -10,7 +10,7 @@ rm(list = ls())
 attached <- search()
 if("output" %in% attached) detach(output)
 if(exists("output")) rm("output")
-load("../../data/output_HalfSib.PCLikeSib.rda")
+load("output_HalfSib.PCLikeSib.rda")
 output <- output_HalfSib.PCLikeSib[["PCLike"]]
 attach(output)
 

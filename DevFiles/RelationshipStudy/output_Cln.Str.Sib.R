@@ -227,5 +227,4 @@ for(case in cases){
   output_Cln.Str.Sib[[case]] <- output
 }
 
-# Save as exported data
-usethis::use_data(output_Cln.Str.Sib, overwrite = TRUE)
+save(output_Cln.Str.Sib, file = "output_Cln.Str.Sib.rda")

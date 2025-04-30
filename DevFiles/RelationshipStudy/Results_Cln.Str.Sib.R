@@ -23,7 +23,7 @@
 rm(list = ls())
 par_default <- par(no.readonly = TRUE)
 cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
-load("../../data/output_Cln.Str.Sib.rda")
+load("output_Cln.Str.Sib.rda")
 
 for(case in cases){
 

@@ -6,7 +6,7 @@
 \alias{Pv3Rs-package}
 \title{Pv3Rs: Estimate the cause of recurrent vivax malaria using genetic data}
 \description{
-Estimate the per-person posterior probability that a recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse, reinfection (3Rs) using per-person P. vivax genetic data on more than one infection.
+Estimate per-person posterior probabilities that each recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse, reinfection (3Rs) using per-person P. vivax genetic data on two or more infections.
 }
 \seealso{
 Useful links:
@@ -27,7 +27,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item European Union, Project 101110393 [funder]
+  \item European Union, Project 101110393 — PvRecur [funder]
 }
 
 }
