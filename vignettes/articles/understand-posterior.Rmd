@@ -22,8 +22,6 @@ load("../../DevFiles/RelationshipStudy/output_Cln.Str.Sib.rda")
 load("../../DevFiles/RelationshipStudy/output_HalfSib.PCLikeSib.rda")
 ```
 
-```
-
 # Summary of contents
 
 In this vignette we document the output of `compute_posterior` when the
