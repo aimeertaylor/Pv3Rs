@@ -17,6 +17,9 @@ knitr::opts_chunk$set(
 ```{r setup, include = FALSE} 
 library(Pv3Rs)
 options(warn = -1) # Suppress warnings about missing and limited data
+```
+
+```{r echo = FALSE}
 # Load data that are not exported with Pv3Rs: 
 load("../../DevFiles/RelationshipStudy/output_Cln.Str.Sib.rda") 
 load("../../DevFiles/RelationshipStudy/output_HalfSib.PCLikeSib.rda")
