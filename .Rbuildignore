@@ -23,8 +23,6 @@ DevFiles*
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^vignettes/articles$
-^data/output_Cln\.Str\.Sib\.rda$
-^data/output_HalfSib\.PCLikeSib\.rda$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
