@@ -4,13 +4,16 @@
 \alias{determine_MOIs}
 \title{Determine MOIs from unphased data}
 \usage{
-determine_MOIs(y)
+determine_MOIs(y, return.names = FALSE)
 }
 \arguments{
 \item{y}{Observed data in the form of a list of lists. The outer list is a
 list of episodes in chronological order. The inner list is a list of named
 markers per episode. For each marker, one must specify an allelic vector: a
 set of distinct alleles detected at that marker.}
+
+\item{return.names}{Logical; if TRUE and episodes are named, episode names
+are returned.}
 }
 \value{
 Returns a vector of the (minimum) multiplicity of infection (MOI) for

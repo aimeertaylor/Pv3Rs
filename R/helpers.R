@@ -17,6 +17,8 @@
 #'   list of episodes in chronological order. The inner list is a list of named
 #'   markers per episode. For each marker, one must specify an allelic vector: a
 #'   set of distinct alleles detected at that marker.
+#' @param return.names Logical; if TRUE and episodes are named, episode names
+#'   are returned.
 #'
 #' @return Returns a vector of the (minimum) multiplicity of infection (MOI) for
 #'   each infection.
@@ -30,8 +32,13 @@
 #' determine_MOIs(y) # should be c(2, 3)
 #'
 #' @export
-determine_MOIs <- function(y) {
-  unname(sapply(prep_data(y), function(x) max(sapply(x, length))))
+determine_MOIs <- function(y, return.names = FALSE) {
+  if(return.names) {
+    if(is.null(names(y))) warning("unnamed episodes")
+    sapply(prep_data(y), function(x) max(sapply(x, length)))
+  } else {
+    unname(sapply(prep_data(y), function(x) max(sapply(x, length))))
+  }
 }
 
 #' Find all allele assignments for genotypes within the same infection
@@ -360,3 +367,4 @@ msg_progress_bar <-
       }
     )
   )
+
