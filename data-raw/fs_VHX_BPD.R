@@ -1,8 +1,9 @@
 ################################################################################
 # Code to prepare fs_VHX_BPD dataset following best practice outlined in 7.1.1
 # of https://r-pkgs.org/data.html. This script only features in the source
-# version of the package (it is listed under .Rbuildignore). Path to real data:
-# https://github.com/jwatowatson/RecurrentVivax/blob/master/RData/GeneticModel/
+# version of the package (it is listed under .Rbuildignore). Real data
+# downloaded from the following link and saved in the same directory as this
+# file: https://zenodo.org/records/3368828.
 #################################################################################
 
 rm(list = ls())
