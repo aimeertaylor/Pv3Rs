@@ -13,10 +13,10 @@ y.dfs <- plyr::dlply(MS_pooled, 'ID') # Group genetic data by patient ID
 # ==============================================================================
 # Reformat data
 # ==============================================================================
-ys_VHX_BPD <- lapply(names(y.dfs), function(i) {
+ys_VHX_BPD <- lapply(names(y.dfs), function(pid) {
 
-  # Extract data for a given patient
-  y.df <- y.dfs[[i]]
+  # Extract data for a given patient IDs
+  y.df <- y.dfs[[pid]]
 
   # Extract markers for which there is at least one non-NA
   ms <- MSs_all[apply(!is.na(y.df[MSs_all]), 2, any)]
@@ -35,6 +35,15 @@ ys_VHX_BPD <- lapply(names(y.dfs), function(i) {
       }
     }), ms)
   })
+
+  # Covert episode IDs into episode indices
+  names(y) <- do.call(rbind, strsplit(names(y), split = "_"))[,3]
+
+  # Check episodes ordered correctly and if not re-order and re-check
+  if(!all(as.numeric(names(y)) == cummax(as.numeric(names(y))))){
+    y <- y[order(as.numeric(names(y)))]
+    if (!all(as.numeric(names(y)) == cummax(as.numeric(names(y))))) stop()
+  }
 
   # Return patient data
   return(y)
