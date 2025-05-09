@@ -75,9 +75,11 @@ flow for a single study participant; i.e.,</p>
 </ol>
 <p>And we show how one might explore relationship graphs and their log
 likelihoods. In one or more upcoming scientific publications, we plan to
-publish a more elaborate study-level <code>Pv3Rs</code> work flow
+publish a more elaborate study-level <code>Pv3Rs</code> tutorial
 including examples of</p>
 <ul>
+<li>how to generate estimates pairwise when the total genotype count
+over multiple recurrences exceeds eight</li>
 <li>how to compute false discovery rates</li>
 <li>how to do a sensitivity analysis for genotyping errors</li>
 <li>how to do a sensitivity analysis for sibling misspecification</li>
@@ -193,6 +195,14 @@ we find the most likely sequence of recurrence states is
 <span><span class="co">#&gt; 0.00000000 0.21338194 0.45682305 0.00000000 0.08501504 0.15385932 0.00000000 </span></span>
 <span><span class="co">#&gt;         LI         II </span></span>
 <span><span class="co">#&gt; 0.03105856 0.05986209</span></span></code></pre></div>
+<p>Aside: we do not recommend running
+<code><a href="../reference/compute_posterior.html">Pv3Rs::compute_posterior()</a></code> for data whose total genotype
+count (sum of per-episode multiplicities of infection) exceeds eight.
+That said, we have not imposed a hard limit on the code. It is possible,
+but very long, to generate estimates using data with a total genotype
+count up to 10 (see code below, which we time out after 2 seconds);
+above 10 genotypes, calls to <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> are liable
+cause memory-use problems and fail.</p>
 </div>
 <div class="section level2">
 <h2 id="exploration-of-relationship-graphs-and-their-log-likelihoods">Exploration of relationship graphs and their log likelihoods<a class="anchor" aria-label="anchor" href="#exploration-of-relationship-graphs-and-their-log-likelihoods"></a>

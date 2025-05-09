@@ -121,7 +121,7 @@
 </h3>
 <ul>
 <li><p>Pv3Rs scales to 100s of markers but not whole-genome sequence (WGS) data.</p></li>
-<li><p>We do not recommend running <code><a href="reference/compute_posterior.html">Pv3Rs::compute_posterior()</a></code> for data whose total genotype count (sum of per-episode multiplicities of infection) exceeds eight. If the total genotype counts exceeds eight but there are multiple recurrences, it might be possible to generate recurrent state estimates for recurrences one-by-one (this approach was used in [2]).</p></li>
+<li><p>We do not recommend running <code><a href="reference/compute_posterior.html">Pv3Rs::compute_posterior()</a></code> for data whose total genotype count (sum of per-episode multiplicities of infection) exceeds eight. If the total genotype counts exceeds eight but there are multiple recurrences, it might be possible to generate recurrent state estimates for recurrences analysing episodes pairwise (this approach was used in [2]).</p></li>
 <li><p>We have not tested the per-marker allele limit of <code><a href="reference/compute_posterior.html">Pv3Rs::compute_posterior()</a></code>. Very high marker cardinalities could lead to very small allele frequencies and thus underflow problems.</p></li>
 </ul>
 </div>
