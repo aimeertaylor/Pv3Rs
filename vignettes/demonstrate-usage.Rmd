@@ -30,8 +30,9 @@ participant; i.e.,
 
 And we show how one might explore relationship graphs and their log likelihoods.
 In one or more upcoming scientific publications, we plan to publish a more
-elaborate study-level `Pv3Rs` work flow including examples of
+elaborate study-level `Pv3Rs` tutorial including examples of
 
+- how to generate estimates pairwise when the total genotype count over multiple recurrences exceeds eight
 - how to compute false discovery rates 
 - how to do a sensitivity analysis for genotyping errors
 - how to do a sensitivity analysis for sibling misspecification
@@ -142,6 +143,12 @@ post$joint[which.max(post$joint)]`
 post$joint
 ```
 
+Aside: we do not recommend running `Pv3Rs::compute_posterior()` for data whose total
+genotype count (sum of per-episode multiplicities of infection) exceeds eight.
+That said, we have not imposed a hard limit on the code. It is possible, but
+very long, to generate estimates using data with a total genotype count up to 10
+(see code below, which we time out after 2 seconds); above 10 genotypes, calls to
+`compute_posterior()` are liable cause memory-use problems and fail.
 
 ## Exploration of relationship graphs and their log likelihoods
 

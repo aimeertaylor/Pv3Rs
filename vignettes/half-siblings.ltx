@@ -446,7 +446,7 @@ Consider the case where $\lambda\rightarrow 0$, i.e. one of the allele frequenci
 
 \subsubsection*{Limiting distributions give rise to erratic behaviour}
 
-In the case of $d=3$ possible alleles per marker, large number of markers $m$, and $\lambda\rightarrow\infty$, simulations show that the likelihood ratio $\mathbb{P}(\bm{y} | \rg_\RN{4} ) / \mathbb{P}(\bm{y} | \rg_\RN{5} )$ (intra-sib to inter-sib) is not always close to 0 (see vignette entitled Understand posterior estimates). The same also occurs when $\lambda\rightarrow 0$ (these simulations are not documented). We can corroborate these results analytically. Let $c_j$ denote the observation case number for marker $j$. Using the results from Table~\ref{tbl:graph_ratios}, we obtain
+In the case of $d=3$ possible alleles per marker, large number of markers $m$, and $\lambda\rightarrow\infty$, simulations show that the likelihood ratio $\mathbb{P}(\bm{y} | \rg_\RN{4} ) / \mathbb{P}(\bm{y} | \rg_\RN{5} )$ (intra-sib to inter-sib) is not always close to 0 (see vignette entitled ``Understand posterior estimates''). The same also occurs when $\lambda\rightarrow 0$ (these simulations are not documented). We can corroborate these results analytically. Let $c_j$ denote the observation case number for marker $j$. Using the results from Table~\ref{tbl:graph_ratios}, we obtain
 \begin{equation}\label{eq:IV_to_V}
     \frac{\mathbb{P}(\bm{y} | \rg_\RN{4} ) }{ \mathbb{P}(\bm{y} | \rg_\RN{5} )} = \frac{\displaystyle\prod_{j\colon c_j=3} \left(1+\frac{1}{f(\alpha_j)}\right)}{\displaystyle\prod_{j\colon c_j=4} \left(1+\frac{1}{2f(\alpha_j)}\right)}.
 \end{equation}
