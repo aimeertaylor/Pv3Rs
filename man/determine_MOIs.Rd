@@ -21,12 +21,13 @@ each infection.
 }
 \description{
 The MOIs returned correspond to the parsimonious explanation of the data,
-i.e. the minimal MOIs required to support the observed allelic diversity.
+i.e., the minimal MOIs required to support the observed allelic diversity.
 }
 \details{
 For a given episode, the minimal MOI required to support the observed allelic
 diversity is equal to the maximum number of per-marker alleles observed
-across markers.
+across markers. These MOIs are the default used by
+\code{\link{compute_posterior}}.
 
 At present, \code{Pv3Rs} only supports prevalence data (categorical data that
 signal the detection of alleles), not quantitative (proportional abundance)
