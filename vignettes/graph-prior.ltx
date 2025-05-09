@@ -52,7 +52,7 @@ We start by making some observations about the posterior odds of relapse to rein
 
 For clarity of exposition, we start with the case of a single recurrent episode. Let $\RG_\recru, \RG_\relap,$ and $\RG_\reinf$ denote subsets of the graph space $\RG$, containing the relationship graphs compatible with recrudescence, relapse, and reinfection respectively. The posterior odds of relapse to recrudescence is given by
 
-\small
+
 \begin{equation*}
 o_{\relap:\recru} \coloneqq 
 \frac{\mathbb{P}(\bm{y} | \relap)\mathbb{P}(\relap)}{\mathbb{P}(\bm{y} | \recru)\mathbb{P}(\recru)} =
@@ -63,7 +63,7 @@ o_{\relap:\recru} \coloneqq
 \frac{\mathbb{P}(\relap)}{\mathbb{P}(\recru)}
 \frac{| \RG_\recru |}{| \RG_\relap |} \left(1 + \frac{\sum_{\rg\in\RG_\relap\setminus\RG_\recru}\mathbb{P}(\bm{y} | \rg)}{\sum_{\rg\in\RG_\recru}\mathbb{P}(\bm{y} | \rg)}\right), 
 \end{equation*}
-\normalsize
+
 
 where $\RG_\relap\setminus\RG_\recru$ is the subset of graphs compatible with relapse but not recrudescence (graphs where genotypes from the recurrent episode are not all clones from the initial episode). It follows that $o_{\relap:\recru} \ge 
 \sfrac{\mathbb{P}(\relap)| \RG_\recru |}
@@ -167,17 +167,18 @@ converges to
 \end{equation*}
 when $\sum_{\rg\in\RG_{\recru\recru}} \mathbb{P}(\bm{y} | \rg)$ significantly exceeds the summation over all other subsets of graph space in equation \eqref{eq:CC_prob_max}. 
 
-Bounds on marginal posteriors are harder to compute because computation involves summation over sequences whose probabilities are not necessarily zero. For example, the bound on recrudescence at the first recurrence of two recurrences, is a maximum of three upper bounds each involving non-zero probabilities: the bound when 
+Bounds on marginal posteriors are harder to compute because computation involves summation over sequences whose probabilities are not necessarily zero. For example, the bound on recrudescence at the first recurrence of two recurrences, is a maximum of three upper bounds each involving non-zero probabilities: 
 \begin{enumerate}
-    \item the probability of CC is maximal and the probabilities of CI \& CL are not necessarily both zero. 
-    \item the probability of CL is maximal and the probabilities of CC \& CI are not necessarily both zero. 
-    \item  the probability of CI is maximal and the probabilities of CC \& CL are not necessarily both zero
+    \item bound given maximal CC probability (probabilities of CI \& CL are not necessarily both zero) 
+    \item bound given maximal CL probability (probabilities of CC \& CI are not necessarily both zero) 
+    \item  bound given maximal CI probability (probabilities of CC \& CL are not necessarily both zero)
 \end{enumerate}
 
 \paragraph{Digression}
-In the subsection ``Increasing episode counts'' of the vignette entitled ``Understand posterior estimates'' we compute maximum marginal probabilities of recrudescence / reinfection at the first recurrence of two / three recurrences. These maxima are not bounds imposed by the prior: they are based on knowledge that there are no recurrent data on all but the first recurrence. The computation only holds because all episodes are monoclonal. When all episodes are monoclonal, equivalent sequences (e.g., CC, CI and CL in the case of two recurrences with strong evidence of recrudescence on the first and no data on the second) are equal. Otherwise (for reasons analogous to those that explain departure from the prior in the section ``Data on only one episode) they are unequal. In addition, when all episodes are monoclonal, graph likelihoods are equal for all graphs compatible with equivalent sequences, e.g., $\mathbb{P}(\bm{y} | \rg)$ is the same for all $\rg \in \RG_{\recru\recru}$, for all $\rg \in \RG_{\recru\reinf}$ and for all $\rg \in \RG_{\recru\relap}$. As such, the factor $\mathbb{P}(\bm{y} | \rg)$ drops out of the upper bound and we can express the probability for a given sequence as a ratio of graph spaces. For example, given a uniform prior on recurrent states, the posterior probability of CC given strong evidence of recrudescence for the first recurrence and no data on the second recurrence is 
+In the subsection ``Increasing episode counts'' of the vignette entitled ``Understand posterior estimates'' we compute maximum marginal probabilities of recrudescence / reinfection at the first recurrence of two / three recurrences. These maxima are not bounds imposed by the prior: they are based on additional knowledge that there are no recurrent data on all but the first recurrence. The computation only holds because all episodes are monoclonal. When all episodes are monoclonal, the likelihood of equivalent sequences (e.g., CC, CI and CL in the case of two recurrences with strong evidence of recrudescence on the first and no data on the second) are equal (otherwise, they are unequal for reasons analogous to those that explain departure from the prior in the section ``Data on only one episode'') and graph likelihoods are equal for all graphs compatible with equivalent sequences (e.g., $\mathbb{P}(\bm{y} | \rg)$ is the same $\forall \rg \in \RG_{\recru\recru}$, $\forall \rg \in \RG_{\recru\reinf}$, and $\forall \rg \in \RG_{\recru\relap}$ in the case of two recurrences with strong evidence of recrudescence on the first and no data on the second). Given a uniform prior on recurrent states, three monoclonal episodes with strong evidence of recrudescence for the first recurrence and no data on the second recurrence, we thus have 
 \begin{align}
-  &\leq
+&\mathbb{P}(s_1 = \recru | \bm{y}  ) \\ 
+&\leq 
     \dfrac{
     \sfrac{\sum_{\rg\in\RG_{\recru\recru}} \mathbb{P}(\bm{y} | \rg) }{|\RG_{\recru\recru}|}}
     {
@@ -193,7 +194,7 @@ In the subsection ``Increasing episode counts'' of the vignette entitled ``Under
     +
     \dfrac{\sum_{\rg\in\RG_{\recru\relap}} \mathbb{P}(\bm{y} | \rg)}{|\RG_{\relap\relap}|}
   } \nonumber \\
-  &=
+   &=
     \dfrac{\sfrac{|\RG_{\recru\recru}|}{|\RG_{\recru\recru}|}}
     {
     \dfrac{|\RG_{\recru\recru}|}{|\RG_{\recru\recru}|}  
@@ -211,19 +212,19 @@ In the subsection ``Increasing episode counts'' of the vignette entitled ``Under
   &= \dfrac{1}
   {3 + \sfrac{1}{3} + \sfrac{1}{3} + \sfrac{3}{12}}. \label{eq:marginal_bound}
 \end{align}
-
+The same reasoning applies given strong evidence of reinfection. 
 
 
 
 \section{Bounds as indicators of data informativeness}
 
-By comparing probability estimates to their respective bounds, we might like to answer the question: could the posterior probability of my most probable state sequence be higher if I added data on more markers? However, we cannot guarantee convergence onto bounds. In the case of a marginal probability, the bound is the maximum of multiple upper bounds (see example above), and thus convergence is not guaranteed; in the case of a non-marginal probability, we suspect convergence might depend on the true relationship graph on which data are conditioned.  
+By comparing probability estimates to their respective bounds, we might like to answer the question: could the posterior probability of my most probable state sequence be higher if I added data on more markers? However, we cannot guarantee convergence onto bounds. In the case of a marginal probability, the bound is the maximum of multiple upper bounds (see example above), and thus convergence is not guaranteed; in the case of a non-marginal probability, we suspect convergence might depend on the relationship graph from which the data are generated.  
 
 
 
 \section{How bounds induced by the graph prior change with MOI}
 
-In this section we explore how maximum probabilities of recrudescence / reinfection given a single recurrence change with graph size, where maximum probabilities are those induced by the the graph prior. Maximum probabilities of reinfection increase with the size of the graph, both when MOIs of the enrolment episode and the first recurrence are equal (plot \ref{fig:MOIDiff_reinfection}, centre) and not (plot \ref{fig:MOIDiff_reinfection}, off-centre). Maximum probabilities of recrudescence increase with graph size when the MOIs of the enrolment episode and the first recurrence are equal (plot \ref{fig:MOIDiff_recrudescence}, centre); they decrease with increasing disparity between the higher MOI of the enrolment episode and the lower MOI of the first recurrence (plot \ref{fig:MOIDiff_recrudescence}, right of centre). Note that, when the MOI of first recurrence exceeds that of the enrolment episode, recrudescence has zero posterior probability because it is assumed under the Pv3Rs model that all parasites are detected and there are no genotyping errors; as such, a recrudescence can be at most as diverse as the preceding episode. 
+In this section we explore how maximum probabilities of recrudescence / reinfection given a single recurrence change with graph size, where maximum probabilities are those induced by the the graph prior. Maximum probabilities of reinfection increase with the size of the graph, both when MOIs of the enrolment episode and the first recurrence are equal (plot \ref{fig:MOIDiff_reinfection}, centre) and not (plot \ref{fig:MOIDiff_reinfection}, off-centre). Maximum probabilities of recrudescence increase with graph size when the MOIs of the enrolment episode and the first recurrence are equal (plot \ref{fig:MOIDiff_recrudescence}, centre); they decrease with increasing disparity between the higher MOI of the enrolment episode and the lower MOI of the first recurrence (plot \ref{fig:MOIDiff_recrudescence}, right of centre). Note that, when the MOI of first recurrence exceeds that of the enrolment episode, recrudescence has zero posterior probability because we assume under the Pv3Rs model that all parasites are detected and that there are no genotyping errors; as such, a recrudescence can be at most as diverse as the preceding episode. 
 
 \begin{figure}[h]
 \begin{subfigure}{.5\textwidth}
