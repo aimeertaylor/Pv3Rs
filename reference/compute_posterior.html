@@ -192,7 +192,1019 @@ abundance of the alleles detected).</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># ===========================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Example where alleles are named numerically</span></span></span>
+<span class="r-in"><span><span class="co"># ===========================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Data</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enroll <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'3'</span>,<span class="st">'2'</span><span class="op">)</span>, m2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1'</span>,<span class="st">'2'</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          recur1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1'</span>,<span class="st">'4'</span><span class="op">)</span>, m2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1'</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          recur2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1'</span><span class="op">)</span>, m2 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Allele frequencies</span></span></span>
+<span class="r-in"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1'</span> <span class="op">=</span> <span class="fl">0.78</span>, <span class="st">'2'</span> <span class="op">=</span> <span class="fl">0.14</span>, <span class="st">'3'</span> <span class="op">=</span> <span class="fl">0.07</span>, <span class="st">'4'</span> <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>           m2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1'</span> <span class="op">=</span> <span class="fl">0.27</span>, <span class="st">'2'</span> <span class="op">=</span> <span class="fl">0.73</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Compute posterior probabilities using default prior</span></span></span>
+<span class="r-in"><span><span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 250</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 250 RGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $marg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                C         L         I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur1 0.0000000 0.1949556 0.8050444</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur2 0.2938829 0.2476598 0.4584573</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $joint</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         CC         LC         IC         CL         LL         IL         CI </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.00000000 0.05539481 0.23848807 0.00000000 0.05314490 0.19451493 0.00000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         LI         II </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.08641590 0.37204139 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># ===========================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Example where alleles are named arbitrarily and probabilities are plotted</span></span></span>
+<span class="r-in"><span><span class="co"># ===========================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Data</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>episode0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>marker1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tinky Winky"</span>, <span class="st">"Dipsy"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                          marker2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tinky Winky"</span>, <span class="st">"Laa-Laa"</span>, <span class="st">"Po"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          episode1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>marker1 <span class="op">=</span> <span class="st">"Tinky Winky"</span>,</span></span>
+<span class="r-in"><span>                          marker2 <span class="op">=</span> <span class="st">"Laa-Laa"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Allele frequencies</span></span></span>
+<span class="r-in"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>marker1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tinky Winky"</span> <span class="op">=</span> <span class="fl">0.4</span>, <span class="st">"Dipsy"</span> <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>           marker2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tinky Winky"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"Laa-Laa"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"Po"</span> <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Compute posterior probabilities using default prior</span></span></span>
+<span class="r-in"><span><span class="va">posterior_probs</span> <span class="op">&lt;-</span> <span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 30</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 30 RGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Plot posterior probabilities on the simplex</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_simplex.html">plot_simplex</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Recrudescence"</span>, <span class="st">"Relapse"</span>, <span class="st">"Reinfection"</span><span class="op">)</span>, <span class="fl">0.5</span><span class="op">)</span> <span class="co"># Simplex</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="project2D.html">project2D</a></span><span class="op">(</span><span class="va">posterior_probs</span><span class="op">$</span><span class="va">marg</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">)</span> <span class="co"># Project probabilities</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xy</span><span class="op">[</span><span class="st">"x"</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">xy</span><span class="op">[</span><span class="st">"y"</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="co"># Plot projected probabilities</span></span></span>
+<span class="r-plt img"><img src="compute_posterior-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#============================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Demonstrating the return of the prior when all data are missing</span></span></span>
+<span class="r-in"><span><span class="co">#============================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Data</span></span></span>
+<span class="r-in"><span><span class="va">y_missing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enroll <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                  recur1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                  recur2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Return of the prior</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y_missing</span>, fs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Markers m1 has data on one episode only</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episodes enroll &amp; recur1 &amp; recur2 have no data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $marg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                C         L         I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur1 0.3333333 0.3333333 0.3333333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur2 0.3333333 0.3333333 0.3333333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $joint</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        CC        LC        IC        CL        LL        IL        CI        LI </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.1111111 0.1111111 0.1111111 0.1111111 0.1111111 0.1111111 0.1111111 0.1111111 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        II </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.1111111 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Return of the prior re-weighted to the exclusion of recrudescence</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y_missing</span>, fs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                 MOIs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Markers m1 has data on one episode only</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episodes enroll &amp; recur1 &amp; recur2 have no data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $marg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        C   L   I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur1 0 0.5 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur2 0 0.5 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $joint</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   CC   LC   IC   CL   LL   IL   CI   LI   II </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.00 0.00 0.00 0.00 0.25 0.25 0.00 0.25 0.25 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># (Recrudescing parasites are clones of previous blood-stage parasites. The</span></span></span>
+<span class="r-in"><span><span class="co"># Pv3R model assumes no within-host de-novo mutations and perfect allele</span></span></span>
+<span class="r-in"><span><span class="co"># detection. As such, recrudescence is incompatible with an MOI increase on</span></span></span>
+<span class="r-in"><span><span class="co"># the preceding infection.)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># ===========================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Demonstrating the cosmetic-only nature of episode names</span></span></span>
+<span class="r-in"><span><span class="co"># ===========================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Data</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enroll <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          recur2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          recur1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use a non-uniform prior for the purpose of illustration</span></span></span>
+<span class="r-in"><span><span class="va">prior</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>,<span class="fl">0.2</span>,<span class="fl">0.6</span>,<span class="fl">0.7</span>,<span class="fl">0.1</span>,<span class="fl">0.2</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span>, nrow <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>                dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"recur1_prior"</span>, <span class="st">"recur2_prior"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"L"</span>, <span class="st">"I"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Print posterior and prior, noting that "recur1_prior" is returned for</span></span></span>
+<span class="r-in"><span><span class="co"># "recur2", and "recur2_prior" is returned for "recur1"</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y</span>, fs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>, <span class="va">prior</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Data and prior episode names disagree</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Markers m1 has data on one episode only</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episodes enroll &amp; recur2 &amp; recur1 have no data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          C   L   I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur2 0.2 0.2 0.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur1 0.7 0.1 0.2</span>
+<span class="r-in"><span><span class="va">prior</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                C   L   I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur1_prior 0.2 0.2 0.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> recur2_prior 0.7 0.1 0.2</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#============================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Demonstrating the informative nature of non-recurrent data</span></span></span>
+<span class="r-in"><span><span class="co">#============================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Data and allele frequencies</span></span></span>
+<span class="r-in"><span><span class="va">y_het</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1'</span>, <span class="st">'2'</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y_hom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">'1'</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'1'</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">'2'</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The prior is not returned despite there being no recurrent data; see</span></span></span>
+<span class="r-in"><span><span class="co"># ["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">compute_posterior</span><span class="op">(</span>y <span class="op">=</span> <span class="va">y_het</span>, <span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Markers m1 has data on one episode only</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              C         L         I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.3292683 0.3414634 0.3292683</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">compute_posterior</span><span class="op">(</span>y <span class="op">=</span> <span class="va">y_hom</span>, <span class="va">fs</span>, MOIs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Markers m1 has data on one episode only</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              C         L         I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.3358209 0.3283582 0.3358209</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#============================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Demonstrating the effect of increasingly large relationship graphs: the</span></span></span>
+<span class="r-in"><span><span class="co"># marginal probability of the first recurrence changes slightly, albeit at a</span></span></span>
+<span class="r-in"><span><span class="co"># decreasing rate, as the number of additional recurrences (all without data)</span></span></span>
+<span class="r-in"><span><span class="co"># increases. The change is greatest when the observed allele is rare.</span></span></span>
+<span class="r-in"><span><span class="co">#============================================================================</span></span></span>
+<span class="r-in"><span><span class="co"># Data for different recurrence counts where only the 1st recurrence has data</span></span></span>
+<span class="r-in"><span><span class="va">ys</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scenario1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enroll <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>           scenario2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enroll <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>           scenario3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enroll <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>           scenario4 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enroll <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            recur4 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Allele frequencies: smaller f_A leads to larger change</span></span></span>
+<span class="r-in"><span><span class="va">f_A</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>; <span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="va">f_A</span>, <span class="st">"Other"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">-</span><span class="va">f_A</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Compute posterior probabilities and extract marginal probabilities</span></span></span>
+<span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ys</span>, <span class="kw">function</span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 3 RGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==========================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episode recur2 has no data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 12</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 12 RGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episodes recur2 &amp; recur3 have no data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 60</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 60 RGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ==</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episodes recur2 &amp; recur3 &amp; recur4 have no data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 358</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 358 RGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> |</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Extract results for the first recurrence</span></span></span>
+<span class="r-in"><span><span class="va">results_recur1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">results</span>, <span class="kw">function</span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="va">result</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">results_recur1</span> <span class="co"># Results are different for different scenarios</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    scenario1  scenario2  scenario3  scenario4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C 0.60606061 0.61538462 0.62294515 0.62925894</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> L 0.33333333 0.32307692 0.31476034 0.30781517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> I 0.06060606 0.06153846 0.06229451 0.06292589</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Visualise the change in the marginal probability of the first recurrence</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_simplex.html">plot_simplex</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Recrudescence"</span>, <span class="st">"Relapse"</span>, <span class="st">"Reinfection"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Plot simplex</span></span></span>
+<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">results_recur1</span>, <span class="fl">2</span>, <span class="va">project2D</span><span class="op">)</span> <span class="co"># Project probabilities</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xy</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span>, y <span class="op">=</span> <span class="va">xy</span><span class="op">[</span><span class="st">"y"</span>, <span class="op">]</span>, pch <span class="op">=</span> <span class="st">"-"</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span> <span class="co"># Plot projections</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"left"</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, pch <span class="op">=</span> <span class="st">"-"</span>, pt.cex <span class="op">=</span> <span class="fl">2</span>, bty <span class="op">=</span> <span class="st">"n"</span>, legend <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,</span></span>
+<span class="r-in"><span>title <span class="op">=</span> <span class="st">"Recurrence \n count"</span><span class="op">)</span> <span class="co"># legend</span></span></span>
+<span class="r-plt img"><img src="compute_posterior-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
