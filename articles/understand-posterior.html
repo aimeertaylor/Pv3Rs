@@ -333,7 +333,8 @@ of recrudescence / reinfection are a subset of those compatible with
 sequences of relapse, bounds induced by the prior on non-marginal
 posterior probabilities can be computed <em>a priori</em> as a function
 of the prior on the recurrent state sequences and the prior on the
-relationship graphs; see <code>vignette("graph-prior")</code>.</p>
+relationship graphs; see
+<code>vignette("graph-prior", "Pv3Rs")</code>.</p>
 <p>Because the probability mass function of a uniformly distributed
 discrete random variable depends on the size of its support, the prior
 on uniformly distributed graphs (and thus bounds on the posterior
@@ -410,7 +411,8 @@ by increasing counts of intra-episode siblings. Arguably, maximum
 probabilities should not increase with more than two intra-episode
 siblings because siblings are not independent. In practice, when MOIs
 under the Pv3Rs model are based on realistic MOI estimates, groups of
-three or more siblings are modelled as groups of two; see <a href="intra-episode-siblings.html">vignette(“intra-episode-siblings”)</a>.</p>
+three or more siblings are modelled as groups of two; see
+<code><a href="../articles/intra-episode-siblings.html">vignette("intra-episode-siblings", "Pv3Rs")</a></code>.</p>
 <p>END OF DIGRESSION</p>
 </div>
 </div>
@@ -446,7 +448,7 @@ maxima over 1, 2, 5 and 100 markers:</p>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-25-1.png" width="100%"></p>
 <p>Note that the above maxima are not bounds imposed by the prior: they
 are based on knowledge that there are no recurrent data on all but the
-first recurrence; see <a href="graph-prior.pdf">vignette(“graph-prior”)</a>.</p>
+first recurrence; see <code>vignette("graph-prior", "Pv3Rs")</code>.</p>
 </div>
 <div class="section level3">
 <h3 id="position-in-a-sequence">Position in a sequence<a class="anchor" aria-label="anchor" href="#position-in-a-sequence"></a>
@@ -699,13 +701,14 @@ erratically because a small perturbation to the ratio of observations
 (all alleles match across the three half siblings, all alleles are
 different, intra-episode alleles match, inter-episode alleles match) can
 lead to a large deviation in the odds of relapse versus reinfection; see
-<a href="half-siblings.pdf">vignette(“half-siblings”)</a>. The purple,
-red, and green trajectories below have higher than the expected 0.5
+<code>vignette("half-siblings", "Pv3Rs")</code>. The purple, red, and
+green trajectories below have higher than the expected 0.5
 intra-to-inter match ratios; moreover, the purple trajectory’s
 intra-to-inter match ratio consistently exceeds
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.5</mn><mo>×</mo><msub><mtext mathvariant="normal">log</mtext><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mfrac displaystyle="true"><mn>2</mn><mn>5</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">0.5\times \text{log}_2(\dfrac{2}{5})</annotation></semantics></math>,
 a condition found theoretically to concentrate posterior probability on
-reinfection under certain conditions; again, see <a href="half-siblings.pdf">vignette(“half-siblings”)</a>.</p>
+reinfection under certain conditions; again, see
+<code>vignette("half-siblings", "Pv3Rs")</code>.</p>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-35-1.png" width="100%">
 When intra-episode parasites systematically share rare alleles
 (admixture AND imbalanced allele frequencies), the frequency of probable
