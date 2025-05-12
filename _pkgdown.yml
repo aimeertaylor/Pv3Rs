@@ -2,7 +2,3 @@ url: https://aimeertaylor.github.io/Pv3Rs/
 template:
   bootstrap: 5
   light-switch: true
-  home:
-    sidebar:
-      structure: [links, license, citation, dev]
-
