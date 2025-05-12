@@ -1,6 +1,6 @@
 # Pv3Rs
 
-# pkgdown <img src="man/figures/logo.png" align="right" />
+# Pv3Rs <img src="man/figures/logo.png" align="right" />
 
 An R package developed to enable statistical genetic inference of 
 *Plasmodium vivax* 
