@@ -50,7 +50,7 @@ and thus comment on how the above dependencies impact the
 - interpretation of uncertainty. 
 
 Finally, we summarise results 
-on the output of `compute_posterior` when the model is misspecified because of
+on the output of `compute_posterior()` when the model is misspecified because of
 
 - meiotic siblings,
 - half siblings,
@@ -89,7 +89,7 @@ get_graph_dist <- function(x) {
 
 # Missing data
 
-When data are entirely missing, `compute_posterior` returns the prior. 
+When data are entirely missing, `compute_posterior()` returns the prior. 
 
 ```{r}
 fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
@@ -98,7 +98,7 @@ suppressMessages(compute_posterior(y, fs))$marg # Posterior
 ```
 
 When data are missing but the user provides MOIs that are incompatible with
-recrudescence, `compute_posterior` returns the prior re-weighted to the
+recrudescence, `compute_posterior()` returns the prior re-weighted to the
 exclusion of recrudescence.
 
 ```{r}
@@ -108,7 +108,7 @@ suppressMessages(compute_posterior(y, fs, MOIs = c(1,2)))$marg
 # Uniformative data
 
 When data are entirely uninformative because there is no genetic diversity,
-`compute_posterior` returns the prior.
+`compute_posterior()` returns the prior.
 
 ```{r}
 fs = list(m1 = c("A" = 1)) # Unit allele frequency: no genetic diversity
@@ -121,7 +121,7 @@ suppressMessages(compute_posterior(y, fs))$marg # Posterior
 ## Homoallelic data without user-specified MOIs: prior return
 
 When only one episode has homoallelic data and the user does not specify an MOI
-> 1, `compute_posterior` returns the prior.
+> 1, `compute_posterior()` returns the prior.
 
 ```{r}
 fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
@@ -266,7 +266,7 @@ legend("topleft", pch = 20, bty= "n", col = c("black", "hotpink", "lightgray"),
 # Data are incomparable across episodes
 
 When there are data on multiple episodes but no comparable data across episodes,
-`compute_posterior` behaves similarly to when data are limited to one episode:
+`compute_posterior()` behaves similarly to when data are limited to one episode:
 
 - it returns the prior when data are homoallelic without user-specified MOIs > 1, 
 - its output remains close to the prior when data are heteroallelic,
@@ -294,7 +294,7 @@ suppressMessages(compute_posterior(y_hom, fs, MOIs = c(2,2)))$marg # Prior depar
 # Data on only one marker
 
 When data on a single marker are comparable across episodes, the output of
-`compute_posterior` depends on the observation type and the frequencies of the
+`compute_posterior()` depends on the observation type and the frequencies of the
 observed alleles. For example,
 
 - A rare match is informative: it quashes the posterior probability of 
@@ -987,7 +987,7 @@ likely *a priori*.
 
 ## Results
 
-When the initial infection contains two meiotic siblings `compute_posterior` is
+When the initial infection contains two meiotic siblings `compute_posterior()` is
 well behaved with maximum likelihood on the true relationship graph (not shown). 
 Posterior probabilities converge to
 

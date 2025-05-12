@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 library(Pv3Rs)
 ```
 
-`vignette(topic = "intra-episode", package = "Pv3Rs")`
+`vignette(topic = "intra-episode-siblings", package = "Pv3Rs")`
 In this vignette we demonstrate the basic `Pv3Rs` work flow for a single study
 participant; i.e.,
 
