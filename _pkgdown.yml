@@ -3,5 +3,5 @@ template:
   bootstrap: 5
 home:
   sidebar:
-    structure: [links, license, citation, authors, dev]
+    structure: [links, license, citation, dev]
 
