@@ -98,7 +98,7 @@ MOIs),</li>
 <li>interpretation of uncertainty.</li>
 </ul>
 <p>Finally, we summarise results on the output of
-<code>compute_posterior</code> when the model is misspecified because
+<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> when the model is misspecified because
 of</p>
 <ul>
 <li>meiotic siblings,</li>
@@ -126,7 +126,7 @@ sensitivity analyses.</p>
 <div class="section level2">
 <h2 id="missing-data">Missing data<a class="anchor" aria-label="anchor" href="#missing-data"></a>
 </h2>
-<p>When data are entirely missing, <code>compute_posterior</code>
+<p>When data are entirely missing, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>
 returns the prior.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="co"># Allele frequencies</span></span>
@@ -135,8 +135,8 @@ returns the prior.</p>
 <span><span class="co">#&gt;               C         L         I</span></span>
 <span><span class="co">#&gt; recur 0.3333333 0.3333333 0.3333333</span></span></code></pre></div>
 <p>When data are missing but the user provides MOIs that are
-incompatible with recrudescence, <code>compute_posterior</code> returns
-the prior re-weighted to the exclusion of recrudescence.</p>
+incompatible with recrudescence, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>
+returns the prior re-weighted to the exclusion of recrudescence.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span>, MOIs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span> </span>
 <span><span class="co">#&gt;       C   L   I</span></span>
@@ -146,7 +146,7 @@ the prior re-weighted to the exclusion of recrudescence.</p>
 <h2 id="uniformative-data">Uniformative data<a class="anchor" aria-label="anchor" href="#uniformative-data"></a>
 </h2>
 <p>When data are entirely uninformative because there is no genetic
-diversity, <code>compute_posterior</code> returns the prior.</p>
+diversity, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> returns the prior.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Unit allele frequency: no genetic diversity</span></span>
 <span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>, recur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Data: not missing</span></span>
@@ -161,7 +161,7 @@ diversity, <code>compute_posterior</code> returns the prior.</p>
 <h3 id="homoallelic-data-without-user-specified-mois-prior-return">Homoallelic data without user-specified MOIs: prior return<a class="anchor" aria-label="anchor" href="#homoallelic-data-without-user-specified-mois-prior-return"></a>
 </h3>
 <p>When only one episode has homoallelic data and the user does not
-specify an MOI &gt; 1, <code>compute_posterior</code> returns the
+specify an MOI &gt; 1, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> returns the
 prior.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="co"># Allele frequencies</span></span>
@@ -232,7 +232,7 @@ siblings</p>
 <h2 id="data-are-incomparable-across-episodes">Data are incomparable across episodes<a class="anchor" aria-label="anchor" href="#data-are-incomparable-across-episodes"></a>
 </h2>
 <p>When there are data on multiple episodes but no comparable data
-across episodes, <code>compute_posterior</code> behaves similarly to
+across episodes, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> behaves similarly to
 when data are limited to one episode:</p>
 <ul>
 <li>it returns the prior when data are homoallelic without
@@ -270,8 +270,8 @@ with user-specified MOIs &gt; 1.</li>
 <h2 id="data-on-only-one-marker">Data on only one marker<a class="anchor" aria-label="anchor" href="#data-on-only-one-marker"></a>
 </h2>
 <p>When data on a single marker are comparable across episodes, the
-output of <code>compute_posterior</code> depends on the observation type
-and the frequencies of the observed alleles. For example,</p>
+output of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> depends on the observation
+type and the frequencies of the observed alleles. For example,</p>
 <ul>
 <li>A rare match is informative: it quashes the posterior probability of
 reinfection.</li>
@@ -624,7 +624,7 @@ equally likely <em>a priori</em>.</p>
 <h3 id="results">Results<a class="anchor" aria-label="anchor" href="#results"></a>
 </h3>
 <p>When the initial infection contains two meiotic siblings
-<code>compute_posterior</code> is well behaved with maximum likelihood
+<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> is well behaved with maximum likelihood
 on the true relationship graph (not shown). Posterior probabilities
 converge to</p>
 <ul>
