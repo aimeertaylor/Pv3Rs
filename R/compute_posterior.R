@@ -193,8 +193,8 @@
 #' y_hom <- list(list(m1 = '1'), list(m1 = NA))
 #' fs = list(m1 = c('1' = 0.5, '2' = 0.5))
 #'
-#' # The prior is not returned despite there being no recurrent data (see
-#' # vignette XXX to understand why)
+#' # The prior is not returned despite there being no recurrent data; see
+#' ["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html)
 #' suppressMessages(compute_posterior(y = y_het, fs))$marg
 #' suppressMessages(compute_posterior(y = y_hom, fs, MOIs = c(2,1)))$marg
 #'
