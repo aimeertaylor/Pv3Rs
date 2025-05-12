@@ -6,6 +6,8 @@
 \alias{Pv3Rs-package}
 \title{Pv3Rs: Estimate the cause of recurrent vivax malaria using genetic data}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Estimate per-person posterior probabilities that each recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse, reinfection (3Rs) using per-person P. vivax genetic data on two or more infections.
 }
 \seealso{
