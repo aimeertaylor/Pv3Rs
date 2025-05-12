@@ -96,8 +96,7 @@
 #'       recurrent state is a sum over a subset of joint probabilities of
 #'       recurrent state sequences. For example, the marginal probability of "C"
 #'       at the first of two recurrences is a sum over the joint probabilities
-#'       of "CC",
-#'       "CL", and "CI".}
+#'       of "CC", "CL", and "CI".}
 #'     \item{`joint`}{Vector of joint posterior probabilities of each recurrent
 #'       state sequence, where within a sequence "C" denotes recrudescence,
 #'       "L" denotes relapse, and "I" denotes reinfection.}
@@ -193,8 +192,7 @@
 #' y_hom <- list(list(m1 = '1'), list(m1 = NA))
 #' fs = list(m1 = c('1' = 0.5, '2' = 0.5))
 #'
-#' # The prior is not returned despite there being no recurrent data; see
-#' # ["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html)
+#' # The prior is not returned despite there being no recurrent data.
 #' suppressMessages(compute_posterior(y = y_het, fs))$marg
 #' suppressMessages(compute_posterior(y = y_hom, fs, MOIs = c(2,1)))$marg
 #'
