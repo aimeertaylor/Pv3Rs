@@ -3,9 +3,12 @@ pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
   demonstrate-usage: demonstrate-usage.html
+  articles/enumerate: enumerate.html
+  articles/graph-prior: graph-prior.html
+  articles/half-siblings: half-siblings.html
   intra-episode-siblings: intra-episode-siblings.html
   articles/understand-posterior: understand-posterior.html
-last_built: 2025-05-09T15:15Z
+last_built: 2025-05-12T08:34Z
 urls:
   reference: https://aimeertaylor.github.io/Pv3Rs/reference
   article: https://aimeertaylor.github.io/Pv3Rs/articles

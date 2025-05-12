@@ -34,6 +34,9 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/demonstrate-usage.html">Demonstrate Pv3Rs usage</a></li>
+    <li><a class="dropdown-item" href="../articles/enumerate.html">Enumerate graphs and partition</a></li>
+    <li><a class="dropdown-item" href="../articles/graph-prior.html">Understand graph prior ramifications</a></li>
+    <li><a class="dropdown-item" href="../articles/half-siblings.html">Understand half-sibling misspecification</a></li>
     <li><a class="dropdown-item" href="../articles/intra-episode-siblings.html">Explore treatment of intra-episode siblings</a></li>
     <li><a class="dropdown-item" href="../articles/understand-posterior.html">Understand posterior estimates</a></li>
   </ul>
@@ -330,9 +333,7 @@ of recrudescence / reinfection are a subset of those compatible with
 sequences of relapse, bounds induced by the prior on non-marginal
 posterior probabilities can be computed <em>a priori</em> as a function
 of the prior on the recurrent state sequences and the prior on the
-relationship graphs; see vignette(topic = “graph-prior”, package =
-“Pv3Rs”). <!-- no back
-ticks because pkgdown cannot link to pdf vignettes --></p>
+relationship graphs; see <code>vignette("graph-prior")</code>.</p>
 <p>Because the probability mass function of a uniformly distributed
 discrete random variable depends on the size of its support, the prior
 on uniformly distributed graphs (and thus bounds on the posterior
