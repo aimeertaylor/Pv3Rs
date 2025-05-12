@@ -1,0 +1,14 @@
+---
+title: "Understand graph prior ramifications"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(Pv3Rs)
+```
