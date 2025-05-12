@@ -34,7 +34,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/demonstrate-usage.html">Demonstrate Pv3Rs usage</a></li>
-    <li><a class="dropdown-item" href="../articles/enumerate.html">Enumerate graphs and partition</a></li>
+    <li><a class="dropdown-item" href="../articles/enumerate.html">Enumerate graphs and partitions</a></li>
     <li><a class="dropdown-item" href="../articles/graph-prior.html">Understand graph prior ramifications</a></li>
     <li><a class="dropdown-item" href="../articles/half-siblings.html">Understand half-sibling misspecification</a></li>
     <li><a class="dropdown-item" href="../articles/intra-episode-siblings.html">Explore treatment of intra-episode siblings</a></li>
@@ -69,8 +69,9 @@
 
     
     
-<p>In this vignette we demonstrate the basic <code>Pv3Rs</code> work
-flow for a single study participant; i.e.,</p>
+<p><code>vignette(topic = "intra-episode", package = "Pv3Rs")</code> In
+this vignette we demonstrate the basic <code>Pv3Rs</code> work flow for
+a single study participant; i.e.,</p>
 <ol style="list-style-type: decimal">
 <li>Plot data</li>
 <li>Estimate recurrent state probabilities</li>
@@ -198,14 +199,14 @@ we find the most likely sequence of recurrence states is
 <span><span class="co">#&gt; 0.00000000 0.21338194 0.45682305 0.00000000 0.08501504 0.15385932 0.00000000 </span></span>
 <span><span class="co">#&gt;         LI         II </span></span>
 <span><span class="co">#&gt; 0.03105856 0.05986209</span></span></code></pre></div>
-<p>Aside: we do not recommend running
-<code><a href="../reference/compute_posterior.html">Pv3Rs::compute_posterior()</a></code> for data whose total genotype
-count (sum of per-episode multiplicities of infection) exceeds eight.
-That said, we have not imposed a hard limit on the code. It is possible,
-but very long, to generate estimates using data with a total genotype
-count up to 10 (see code below, which we time out after 2 seconds);
-above 10 genotypes, calls to <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> are liable
-cause memory-use problems and fail.</p>
+<p>Aside: we do not recommend running <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>
+for data whose total genotype count (sum of per-episode multiplicities
+of infection) exceeds eight. That said, we have not imposed a hard limit
+on the code. It is possible, but very long, to generate estimates using
+data with a total genotype count up to 10 (see code below, which we time
+out after 2 seconds); above 10 genotypes, calls to
+<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> are liable cause memory-use problems
+and fail.</p>
 </div>
 <div class="section level2">
 <h2 id="exploration-of-relationship-graphs-and-their-log-likelihoods">Exploration of relationship graphs and their log likelihoods<a class="anchor" aria-label="anchor" href="#exploration-of-relationship-graphs-and-their-log-likelihoods"></a>
