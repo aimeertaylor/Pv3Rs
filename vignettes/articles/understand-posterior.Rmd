@@ -27,9 +27,9 @@ load("../../DevFiles/RelationshipStudy/output_HalfSib.PCLikeSib.rda")
 
 # Summary of contents
 
-In this vignette we document the output of `compute_posterior` when the
+In this vignette we document the output of `compute_posterior()` when the
 statistical model underpinning it is well specified and misspecified.
-Specifically, we document the output of `compute_posterior` when the model is
+Specifically, we document the output of `compute_posterior()` when the model is
 well specified but
 
 - data are missing,

@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 library(Pv3Rs)
 ```
 
+`vignette(topic = "intra-episode", package = "Pv3Rs")`
 In this vignette we demonstrate the basic `Pv3Rs` work flow for a single study
 participant; i.e.,
 
@@ -143,7 +144,7 @@ post$joint[which.max(post$joint)]`
 post$joint
 ```
 
-Aside: we do not recommend running `Pv3Rs::compute_posterior()` for data whose total
+Aside: we do not recommend running `compute_posterior()` for data whose total
 genotype count (sum of per-episode multiplicities of infection) exceeds eight.
 That said, we have not imposed a hard limit on the code. It is possible, but
 very long, to generate estimates using data with a total genotype count up to 10

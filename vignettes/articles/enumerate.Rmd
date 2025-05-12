@@ -1,20 +1,14 @@
 ---
-title: "Enumerate graphs and partition"
+title: "Enumerate graphs and partitions"
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-"Enumerate graphs and partition" is a pdf vignette. At present, `pkgdown` does 
-not support pdf vignettes; see 
+"Enumerate graphs and partitions" is a pdf vignette. 
+At present, pkgdown (the R package used to create this website) does not support
+pdf vignettes; see
 [pkgdown issue 781](https://github.com/r-lib/pkgdown/issues/781). 
 When Pv3Rs is on CRAN, this signpost will be replaced by a link to the pdf
 vignette on CRAN. For the time being, please access "Enumerate graphs and
-partition" by calling `vignette(topic = "enumerate", package = "Pv3Rs")` within
-`R`.
+partitions" by calling `vignette(topic = "enumerate", package = "Pv3Rs")` in
+R.
 
 
