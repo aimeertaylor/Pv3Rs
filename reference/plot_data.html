@@ -6,7 +6,7 @@ than one allele is detected per episode per marker, the corresponding
 row-column entry is subdivided into different colours. The legend depicts the
 alleles of the markers as the markers appear from left to right in the main
 plot. Otherwise stated, the legend is ordered by the order of markers stated
-on on the horizontal axis of the main plot. The colour scheme is adaptive. It
+on on the vertical axis of the main plot. The colour scheme is adaptive. It
 is designed to visually differentiate the alleles as much as possible: the
 maximum range of qualitative scheme, with contrast of hue between adjacent
 colours, is always used; the adjacent colours are interpolated only if a
@@ -18,7 +18,7 @@ than one allele is detected per episode per marker, the corresponding
 row-column entry is subdivided into different colours. The legend depicts the
 alleles of the markers as the markers appear from left to right in the main
 plot. Otherwise stated, the legend is ordered by the order of markers stated
-on on the horizontal axis of the main plot. The colour scheme is adaptive. It
+on on the vertical axis of the main plot. The colour scheme is adaptive. It
 is designed to visually differentiate the alleles as much as possible: the
 maximum range of qualitative scheme, with contrast of hue between adjacent
 colours, is always used; the adjacent colours are interpolated only if a
@@ -78,7 +78,7 @@ than one allele is detected per episode per marker, the corresponding
 row-column entry is subdivided into different colours. The legend depicts the
 alleles of the markers as the markers appear from left to right in the main
 plot. Otherwise stated, the legend is ordered by the order of markers stated
-on on the horizontal axis of the main plot. The colour scheme is adaptive. It
+on on the vertical axis of the main plot. The colour scheme is adaptive. It
 is designed to visually differentiate the alleles as much as possible: the
 maximum range of qualitative scheme, with contrast of hue between adjacent
 colours, is always used; the adjacent colours are interpolated only if a
@@ -88,7 +88,18 @@ on top of their colours if marker_annotate.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_data</span><span class="op">(</span><span class="va">ys</span>, fs <span class="op">=</span> <span class="cn">NULL</span>, marker_annotate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_data</span><span class="op">(</span></span>
+<span>  <span class="va">ys</span>,</span>
+<span>  fs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  patient_vert <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">3.5</span>, <span class="fl">1.5</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  gridlines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  legendsize <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  marker_annotate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cex.maj <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  cex.min <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  cex.text <span class="op">=</span> <span class="fl">0.5</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -115,9 +126,41 @@ Specify fs to fix the colour of a given allele across plots of different
 data lists, thereby facilitating cross-comparison.</p></dd>
 
 
+<dt id="arg-patient-vert">patient_vert<a class="anchor" aria-label="anchor" href="#arg-patient-vert"></a></dt>
+<dd><p>Logical. If true, patient IDs are printed vertically;
+otherwise they are printed horizontally (default).</p></dd>
+
+
+<dt id="arg-mar">mar<a class="anchor" aria-label="anchor" href="#arg-mar"></a></dt>
+<dd><p>A vector which gives the number of lines of margin for the main
+plot; see the entry for <code>mar</code> in <code><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></code>.</p></dd>
+
+
+<dt id="arg-gridlines">gridlines<a class="anchor" aria-label="anchor" href="#arg-gridlines"></a></dt>
+<dd><p>Logical. If true (default), white gridlines separating
+patients and markers will be drawn.</p></dd>
+
+
+<dt id="arg-legendsize">legendsize<a class="anchor" aria-label="anchor" href="#arg-legendsize"></a></dt>
+<dd><p>Float representing the proportion of the plot that the
+legend occupies.</p></dd>
+
+
 <dt id="arg-marker-annotate">marker_annotate<a class="anchor" aria-label="anchor" href="#arg-marker-annotate"></a></dt>
 <dd><p>Logical. If true (default), the names of the alleles
 are printed on top of their colours in the legend.</p></dd>
+
+
+<dt id="arg-cex-maj">cex.maj<a class="anchor" aria-label="anchor" href="#arg-cex-maj"></a></dt>
+<dd><p>Float representing the font scaling of major axis labels.</p></dd>
+
+
+<dt id="arg-cex-min">cex.min<a class="anchor" aria-label="anchor" href="#arg-cex-min"></a></dt>
+<dd><p>Float representing the font scaling of minor axis labels.</p></dd>
+
+
+<dt id="arg-cex-text">cex.text<a class="anchor" aria-label="anchor" href="#arg-cex-text"></a></dt>
+<dd><p>Float representing the font scaling for the allele labels.</p></dd>
 
 </dl></div>
 
@@ -125,11 +168,13 @@ are printed on top of their colours in the legend.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot example Plasmodium vivax data set</span></span></span>
-<span class="r-in"><span><span class="fu">plot_data</span><span class="op">(</span>ys <span class="op">=</span> <span class="va">ys_VHX_BPD</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3.5</span>, <span class="fl">1.5</span>, <span class="fl">1</span><span class="op">)</span> <span class="co"># extra vertical margin for vertical patient labels</span></span></span>
+<span class="r-in"><span><span class="fu">plot_data</span><span class="op">(</span>ys <span class="op">=</span> <span class="va">ys_VHX_BPD</span>, patient_vert <span class="op">=</span> <span class="cn">TRUE</span>, mar <span class="op">=</span> <span class="va">mar</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_data-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">plot_data</span><span class="op">(</span>ys <span class="op">=</span> <span class="va">ys_VHX_BPD</span>, fs <span class="op">=</span> <span class="va">fs_VHX_BPD</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_data</span><span class="op">(</span>ys <span class="op">=</span> <span class="va">ys_VHX_BPD</span>, fs <span class="op">=</span> <span class="va">fs_VHX_BPD</span>, patient_vert <span class="op">=</span> <span class="cn">TRUE</span>, mar <span class="op">=</span> <span class="va">mar</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_data-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">plot_data</span><span class="op">(</span>ys <span class="op">=</span> <span class="va">ys_VHX_BPD</span>, fs <span class="op">=</span> <span class="va">fs_VHX_BPD</span>, marker_annotate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_data</span><span class="op">(</span>ys <span class="op">=</span> <span class="va">ys_VHX_BPD</span>, fs <span class="op">=</span> <span class="va">fs_VHX_BPD</span>, marker_annotate <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>          patient_vert <span class="op">=</span> <span class="cn">TRUE</span>, mar <span class="op">=</span> <span class="va">mar</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_data-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Demonstrating the adaptive nature of the colour scheme:</span></span></span>
@@ -151,7 +196,7 @@ are printed on top of their colours in the legend.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
