@@ -7,7 +7,7 @@
 #' row-column entry is subdivided into different colours. The legend depicts the
 #' alleles of the markers as the markers appear from left to right in the main
 #' plot. Otherwise stated, the legend is ordered by the order of markers stated
-#' on on the horizontal axis of the main plot. The colour scheme is adaptive. It
+#' on on the vertical axis of the main plot. The colour scheme is adaptive. It
 #' is designed to visually differentiate the alleles as much as possible: the
 #' maximum range of qualitative scheme, with contrast of hue between adjacent
 #' colours, is always used; the adjacent colours are interpolated only if a
@@ -28,15 +28,28 @@
 #'  large legend areas, and rare alleles have relatively small legend areas.
 #'  Specify fs to fix the colour of a given allele across plots of different
 #'  data lists, thereby facilitating cross-comparison.
+#'@param patient_vert Logical. If true, patient IDs are printed vertically;
+#'  otherwise they are printed horizontally (default).
+#'@param mar A vector which gives the number of lines of margin for the main
+#'  plot; see the entry for `mar` in \code{\link[graphics]{par}}.
+#'@param gridlines Logical. If true (default), white gridlines separating
+#'  patients and markers will be drawn.
+#'@param legendsize Float representing the proportion of the plot that the
+#'  legend occupies.
 #'@param marker_annotate Logical. If true (default), the names of the alleles
 #'  are printed on top of their colours in the legend.
+#'@param cex.maj Float representing the font scaling of major axis labels.
+#'@param cex.min Float representing the font scaling of minor axis labels.
+#'@param cex.text Float representing the font scaling for the allele labels.
 #'
 #' @examples
 #'
 #' # Plot example Plasmodium vivax data set
-#' plot_data(ys = ys_VHX_BPD)
-#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD)
-#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = FALSE)
+#' mar <- c(2, 3.5, 1.5, 1) # extra vertical margin for vertical patient labels
+#' plot_data(ys = ys_VHX_BPD, patient_vert = TRUE, mar = mar)
+#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, patient_vert = TRUE, mar = mar)
+#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = FALSE,
+#'           patient_vert = TRUE, mar = mar)
 #'
 #' # Demonstrating the adaptive nature of the colour scheme:
 #' ys <- ys_VHX_BPD["VHX_52"] # A single patient
@@ -47,8 +60,13 @@
 #' @export
 plot_data = function(ys,
                      fs = NULL,
-                     marker_annotate = TRUE){
-
+                     patient_vert = FALSE,
+                     mar = c(1.5, 3.5, 1.5, 1),
+                     gridlines = TRUE,
+                     legendsize = 0.25,
+                     marker_annotate = TRUE,
+                     cex.maj = 0.7, cex.min = 0.5, cex.text = 0.5
+){
   # Function to create ramped colours based on "Paired" brewer.pal
   cols <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))
 
@@ -145,7 +163,7 @@ plot_data = function(ys,
 
   # Create an index to visually group individuals
   IDs_factor <- as.factor(rep(pids, sapply(ys, length)))
-  IDs = as.numeric(IDs_factor)
+  IDs <- as.vector(IDs_factor)
   ID_01 = c(0, rep(NA, n_episodes-1))
   if (n_episodes > 1) {
     for(i in 2:n_episodes){
@@ -157,24 +175,31 @@ plot_data = function(ys,
     }
   }
 
-  # Y axis
-  ID_midpoints = rep(NA, length(unique(IDs)))
-  names(ID_midpoints) = unique(IDs)
-  for(ID in unique(IDs)){
+  # episode axis, note that patient IDs are unique
+  ID_midpoints <- rep(NA, length(pids))
+  names(ID_midpoints) <- pids
+  for(ID in pids){
     inds = which(IDs == ID)
-    inds_mapped_01 = (inds - 0)/(n_episodes + 1 - 0)
-    ID_midpoints[as.character(ID)] = stats::median(inds_mapped_01)
+    ID_midpoints[as.character(ID)] <- (stats::median(inds)-0.5)/n_episodes
   }
 
   # Plot
   graphics::par(mfrow = c(1,1),
-                fig = c(0,0.75,0.03,0.97), # fig = c(x1, x2, y1, y2) (to leave room for the legend)
-                mar = c(4,4,0,0.5)) # mar = c(bottom, left, top, right)
+                fig = c(0,1,legendsize+0.01,1), # fig = c(x1, x2, y1, y2) (to leave room for the legend)
+                mar = mar) # mar = c(bottom, left, top, right)
+  n_x <- nrow(marker_data_wide_factor)
+  n_y <- ncol(marker_data_wide_factor)
+  x_coords <- seq(1, 2*n_x-1, 2)/(2*n_x)
+  y_coords <- seq(1, 2*n_y-1, 2)/(2*n_y)
 
   # Add IDs to each vertical edge
-  Empty_array = array(dim = dim(marker_data_wide_factor))
-  matrix_to_plot = t(rbind(-1, cbind(ID_01, Empty_array, ID_01), -1))
-  graphics::image(matrix_to_plot, ylim = c(0,1), col = grDevices::grey(c(0,0.35,0.75)), axes = FALSE)
+  rim_ratio <- 40
+  rim_coords <- seq(-1, 2*rim_ratio+1, 2)/(2*rim_ratio)
+  Empty_array <- array(dim = c(rim_ratio, n_x))
+  matrix_to_plot <- t(rbind(ID_01, Empty_array, ID_01))
+  graphics::image(
+    x_coords, rim_coords, matrix_to_plot, xlab="", ylab="",
+    col = grDevices::grey(c(0.4,0.7)), axes = FALSE)
 
   # Add marker data
   COLs = seq(1, n_markers_wide, factorial_maxMOI)
@@ -182,44 +207,49 @@ plot_data = function(ys,
     Y = marker_data_wide_factor
     Y[,-(COLs[i]:(COLs[i]+(factorial_maxMOI)-1))] = NA
     if (all(is.na(Y))) next # If no data skip to next maker
-    graphics::image(t(rbind(-1, cbind(NA, Y, NA), -1)),
+    #graphics::image(t(rbind(-1, cbind(NA, Y, NA), -1)),
+    graphics::image(x_coords, y_coords, Y,
                     col = c(grDevices::grey(0), cols(marker_cardinalities[i])),
                     axes = FALSE, add = TRUE, zlim = c(-1, marker_cardinalities[i]))
   }
 
-  # Add axes
-  xaxis = seq(0, 1, length.out = n_markers_wide+2)
-  xaxis_diff = (xaxis[2] - xaxis[1])
-  if(maxMOI == 1){
-    xaxis_at = xaxis[2:(n_markers+1)]
-  } else {
-    xaxis_at = xaxis[seq((1 + factorial_maxMOI/2), n_markers_wide, factorial_maxMOI)] + ifelse((factorial_maxMOI %% 2) == 0, xaxis_diff/2, 1)
+  # Add gridlines
+  if(gridlines) {
+    for (i in 1:n_episodes) {
+      x <- i/n_episodes
+      graphics::segments(x, -1/rim_ratio, x, 0, lwd=0.5, col="white")
+      graphics::segments(x, 1, x, 1+1/rim_ratio, lwd=0.5, col="white")
+    }
+    graphics::abline(v=c(0, cumsum(unlist(lapply(ys, length))))/n_episodes, lwd=0.5, col="white")
+    graphics::abline(h=(0:n_markers)/n_markers, lwd=0.5, col="white")
+    # graphics::box(lwd=0.5)
   }
-  graphics::axis(at = xaxis_at, side = 1, line = -0.5, labels = markers, cex.axis = 0.5, tick = F)
-  graphics::axis(at = xaxis_at, side = 1, line = 0.5, labels = paste('(', marker_cardinalities, ')', sep = ''), cex.axis = 0.5, tick = F)
-  graphics::axis(side = 2, at = ID_midpoints, labels = levels(IDs_factor)[unique(IDs)], cex.axis = 0.5, las = 2, lwd.ticks = 0.25, lwd = 0)
-  graphics::axis(side = 1, at = c(0, utils::tail(xaxis, 1)), line = -0.5, labels = rep('Grouping', 2), las = 2, cex.axis = 0.5, tick = F)
-  graphics::title(ylab = bquote(.(n_episodes) ~ 'episodes (one row per episode, grouped by patient ID)'),
-                  line = 3.3, cex.lab = 0.5)
-  graphics::title(xlab = 'Marker (number of distinct alleles)', line = 3, cex.lab = 0.5)
+
+  # Add axes
+  graphics::mtext(text = paste0(markers,'\n','(',marker_cardinalities,')'), side = 2, at = ((1:n_markers)-0.5)/(n_markers),
+                  line = 0.2, cex = cex.min, las = 1)
+  graphics::mtext(text = rep('Grouping', 2), side = 2, at = c(-0.5,rim_ratio+0.5)/rim_ratio,
+                  line = 0.2, cex = cex.min, las = 2)
+  graphics::mtext(text = pids, side = 1, at = ID_midpoints, cex = cex.min,
+                  las = ifelse(patient_vert, 3, 1), line = ifelse(patient_vert, 0.2, 0))
+  graphics::mtext(text = bquote(.(n_episodes) ~ 'episodes (one column per episode, grouped by patient)'),
+                  cex = cex.maj)
+  graphics::title(ylab = 'Marker (number of distinct alleles)',
+                  line = 2.5, cex.lab = cex.maj)
 
   # Add legend
   graphics::par(fig = c(0,1,0,1)) # Critical to avoid odd placement of first legend column
-  legendwidth = (1-0.76)/n_markers
+  rowsize = legendsize/n_markers
   for(marker in markers){ # For each marker in turn
     i = which(marker == markers)
-    if(i == 1){
-      SMALLplot = c(0.75, 0.75 + legendwidth, 0.03, 0.97)
-    } else {
-      SMALLplot = c(0.75 + legendwidth * (i-1), 0.75 + legendwidth * i, 0.03, 0.97)
-    }
+    SMALLplot = c(0.05, 0.95, 0.01 + rowsize * (i-1), 0.01 + rowsize * i)
     if (marker_cardinalities[marker] == 1) {
       Breaks <- c(0,1)
       At <- 0.5
     } else {
       if(is.null(fs)) {
         Breaks <- NULL
-        At <- seq(0, 1, length.out = marker_cardinalities[marker])
+        At <- ((1:marker_cardinalities[marker]) - 0.5) / marker_cardinalities[marker]
       } else {
         # Only use the frequencies whose alleles are in marker_alleles
         Breaks <- c(0, cumsum(fs[[marker]][as.character(marker_alleles[[marker]])]))
@@ -232,6 +262,18 @@ plot_data = function(ys,
     matrix_to_plot[is.na(matrix_to_plot)] <- 0
     if (marker_annotate) {
       Labels <- marker_alleles[[marker]]
+      # let n be the number of characters in the allele label
+      min_spaces <- 0.01*sapply(Labels, nchar)
+      # labels must be vertically apart by at least x% of the legend height
+      pos_vec <- c(-min_spaces[1]/2, 1+tail(min_spaces, 1)/2) # and x/2% away from the top and bottom borders
+      marker_order <- ifelse(is.null(fs), 1:length(Labels), order(fs[[marker]], decreasing=TRUE))
+      for(j in marker_order) {
+        if (min(abs(pos_vec - At[j])) < min_spaces[j]) { # label would be too close to an existing label
+          Labels[j] <- NA
+        } else {
+          pos_vec <- c(pos_vec, At[j])
+        }
+      }
     } else {
       Labels <- rep(NA, marker_cardinalities[marker])
     }
@@ -239,13 +281,19 @@ plot_data = function(ys,
                        col = cols(marker_cardinalities[marker]),
                        breaks = Breaks,
                        legend.only = TRUE,
+                       horizontal = TRUE,
                        add = TRUE,
-                       axis.args = list(at = At,
-                                        labels = Labels,
-                                        cex.axis = 0.5,
-                                        tick = FALSE,
-                                        line = -1.5,
-                                        hadj = 0.5),
+                       axis.args = list(cex.axis = 0.5, tick = FALSE, labels = FALSE),
                        smallplot = SMALLplot, legend.mar = 0)
+    y_ndc <- mean(SMALLplot[3:4])
+    x_ndc <- SMALLplot[1] + (SMALLplot[2]-SMALLplot[1])*At
+    text_ndc(x_ndc, y_ndc, Labels, adj=c(0.5,0.5), cex=cex.text)
   }
+}
+
+# Plot text in normalised device coordinates (NDC)
+text_ndc <- function(x_ndc, y_ndc, labels, ...) {
+  x_user <- graphics::grconvertX(x_ndc, from = "ndc", to = "user")
+  y_user <- graphics::grconvertY(y_ndc, from = "ndc", to = "user")
+  graphics::text(x = x_user, y = y_user, labels = labels, xpd = NA, ...)
 }

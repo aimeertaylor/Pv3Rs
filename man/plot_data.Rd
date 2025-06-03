@@ -4,7 +4,18 @@
 \alias{plot_data}
 \title{Plots the data}
 \usage{
-plot_data(ys, fs = NULL, marker_annotate = TRUE)
+plot_data(
+  ys,
+  fs = NULL,
+  patient_vert = FALSE,
+  mar = c(1.5, 3.5, 1.5, 1),
+  gridlines = TRUE,
+  legendsize = 0.25,
+  marker_annotate = TRUE,
+  cex.maj = 0.7,
+  cex.min = 0.5,
+  cex.text = 0.5
+)
 }
 \arguments{
 \item{ys}{A nested list of per-patient, per-episode, per-marker allelic data.
@@ -23,8 +34,26 @@ large legend areas, and rare alleles have relatively small legend areas.
 Specify fs to fix the colour of a given allele across plots of different
 data lists, thereby facilitating cross-comparison.}
 
+\item{patient_vert}{Logical. If true, patient IDs are printed vertically;
+otherwise they are printed horizontally (default).}
+
+\item{mar}{A vector which gives the number of lines of margin for the main
+plot; see the entry for \code{mar} in \code{\link[graphics]{par}}.}
+
+\item{gridlines}{Logical. If true (default), white gridlines separating
+patients and markers will be drawn.}
+
+\item{legendsize}{Float representing the proportion of the plot that the
+legend occupies.}
+
 \item{marker_annotate}{Logical. If true (default), the names of the alleles
 are printed on top of their colours in the legend.}
+
+\item{cex.maj}{Float representing the font scaling of major axis labels.}
+
+\item{cex.min}{Float representing the font scaling of minor axis labels.}
+
+\item{cex.text}{Float representing the font scaling for the allele labels.}
 }
 \description{
 Plots the alleles (colours), which are observed in different episodes (rows),
@@ -34,7 +63,7 @@ than one allele is detected per episode per marker, the corresponding
 row-column entry is subdivided into different colours. The legend depicts the
 alleles of the markers as the markers appear from left to right in the main
 plot. Otherwise stated, the legend is ordered by the order of markers stated
-on on the horizontal axis of the main plot. The colour scheme is adaptive. It
+on on the vertical axis of the main plot. The colour scheme is adaptive. It
 is designed to visually differentiate the alleles as much as possible: the
 maximum range of qualitative scheme, with contrast of hue between adjacent
 colours, is always used; the adjacent colours are interpolated only if a
@@ -44,9 +73,11 @@ on top of their colours if marker_annotate.
 \examples{
 
 # Plot example Plasmodium vivax data set
-plot_data(ys = ys_VHX_BPD)
-plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD)
-plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = FALSE)
+mar <- c(2, 3.5, 1.5, 1) # extra vertical margin for vertical patient labels
+plot_data(ys = ys_VHX_BPD, patient_vert = TRUE, mar = mar)
+plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, patient_vert = TRUE, mar = mar)
+plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = FALSE,
+          patient_vert = TRUE, mar = mar)
 
 # Demonstrating the adaptive nature of the colour scheme:
 ys <- ys_VHX_BPD["VHX_52"] # A single patient
