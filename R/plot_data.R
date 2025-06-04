@@ -232,7 +232,7 @@ plot_data = function(ys,
                   line = 0.2, cex = cex.min, las = 2)
   graphics::mtext(text = pids, side = 1, at = ID_midpoints, cex = cex.min,
                   las = ifelse(patient_vert, 3, 1), line = ifelse(patient_vert, 0.2, 0))
-  graphics::mtext(text = bquote(.(n_episodes) ~ 'episodes (one column per episode, grouped by patient)'),
+  graphics::mtext(text = sprintf("%s episodes in %s people (one column per episode, grouped by person)", n_episodes, n_patients),
                   cex = cex.maj)
   graphics::title(ylab = 'Marker (number of distinct alleles)',
                   line = 2.5, cex.lab = cex.maj)
