@@ -4,13 +4,15 @@
 \alias{enumerate_RGs}
 \title{Enumerate relationship graphs}
 \usage{
-enumerate_RGs(MOIs, igraph = TRUE)
+enumerate_RGs(MOIs, igraph = TRUE, progress.bar = TRUE)
 }
 \arguments{
 \item{MOIs}{A numeric vector specifying, for each infection, the number of
 distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
 
 \item{igraph}{Logical for whether to return \code{igraph} objects.}
+
+\item{progress.bar}{Boolean for printing progress bars.}
 }
 \value{
 A list of relationship graphs. If \code{igraph} is \code{FALSE},

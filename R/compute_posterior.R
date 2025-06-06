@@ -86,6 +86,11 @@
 #'   `TRUE` will result in longer runtimes, especially when multiplicities of
 #'   infection are large. Note that this argument does not affect the output of
 #'   the posterior probabilities.
+#' @param progress.bar Boolean for printing progress bars. When `TRUE`
+#'   (default), the progress bar is printed to the screen. Please note that the
+#'   progress bar does not necessarily increment uniformly (see details below);
+#'   it may seem stuck when the code is still running.
+#'
 #'
 #' @return List containing:
 #'   \describe{
@@ -119,7 +124,7 @@
 #'            m2 = c('1' = 0.27, '2' = 0.73))
 #'
 #' # Compute posterior probabilities using default prior
-#' compute_posterior(y, fs)
+#' compute_posterior(y, fs, progress.bar = FALSE)
 #'
 #'
 #' # ===========================================================================
@@ -136,7 +141,7 @@
 #'            marker2 = c("Tinky Winky" = 0.1, "Laa-Laa" = 0.1, "Po" = 0.8))
 #'
 #' # Compute posterior probabilities using default prior
-#' posterior_probs <- compute_posterior(y, fs)
+#' posterior_probs <- compute_posterior(y, fs, progress.bar = FALSE)
 #'
 #' # Plot posterior probabilities on the simplex
 #' plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Simplex
@@ -224,7 +229,7 @@
 #' f_A <- 0.1; fs <- list(m1 = c("A" = f_A, "Other" = 1-f_A))
 #'
 #' # Compute posterior probabilities and extract marginal probabilities
-#' results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
+#' results <- lapply(ys, function(y) compute_posterior(y, fs, progress.bar = FALSE)$marg)
 #'
 #' # Extract results for the first recurrence
 #' results_recur1 <- sapply(results, function(result) result[1,])
@@ -239,7 +244,8 @@
 #'
 #' @export
 compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
-                              return.RG = FALSE, return.logp = FALSE) {
+                              return.RG = FALSE, return.logp = FALSE,
+                              progress.bar = TRUE) {
 
   # Check y is a list of lists:
   if (!is.list(y) | !all(sapply(y, is.list))) {
@@ -383,7 +389,7 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
   )
 
   # enumerate all relationship graphs (RGs) and find their likelihood
-  RGs <- RG_inference(MOIs, fs, alleles_per_m)
+  RGs <- RG_inference(MOIs, fs, alleles_per_m, progress.bar)
 
   # get all vectors of recurrence states
   n_rstrs <- 3^n_recur
@@ -400,7 +406,7 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
   # for each RG, add p(y|RG) for recurrence states where RG is compatible
   RG_i <- 0
   n.RG <- length(RGs)
-  pbar <- msg_progress_bar(n.RG)
+  if (progress.bar) pbar <- msg_progress.bar(n.RG)
   message("Finding log-likelihood of each vector of recurrent states")
   max.logp <- max(sapply(RGs, "[[", "logp"))
   for (RG in RGs) {
@@ -411,7 +417,7 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
       logp_sum_per_rstr[rstr] <- log(exp(logp_sum_per_rstr[rstr]) + prob_RG)
     }
     RG_i <- RG_i + 1
-    pbar$increment()
+    if (progress.bar) pbar$increment()
   }
   message("")
 

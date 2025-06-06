@@ -29,6 +29,7 @@
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
 #' @param igraph Logical for whether to return \code{igraph} objects.
+#' @param progress.bar Boolean for printing progress bars.
 #'
 #' @return A list of relationship graphs. If \code{igraph} is \code{FALSE},
 #' each element is a list of four attributes:
@@ -51,7 +52,7 @@
 #' graphs <- enumerate_RGs(c(2, 1, 2), igraph=TRUE) # 250 graphs
 #'
 #' @export
-enumerate_RGs <- function(MOIs, igraph = TRUE) {
+enumerate_RGs <- function(MOIs, igraph = TRUE, progress.bar = TRUE) {
   # Check MOIs are positive whole numbers
   if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
@@ -77,7 +78,7 @@ enumerate_RGs <- function(MOIs, igraph = TRUE) {
 
   # Count number of valid graphs and create progress bar
   n.RG <- sum(sapply(CP_list, function(x) ncol(part.list[[max(x)]])))
-  pbar <- msg_progress_bar(n.RG)
+  if (progress.bar) pbar <- msg_progress.bar(n.RG)
   message(paste("Number of valid relationship graphs (RGs) is", n.RG))
 
   for (CP in CP_list) { # for each clonal partition (membership vector)
@@ -108,7 +109,7 @@ enumerate_RGs <- function(MOIs, igraph = TRUE) {
 
       RG_i <- RG_i + 1
       RGs[[RG_i]] <- RG
-      pbar$increment()
+      if (progress.bar) pbar$increment()
     }
   }
 
