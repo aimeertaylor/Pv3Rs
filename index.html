@@ -76,11 +76,11 @@
 <li>Reinfection</li>
 <li>Recrudescence</li>
 </ul>
-<p>The main function <code><a href="reference/compute_posterior.html">compute_posterior()</a></code> can be used to estimate per-person posterior probabilities of relapse, reinfection and recrudescence using <em>P. vivax</em> genetic data on paired samples from one or more recurrence to update a prior, which is ideally informative (e.g., based on time-to-event information).</p>
-<p>Other important features are more general:</p>
+<p>The core function <code><a href="reference/compute_posterior.html">compute_posterior()</a></code> can be used to estimate per-person posterior probabilities of relapse, reinfection and recrudescence using <em>P. vivax</em> genetic data on paired samples from one or more recurrence to update a prior, which is ideally informative (e.g., based on time-to-event information).</p>
+<p>Two other important features are more general:</p>
 <ul>
-<li><p><code><a href="reference/plot_data.html">plot_data()</a></code> can be used to visualise genetic data for molecular correction regardless of the analytical method (e.g., it could be used to visualise <em>Plasmodium falciparum</em> data intended for analysis using a WHO match counting algorithm).</p></li>
-<li><p><code><a href="reference/plot_simplex.html">plot_simplex()</a></code> can be used to visualise per-recurrence estimates of the probabilities of relapse, reinfection and recrudescence or a vector of any three numbers between 0 and 1 that sum to one.</p></li>
+<li><p><code><a href="reference/plot_data.html">plot_data()</a></code> can be used to visualise genetic data for molecular correction regardless of the analytical method; for example, <em>Plasmodium falciparum</em> data intended for analysis using a WHO match counting algorithm.</p></li>
+<li><p><code><a href="reference/plot_simplex.html">plot_simplex()</a></code> can be used to visualise per-recurrence estimates of the probabilities of relapse, reinfection and recrudescence or a vector of any three numbers in zero to one that sum to one.</p></li>
 </ul>
 <div class="section level2">
 <h2 id="please-be-aware-of-the-following-points">Please be aware of the following points!<a class="anchor" aria-label="anchor" href="#please-be-aware-of-the-following-points"></a>
@@ -101,34 +101,46 @@
 </ul>
 </div>
 <div class="section level3">
-<h3 id="notable-assumptions">Notable assumptions:<a class="anchor" aria-label="anchor" href="#notable-assumptions"></a>
+<h3 id="notable-limitations">Notable limitations:<a class="anchor" aria-label="anchor" href="#notable-limitations"></a>
 </h3>
-<ol style="list-style-type: decimal">
-<li>Relationship graphs compatible with a given recurrent state sequence are equally likely <em>a priori</em>
-</li>
-<li>Perfect detection of alleles (no genotyping errors)</li>
-<li>Perfect detection of parasites (problematic for low density clones)</li>
-<li>Perfect detection of episodes (requires active follow up)</li>
-<li>Mutually exclusive recurrent states (requires frequent follow up with treatment)</li>
-<li>No within-host <em>de novo</em> mutations</li>
-<li>Parasites are outbred (implies the parasite population is infinitely large and panmitic)</li>
-<li>Genetic loci are conditionally independent
-<ul>
-<li>Ignores short and long range linkage disequilibrium<br>
-</li>
-</ul>
-</li>
-<li>All siblings are regular siblings
-<ul>
-<li>Siblings are transitive (not true of some half and parent-child-like sibling trios)</li>
-<li>Siblings are independent (not true of meiotic siblings)</li>
-<li>Siblings draw from at most two parents (not true of half-siblings)</li>
-</ul>
-</li>
-</ol>
-<p>The first assumption listed above has a small artefactual effect on posterior estimates when relationship graphs grow in size. This is demonstrated in one of the examples of <code><a href="reference/compute_posterior.html">compute_posterior()</a></code> and will be explained in more detail in an upcoming vignette.</p>
-<p>For studies with possibly high rates of recrudescence, we recommend a sensitivity analysis to explore the impact of genotyping errors on recrudescence. An example will be provided in an upcoming vignette.</p>
-<p>The marker independence assumption is liable to lead to overconfident posterior probabilities when markers are linked.</p>
+<table class="table">
+<colgroup>
+<col width="64%">
+<col width="35%">
+</colgroup>
+<thead><tr class="header">
+<th>Limitation</th>
+<th>Reason</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>misclassification of relapse as reinfection</td>
+<td>not modelling errors and half-sibling misspecification</td>
+</tr>
+<tr class="even">
+<td>misclassification of recrudescence as relapse</td>
+<td>not modelling errors</td>
+</tr>
+<tr class="odd">
+<td>inconsistency with data on more-and-more markers</td>
+<td>not modelling errors</td>
+</tr>
+<tr class="even">
+<td>misclassification of multiple events (e.g., recrudescence plus reinfection) as relapse</td>
+<td>modelling 3Rs as mutually exclusive events</td>
+</tr>
+<tr class="odd">
+<td>strong prior impact of probabilities of reinfection / recrudescence</td>
+<td>assumption that relationship graphs compatible with a given recurrent state sequence are equally likely </td>
+</tr>
+</tbody>
+</table>
+<!-- Because, we don't model population structure, we also recommend a
+3) Perfect detection of parasites (problematic for low density clones)
+7) Parasites are outbred (implies the parasite population is infinitely large and panmitic)
+For studies with possibly high rates of recrudescence, we recommend a
+sensitivity analysis to explore the impact of genotyping errors on
+recrudescence. An example will be provided in an upcoming manuscript. -->
 </div>
 <div class="section level3">
 <h3 id="computational-limits">Computational limits:<a class="anchor" aria-label="anchor" href="#computational-limits"></a>
@@ -169,14 +181,14 @@
 <span><span class="co"># Load and attach Pv3Rs</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/aimeertaylor/Pv3Rs" class="external-link">Pv3Rs</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># View documentation and examples for main function, e.g., </span></span>
-<span><span class="op">?</span><span class="va">compute_posterior</span></span>
+<span><span class="co"># List links to all available documentation</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"Pv3Rs"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Explore vignettes</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"demo"</span>, package <span class="op">=</span> <span class="st">"Pv3Rs"</span><span class="op">)</span></span>
+<span><span class="co"># List links to vignettes</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"Pv3Rs"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Lists available functions, as well as example data sets and their documentation [check]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"Pv3Rs"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># View function documentation, e.g., </span></span>
+<span><span class="op">?</span><span class="va">compute_posterior</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
