@@ -406,7 +406,7 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
   # for each RG, add p(y|RG) for recurrence states where RG is compatible
   RG_i <- 0
   n.RG <- length(RGs)
-  if (progress.bar) pbar <- msg_progress.bar(n.RG)
+  if (progress.bar) pbar <- msg_progress_bar(n.RG)
   message("Finding log-likelihood of each vector of recurrent states")
   max.logp <- max(sapply(RGs, "[[", "logp"))
   for (RG in RGs) {

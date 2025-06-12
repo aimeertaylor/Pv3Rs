@@ -60,7 +60,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m, progress.bar = TRUE) {
 
   RG_i <- 0
   n.RG <- length(RGs)
-  if (progress.bar) pbar <- msg_progress.bar(n.RG)
+  if (progress.bar) pbar <- msg_progress_bar(n.RG)
   message(paste("Computing log p(Y|RG) for", n.RG, "RGs"))
 
   for (RG in RGs) { # for each relationship graph

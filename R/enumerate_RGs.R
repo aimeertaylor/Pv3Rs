@@ -78,7 +78,7 @@ enumerate_RGs <- function(MOIs, igraph = TRUE, progress.bar = TRUE) {
 
   # Count number of valid graphs and create progress bar
   n.RG <- sum(sapply(CP_list, function(x) ncol(part.list[[max(x)]])))
-  if (progress.bar) pbar <- msg_progress.bar(n.RG)
+  if (progress.bar) pbar <- msg_progress_bar(n.RG)
   message(paste("Number of valid relationship graphs (RGs) is", n.RG))
 
   for (CP in CP_list) { # for each clonal partition (membership vector)

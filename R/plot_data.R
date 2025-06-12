@@ -265,7 +265,7 @@ plot_data = function(ys,
       # let n be the number of characters in the allele label
       min_spaces <- 0.01*sapply(Labels, nchar)
       # labels must be vertically apart by at least x% of the legend height
-      pos_vec <- c(-min_spaces[1]/2, 1+tail(min_spaces, 1)/2) # and x/2% away from the top and bottom borders
+      pos_vec <- c(-min_spaces[1]/2, 1 + utils::tail(min_spaces, 1)/2) # and x/2% away from the top and bottom borders
       marker_order <- ifelse(is.null(fs), 1:length(Labels), order(fs[[marker]], decreasing=TRUE))
       for(j in marker_order) {
         if (min(abs(pos_vec - At[j])) < min_spaces[j]) { # label would be too close to an existing label
