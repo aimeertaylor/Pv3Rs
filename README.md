@@ -65,7 +65,7 @@ Possible misclassification of relapse as reinfection | Not modelling errors and 
 Possible misclassification of recrudescence as relapse | Not modelling errors
 Possible inconsistency with data on more-and-more markers | Not modelling errors
 Possible misclassification of persistent and/or accumulated events (e.g., recrudescence plus reinfection) as relapse | Modelling 3Rs as mutually exclusive events
-Strong prior impact of probabilities of reinfection / recrudescence | Assumption that relationship graphs compatible with a given recurrent state sequence are equally likely *a priori*
+Strong prior impact on posterior probabilities of reinfection and recrudescence | Assumption that relationship graphs compatible with a given recurrent state sequence are equally likely *a priori*
 
 <!-- Because, we don't model population structure, we also recommend a
 3) Perfect detection of parasites (problematic for low density clones)
