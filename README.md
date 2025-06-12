@@ -7,21 +7,20 @@ inference of *P. vivax*
 - Reinfection
 - Recrudescence
 
-The main function `compute_posterior()` can be used to estimate per-person
+The core function `compute_posterior()` can be used to estimate per-person
 posterior probabilities of relapse, reinfection and recrudescence using *P.
 vivax* genetic data on paired samples from one or more recurrence to update a
 prior, which is ideally informative (e.g., based on time-to-event information).
 
-Other important features are more general:
+Two other important features are more general:
 
 - `plot_data()` can be used to visualise genetic data for molecular
-correction regardless of the analytical method (e.g., it could be used to
-visualise *Plasmodium falciparum* data intended for analysis using a WHO match
-counting algorithm).
+correction regardless of the analytical method; for example, *Plasmodium
+falciparum* data intended for analysis using a WHO match counting algorithm.
 
 - `plot_simplex()` can be used to visualise per-recurrence estimates of the
 probabilities of relapse, reinfection and recrudescence or a vector of any three
-numbers between 0 and 1 that sum to one.
+numbers in zero to one that sum to one.
 
 ## Please be aware of the following points!
 
@@ -58,34 +57,22 @@ misclassification of recrudescence as reinfection when the probability of
 relapse is zero *a priori* (and of recrudescence as relapse when the prior
 probability of relapse exceeds zero). 
 
-### Notable assumptions: 
+### Notable limitations: 
 
-1) Relationship graphs compatible with a given recurrent state sequence are
-equally likely *a priori*
-2) Perfect detection of alleles (no genotyping errors)
+Limitation              | Reason
+-----------             | ------
+misclassification of relapse as reinfection | not modelling errors and half-sibling misspecification
+misclassification of recrudescence as relapse | not modelling errors
+inconsistency with data on more-and-more markers | not modelling errors
+misclassification of multiple events (e.g., recrudescence plus reinfection) as relapse | modelling 3Rs as mutually exclusive events
+strong prior impact of probabilities of reinfection / recrudescence | assumption that relationship graphs compatible with a given recurrent state sequence are equally likely \textit{a priori}
+
+<!-- Because, we don't model population structure, we also recommend a
 3) Perfect detection of parasites (problematic for low density clones)
-4) Perfect detection of episodes (requires active follow up) 
-5) Mutually exclusive recurrent states (requires frequent follow up with treatment)
-6) No within-host *de novo* mutations 
 7) Parasites are outbred (implies the parasite population is infinitely large and panmitic)
-8) Genetic loci are conditionally independent
-    - Ignores short and long range linkage disequilibrium  
-10) All siblings are regular siblings
-    - Siblings are transitive (not true of some half and parent-child-like sibling trios)
-    - Siblings are independent (not true of meiotic siblings)
-    - Siblings draw from at most two parents (not true of half-siblings)
-
-The first assumption listed above has a small artefactual effect on posterior 
-estimates when relationship graphs grow in size. This is demonstrated in one of 
-the examples of `compute_posterior()` and will be explained in more 
-detail in an upcoming vignette. 
-
 For studies with possibly high rates of recrudescence, we recommend a
 sensitivity analysis to explore the impact of genotyping errors on
-recrudescence. An example will be provided in an upcoming vignette. 
-
-The marker independence assumption is liable to lead to overconfident posterior 
-probabilities when markers are linked. 
+recrudescence. An example will be provided in an upcoming manuscript. -->
 
 ### Computational limits:
 
@@ -139,12 +126,12 @@ devtools::install_github("aimeertaylor/Pv3Rs", build_vignettes = TRUE)
 # Load and attach Pv3Rs
 library(Pv3Rs)
 
-# View documentation and examples for main function, e.g., 
-?compute_posterior
-
-# Explore vignettes
-vignette("demo", package = "Pv3Rs")
-
-# Lists available functions, as well as example data sets and their documentation [check]
+# List links to all available documentation
 help(package = "Pv3Rs")
+
+# List links to vignettes
+vignette(package = "Pv3Rs")
+
+# View function documentation, e.g., 
+?compute_posterior
 ```
