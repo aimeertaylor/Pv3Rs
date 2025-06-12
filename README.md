@@ -59,13 +59,13 @@ probability of relapse exceeds zero).
 
 ### Notable limitations: 
 
-Limitation              | Reason
------------             | ------
-misclassification of relapse as reinfection | not modelling errors and half-sibling misspecification
-misclassification of recrudescence as relapse | not modelling errors
-inconsistency with data on more-and-more markers | not modelling errors
-misclassification of multiple events (e.g., recrudescence plus reinfection) as relapse | modelling 3Rs as mutually exclusive events
-strong prior impact of probabilities of reinfection / recrudescence | assumption that relationship graphs compatible with a given recurrent state sequence are equally likely \textit{a priori}
+Limitation | Reason
+----------- | ------
+Possible misclassification of relapse as reinfection | Not modelling errors and half-sibling misspecification
+Possible misclassification of recrudescence as relapse | Not modelling errors
+Possible inconsistency with data on more-and-more markers | Not modelling errors
+Possible misclassification of persistent and/or accumulated events (e.g., recrudescence plus reinfection) as relapse | Modelling 3Rs as mutually exclusive events
+Strong prior impact of probabilities of reinfection / recrudescence | Assumption that relationship graphs compatible with a given recurrent state sequence are equally likely *a priori*
 
 <!-- Because, we don't model population structure, we also recommend a
 3) Perfect detection of parasites (problematic for low density clones)
