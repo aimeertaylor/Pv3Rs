@@ -128,8 +128,7 @@ Possible misclassification of relapse as reinfection | Half-sibling misspecifica
 Possible inconsistency with data on more-and-more markers | Not modelling errors
 Possible misclassification of recrudescence as relapse | Not modelling errors
 Possible misclassification of reinfection | Not modelling population structure
-Strong prior impact on posterior probabilities of reinfection and recrudescence | Recurrent states are not
-always identifiable from genetic data alone
+Strong prior impact on posterior probabilities of reinfection and recrudescence | Recurrent states are not always identifiable from genetic data alone
 
 
 ### Computational limits:
