@@ -115,9 +115,9 @@ population structure will be provided in an upcoming manuscript).
 In lieu of a generative model on intra-inoculation parasite relationships, we
 assume all relationship graphs compatible with a given sequence of recurrent
 states are equally likely *a priori*. When data are informative up to two states 
-— \{reinfection and relapse\} or \{recrudescence and relapse\} — but not beyond,
+(\{reinfection and relapse\} or \{recrudescence and relapse\}) but not beyond,
 the model returns the prior re-weighted to the exclusion of the incompatible
-states. As such, our prior on relationship graphs has a strong impact on 
+state. As such, our prior on relationship graphs has a strong impact on 
 posterior probabilities of probable reinfection and recrudescence.
 
 
