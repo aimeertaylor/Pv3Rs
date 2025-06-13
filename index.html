@@ -103,31 +103,32 @@
 <div class="section level3">
 <h3 id="notable-assumptions-and-limitations">Notable assumptions and limitations:<a class="anchor" aria-label="anchor" href="#notable-assumptions-and-limitations"></a>
 </h3>
-<p>Naturally, Pv3Rs makes various assumptions which limit is capabilities in some settings. They are explained in some detail below and summarised in a table.</p>
+<p>Naturally, Pv3Rs makes various assumptions that limit is capabilities in some settings. They are explained in some detail below and summarised in a table.</p>
 <div class="section level4">
 <h4 id="mutually-exclusive-recurrent-states">Mutually exclusive recurrent states<a class="anchor" aria-label="anchor" href="#mutually-exclusive-recurrent-states"></a>
 </h4>
-<p>We model recurrent states (relapse, reinfection and recrudescence) as mutually exclusive. Pv3Rs was designed with a view towards clinical trials where study participants are actively followed up frequently and where all detected infections are treated to the extent that parasitaeamia drops below some detectable level. In studies where infections persists untreated and/or where follow up is passive and infrequent such that events have time to accumulate (e.g., a person with an untreated recrudescence experiences a reinfection), the assumption that recurrent states are mutually exclusive does not hold, persistent and recrudescent infections are ill defined, and recrudescences and reinfections are liable to misclassification as relapses.</p>
-</div>
-<div class="section level4">
-<h4 id="genotyping-errors">Genotyping errors<a class="anchor" aria-label="anchor" href="#genotyping-errors"></a>
-</h4>
-<p>We do not model genotyping errors including undetected alleles, or <em>de novo</em> mutations. As such, estimates are not always consistent with data on more-and-more markers (the more markers there are, the more likely one is erroneous) some recrudescences are liable to misclassification as relapse, some relapses are liable to misclassification as reinfections (we assume siblings are regular siblings drawing from two parental alleles, rendering relapse classification sensitive to false positive alleles). We recommend a sensitivity analysis to explore the impact of genotyping errors on recurrent state estimates (an example will be provided in an upcoming manuscript).</p>
+<p>We model recurrent states (relapse, reinfection and recrudescence) as mutually exclusive. Pv3Rs was designed with a view towards clinical trials where study participants are actively followed up frequently and where all detected infections are treated to the extent that parasitaemia drops below some detectable level. In studies where infections persists untreated and/or where events have time to accumulate (e.g., a person with an untreated recrudescence experiences a reinfection), the assumption that recurrent states are mutually exclusive does not hold, persistent and recrudescent infections are ill defined, and recrudescences and reinfections are liable to misclassification as relapses.</p>
 </div>
 <div class="section level4">
 <h4 id="sibling-misspecification">Sibling misspecification<a class="anchor" aria-label="anchor" href="#sibling-misspecification"></a>
 </h4>
-<p>Relapsing parasites that are siblings of parasites in previous infections can be meiotic, parent-child-like, regular or half siblings, but we model all sibling parasites as regular siblings: - independent (not true of meiotic siblings) - transitive (not true of parent-child-like trios or some half-sibling trios) - drawing from at most two parental alleles (not true of half siblings). In our experience, half sibling misspecification leads to some misclassification of relapses as reinfections. A descriptive study to explore the extent of half-sibling misspecification is recommended (an example will be provided in an upcoming manuscript).</p>
+<p>Relapsing parasites that are siblings of parasites in previous infections can be meiotic, parent-child-like, regular or half siblings, but we model all sibling parasites as regular siblings: - independent (not true of meiotic siblings) - transitive (not true of parent-child-like trios or some half-sibling trios) - drawing from at most two parental alleles (not true of half siblings).</p>
+<p>In our experience, half sibling misspecification leads to some misclassification of relapses as reinfections. A descriptive study to explore the extent of half-sibling misspecification is recommended (an example will be provided in an upcoming manuscript).</p>
 </div>
 <div class="section level4">
-<h4 id="complexities-of-molecular-correction-that-exceed-the-available-data">Complexities of molecular correction that exceed the available data<a class="anchor" aria-label="anchor" href="#complexities-of-molecular-correction-that-exceed-the-available-data"></a>
+<h4 id="genotyping-errors">Genotyping errors<a class="anchor" aria-label="anchor" href="#genotyping-errors"></a>
 </h4>
-<p>We do not model all the complexities of molecular correction that can cause recurrent state misclassification (the end-goal of molecular correction is improved efficacy estimation, not per-recurrence perfection). For example, we do not model the failure to draw a low-density clone in a blood sample of limited volume (could lead to misclassification of a recrudescence as a reinfection if recrudescent clone is at low density at enrolment), persistent gametocytes (can lead to the misclassification of reinfection as recrudescence), or population structure (could also lead to the misclassification of reinfection). If there is reason for concern, we recommend doing sensitivity analyses (an example around population structure will be provided in an upcoming manuscript).</p>
+<p>We do not model genotyping errors including undetected alleles, or <em>de novo</em> mutations. As such, estimates are not always consistent with data on more-and-more markers (the more markers there are, the more likely one is erroneous) some recrudescences are liable to misclassification as relapse (the assumption that recrudescent parasites are perfect clones renders recrudescence classification sensitive to false positive alleles), some relapses are liable to misclassification as reinfections (the assumption that siblings draw from at-most two parental alleles renders relapse classification sensitive to false positive alleles). We recommend a sensitivity analysis to explore the impact of genotyping errors on recurrent state estimates (an example will be provided in an upcoming manuscript).</p>
+</div>
+<div class="section level4">
+<h4 id="complexities-of-molecular-correction-that-exceed-data-sampled-data">Complexities of molecular correction that exceed data sampled data<a class="anchor" aria-label="anchor" href="#complexities-of-molecular-correction-that-exceed-data-sampled-data"></a>
+</h4>
+<p>We do not model all the complexities of molecular correction that can cause recurrent state misclassification (the end-goal of molecular correction is improved efficacy estimation, not per-recurrence perfection). For example, we do not model the failure to draw a low-density clone in a blood sample of limited volume (could lead to misclassification of a recrudescence as a reinfection if the recrudescent clone is at low density at enrolment), persistent gametocytes (can lead to the misclassification of reinfection as recrudescence), or population structure (could also lead to the misclassification of reinfection). If there is reason for concern, we recommend doing sensitivity analyses (an example around population structure will be provided in an upcoming manuscript).</p>
 </div>
 <div class="section level4">
 <h4 id="prior-impact-on-posterior-probabilities-of-probable-reinfection-and-recrudescence">Prior impact on posterior probabilities of probable reinfection and recrudescence<a class="anchor" aria-label="anchor" href="#prior-impact-on-posterior-probabilities-of-probable-reinfection-and-recrudescence"></a>
 </h4>
-<p>In lieu of a generative model on intra-inoculation parasite relationships, we assume all relationship graphs compatible with a given sequence of recurrent states are equally likely <em>a priori</em>. When data are informative up to two states ({reinfection and relapse} or {recrudescence and relapse}) but not beyond, the model returns the prior re-weighted to the exclusion of the incompatible states. As such, our prior on relationship graphs has a strong impact on posterior probabilities of probable reinfection and recrudescence</p>
+<p>In lieu of a generative model on intra-inoculation parasite relationships, we assume all relationship graphs compatible with a given sequence of recurrent states are equally likely <em>a priori</em>. When data are informative up to two states — {reinfection and relapse} or {recrudescence and relapse} — but not beyond, the model returns the prior re-weighted to the exclusion of the incompatible states. As such, our prior on relationship graphs has a strong impact on posterior probabilities of probable reinfection and recrudescence.</p>
 <table class="table">
 <colgroup>
 <col width="64%">
@@ -139,20 +140,20 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Possible misclassification of persistent and/or accumulated events (e.g., recrudescence plus reinfection) as relapse</td>
-<td>Modelling 3Rs as mutually exclusive events</td>
-</tr>
-<tr class="even">
-<td>Possible inconsistency with data on more-and-more markers</td>
-<td>Not modelling errors</td>
-</tr>
-<tr class="odd">
-<td>Possible misclassification of recrudescence as relapse</td>
-<td>Not modelling errors</td>
+<td>Possible misclassification of persistent and/or accumulated states as relapse</td>
+<td>Modelling recurrent states as mutually exclusive</td>
 </tr>
 <tr class="even">
 <td>Possible misclassification of relapse as reinfection</td>
-<td>Not modelling errors and half-sibling misspecification</td>
+<td>Half-sibling misspecification and not modelling errors</td>
+</tr>
+<tr class="odd">
+<td>Possible inconsistency with data on more-and-more markers</td>
+<td>Not modelling errors</td>
+</tr>
+<tr class="even">
+<td>Possible misclassification of recrudescence as relapse</td>
+<td>Not modelling errors</td>
 </tr>
 <tr class="odd">
 <td>Possible misclassification of reinfection</td>
@@ -160,11 +161,11 @@
 </tr>
 <tr class="even">
 <td>Strong prior impact on posterior probabilities of reinfection and recrudescence</td>
-<td>Assumption that relationship graphs compatible with a given recurrent state sequence are equally likely <em>a priori</em>
-</td>
+<td>Recurrent states are not</td>
 </tr>
 </tbody>
 </table>
+<p>always identifiable from genetic data alone</p>
 </div>
 </div>
 <div class="section level3">
