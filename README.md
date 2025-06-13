@@ -57,22 +57,77 @@ misclassification of recrudescence as reinfection when the probability of
 relapse is zero *a priori* (and of recrudescence as relapse when the prior
 probability of relapse exceeds zero). 
 
-### Notable limitations: 
+### Notable assumptions and limitations: 
+
+Naturally, Pv3Rs makes various assumptions which limit is capabilities in some
+settings. They are explained in some detail below and summarised in a table.
+
+#### Mutually exclusive recurrent states
+We model recurrent states (relapse, reinfection and recrudescence) as mutually
+exclusive. Pv3Rs was designed with a view towards clinical trials where study
+participants are actively followed up frequently and where all detected
+infections are treated to the extent that parasitaeamia drops below some
+detectable level. In studies where infections persists untreated and/or where
+follow up is passive and infrequent such that events have time to accumulate
+(e.g., a person with an untreated recrudescence experiences a reinfection), the
+assumption that recurrent states are mutually exclusive does not hold,
+persistent and recrudescent infections are ill defined, and recrudescences and
+reinfections are liable to misclassification as relapses. 
+
+#### Genotyping errors
+We do not model genotyping errors including undetected alleles, or *de novo* mutations.
+As such, estimates are not always consistent with data on more-and-more markers
+(the more markers there are, the more likely one is erroneous) some
+recrudescences are liable to misclassification as relapse, some relapses are
+liable to misclassification as reinfections (we assume siblings are regular
+siblings drawing from two parental alleles, rendering relapse classification
+sensitive to false positive alleles). We recommend a sensitivity analysis to
+explore the impact of genotyping errors on recurrent state estimates (an example
+will be provided in an upcoming manuscript).
+
+#### Sibling misspecification
+Relapsing parasites that are siblings of parasites in previous infections can be
+meiotic, parent-child-like, regular or half siblings, but we model all sibling
+parasites as regular siblings: 
+   - independent (not true of meiotic siblings)
+   - transitive (not true of parent-child-like trios or some half-sibling trios)
+   - drawing from at most two parental alleles (not true of half siblings).
+In our experience, half sibling misspecification leads to some misclassification
+of relapses as reinfections. A descriptive study to explore the extent of
+half-sibling misspecification is recommended (an example will be provided in an
+upcoming manuscript).
+
+#### Complexities of molecular correction that exceed the available data
+We do not model all the complexities of molecular correction that can cause
+recurrent state misclassification (the end-goal of molecular correction is
+improved efficacy estimation, not per-recurrence perfection). For example, we do
+not model the failure to draw a low-density clone in a blood sample of limited
+volume (could lead to misclassification of a recrudescence as a reinfection if
+recrudescent clone is at low density at enrolment), persistent gametocytes (can
+lead to the misclassification of reinfection as recrudescence), or population
+structure (could also lead to the misclassification of reinfection). If there is
+reason for concern, we recommend doing sensitivity analyses (an example around
+population structure will be provided in an upcoming manuscript).
+
+#### Prior impact on posterior probabilities of probable reinfection and recrudescence
+In lieu of a generative model on intra-inoculation parasite relationships, we
+assume all relationship graphs compatible with a given sequence of recurrent
+states are equally likely *a priori*. When data are informative up to two states
+(\{reinfection and relapse\} or \{recrudescence and relapse\}) but not beyond,
+the model returns the prior re-weighted to the exclusion of the incompatible
+states. As such, our prior on relationship graphs has a strong impact on 
+posterior probabilities of probable reinfection and recrudescence
+
 
 Limitation | Reason
 ----------- | ------
-Possible misclassification of relapse as reinfection | Not modelling errors and half-sibling misspecification
-Possible misclassification of recrudescence as relapse | Not modelling errors
-Possible inconsistency with data on more-and-more markers | Not modelling errors
 Possible misclassification of persistent and/or accumulated events (e.g., recrudescence plus reinfection) as relapse | Modelling 3Rs as mutually exclusive events
+Possible inconsistency with data on more-and-more markers | Not modelling errors
+Possible misclassification of recrudescence as relapse | Not modelling errors
+Possible misclassification of relapse as reinfection | Not modelling errors and half-sibling misspecification
+Possible misclassification of reinfection | Not modelling population structure
 Strong prior impact on posterior probabilities of reinfection and recrudescence | Assumption that relationship graphs compatible with a given recurrent state sequence are equally likely *a priori*
 
-<!-- Because, we don't model population structure, we also recommend a
-3) Perfect detection of parasites (problematic for low density clones)
-7) Parasites are outbred (implies the parasite population is infinitely large and panmitic)
-For studies with possibly high rates of recrudescence, we recommend a
-sensitivity analysis to explore the impact of genotyping errors on
-recrudescence. An example will be provided in an upcoming manuscript. -->
 
 ### Computational limits:
 
