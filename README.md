@@ -59,8 +59,9 @@ probability of relapse exceeds zero).
 
 ### Notable assumptions and limitations: 
 
-Naturally, Pv3Rs makes various assumptions that limit is capabilities in some
-settings. They are explained in some detail below and summarised in a table.
+As with any model, Pv3Rs makes various assumptions that limit is capabilities in
+some settings. They are explained in some detail below and summarised in a
+table.
 
 #### Mutually exclusive recurrent states
 We model recurrent states (relapse, reinfection and recrudescence) as mutually
