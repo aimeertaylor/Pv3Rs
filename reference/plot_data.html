@@ -3,27 +3,15 @@
 on different markers (columns), where episodes are grouped by patient. The
 patients and per-patient episodes are plotted from bottom to top. If more
 than one allele is detected per episode per marker, the corresponding
-row-column entry is subdivided into different colours. The legend depicts the
-alleles of the markers as the markers appear from left to right in the main
-plot. Otherwise stated, the legend is ordered by the order of markers stated
-on on the vertical axis of the main plot. The colour scheme is adaptive. It
-is designed to visually differentiate the alleles as much as possible: the
-maximum range of qualitative scheme, with contrast of hue between adjacent
-colours, is always used; the adjacent colours are interpolated only if a
-given marker has more than 12 alleles. The names of the alleles are printed
-on top of their colours if marker_annotate."><meta property="og:description" content="Plots the alleles (colours), which are observed in different episodes (rows),
+row-column entry is subdivided into different colours. The order of markers
+follow the allele frequencies, if provided. Otherwise, markers are ordered
+lexicographically."><meta property="og:description" content="Plots the alleles (colours), which are observed in different episodes (rows),
 on different markers (columns), where episodes are grouped by patient. The
 patients and per-patient episodes are plotted from bottom to top. If more
 than one allele is detected per episode per marker, the corresponding
-row-column entry is subdivided into different colours. The legend depicts the
-alleles of the markers as the markers appear from left to right in the main
-plot. Otherwise stated, the legend is ordered by the order of markers stated
-on on the vertical axis of the main plot. The colour scheme is adaptive. It
-is designed to visually differentiate the alleles as much as possible: the
-maximum range of qualitative scheme, with contrast of hue between adjacent
-colours, is always used; the adjacent colours are interpolated only if a
-given marker has more than 12 alleles. The names of the alleles are printed
-on top of their colours if marker_annotate."><meta property="og:image" content="https://aimeertaylor.github.io/Pv3Rs/logo.png"></head><body>
+row-column entry is subdivided into different colours. The order of markers
+follow the allele frequencies, if provided. Otherwise, markers are ordered
+lexicographically."><meta property="og:image" content="https://aimeertaylor.github.io/Pv3Rs/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -75,15 +63,9 @@ on top of their colours if marker_annotate."><meta property="og:image" content="
 on different markers (columns), where episodes are grouped by patient. The
 patients and per-patient episodes are plotted from bottom to top. If more
 than one allele is detected per episode per marker, the corresponding
-row-column entry is subdivided into different colours. The legend depicts the
-alleles of the markers as the markers appear from left to right in the main
-plot. Otherwise stated, the legend is ordered by the order of markers stated
-on on the vertical axis of the main plot. The colour scheme is adaptive. It
-is designed to visually differentiate the alleles as much as possible: the
-maximum range of qualitative scheme, with contrast of hue between adjacent
-colours, is always used; the adjacent colours are interpolated only if a
-given marker has more than 12 alleles. The names of the alleles are printed
-on top of their colours if marker_annotate.</p>
+row-column entry is subdivided into different colours. The order of markers
+follow the allele frequencies, if provided. Otherwise, markers are ordered
+lexicographically.</p>
     </div>
 
     <div class="section level2">
@@ -94,7 +76,8 @@ on top of their colours if marker_annotate.</p>
 <span>  patient_vert <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">3.5</span>, <span class="fl">1.5</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  gridlines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  legendsize <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  legendsize <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  palette <span class="op">=</span> <span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">12</span>, <span class="st">"Paired"</span><span class="op">)</span>,</span>
 <span>  marker_annotate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cex.maj <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>  cex.min <span class="op">=</span> <span class="fl">0.5</span>,</span>
@@ -133,7 +116,7 @@ otherwise they are printed horizontally (default).</p></dd>
 
 <dt id="arg-mar">mar<a class="anchor" aria-label="anchor" href="#arg-mar"></a></dt>
 <dd><p>A vector which gives the number of lines of margin for the main
-plot; see the entry for <code>mar</code> in <code><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></code>.</p></dd>
+plot; see the entry for <code>mar</code> in <a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a>.</p></dd>
 
 
 <dt id="arg-gridlines">gridlines<a class="anchor" aria-label="anchor" href="#arg-gridlines"></a></dt>
@@ -144,6 +127,13 @@ patients and markers will be drawn.</p></dd>
 <dt id="arg-legendsize">legendsize<a class="anchor" aria-label="anchor" href="#arg-legendsize"></a></dt>
 <dd><p>Float representing the proportion of the plot that the
 legend occupies.</p></dd>
+
+
+<dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
+<dd><p>Colour palette for alleles, see return value of
+RColorBrewer::brewer.pal. Colour interpolation takes place
+when the number of alleles exceeds the number of colours defining the
+palette.</p></dd>
 
 
 <dt id="arg-marker-annotate">marker_annotate<a class="anchor" aria-label="anchor" href="#arg-marker-annotate"></a></dt>
@@ -163,6 +153,18 @@ are printed on top of their colours in the legend.</p></dd>
 <dd><p>Float representing the font scaling for the allele labels.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The legend depicts the alleles of the markers as the markers appear from left
+to right in the main plot. Otherwise stated, the legend is ordered by the
+order of markers stated on on the vertical axis of the main plot. The default
+colour scheme is adaptive. It is designed to visually differentiate the
+alleles as much as  ossible: the maximum range of qualitative scheme, with
+contrast of hue between adjacent colours, is always used; the adjacent
+colours areinterpolated only if a given marker has more than 12 alleles. The
+names of the alleles are printed on top of their colours if
+<code>marker_annotate</code> is set to <code>TRUE</code>.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

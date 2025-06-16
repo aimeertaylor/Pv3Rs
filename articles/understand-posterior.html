@@ -228,6 +228,7 @@ relationship graphs with intra-episode relatedness.</p>
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">'A'</span><span class="op">)</span>, recur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="co"># Homoallelic data</span></span>
 <span><span class="va">MOIs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Different MOIs with first MOI &gt; 1</span></span>
 <span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.01</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span><span class="op">)</span> <span class="co"># Rare observed allele</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; NULL</span></span></code></pre>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-10-1.png" width="100%"></p>
 <p>The per-graph likelihood is only appreciable for relationship graphs
 where all distinct parasite genotypes in the first episode are
@@ -249,7 +250,7 @@ heteroallelic,</li>
 <li>its output departs from the prior when data are homoallelic and rare
 with user-specified MOIs &gt; 1.</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Allele frequencies</span></span>
 <span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.01</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span>, </span>
 <span>          m2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.01</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span><span class="op">)</span> </span>
@@ -295,6 +296,7 @@ recrudescence.</li>
 the assumption under the model that there are no genotyping errors: if a
 genotyping error generates a single mismatch, the posterior probability
 of recrudescence is quashed.</p>
+<pre><code><span><span class="co">#&gt; NULL</span></span></code></pre>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
 </div>
 <div class="section level2">
@@ -308,6 +310,7 @@ partial match, which is not very informative (central arrow). When a
 mismatch is added to a rare match (diamond), relapse becomes the most
 probable state. This demonstrates the requirement of multiple markers
 for relapse inference.</p>
+<pre><code><span><span class="co">#&gt; NULL</span></span></code></pre>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-14-1.png" width="100%"></p>
 </div>
 <div class="section level2">
@@ -358,7 +361,7 @@ adding recurrences with no recurrent data. However, these maxima are
 based on knowledge that there are no recurrent data on all but the first
 recurrence. In other words, they are not computable <em>a
 priori</em>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">marker_count</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="co"># Number of markers</span></span>
 <span><span class="va">ms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"m"</span>, <span class="fl">1</span><span class="op">:</span><span class="va">marker_count</span><span class="op">)</span> <span class="co"># Marker names </span></span>
 <span><span class="va">all_As</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">ms</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="st">"A"</span>, simplify <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="co"># As for all markers</span></span>
@@ -369,10 +372,11 @@ priori</em>.</p>
 <div class="section level3">
 <h3 id="increasing-per-episode-mois">Increasing per-episode MOIs<a class="anchor" aria-label="anchor" href="#increasing-per-episode-mois"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MOIs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> </span>
 <span><span class="va">y_match</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, recur <span class="op">=</span> <span class="va">all_As</span><span class="op">)</span></span>
 <span><span class="va">y_mismatch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, recur <span class="op">=</span> <span class="va">all_Bs</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; NULL</span></span></code></pre>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-18-1.png" width="100%"></p>
 <p>The posterior probabilities of recrudescence increase with increasing
 graph size when the MOIs are balanced. The posterior probabilities of
@@ -385,7 +389,7 @@ user-specified MOIs without changing the data, or we can increase the
 allelic diversity of the data, s.t. MOIs modelled under Pv3Rs increase
 without user-specified MOIs. Either way, we get the same maximum
 probabilities:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_ACs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">ms</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"C"</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="co"># A&amp;C for all </span></span>
 <span><span class="va">all_BEs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">ms</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B"</span>, <span class="st">"E"</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="co"># A&amp;C for all </span></span>
 <span><span class="va">all_ACDs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">ms</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"C"</span>, <span class="st">"D"</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="co"># A&amp;C for all </span></span>
@@ -427,7 +431,7 @@ three or more siblings are modelled as groups of two; see
 <h3 id="increasing-episode-counts">Increasing episode counts<a class="anchor" aria-label="anchor" href="#increasing-episode-counts"></a>
 </h3>
 <p>Recurrences can be added without adding data</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ys_match</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"1_recurrence"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, </span>
 <span>                                       recur1 <span class="op">=</span> <span class="va">all_As</span><span class="op">)</span>,</span>
 <span>                 <span class="st">"2_recurrence"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, </span>
@@ -449,9 +453,11 @@ three or more siblings are modelled as groups of two; see
 <span>                                          recur3 <span class="op">=</span> <span class="va">no_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The marginal probability that the first recurrence is a recrudescence
 / reinfection depends on the total number of recurrences:</p>
+<pre><code><span><span class="co">#&gt; NULL</span></span></code></pre>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-24-1.png" width="100%"></p>
 <p>An example of how recrudescence probabilities converge to their
 maxima over 1, 2, 5 and 100 markers:</p>
+<pre><code><span><span class="co">#&gt; NULL</span></span></code></pre>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-25-1.png" width="100%"></p>
 <p>Note that the above maxima are not bounds imposed by the prior: they
 are based on knowledge that there are no recurrent data on all but the
@@ -468,7 +474,7 @@ three episodes, for example), the position of a recurrence in a sequence
 has a bearing on posterior estimates.</p>
 <p>This effect is negligible when all episodes have the same data on
 many markers:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, </span>
 <span>          recur1 <span class="op">=</span> <span class="va">all_As</span>, </span>
 <span>          recur2 <span class="op">=</span> <span class="va">all_As</span>, </span>
@@ -480,7 +486,7 @@ many markers:</p>
 <span><span class="co">#&gt; recur3 0.7720588 0.2279412 5.044004e-23</span></span></code></pre></div>
 <p>Instead, consider sequences of episodes with observations (Os) and
 episodes with no data (Ns):</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ys_match</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"NOO"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">no_data</span>, </span>
 <span>                              recur1 <span class="op">=</span> <span class="va">all_As</span>,</span>
 <span>                              recur2 <span class="op">=</span> <span class="va">all_As</span><span class="op">)</span>,</span>
@@ -500,6 +506,7 @@ episodes with no data (Ns):</p>
 <span>                    <span class="st">"OON"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, </span>
 <span>                                 recur1 <span class="op">=</span> <span class="va">all_Bs</span>,</span>
 <span>                                 recur2 <span class="op">=</span> <span class="va">no_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; NULL</span></span></code></pre>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-28-1.png" width="100%"></p>
 <div class="section level4">
 <h4 id="highly-informed-recurrences">Highly informed recurrences<a class="anchor" aria-label="anchor" href="#highly-informed-recurrences"></a>
@@ -539,7 +546,7 @@ informing the second recurrence only; likewise, strong evidence for a
 clonal edge between episodes one and two in <span style="color: purple;"><strong>OO</strong>N</span> is incompatible with
 all sequences of recurrences starting with reinfection, informing the
 first recurrence only.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">epsilon</span> <span class="op">&lt;-</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span> <span class="co"># Very small probability</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ys_match</span><span class="op">[[</span><span class="st">"ONO"</span><span class="op">]</span><span class="op">]</span>, <span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">joint</span> <span class="op">&lt;</span> <span class="va">epsilon</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "IC" "CI" "LI" "II"</span></span>
@@ -563,7 +570,7 @@ evidence for a stranger edge between episodes one and three is
 incompatible with a double recrudescence, so the posterior of the first
 recurrence (downward orange 1 triangle) deviates from the prior despite
 the first recurrence having no data.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">epsilon</span> <span class="op">&lt;-</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span> <span class="co"># Very small probability</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ys_mismatch</span><span class="op">[[</span><span class="st">"ONO"</span><span class="op">]</span><span class="op">]</span>, <span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">joint</span> <span class="op">&lt;</span> <span class="va">epsilon</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "CC"</span></span>
@@ -593,7 +600,7 @@ participants with a single monoclonal recurrence following a monoclonal
 enrolment episode because their posterior reinfection probabilities will
 never exceed 0.75, even if their data are highly informative of
 reinfection:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, recur <span class="op">=</span> <span class="va">all_Bs</span><span class="op">)</span></span>
 <span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">ms</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
