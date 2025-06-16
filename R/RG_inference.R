@@ -16,6 +16,7 @@
 #' @param alleles_per_m List of allele assignments as dataframes for each
 #'   marker. Each column corresponds to a genotype and each row corresponds to
 #'   an allele assignment.
+#' @param progress.bar Boolean for printing progress bars.
 #'
 #' @return List of all relationship graph objects, including their
 #'   log-likelihoods as a variable under each object.
@@ -37,7 +38,7 @@
 #' RGs <- RG_inference(MOIs, fs, alleles_per_m)
 #'
 #' @export
-RG_inference <- function(MOIs, fs, alleles_per_m) {
+RG_inference <- function(MOIs, fs, alleles_per_m, progress.bar = TRUE) {
   # check that allele assignments are given as data frames
   for (al.df in alleles_per_m) stopifnot(class(al.df)[1] == "data.frame")
 
@@ -54,12 +55,12 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
   }), ms)
 
   # enumerate all relationship graphs
-  RGs <- enumerate_RGs(MOIs, igraph = FALSE)
+  RGs <- enumerate_RGs(MOIs, igraph = FALSE, progress.bar)
   gs <- paste0("g", 1:sum(MOIs)) # genotype names
 
   RG_i <- 0
   n.RG <- length(RGs)
-  pbar <- msg_progress_bar(n.RG)
+  if (progress.bar) pbar <- msg_progress_bar(n.RG)
   message(paste("Computing log p(Y|RG) for", n.RG, "RGs"))
 
   for (RG in RGs) { # for each relationship graph
@@ -82,7 +83,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
     # set logp to -Inf in case of any clonal edges that are impossible
     if (incompatible) {
       RG_i <- RG_i + 1
-      pbar$increment()
+      if (progress.bar) pbar$increment()
       RGs[[RG_i]]$logp <- -Inf
       next
     }
@@ -134,7 +135,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m) {
     }
 
     RG_i <- RG_i + 1
-    pbar$increment()
+    if (progress.bar) pbar$increment()
 
     # p(y | RG) = sum of p(y | IP) p(IP | RG), where p(IP | RG) is uniform
     RGs[[RG_i]]$logp <- (sum(matrixStats::colLogSumExps(IP_logps))

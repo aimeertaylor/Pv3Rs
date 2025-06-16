@@ -10,7 +10,8 @@ compute_posterior(
   prior = NULL,
   MOIs = NULL,
   return.RG = FALSE,
-  return.logp = FALSE
+  return.logp = FALSE,
+  progress.bar = TRUE
 )
 }
 \arguments{
@@ -56,6 +57,11 @@ computational time, see \code{\link{enumerate_alleles}}. Setting this to
 \code{TRUE} will result in longer runtimes, especially when multiplicities of
 infection are large. Note that this argument does not affect the output of
 the posterior probabilities.}
+
+\item{progress.bar}{Boolean for printing progress bars. When \code{TRUE}
+(default), the progress bar is printed to the screen. Please note that the
+progress bar does not necessarily increment uniformly (see details below);
+it may seem stuck when the code is still running.}
 }
 \value{
 List containing:
@@ -139,7 +145,7 @@ fs <- list(m1 = c('1' = 0.78, '2' = 0.14, '3' = 0.07, '4' = 0.01),
            m2 = c('1' = 0.27, '2' = 0.73))
 
 # Compute posterior probabilities using default prior
-compute_posterior(y, fs)
+compute_posterior(y, fs, progress.bar = FALSE)
 
 
 # ===========================================================================
@@ -156,7 +162,7 @@ fs <- list(marker1 = c("Tinky Winky" = 0.4, "Dipsy" = 0.6),
            marker2 = c("Tinky Winky" = 0.1, "Laa-Laa" = 0.1, "Po" = 0.8))
 
 # Compute posterior probabilities using default prior
-posterior_probs <- compute_posterior(y, fs)
+posterior_probs <- compute_posterior(y, fs, progress.bar = FALSE)
 
 # Plot posterior probabilities on the simplex
 plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Simplex
@@ -244,7 +250,7 @@ ys <- list(scenario1 = list(enroll = list(m1 = "A"),
 f_A <- 0.1; fs <- list(m1 = c("A" = f_A, "Other" = 1-f_A))
 
 # Compute posterior probabilities and extract marginal probabilities
-results <- lapply(ys, function(y) compute_posterior(y, fs)$marg)
+results <- lapply(ys, function(y) compute_posterior(y, fs, progress.bar = FALSE)$marg)
 
 # Extract results for the first recurrence
 results_recur1 <- sapply(results, function(result) result[1,])

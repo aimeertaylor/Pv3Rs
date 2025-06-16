@@ -4,7 +4,7 @@
 \alias{RG_inference}
 \title{Computes the likelihood of all relationship graphs}
 \usage{
-RG_inference(MOIs, fs, alleles_per_m)
+RG_inference(MOIs, fs, alleles_per_m, progress.bar = TRUE)
 }
 \arguments{
 \item{MOIs}{A numeric vector specifying, for each infection, the number of
@@ -16,6 +16,8 @@ match with the marker names in \code{alleles_per_m}.}
 \item{alleles_per_m}{List of allele assignments as dataframes for each
 marker. Each column corresponds to a genotype and each row corresponds to
 an allele assignment.}
+
+\item{progress.bar}{Boolean for printing progress bars.}
 }
 \value{
 List of all relationship graph objects, including their
