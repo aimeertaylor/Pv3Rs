@@ -19,7 +19,9 @@ respectively.
 \description{
 Project three probabilities that sum to one (e.g., the marginal probabilities
 of the 3Rs) onto the coordinates of a 2D simplex centred at the origin
-(i.e., a triangle centred at (0,0) with unit sides).
+(i.e., a triangle centred at (0,0) with unit sides). Each probability is
+proportional to the distance between the point and the side opposite to the
+corner corresponding to the probability.
 }
 \examples{
 project2D(v = c(0.75,0.20,0.05))

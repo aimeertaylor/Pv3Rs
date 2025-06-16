@@ -68,9 +68,13 @@
 #' arrows(x0 = xy_prior["x"], x1 = xy_post["x"],
 #'        y0 = xy_prior["y"], y1 = xy_post["y"], length = 0.1)
 #' @export
-plot_simplex <- function(v_labels = NULL,
+plot_simplex <- function(v_labels = c("Recrudescence", "Relapse", "Reinfection"),
                          v_cutoff = 0.5,
-                         v_colours = c("yellow","purple","red")) {
+                         v_colours = c("yellow","purple","red"),
+                         plot_tri = T,
+                         p_coords = NULL,
+                         p_labels = rownames(p_coords),
+                         pos = 3) {
 
   # Define some constants:
   h <- sqrt(3)/2 # Height of equilateral triangle with unit sides
@@ -83,7 +87,7 @@ plot_simplex <- function(v_labels = NULL,
        ylab = "", xlab = "")
 
   # Plot equilateral triangle:
-  graphics::polygon(x = c(-0.5, 0.5, 0), y = c(-k, -k, r))
+  if(plot_tri) graphics::polygon(x = c(-0.5, 0.5, 0), y = c(-k, -k, r))
 
   # Annotate vertices:
   if (!is.null(v_labels)) {
@@ -133,11 +137,20 @@ plot_simplex <- function(v_labels = NULL,
     p2 <- rbind(xyL, xyTL_L, xyLR_L)
     p3 <- rbind(xyR, xyLR_R, xyTR_R)
 
-    graphics::polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = v_colours[1])
-    graphics::polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = v_colours[2])
-    graphics::polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = v_colours[3])
+    # Triangles plotted on top of quadrilaterals (0.35 + 0.45 = 0.8)
+    graphics::polygon(x = p1[,"x"], y = p1[,"y"], border = NA, col = grDevices::adjustcolor(v_colours[1], alpha.f = 0.45))
+    graphics::polygon(x = p2[,"x"], y = p2[,"y"], border = NA, col = grDevices::adjustcolor(v_colours[2], alpha.f = 0.45))
+    graphics::polygon(x = p3[,"x"], y = p3[,"y"], border = NA, col = grDevices::adjustcolor(v_colours[3], alpha.f = 0.45))
   }
 
+  # Plot points if given
+  if(is.null(p_coords)) return()
+  # if p_coords is a single vector, make it a matrix of one row
+  if(is.vector(p_coords)) p_coords <- t(p_coords)
+  # note that p_coords has one point per row, p_2Dcoords has one point per column
+  xy <- apply(p_coords, 1, project2D)
+  points(x = xy["x",], y = xy["y",], pch = 20)
+  text(x = xy["x",], y = xy["y",], pos = pos, labels = p_labels)
 }
 
 
@@ -145,7 +158,9 @@ plot_simplex <- function(v_labels = NULL,
 #'
 #' Project three probabilities that sum to one (e.g., the marginal probabilities
 #' of the 3Rs) onto the coordinates of a 2D simplex centred at the origin
-#' (i.e., a triangle centred at (0,0) with unit sides).
+#' (i.e., a triangle centred at (0,0) with unit sides). Each probability is
+#' proportional to the distance between the point and the side opposite to the
+#' corner corresponding to the probability.
 #'
 #' @param v A numeric vector of three numbers in zero to one that sum to one.
 #'

@@ -5,9 +5,13 @@
 \title{Plots a 2D simplex}
 \usage{
 plot_simplex(
-  v_labels = NULL,
+  v_labels = c("Recrudescence", "Relapse", "Reinfection"),
   v_cutoff = 0.5,
-  v_colours = c("yellow", "purple", "red")
+  v_colours = c("yellow", "purple", "red"),
+  plot_tri = T,
+  p_coords = NULL,
+  p_labels = rownames(p_coords),
+  pos = 3
 )
 }
 \arguments{

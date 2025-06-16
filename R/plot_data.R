@@ -4,15 +4,19 @@
 #' on different markers (columns), where episodes are grouped by patient. The
 #' patients and per-patient episodes are plotted from bottom to top. If more
 #' than one allele is detected per episode per marker, the corresponding
-#' row-column entry is subdivided into different colours. The legend depicts the
-#' alleles of the markers as the markers appear from left to right in the main
-#' plot. Otherwise stated, the legend is ordered by the order of markers stated
-#' on on the vertical axis of the main plot. The colour scheme is adaptive. It
-#' is designed to visually differentiate the alleles as much as possible: the
-#' maximum range of qualitative scheme, with contrast of hue between adjacent
-#' colours, is always used; the adjacent colours are interpolated only if a
-#' given marker has more than 12 alleles. The names of the alleles are printed
-#' on top of their colours if marker_annotate.
+#' row-column entry is subdivided into different colours. The order of markers
+#' follow the allele frequencies, if provided. Otherwise, markers are ordered
+#' lexicographically.
+#'
+#' The legend depicts the alleles of the markers as the markers appear from left
+#' to right in the main plot. Otherwise stated, the legend is ordered by the
+#' order of markers stated on on the vertical axis of the main plot. The default
+#' colour scheme is adaptive. It is designed to visually differentiate the
+#' alleles as much as  ossible: the maximum range of qualitative scheme, with
+#' contrast of hue between adjacent colours, is always used; the adjacent
+#' colours areinterpolated only if a given marker has more than 12 alleles. The
+#' names of the alleles are printed on top of their colours if
+#' \code{marker_annotate} is set to \code{TRUE}.
 #'
 #'@param ys A nested list of per-patient, per-episode, per-marker allelic data.
 #'  Specifically, a per-patient list of a per-episode list of a per-marker list
@@ -36,6 +40,10 @@
 #'  patients and markers will be drawn.
 #'@param legendsize Float representing the proportion of the plot that the
 #'  legend occupies.
+#'@param palette Colour palette for alleles, see return value of
+#'  \code{\link[RColorBrewer]{brewer.pal}}. Colour interpolation takes place
+#'  when the number of alleles exceeds the number of colours defining the
+#'  palette.
 #'@param marker_annotate Logical. If true (default), the names of the alleles
 #'  are printed on top of their colours in the legend.
 #'@param cex.maj Float representing the font scaling of major axis labels.
@@ -63,12 +71,13 @@ plot_data = function(ys,
                      patient_vert = FALSE,
                      mar = c(1.5, 3.5, 1.5, 1),
                      gridlines = TRUE,
-                     legendsize = 0.25,
+                     legendsize = 0.2,
+                     palette = RColorBrewer::brewer.pal(12, "Paired"),
                      marker_annotate = TRUE,
                      cex.maj = 0.7, cex.min = 0.5, cex.text = 0.5
 ){
   # Function to create ramped colours based on "Paired" brewer.pal
-  cols <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))
+  cols <- grDevices::colorRampPalette(palette)
 
   # Extract patients and episode counts and names
   n_patients <- length(ys)
@@ -99,7 +108,7 @@ plot_data = function(ys,
   names(ys_by_epi) <- eids
 
   # Extract marker info.
-  markers_in_data <- unique(unlist(lapply(ys_by_epi, function(epi) names(epi)), use.names = F))
+  markers_in_data <- sort(unique(unlist(lapply(ys_by_epi, function(epi) names(epi)), use.names = F)))
   marker_alleles_in_data <- lapply(markers_in_data, function(marker) {
     sort(
       unique(
@@ -142,11 +151,11 @@ plot_data = function(ys,
       epi_marker_alleles = sort(unique(ys_by_epi[[epi]][[marker]]))
       if (all(is.na(epi_marker_alleles))) next # TRUE if typed but all NA or untyped
       moi_marker = length(epi_marker_alleles[!is.na(epi_marker_alleles)])
-      to_fill_list = lapply(seq(factorial_maxMOI, 1, -factorial_maxMOI/moi_marker), function(x){1:x})
+      seglen <- factorial_maxMOI/moi_marker
       for(k in 1:moi_marker){
-        to_fill_list_k <- to_fill_list[[k]]
-        to_fill = paste(rep(marker, each = max(to_fill_list_k)), to_fill_list_k, sep = '_')
-        marker_data_wide_format[epi, to_fill] = rep(epi_marker_alleles[k], each = max(to_fill_list_k))
+        seg <- (k*seglen-seglen+1):(k*seglen)
+        to_fill = paste(rep(marker, seglen), seg, sep = '_')
+        marker_data_wide_format[epi, to_fill] = rep(epi_marker_alleles[k], seglen)
       }
     }
   }
@@ -199,7 +208,8 @@ plot_data = function(ys,
   matrix_to_plot <- t(rbind(ID_01, Empty_array, ID_01))
   graphics::image(
     x_coords, rim_coords, matrix_to_plot, xlab="", ylab="",
-    col = grDevices::grey(c(0.4,0.7)), axes = FALSE)
+    col = grDevices::grey(c(0.4,0.7)), axes = FALSE,
+    ylim=c(1+1/rim_ratio,-1/rim_ratio))
 
   # Add marker data
   COLs = seq(1, n_markers_wide, factorial_maxMOI)
@@ -232,8 +242,10 @@ plot_data = function(ys,
                   line = 0.2, cex = cex.min, las = 2)
   graphics::mtext(text = pids, side = 1, at = ID_midpoints, cex = cex.min,
                   las = ifelse(patient_vert, 3, 1), line = ifelse(patient_vert, 0.2, 0))
-  graphics::mtext(text = bquote(.(n_episodes) ~ 'episodes (one column per episode, grouped by patient)'),
-                  cex = cex.maj)
+  xlabel <- ifelse(n_patients > 1,
+                   sprintf("%s episodes in %s people (one column per episode, grouped by person)", n_episodes, n_patients),
+                   sprintf("%s episodes in 1 person (one column per episode)", n_episodes))
+  graphics::mtext(text = xlabel, line = 0.2, cex = cex.maj)
   graphics::title(ylab = 'Marker (number of distinct alleles)',
                   line = 2.5, cex.lab = cex.maj)
 
@@ -242,7 +254,8 @@ plot_data = function(ys,
   rowsize = legendsize/n_markers
   for(marker in markers){ # For each marker in turn
     i = which(marker == markers)
-    SMALLplot = c(0.05, 0.95, 0.01 + rowsize * (i-1), 0.01 + rowsize * i)
+    SMALLplot = c(0.05, 0.95,
+                  0.01 + rowsize*(n_markers-i), 0.01 + rowsize*(n_markers-i+1))
     if (marker_cardinalities[marker] == 1) {
       Breaks <- c(0,1)
       At <- 0.5

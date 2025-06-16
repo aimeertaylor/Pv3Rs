@@ -10,7 +10,8 @@ plot_data(
   patient_vert = FALSE,
   mar = c(1.5, 3.5, 1.5, 1),
   gridlines = TRUE,
-  legendsize = 0.25,
+  legendsize = 0.2,
+  palette = RColorBrewer::brewer.pal(12, "Paired"),
   marker_annotate = TRUE,
   cex.maj = 0.7,
   cex.min = 0.5,
@@ -38,13 +39,18 @@ data lists, thereby facilitating cross-comparison.}
 otherwise they are printed horizontally (default).}
 
 \item{mar}{A vector which gives the number of lines of margin for the main
-plot; see the entry for \code{mar} in \code{\link[graphics]{par}}.}
+plot; see the entry for \code{mar} in \link[graphics]{par}.}
 
 \item{gridlines}{Logical. If true (default), white gridlines separating
 patients and markers will be drawn.}
 
 \item{legendsize}{Float representing the proportion of the plot that the
 legend occupies.}
+
+\item{palette}{Colour palette for alleles, see return value of
+\link{RColorBrewer::brewer.pal}. Colour interpolation takes place
+when the number of alleles exceeds the number of colours defining the
+palette.}
 
 \item{marker_annotate}{Logical. If true (default), the names of the alleles
 are printed on top of their colours in the legend.}
@@ -60,15 +66,20 @@ Plots the alleles (colours), which are observed in different episodes (rows),
 on different markers (columns), where episodes are grouped by patient. The
 patients and per-patient episodes are plotted from bottom to top. If more
 than one allele is detected per episode per marker, the corresponding
-row-column entry is subdivided into different colours. The legend depicts the
-alleles of the markers as the markers appear from left to right in the main
-plot. Otherwise stated, the legend is ordered by the order of markers stated
-on on the vertical axis of the main plot. The colour scheme is adaptive. It
-is designed to visually differentiate the alleles as much as possible: the
-maximum range of qualitative scheme, with contrast of hue between adjacent
-colours, is always used; the adjacent colours are interpolated only if a
-given marker has more than 12 alleles. The names of the alleles are printed
-on top of their colours if marker_annotate.
+row-column entry is subdivided into different colours. The order of markers
+follow the allele frequencies, if provided. Otherwise, markers are ordered
+lexicographically.
+}
+\details{
+The legend depicts the alleles of the markers as the markers appear from left
+to right in the main plot. Otherwise stated, the legend is ordered by the
+order of markers stated on on the vertical axis of the main plot. The default
+colour scheme is adaptive. It is designed to visually differentiate the
+alleles as much as  ossible: the maximum range of qualitative scheme, with
+contrast of hue between adjacent colours, is always used; the adjacent
+colours areinterpolated only if a given marker has more than 12 alleles. The
+names of the alleles are printed on top of their colours if
+\code{marker_annotate} is set to \code{TRUE}.
 }
 \examples{
 
