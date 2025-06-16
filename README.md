@@ -87,8 +87,8 @@ of relapses as reinfections. A descriptive study to explore the extent of
 half-sibling misspecification is recommended (an example will be provided in an
 upcoming manuscript).
 
-#### Genotyping errors
-We do not model genotyping errors including undetected alleles, or *de novo*
+#### Observation errors and *de novo* mutations
+We do not model undetected alleles, genotyping errors, or *de novo*
 mutations. As such, estimates are not always consistent with data on
 more-and-more markers (the more markers there are, the more likely one is
 erroneous) some recrudescences are liable to misclassification as relapse (the
@@ -100,7 +100,7 @@ positive alleles). We recommend a sensitivity analysis to explore the impact of
 genotyping errors on recurrent state estimates (an example will be provided in
 an upcoming manuscript).
 
-#### Complexities of molecular correction that exceed data sampled data
+#### Complexities of molecular correction that exceed data sampled
 We do not model all the complexities of molecular correction that can cause
 recurrent state misclassification (the end-goal of molecular correction is
 improved efficacy estimation, not per-recurrence perfection). For example, we do
