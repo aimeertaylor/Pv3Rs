@@ -3,23 +3,26 @@
 An R package for *Plasmodium vivax* molecular correction: statistical genetic
 inference of *P. vivax*
 
-- Relapse
-- Reinfection
-- Recrudescence
+[//]: # (use same order as software note abstract)
 
-The core function `compute_posterior()` can be used to estimate per-person
-posterior probabilities of relapse, reinfection and recrudescence using *P.
-vivax* genetic data on paired samples from one or more recurrence to update a
-prior, which is ideally informative (e.g., based on time-to-event information).
+- Relapse
+- Recrudescence
+- Reinfection
+
+The core function `compute_posterior()` can be used to obtain per-person
+posterior probabilities of relapse, recrudescence, and reinfection (recurrence
+states) using *P. vivax* genetic data across multiple episodes to update a prior 
+over recurrence states, which is ideally informative (e.g., based on 
+time-to-event information).
 
 Two other important features are more general:
 
 - `plot_data()` can be used to visualise genetic data for molecular
 correction regardless of the analytical method; for example, *Plasmodium
-falciparum* data intended for analysis using a WHO match counting algorithm.
+falciparum* data intended for analysis using a WHO match-counting algorithm.
 
-- `plot_simplex()` can be used to visualise per-recurrence estimates of the
-probabilities of relapse, reinfection and recrudescence or a vector of any three
+- `plot_simplex()` can be used to visualise per-recurrence posterior 
+probabilities of relapse, recrudescence, and reinfection, or a vector of any three
 numbers in zero to one that sum to one.
 
 ## Please be aware of the following points!
@@ -64,77 +67,68 @@ some settings. They are explained in some detail below and summarised in a
 table.
 
 #### Mutually exclusive recurrent states
-We model recurrent states (relapse, reinfection and recrudescence) as mutually
-exclusive. Pv3Rs was designed with a view towards clinical trials where study
-participants are actively followed up frequently and where all detected
-infections are treated to the extent that parasitaemia drops below some
-detectable level. In studies where infections persists untreated and/or where
-events have time to accumulate (e.g., a person with an untreated recrudescence
-experiences a reinfection), the assumption that recurrent states are mutually
-exclusive does not hold, persistent and recrudescent infections are ill defined,
-and recrudescences and reinfections are liable to misclassification as relapses.
+We model recurrent states (relapse, recrudescence, and reinfection) as mutually
+exclusive. Pv3Rs was designed with a view towards clinical trials where study 
+participants are actively followed up frequently and where all detected 
+infections are treated to the extent that post-treatment parasitaemia drops 
+below some detectable level before recurrence, if it occurs. In studies where 
+infections persist untreated and/or where events have time to accumulate, the 
+concept of recurrence is ill-defined, and the output of Pv3Rs might not be 
+meaningful.
+
+#### Complexities of molecular correction that exceed data sampled
+We do not model all the complexities around molecular correction. For example, we do 
+not model any population structure (e.g., household effects) or the failure to 
+capture a low-density clone in the body by a blood sample of limited volume [[Snounou
+and Beck, 1998]](https://doi.org/10.1016/S0169-4758(98)01340-4), nor hidden biomass in 
+the spleen and bone marrow (an alternative source of P. vivax recurrence) [[Markus, 2019]](https://doi.org/10.1016/j.pt.2019.08.009). 
+As with study design above, we urge  the user to interpret Pv3Rs’ output conditional 
+on the input. For example, we expect Pv3Rs to output probable relapse if a person is 
+reinfected by a new mosquito with parasites that are recently related to those that 
+caused a previous infection, as might happen in household transmission chains.
 
 #### Sibling misspecification
 Relapsing parasites that are siblings of parasites in previous infections can be
 meiotic, parent-child-like, regular or half siblings, but we model all sibling
-parasites as regular siblings: 
-   - independent (not true of meiotic siblings)
-   - transitive (not true of parent-child-like trios or some half-sibling trios)
-   - drawing from at most two parental alleles (not true of half siblings).
+parasites as regular siblings via the following assumptions: 
+   - allele inheritance is independent (not true of meiotic siblings)
+   - sibling relationships are transitive (not true of parent-child-like trios or some half-sibling trios)
+   - alleles of a sibling cluster are drawn from at most two parental alleles (not true of half siblings).
 
 In our experience, half sibling misspecification leads to some misclassification
-of relapses as reinfections. A descriptive study to explore the extent of
-half-sibling misspecification is recommended (an example will be provided in an
-upcoming manuscript).
+of relapses as reinfections; see vignette ["Understand half-sibling misspecification"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
+A descriptive study to explore the extent of half-sibling misspecification is 
+recommended (an example will be provided in an upcoming manuscript).
 
 #### Observation errors and *de novo* mutations
-We do not model undetected alleles, genotyping errors, or *de novo*
-mutations. As such, estimates are not always consistent with data on
-more-and-more markers (the more markers there are, the more likely one is
-erroneous) some recrudescences are liable to misclassification as relapse (the
-assumption that recrudescent parasites are perfect clones renders recrudescence
-classification sensitive to false positive alleles), some relapses are liable to
-misclassification as reinfections (the assumption that siblings draw from
-at-most two parental alleles renders relapse classification sensitive to false
-positive alleles). We recommend a sensitivity analysis to explore the impact of
-genotyping errors on recurrent state estimates (an example will be provided in
-an upcoming manuscript).
+We do not model undetected alleles, genotyping errors, or *de novo* mutations. 
+Recall that recrudescent parasites are modelled as perfect clones under Pv3Rs. As 
+such, the posterior probability of recrudescence is rendered zero by errors and 
+mutations. This becomes more likely when there are data on more markers. Sensitivity 
+analyses that explore the impact of errors and mutations on recurrence state 
+estimates are merited.
 
-#### Complexities of molecular correction that exceed data sampled
-We do not model all the complexities of molecular correction that can cause
-recurrent state misclassification (the end-goal of molecular correction is
-improved efficacy estimation, not per-recurrence perfection). For example, we do
-not model the failure to draw a low-density clone in a blood sample of limited
-volume (could lead to misclassification of a recrudescence as a reinfection if
-the recrudescent clone is at low density at enrolment), persistent gametocytes (can
-lead to the misclassification of reinfection as recrudescence), or population
-structure (could also lead to the misclassification of reinfection). If there is
-reason for concern, we recommend doing sensitivity analyses (an example around
-population structure will be provided in an upcoming manuscript).
-
-#### Prior impact on posterior probabilities of probable reinfection and recrudescence
-In lieu of a generative model on intra-inoculation parasite relationships, we
-assume all relationship graphs compatible with a given sequence of recurrent
-states are equally likely *a priori*. When data are informative up to two states 
-(\{reinfection and relapse\} or \{recrudescence and relapse\}) but not beyond,
-the model returns the prior re-weighted to the exclusion of the incompatible
-state. As such, our prior on relationship graphs has a strong impact on 
-posterior probabilities of probable reinfection and recrudescence.
-
+#### Interpreting probable reinfection and recrudescence
+When data are not sufficiently informative to distinguish between recrudescence and 
+relapse (or reinfection and relapse), the posterior probabilities of recrudescence and 
+relapse (or reinfection and relapse) are heavily influenced by our uniform distribution 
+over graphs (see vignette ["Understand graph prior ramifications"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html)). 
+The development of a more biologically-principled generative model on parasite 
+relationships is merited.
 
 Limitation | Reason
 ----------- | ------
 Possible misclassification of persistent and/or accumulated states as relapse | Modelling recurrent states as mutually exclusive
-Possible misclassification of relapse as reinfection | Half-sibling misspecification and not modelling errors
 Possible inconsistency with data on more-and-more markers | Not modelling errors
-Possible misclassification of recrudescence as relapse | Not modelling errors
+Possible misclassification of relapse as reinfection | Half-sibling misspecification and not modelling errors
+Possible misclassification of recrudescence | Not modelling errors
 Possible misclassification of reinfection | Not modelling population structure
-Strong prior impact on posterior probabilities of reinfection and recrudescence | Recurrent states are not always identifiable from genetic data alone
+Strong prior impact on posterior probabilities | Recurrent states are not always identifiable from genetic data alone
 
 
 ### Computational limits:
 
-- Pv3Rs scales to 100s of markers but not whole-genome sequence (WGS) data.  
+- Pv3Rs scales to hundreds of markers but not whole-genome sequence (WGS) data.  
 
 - We do not recommend running `compute_posterior()` for data whose total 
 genotype count (sum of per-episode multiplicities of infection) exceeds eight. 
