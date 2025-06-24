@@ -1,0 +1,332 @@
+\subsection{Simple example involving phasing} \label{ex:phase}
+
+\paragraph{Observed and phased alleles} In a simple example two alleles are observed at two of three markers genotyped in an incident infection, while one allele is observed per marker genotyped in a single recurrent infection. As in example \ref{ex:multiple_genos}, we assume the most parsimonious explanation of the data: the number of genotypes in the first and second infections are two and one, respectively. However, there are now two non-equivalent ways to phase allelic data into $n = 3$ genotypes, 
+\begin{align*}
+    \bm{y} &= \begin{blockarray}{cccc}
+        j=1 & j=2 & j=3  \\
+        \begin{block}{(ccc)c}
+        \{A,T\} & \{T\} & \{C,G\} & t=0\\
+        \{T\} & \{T\} & \{C\} &t=1\\
+        \end{block}
+        \end{blockarray}, \\
+    \bm{a}_\RN{1}  &= \begin{blockarray}{cccc}
+        j=1 & j=2 & j=3  \\
+        \begin{block}{(ccc)c}
+        A & T & C & j=1, \; t=0\\
+        T & T & G & j=2, \; t=0\\
+        T & T & C & j=3, \; t=1\\
+        \end{block}
+        \end{blockarray}, 
+        \hspace{1cm}    
+    \bm{a}_\RN{2} = \begin{blockarray}{cccc}
+        j=1 & j=2 & j=3  \\
+        \begin{block}{(ccc)c}
+        A & T & G & j=1, \; t=0\\
+        T & T & C & j=2, \; t=0\\
+        T & T & C & j=3, \; t=1\\
+        \end{block}
+        \end{blockarray}.
+\end{align*}
+The total number of allele assignments is in fact $\lvert \A \rvert = 4$, which can be partitioned into two equivalence classes of two allele assignments each; $\bm{a}_\RN{1}$ and $\bm{a}_\RN{2}$ are representatives of the two equivalence classes.
+
+\paragraph{Relationship graphs and IBD partitions} We sum over relationship graphs and IBD partitions in example \ref{ex:multiple_genos}. 
+
+\paragraph{Likelihood}
+%
+\begin{align*}
+\mathbb{P}(\bm{y}|\bm{s} = L) &= 
+2c \times 
+    \tfrac{1}{9}\Big(
+    2f(T_1)f(T_2)^2f(C_3) + \\
+    &\qquad \qquad \tfrac{3}{8}f(T_1)(f(T_2)^2 + f(T_2))f(C_3) + \\
+    &\qquad \qquad \tfrac{1}{8}f(T_1)(f(T_2)^2 + f(T_2))(f(C_3) + 1) +  \\
+    &\qquad \qquad \tfrac{1}{8}(f(T_1) + 1)(f(T_1)^2 + f(T_1))f(C_3) +  \\
+    &\qquad \qquad \tfrac{1}{8}(f(T_1) + 1)(f(T_1)^2 + f(T_1))(f(C_3)+ 1) + \\
+    &\qquad \qquad \tfrac{1}{32}(3f(T_2) + 1) + \tfrac{1}{8}(9f(T_2) + 1)
+    \Big),\\
+    %
+    \mathbb{P}(\bm{y}|\bm{s} = I) &=
+    2c \times \tfrac{1}{8}f(T_1)f(T_2)f(C_3)\Big(9f(T_2) + 1\Big),\\    
+    %
+    \mathbb{P}(\bm{y}|\bm{s} = C) &=
+    2c \times \tfrac{1}{32}\Big(9f(T_2) + 1\Big),
+\end{align*}
+\normalsize
+where $c = f(A_1)f(T_1)f(T_2)f(C_3)f(G_3)$. Note that the prefactor of $2$ corresponds to the fact that each equivalence class consists of two allele assignments. \\ 
+
+\noindent
+The likelihood can be written as a summation over $\bm{a}_\RN{1}$ and $\bm{a}_\RN{2}$:
+\begin{equation*}
+\mathbb{P}(\bm{y}|s)\forall s\in\{L,I,C\} = 
+2 \left( \mathbb{P}(\bm{a}_\RN{1} |s)\forall s\in\{L,I,C\} + 
+\mathbb{P}(\bm{a}_\RN{2} |s)\forall s\in\{L,I,C\} \right)
+\end{equation*}
+where, with differences between $\bm{a}_\RN{1}$ and $\bm{a}_\RN{2}$ highlighted in blue, 
+\scriptsize
+\begin{align*}
+&\mathbb{P}(\bm{a}_\RN{1} |s)\forall s\in\{L,I,C\} = \\
+&\underbrace{
+    \begin{blockarray}{lccccccccc}
+        & \rg_\RN{1} & \rg_\RN{2} & \rg_\RN{3} & 
+        \rg_\RN{4} & \rg_\RN{5} & \rg_\RN{6} &
+        \rg_\RN{7} & \rg_\RN{8} & \rg_\RN{9}\\
+        \begin{block}{l(ccccccccc)}
+          L & \sfrac{1}{9} & \sfrac{1}{9} & \sfrac{1}{9} & 
+          \sfrac{1}{9} & \sfrac{1}{9} & \sfrac{1}{9} &
+          \sfrac{1}{9} & \sfrac{1}{9} & \sfrac{1}{9} \\
+          I& \sfrac{1}{2} &0&0 & \sfrac{1}{2} &0&0&0&0&0 
+          \\
+          C&0&\sfrac{1}{4}&\sfrac{1}{4}&0&0&0&0&
+          \sfrac{1}{4}&\sfrac{1}{4}
+          \\
+        \end{block}
+        \end{blockarray}
+}_{\mathclap{\mathbb{P}(\rg|s)\forall\rg\in\RG,s\in\{L,I,C\}}} 
+\times 
+\underbrace{
+ c \times 
+    \begin{blockarray}{cl}
+    \bm{a}_\RN{1} \\
+    \begin{block}{(c)l}
+    f(T_1)  f(T_2)^2  f(C_3) & \rg_\RN{1}\\
+    0 &\rg_\RN{2} \\ 
+    0 &\rg_\RN{3} \\ 
+    \sfrac{1}{8}  f(T_1)  \big(f(T_2)^2 + f(T_2)\big)  f(C_3) &\rg_\RN{4} \\ 
+    \sfrac{1}{8}  f(T_1) \big(f(T_2)^2 + f(T_2)\big)\big(f(C_3) + 1 \big) &\rg_\RN{5} \\
+    \sfrac{1}{8}  (f(T_1) + 1)  \big(f(T_2)^2 + f(T_2)\big)  f(C_3) &\rg_\RN{6} \\
+    \sfrac{1}{64} \big(3f(T_2) + 1\big) &\rg_\RN{7} \\
+    0 &\rg_\RN{8} \\
+    0 &\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}(\bm{a}|\rg)\forall\rg\in\RG}}, 
+\end{align*}
+%
+\begin{align*}
+&\mathbb{P}(\bm{a}_\RN{2} |s)\forall s\in\{L,I,C\} = \\
+&\underbrace{
+    \begin{blockarray}{cccccccccl}
+        \rg_\RN{1}& \rg_\RN{2} & \rg_\RN{3} & 
+        \rg_\RN{4} & \rg_\RN{5} & \rg_\RN{6} &
+        \rg_\RN{7} & \rg_\RN{8} & \rg_\RN{9}\\
+        \begin{block}{(ccccccccc)l}
+          \sfrac{1}{9} & \sfrac{1}{9} & \sfrac{1}{9} & 
+          \sfrac{1}{9} & \sfrac{1}{9} & \sfrac{1}{9} &
+          \sfrac{1}{9} & \sfrac{1}{9} & \sfrac{1}{9} 
+          & L \\
+          \sfrac{1}{2} &0&0 & \sfrac{1}{2} &0&0&0&0&0 
+          & I \\
+          0&\sfrac{1}{4}&\sfrac{1}{4}&0&0&0&0&
+          \sfrac{1}{4}&\sfrac{1}{4}
+          & C \\
+        \end{block}
+        \end{blockarray}
+}_{\mathclap{\mathbb{P}(\rg|s)\forall\rg\in\RG,s\in\{L,I,C\}}} 
+\times 
+\underbrace{ 
+c \times 
+    \begin{blockarray}{cl}
+    \bm{a}_\RN{2} \\
+    \begin{block}{(c)l}
+    f(T_1)  f(T_2)^2  f(C_3) & \rg_\RN{1}\\
+    0 &\rg_\RN{2} \\ 
+    {\color{blue}f(T_2)}  &\rg_\RN{3} \\ 
+    \sfrac{1}{8} f(T_1)  \big(f(T_2)^2 + f(T_2)\big) f(C_3) &\rg_\RN{4} \\ 
+    {\color{blue}\sfrac{1}{8}f(T_1) \big(f(T_2)^2 + f(T_2)\big)  f(C_3)} &\rg_\RN{5} \\
+    {\color{blue}\sfrac{1}{8}(f(T_1) + 1) \big(f(T_2)^2 + f(T_2)\big)\big(f(C_3) + 1 \big)} &\rg_\RN{6} \\
+    \sfrac{1}{64}\big(3f(T_2) + 1\big)&\rg_\RN{7} \\
+    0 &\rg_\RN{8} \\
+    {\color{blue}  \sfrac{1}{8} (f(T_2) + 1)} &\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}(\bm{a}|\rg)\forall\rg\in\RG}},
+\end{align*}
+%
+\normalsize
+and where
+\small
+\begin{align*}
+&\underbrace{ c \times 
+    \begin{blockarray}{cl}
+    \bm{a}_\RN{1} \\
+    \begin{block}{(c)l}
+    f(T_1) f(T_2)^2 f(C_3) & \rg_\RN{1}\\
+    0 &\rg_\RN{2} \\ 
+    0 &\rg_\RN{3} \\ 
+    \sfrac{1}{8} f(T_1) \big(f(T_2)^2 + f(T_2)\big) f(C_3) &\rg_\RN{4} \\ 
+    \sfrac{1}{8} f(T_1) \big(f(T_2)^2 + f(T_2)\big) \big(f(C_3) + 1 \big)  &\rg_\RN{5} \\
+    \sfrac{1}{8} (f(T_1)+1) \big(f(T_2)^2 + f(T_2)\big) f(C_3) &\rg_\RN{6} \\
+    \sfrac{1}{64} \big(3f(T_2) + 1\big) &\rg_\RN{7} \\
+    0 &\rg_\RN{8} \\
+    0 &\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}(\bm{a}_\RN{1}|\rg)\forall\rg\in\RG}} = 
+\underbrace{ 
+    \begin{blockarray}{cl}
+    \bm{a}_\RN{1} \\
+    \begin{block}{(c)l}
+    f(A_1)f(T_1)^2 f(T_2)^3  f(C_3)^2f(G_3) & \rg_\RN{1}\\
+    0 &\rg_\RN{2} \\ 
+    0 &\rg_\RN{3} \\ 
+    \sfrac{1}{8} f(A_1)f(T_1)^2 \big(f(T_2)^3 + f(T_2)^2\big) f(C_3)^2f(G_3) &\rg_\RN{4} \\ 
+    \sfrac{1}{8} f(A_1)f(T_1)^2 \big(f(T_2)^3 + f(T_2)^2\big) f(C_3)f(G_3)\big(f(C_3) + 1 \big)  &\rg_\RN{5} \\
+    %
+    \sfrac{1}{8} f(A_1)f(T_1)(f(T_1)+1) \big(f(T_2)^3 + f(T_2)^2\big) f(C_3)^2f(G_3) &\rg_\RN{6} \\
+    %
+    \sfrac{1}{64} f(A_1)f(T_1) f(T_2)\big(3f(T_2) + 1\big) f(C_3)f(G_3) &\rg_\RN{7} \\
+    0 &\rg_\RN{8} \\
+    0 &\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}(\bm{a}_\RN{1}|\rg)\forall\rg\in\RG}} \\
+&= \text{column product}\left\{
+\underbrace{ 
+    \begin{blockarray}{cccl}
+    {\bm{a}_\RN{1}}_{\cdot 1} & {\bm{a}_\RN{1}}_{\cdot 2} & {\bm{a}_\RN{1}}_{\cdot 3} \\
+    \begin{block}{(ccc)l}
+    f(A_1)f(T_1)^2 & f(T_2)^3 & f(C_3)^2f(G_3) &\rg_\RN{1}\\
+    0 & f(T_2)^2 & f(C_3)f(G_3) &\rg_\RN{2} \\ 
+    f(A_1)f(T_1) & f(T_2)^2 & 0 &\rg_\RN{3} \\ 
+    \sfrac{1}{2}f(A_1)f(T_1)^2 & \sfrac{1}{2}\big(f(T_2)^3 + f(T_2)^2\big) & \sfrac{1}{2}f(C_3)^2f(G_3) &\rg_\RN{4} \\ 
+    \sfrac{1}{2}f(A_1)f(T_1)^2 & \sfrac{1}{2}\big(f(T_2)^3 + f(T_2)^2\big) & \sfrac{1}{2}f(C_3)f(G_3)\big(f(C_3) + 1 \big) &\rg_\RN{5} \\
+    %
+    \sfrac{1}{2}f(A_1)f(T_1)(f(T_1) + 1) & \sfrac{1}{2}\big(f(T_2)^3 + f(T_2)^2\big) & \sfrac{1}{2}f(C_3)^2f(G_3) &\rg_\RN{6} \\
+    %
+    \sfrac{1}{4}f(A_1)f(T_1) & \sfrac{1}{4}f(T_2)\big(3f(T_2) + 1\big) & \sfrac{1}{4}f(C_3)f(G_3) 
+    & \rg_\RN{7} \\
+    0 & \sfrac{1}{2}f(T_2)(f(T_2) + 1) & \sfrac{1}{2}f(C_3)f(G_3) & \rg_\RN{8} \\
+    \sfrac{1}{2}f(A_1)f(T_1) & \sfrac{1}{2}f(T_2)(f(T_2) + 1) & 0 &\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}({\bm{a}_\RN{1}}_{\cdot j}|\rg)\forall {\bm{a}_\RN{1}}_{\cdot j}\in\bm{a}_\RN{1},\rg\in\RG}}
+\right\},
+\\
+&= \text{column product}\left\{
+\underbrace{ 
+    \begin{blockarray}{cccccl}
+    \ip_\RN{1} & \ip_\RN{2} & \ip_\RN{3} & 
+    \ip_\RN{4} & \ip_\RN{5} \\
+    \begin{block}{(ccccc)l}
+    1&0&0&0&0&\rg_\RN{1}\\
+    0&0&0&0&1&\rg_\RN{2} \\
+    0&0&1&0&0&\rg_\RN{3}  \\
+    \sfrac{1}{2}&0&0&\sfrac{1}{2}&0&\rg_\RN{4} \\
+    \sfrac{1}{2}&0&0&0&\sfrac{1}{2}&\rg_\RN{5} \\
+    \sfrac{1}{2}&0&\sfrac{1}{2}&0&0&\rg_\RN{6} \\
+    0&\sfrac{1}{4}&\sfrac{1}{4}&\sfrac{1}{4}&\sfrac{1}{4}&\rg_\RN{7} \\
+    0&\sfrac{1}{2}&0&0&\sfrac{1}{2}&\rg_\RN{8} \\
+    0&\sfrac{1}{2}&\sfrac{1}{2}&0&0&\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}(\ip|\rg)\forall\ip\in\IP,\rg\in\RG}} 
+\times \quad
+\underbrace{ 
+    \begin{blockarray}{cccl}
+    {\bm{a}_\RN{1}}_{\cdot 1} & {\bm{a}_\RN{1}}_{\cdot 2} & {\bm{a}_\RN{1}}_{\cdot 3} \\
+    \begin{block}{(ccc)l}
+    f(A_1)f(T_1)^2 & f(T_2)^3 & f(C_3)^2f(G_3) & \ip_\RN{1} \\
+    0 & f(T_2) & 0 & \ip_\RN{2} \\ 
+    f(A_1)f(T_1) & f(T_2)^2 & 0 & \ip_\RN{3} \\ 
+    0 & f(T_2)^2 & 0 & \ip_\RN{4} \\ 
+    0 & f(T_2)^2 & f(C_3)f(G_3) & \ip_\RN{5} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}({\bm{a}_\RN{1}}_{\cdot j}|\ip)\forall {\bm{a}_\RN{1}}_{\cdot j} \in \bm{a}_\RN{1},\ip\in\IP}}
+\right\},
+\end{align*} 
+%
+and 
+\small
+%
+\begin{align*}
+&\underbrace{ 
+c \times 
+    \begin{blockarray}{cl}
+    \bm{a}_\RN{2} \\
+    \begin{block}{(c)l}
+    f(T_1)  f(T_2)^2  f(C_3) & \rg_\RN{1}\\
+    0 &\rg_\RN{2} \\ 
+    {\color{blue}f(T_2)}  &\rg_\RN{3} \\ 
+    \sfrac{1}{8} f(T_1)  \big(f(T_2)^2 + f(T_2)\big) f(C_3) &\rg_\RN{4} \\ 
+    {\color{blue}\sfrac{1}{8}f(T_1) \big(f(T_2)^2 + f(T_2)\big)  f(C_3)} &\rg_\RN{5} \\
+    {\color{blue}\sfrac{1}{8}(f(T_1) + 1) \big(f(T_2)^2 + f(T_2)\big)\big(f(C_3) + 1 \big)} &\rg_\RN{6} \\
+    \sfrac{1}{64}\big(3f(T_2) + 1\big)&\rg_\RN{7} \\
+    0 &\rg_\RN{8} \\
+    {\color{blue}  \sfrac{1}{8} (f(T_2) + 1)} &\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}(\bm{a}|\rg)\forall\rg\in\RG}}\\ 
+&=\underbrace{ 
+    \begin{blockarray}{cl}
+    \bm{a}_\RN{2} \\
+    \begin{block}{(c)l}
+    f(A_1)f(T_1)^2 f(T_2)^3 f(C_3)^2f(G_3) & \rg_\RN{1}\\
+    0 &\rg_\RN{2} \\ 
+    {\color{blue}f(A_1)f(T_1)f(T_2)^2f(C_3)f(G_3)}  &\rg_\RN{3} \\ 
+    \sfrac{1}{8} f(A_1)f(T_1)^2 \big(f(T_2)^3 + f(T_2)^2\big)f(C_3)^2f(G_3) &\rg_\RN{4} \\ 
+    {\color{blue}\sfrac{1}{8}f(A_1)f(T_1)^2 \big(f(T_2)^3 + f(T_2)^2\big)f(C_3)^2f(G_3)} &\rg_\RN{5} \\
+    {\color{blue}\sfrac{1}{8} f(A_1)f(T_1)(f(T_1)+1) \big(f(T_2)^3 + f(T_2)^2\big)  f(C_3)f(G_3)\big(f(C_3) + 1 \big)} &\rg_\RN{6} \\
+    \sfrac{1}{64} (f(A_1)f(T_1)f(T_2)\big(3f(T_2) + 1\big) f(C_3)f(G_3) &\rg_\RN{7} \\
+    0 &\rg_\RN{8} \\
+    {\color{blue}  \sfrac{1}{8} f(A_1)f(T_1)  f(T_2)(f(T_2) + 1) f(C_3)f(G_3)} &\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}(\bm{a}_\RN{2}|\rg)\forall\rg\in\RG}} \\
+&= \text{column product}\left\{
+\underbrace{ 
+    \begin{blockarray}{cccl}
+    {\bm{a}_\RN{2}}_{\cdot 1} & {\bm{a}_\RN{2}}_{\cdot 2} & {\bm{a}_\RN{2}}_{\cdot 3} \\
+    \begin{block}{(ccc)l}
+    f(A_1)f(T_1)^2 & f(T_2)^3 & f(C_3)^2f(G_3) &\rg_\RN{1}\\
+    0 & f(T_2)^2 & {\color{blue}0} &\rg_\RN{2} \\ 
+    f(A_1)f(T_1) & f(T_2)^2 & {\color{blue}f(C_3)f(G_3)} &\rg_\RN{3} \\ 
+    %
+    \sfrac{1}{2}f(A_1)f(T_1)^2 & \sfrac{1}{2}\big(f(T_2)^3 + f(T_2)^2\big) & \sfrac{1}{2}f(C_3)^2f(G_3) &\rg_\RN{4} \\ 
+    \sfrac{1}{2}f(A_1)f(T_1)^2 & \sfrac{1}{2}\big(f(T_2)^3 + f(T_2)^2\big) & {\color{blue}\sfrac{1}{2}f(C_3)^2f(G_3)} &\rg_\RN{5} \\
+    \sfrac{1}{2}f(A_1)f(T_1)(T_1 + 1) & \sfrac{1}{2}\big(f(T_2)^3 + f(T_2)^2\big) & {\color{blue}\sfrac{1}{2}f(C_3)f(G_3)\big(f(C_3) + 1\big)} &\rg_\RN{6} \\
+    %
+    \sfrac{1}{4}f(A_1)f(T_1) & \sfrac{1}{4}f(T_2)\big(3f(T_2) + 1\big) & \sfrac{1}{4}f(C_3)f(G_3) 
+    & \rg_\RN{7} \\
+    0 & \sfrac{1}{2}f(T_2)(f(T_2) + 1) & {\color{blue}0} & \rg_\RN{8} \\
+    \sfrac{1}{2}f(A_1)f(T_1) & \sfrac{1}{2}f(T_2)(f(T_2) + 1) & 
+    {\color{blue}\sfrac{1}{2}f(C_3)f(G_3)} &\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}({\bm{a}_\RN{2}}_{\cdot j}|\rg)\forall{\bm{a}_\RN{2}}_{\cdot j}\in\bm{a}_\RN{2},\rg\in\RG}}
+\right\},
+\\
+&= \text{column product}\left\{
+\underbrace{ 
+    \begin{blockarray}{cccccl}
+    \ip_\RN{1} & \ip_\RN{2} & \ip_\RN{3} & 
+    \ip_\RN{4} & \ip_\RN{5} \\
+    \begin{block}{(ccccc)l}
+    1&0&0&0&0&\rg_\RN{1}\\
+    0&0&0&0&1&\rg_\RN{2} \\
+    0&0&1&0&0&\rg_\RN{3}  \\
+    \sfrac{1}{2}&0&0&\sfrac{1}{2}&0&\rg_\RN{4} \\
+    \sfrac{1}{2}&0&0&0&\sfrac{1}{2}&\rg_\RN{5} \\
+    \sfrac{1}{2}&0&\sfrac{1}{2}&0&0&\rg_\RN{6} \\
+    0&\sfrac{1}{4}&\sfrac{1}{4}&\sfrac{1}{4}&\sfrac{1}{4}&\rg_\RN{7} \\
+    0&\sfrac{1}{2}&0&0&\sfrac{1}{2}&\rg_\RN{8} \\
+    0&\sfrac{1}{2}&\sfrac{1}{2}&0&0&\rg_\RN{9} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}(\ip|\rg)\forall\ip\in\IP,\rg\in\RG}} 
+\times \quad
+\underbrace{ 
+    \begin{blockarray}{cccl}
+    {\bm{a}_\RN{2}}_{\cdot 1} & {\bm{a}_\RN{2}}_{\cdot 2} & {\bm{a}_\RN{2}}_{\cdot 3} \\
+    \begin{block}{(ccc)l}
+    f(A_1)f(T_1)^2 & f(T_2)^3 & f(C_3)^2f(G_3) & \ip_\RN{1} \\
+    0 & f(T_2) & 0 & \ip_\RN{2} \\ 
+    f(A_1)f(T_1) & f(T_2)^2 & {\color{blue}f(C_3)f(G_3)} & \ip_\RN{3} \\ 
+    0 & f(T_2)^2 & 0 & \ip_\RN{4} \\ 
+    0 & f(T_2)^2 & {\color{blue}0} & \ip_\RN{5} \\
+    \end{block}
+    \end{blockarray}
+}_{\mathclap{\mathbb{P}({\bm{a}_\RN{2}}_{\cdot j}|\ip)\forall{\bm{a}_\RN{2}}_{\cdot j} \in\bm{a}_\RN{2},\ip\in\IP}}
+\right\}.
+\end{align*}
+

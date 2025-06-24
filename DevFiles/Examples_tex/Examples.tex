@@ -1,0 +1,86 @@
+\documentclass{article}
+\usepackage[a4paper,top=2cm,bottom=2cm,left=2.5cm,right=1.5cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{mathrsfs}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{bm} % For bond greek
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{tikz} % For drawing Figures 
+\usetikzlibrary{backgrounds} % To add frame to tikz pic
+\usepackage{blkarray} % For annotated matrices
+\usepackage{xfrac} % For sfrac
+\usepackage{float} % For [H] placement
+\usepackage{amsfonts} % For mathbb font
+\usepackage{amsmath} % For dfrac
+\usepackage{mathtools} % For mathclap, \smashoperator
+\usepackage[super]{nth} % For \nth{1}, \nth{2}, ...
+\usepackage{../../vignettes/pv3rs} % For notation
+\usepackage{fix-cm} % To avoid font size warnings
+
+
+\title{Examples}
+\date{}
+\author{}
+\begin{document}
+\maketitle
+
+These examples, which featured in the preprint \href{https://doi.org/10.1101/2022.11.23.22282669}{medRxiv 2022.11.23.22282669}, are used as tests in the Pv3Rs R package and thus described here as developer documentation. The only significant difference between this write-up and that of the preprint is in example \ref{ex:phase}, where we refer to $\bm{a}_\RN{1}$ and $\bm{a}_\RN{2}$ as two representatives of two equivalence classes because we now sum over all allelic assignments, including those that are equivalent up to within-episode genotype permutations. 
+%
+The notation is taken from the preprint. In addition, Roman numerals are used to enumerate members of discrete spaces ($\bm{a}\in\A, \ip\in\IP,\rg\in\RG$) over which we sum. Arabic numerals are used to index rows and columns etc. 
+
+\begin{figure}[H]
+    \begin{center}
+    \begin{tikzpicture}
+
+    \tikzstyle{geno} = [draw, circle, rounded corners, minimum height=1cm, minimum width=1cm, fill=gray!20, text=teal]
+
+    % Non-arrow lines
+    \draw[dotted,-] (5,0) -- (6,1); 
+    \draw[dotted,-] (1,1) -- (6,1); 
+    \draw[dotted,-] (0,5) -- (1,6); 
+    \draw[dotted,-] (1,6) -- (6,6); 
+    \draw[dotted,-] (6,1) -- (6,6); 
+    \draw[dotted,-] (1,1) -- (1,6);
+    \draw[dotted,-] (5,0) -- (5,5);
+    \draw[dotted,-] (5,5) -- (6,6);
+    
+    % Nodes
+    \node[geno] at (0,0) (1) {1 \& 2};
+    \node[geno] at (5,0) (2) {3 \& 4};
+    \node[geno] at (1,1) (3) {5 \& 6};
+    \node[geno] at (0,5) (4) {7 \& 8};
+    \node[geno] at (5,5) (5) {9};
+
+    % Arrows
+    \draw[thick,->] (1) -- (2);
+    \draw[thick,->] (1) -- (4); 
+    %\draw[thick,->] (2) -- (6);
+    \draw[thick,->] (4) -- (5); 
+    \draw[thick,->] (1) -- (3); 
+    %\draw[thick,->] (6) -- (8); 
+    \draw[thick,->] (-2,-1) -- (-1,0); 
+    
+    % Labels
+    \node[fill = white] at (2.5,0) {Increase markers};
+    \node[fill = white] at (2.5,5) {Increase markers};
+    \node[fill = white, rotate = 90] at (0,2.5) {Increase genotypes};
+    \node[rotate = 45] at (-1.5,0)
+    {Increase recurrences};
+
+    \end{tikzpicture}
+    
+\end{center}
+    \caption{Visual summary of the examples. We start in the simplest setting (examples \ref{ex:simplest_het} \& \ref{ex:simplest_hom}). We then add complexity in three separate directions: by increasing the number of markers (examples \ref{ex:multiple_markers_het} \& \ref{ex:multiple_markers_hom}), by increasing the number of recurrences (example \ref{ex:multiple_recurs_het} \& \ref{ex:multiple_recurs_hom}), and by increasing the number of genotypes per infection (examples \ref{ex:multiple_genos} \& \ref{ex:cells}), where the latter focuses on the computation of the probability of phased alleles given an IBD partition, to better illustrate how cells are multiplied over. Our final example addresses the need to phase, which can occur when there are multiple genotypes per infection and multiple markers typed (example \ref{ex:phase}).}
+    \label{fig:my_label}
+\end{figure}
+
+\input{examples/example_single_marker}
+\input{examples/example_multiple_markers}
+\input{examples/example_multiple_recurrence}
+\input{examples/example_multiple_genotypes}
+\input{examples/example_simple_phasing}
+
+\end{document}

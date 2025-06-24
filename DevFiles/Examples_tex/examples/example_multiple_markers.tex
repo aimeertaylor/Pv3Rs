@@ -1,0 +1,292 @@
+\subsection{Multiple partially heterologous markers}\label{ex:multiple_markers_het}
+% Re-add Allele indices
+
+\paragraph{Observed and phased alleles} In the simplest example a single allele is observed per marker genotyped in an incident and single recurrent infection. Since we detect only one allele per infection we assume there is only one genotype per infection and thus there is only one to phase the observed alleles, e.g., 
+\begin{equation*}
+    \bm{y} = 
+    \begin{blockarray}{cccl}
+    j = 1 & j = 2 & j = 3 \\
+    \begin{block}{(ccc)l}
+    \{A\} & \{T\} & \{G\} & t=0 \\
+    \{T\} & \{T\} & \{G\} & t=1 \\
+    \end{block}
+    \end{blockarray},
+    \hspace{1cm}
+    \bm{a} = 
+    \begin{blockarray}{cccl}
+    j = 1 & j = 2 & j = 3\\
+    \begin{block}{(ccc)l}
+    A & T & G & i=1 \\
+    T & T & G & i=2 \\
+    \end{block}
+    \end{blockarray}.
+\end{equation*}
+
+
+\paragraph{Relationship graphs and IBD partitions} We sum over the same three graphs of relationships between genotypes and the same two IBD partitions as in example \ref{ex:simplest_het}. 
+
+\paragraph{Likelihood} The likelihood computation is similar to examples \ref{ex:simplest_het} \& \ref{ex:simplest_hom}, but because there are multiple markers, which are conditionally independent given the relationship graphs, a product over markers is taken before summing over relationship graphs. In addition, alleles are indexed by $j$, since a given allele at one locus might have a different frequency at another locus. 
+\small
+\begin{align*}
+&\;\mathbb{P}(\bm{y}|s) \forall s\in\{L,I,C\}=
+\\
+&\; \underbrace{
+    \begin{blockarray}{lccc}
+        & L & I & C \\
+        \begin{block}{l(ccc)}
+          \bm{a} & \sfrac{1}{3}f(A_1)f(T_1)f(T_2)f(G_3)\Big(f(T_2)f(G_3) + \sfrac{1}{8}(f(T_2)+1)(f(G_3)+1)\Big)&
+          f(A_1)f(T_1)f(T_2)^2f(G_3)^2 & 
+          0  \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\bm{a}|s)\forall s\in\{L,I,C\}}}
+    \\
+&= \underbrace{
+    \begin{blockarray}{lccc}
+        & \rg_\RN{1} & \rg_\RN{2} & \rg_\RN{3}\\
+        \begin{block}{l(ccc)}
+          \bm{a} & f(A_1)f(T_1)f(T_2)^2f(G_3)^2 & 
+          \sfrac{1}{8}f(A_1)f(T_1)f(T_2)(f(T_2)+1)f(G_3)(f(G_3)+1)& 
+          0  \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\bm{a}|\rg)\forall\rg\in\RG}}
+    \times\;
+    \underbrace{
+    \begin{blockarray}{cccc}
+        L & I & C & \\
+        \begin{block}{(ccc)l}
+          \sfrac{1}{3} & 1 & 0 & \rg_\RN{1} \\
+          \sfrac{1}{3} & 0 & 0 & \rg_\RN{2} \\
+          \sfrac{1}{3} & 0 & 1 & \rg_\RN{3} \\
+        \end{block}
+        \end{blockarray}.
+    }_{\mathclap{\mathbb{P}(\rg|s) \forall \rg\in\RG, s\in\{L,I,C\}}}
+    \\
+&=
+\text{row product}
+\left\{\;
+\underbrace{
+    \begin{blockarray}{cccl}
+        \rg_\RN{1} & \rg_\RN{2} & \rg_\RN{3}\\
+        \begin{block}{(ccc)l}
+          f(A_1)f(T_1) & \sfrac{1}{2}f(A_1)f(T_1) & 0 & \bm{a_{\cdot 1}} \\
+          f(T_2)^2 & \sfrac{1}{2}f(T_2)^2 + \sfrac{1}{2}f(T_2) & f(T_2) & \bm{a_{\cdot 2}} \\
+          f(G_3)^2 & \sfrac{1}{2}f(G_3)^2 + \sfrac{1}{2}f(G_3) & f(G_3) & \bm{a_{\cdot 3}} \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\bm{a}_{\cdot j}|\rg) \text{ for }j=1,2,3\text{ and all }\rg\in\RG}}
+\right\}
+    \times\;
+    \underbrace{
+    \begin{blockarray}{cccc}
+        L & I & C & \\
+        \begin{block}{(ccc)l}
+          \sfrac{1}{3} & 1 & 0 & \rg_\RN{1} \\
+          \sfrac{1}{3} & 0 & 0 & \rg_\RN{2} \\
+          \sfrac{1}{3} & 0 & 1 & \rg_\RN{3} \\
+        \end{block}
+        \end{blockarray}.
+    }_{\mathclap{\mathbb{P}(\rg|s) \forall \rg\in\RG, s\in\{L,I,C\}}}
+    \\
+&= 
+\text{row product}
+    \left\{\;
+    \underbrace{
+    \begin{blockarray}{ccl}
+        \ip_\RN{1} & \ip_\RN{2} \\
+        \begin{block}{(cc)l}
+          f(A_1)f(T_1) & 0 & \bm{a_{\cdot 1}} \\
+          f(T_2)^2 & f(T_2) & \bm{a_{\cdot 2}} \\
+          f(G_3)^2 & f(G_3) & \bm{a_{\cdot 3}} \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\bm{a}_j|\ip) \text{ for }j=1,2,3\text{ and all }\ip\in\IP}}
+    \times\;
+    \underbrace{
+    \begin{blockarray}{cccl}
+        \rg_\RN{1}, & \rg_\RN{2}, & \rg_\RN{3} & \\
+        \begin{block}{(ccc)l}
+         1 & \sfrac{1}{2} & 0 & \ip_\RN{1} \\
+         0 & \sfrac{1}{2} & 1 & \ip_\RN{2} \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\ip | \rg)\forall \ip\in\IP, \rg\in\RG}}
+    \right\}
+    \times\;
+    \underbrace{
+    \begin{blockarray}{cccc}
+        L & I & C & \\
+        \begin{block}{(ccc)l}
+          \sfrac{1}{3} & 1 & 0 & \rg_\RN{1} \\
+          \sfrac{1}{3} & 0 & 0 & \rg_\RN{2} \\
+          \sfrac{1}{3} & 0 & 1 & \rg_\RN{3} \\
+        \end{block}
+        \end{blockarray}.
+    }_{\mathclap{\mathbb{P}(\rg|s) \forall \rg\in\RG, s\in\{L,I,C\}}}
+\end{align*}\\
+\normalsize
+
+\paragraph{Posterior} For a uniform prior on s, 
+\begin{align*}
+    \mathbb{P}(\bm{y}) &= \sfrac{1}{3}f(A_1)f(T_1)f(T_2)f(G_3) \Big(\sfrac{1}{3}(f(T_2)f(G_3) + \sfrac{1}{8}(f(T_2)+1)(f(G_3)+1)) + f(T_2)f(G_3) \Big), 
+\end{align*}
+such that
+\begin{align*}
+    \mathbb{P}(s=L | \bm{y}) &= 
+    \dfrac{\sfrac{1}{3}(f(T_2)f(G_3) + \sfrac{1}{8}(f(T_2)+1)(f(G_3)+1))}
+    {\sfrac{1}{3}(f(T_2)f(G_3) + \sfrac{1}{8}(f(T_2)+1)(f(G_3)+1)) + f(T_2)f(G_3)},
+    \\
+    \mathbb{P}(s=I | \bm{y}) &= 
+    \dfrac{f(T_2)f(G_3)}
+    {\sfrac{1}{3}(f(T_2)f(G_3) + \sfrac{1}{8}(f(T_2)+1)(f(G_3)+1)) + f(T_2)f(G_3)},
+    \\
+    \mathbb{P}(s=C | \bm{y}) &= 0.
+\end{align*}
+
+%=============================================
+\subsection{Multiple exclusively homologous markers}\label{ex:multiple_markers_hom}
+When markers are homologous over infections, $\mathbb{P}(s=C | \bm{y}) > 0$. For example, if
+\begin{equation*}
+\bm{a} = 
+    \begin{blockarray}{cccl}
+    j = 1 & j = 2 & j = 3\\
+    \begin{block}{(ccc)l}
+    A & T & G & i=1 \\
+    A & T & G & i=2 \\
+    \end{block}
+    \end{blockarray},    
+\end{equation*}
+%
+\begin{align*}
+    \mathbb{P}(\bm{y}) &= 
+    \sfrac{1}{9}f(A_1)f(T_2)f(G_3) 
+        \Big(\sfrac{1}{8}(f(A_1)+1)(f(T_2)+1)(f(G_3)+1) + 
+        4f(A_1)f(T_2)f(G_3) + 4\Big),
+\end{align*}
+such that
+\begin{align*}
+    \mathbb{P}(s=L|\bm{y})&= 
+    \dfrac{\sfrac{1}{8}(f(A_1)+1)(f(T_2)+1)(f(G_3)+1) 
+        + f(A_1)f(T_2)f(G_3) + 1}{
+        \sfrac{1}{8}(f(A_1)+1)(f(T_2)+1)(f(G_3)+1) + 
+        4f(A_1)f(T_2)f(G_3) + 4},
+    \\
+    \mathbb{P}(s=I|\bm{y})&= 
+    \dfrac{3f(A_1)f(T_2)f(G_3)}
+    {\sfrac{1}{8}(f(A_1)+1)(f(T_2)+1)(f(G_3)+1) + 4f(A_1)f(T_2)f(G_3) + 4},
+    \\
+    \mathbb{P}(s=C|\bm{y})&= 
+    \dfrac{3}
+    {\sfrac{1}{8}(f(A_1)+1)(f(T_2)+1)(f(G_3)+1) + 4f(A_1)f(T_2)f(G_3) + 4}.\\
+\end{align*}
+
+because
+\small
+\begin{align*}
+\mathbb{P}(\bm{y}|s) &= \mathbb{P}(\bm{a}|s) \forall s\in\{L,I,C\}, \\
+&= 
+\left\{\;
+\underbrace{
+    \begin{blockarray}{cl}
+        \bm{a} \\
+        \begin{block}{(c)l}
+        \sfrac{1}{3}f(A_1)f(T_2)f(G_3) 
+        \Big(f(A_1)f(T_2)f(G_3) +  
+        \sfrac{1}{8}(f(A_1)+1)(f(T_2)+1)(f(G_3)+1) 
+        + 1\Big)
+        & L \\
+        f(A_1)^2f(T_2)^2f(G_3)^2 & I \\
+        f(A_1)f(T_2)f(G_3) & C \\
+        \end{block}
+        \end{blockarray},
+    }_{\mathclap{\mathbb{P}(\bm{a}|s)\forall s\in\{L,I,C\}}}
+\right\}^{T}\\
+&= 
+\left\{\;
+\underbrace{
+    \begin{blockarray}{cl}
+        \bm{a} \\
+        \begin{block}{(c)l}
+          f(A_1)^2f(T_2)^2f(G_3)^2 & \rg_\RN{1}\\ 
+          \sfrac{1}{8}f(A_1)(f(A_1)+1)f(T_2)(f(T_2)+1)f(G_3)(f(G_3)+1)& \rg_\RN{2} \\
+          f(A_1)f(T_2)f(G_3) & \rg_\RN{3} \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\bm{a}|\rg)\forall\rg\in\RG}}
+\right\}^{T}
+    \times\;
+    \underbrace{
+    \begin{blockarray}{cccc}
+        L & I & C & \\
+        \begin{block}{(ccc)l}
+          \sfrac{1}{3} & 1 & 0 & \rg_\RN{1} \\
+          \sfrac{1}{3} & 0 & 0 & \rg_\RN{2} \\
+          \sfrac{1}{3} & 0 & 1 & \rg_\RN{3} \\
+        \end{block}
+        \end{blockarray}, 
+    }_{\mathclap{\mathbb{P}(\rg|s) \forall \rg\in\RG, s\in\{L,I,C\}}}
+    \\
+&=
+\text{row product}
+\left\{\;
+\underbrace{
+    \begin{blockarray}{cccl}
+        \rg_\RN{1} & \rg_\RN{2} & \rg_\RN{3}\\
+        \begin{block}{(ccc)l}
+          f(A_1)^2 & \sfrac{1}{2}f(A_1)^2 + \sfrac{1}{2}f(A_1) & f(A_1) & \bm{a_{\cdot 1}} \\
+          f(T_2)^2 & \sfrac{1}{2}f(T_2)^2 + \sfrac{1}{2}f(T_2) & f(T_2) & \bm{a_{\cdot 2}} \\
+          f(G_3)^2 & \sfrac{1}{2}f(G_3)^2 + \sfrac{1}{2}f(G_3) & f(G_3) & \bm{a_{\cdot 3}} \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\bm{a}_{\cdot j}|\rg) \text{ for }j=1,2,3\text{ and all }\rg\in\RG}}
+\right\}
+    \times\;
+    \underbrace{
+    \begin{blockarray}{cccc}
+        L & I & C & \\
+        \begin{block}{(ccc)l}
+          \sfrac{1}{3} & 1 & 0 & \rg_\RN{1} \\
+          \sfrac{1}{3} & 0 & 0 & \rg_\RN{2} \\
+          \sfrac{1}{3} & 0 & 1 & \rg_\RN{3} \\
+        \end{block}
+        \end{blockarray},
+    }_{\mathclap{\mathbb{P}(\rg|s) \forall \rg\in\RG, s\in\{L,I,C\}}}
+    \\
+&= 
+\text{row product}
+    \left\{\;
+    \underbrace{
+    \begin{blockarray}{ccl}
+        \ip_\RN{1} & \ip_\RN{2} \\
+        \begin{block}{(cc)l}
+          f(A_1)^2 & f(A_1) & \bm{a_{\cdot 1}} \\
+          f(T_2)^2 & f(T_2) & \bm{a_{\cdot 2}} \\
+          f(G_3)^2 & f(G_3) & \bm{a_{\cdot 3}} \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\bm{a}_j|\ip) \text{ for }j=1,2,3\text{ and all }\ip\in\IP}}
+    \times\;
+    \underbrace{
+    \begin{blockarray}{cccl}
+        \rg_\RN{1}, & \rg_\RN{2}, & \rg_\RN{3} & \\
+        \begin{block}{(ccc)l}
+         1 & \sfrac{1}{2} & 0 & \ip_\RN{1} \\
+         0 & \sfrac{1}{2} & 1 & \ip_\RN{2} \\
+        \end{block}
+        \end{blockarray}
+    }_{\mathclap{\mathbb{P}(\ip | \rg)\forall \ip\in\IP, \rg\in\RG}}
+    \right\}
+    \times\;
+    \underbrace{
+    \begin{blockarray}{cccc}
+        L & I & C & \\
+        \begin{block}{(ccc)l}
+          \sfrac{1}{3} & 1 & 0 & \rg_\RN{1} \\
+          \sfrac{1}{3} & 0 & 0 & \rg_\RN{2} \\
+          \sfrac{1}{3} & 0 & 1 & \rg_\RN{3} \\
+        \end{block}
+        \end{blockarray}.
+    }_{\mathclap{\mathbb{P}(\rg|s) \forall \rg\in\RG, s\in\{L,I,C\}}}
+\end{align*}\\
+\normalsize
