@@ -62,7 +62,7 @@ probability of relapse exceeds zero).
 
 ### Notable assumptions and limitations: 
 
-As with any model, Pv3Rs makes various assumptions that limit is capabilities in
+As with any model, Pv3Rs makes various assumptions that limit its capabilities in
 some settings. They are explained in some detail below and summarised in a
 table.
 
@@ -91,9 +91,9 @@ caused a previous infection, as might happen in household transmission chains.
 Relapsing parasites that are siblings of parasites in previous infections can be
 meiotic, parent-child-like, regular or half siblings, but we model all sibling
 parasites as regular siblings via the following assumptions: 
-   - allele inheritance is independent (not true of meiotic siblings)
-   - sibling relationships are transitive (not true of parent-child-like trios or some half-sibling trios)
-   - alleles of a sibling cluster are drawn from at most two parental alleles (not true of half siblings).
+    - allele inheritance is independent (not true of meiotic siblings)
+    - sibling relationships are transitive (not true of parent-child-like trios or some half-sibling trios)
+    - alleles of a sibling cluster are drawn from at most two parental alleles (not true of half siblings).
 
 In our experience, half sibling misspecification leads to some misclassification
 of relapses as reinfections; see vignette ["Understand half-sibling misspecification"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
@@ -111,8 +111,8 @@ estimates are merited.
 #### Interpreting probable reinfection and recrudescence
 When data are not sufficiently informative to distinguish between recrudescence and 
 relapse (or reinfection and relapse), the posterior probabilities of recrudescence and 
-relapse (or reinfection and relapse) are heavily influenced by our uniform distribution 
-over graphs (see vignette ["Understand graph prior ramifications"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html)). 
+relapse (or reinfection and relapse) are heavily influenced by assumption that the distribution
+over graphs is uniform *a priori* (see vignette ["Understand graph prior ramifications"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html)). 
 The development of a more biologically-principled generative model on parasite 
 relationships is merited.
 

@@ -6,5 +6,6 @@ title: "Understand half-sibling misspecification"
 not support pdf vignettes; see 
 [pkgdown issue 781](https://github.com/r-lib/pkgdown/issues/781). 
 When Pv3Rs is on CRAN, this signpost will be replaced by a link to the pdf
-vignette on CRAN. For the time being, please access "Understand half-sibling misspecification" by calling `vignette(topic = "half-siblings", package = "Pv3Rs")` in
+vignette on CRAN. For the time being, please access "Understand half-sibling misspecification" by 
+installing Pv3Rs and calling `vignette(topic = "half-siblings", package = "Pv3Rs")` in
 R.

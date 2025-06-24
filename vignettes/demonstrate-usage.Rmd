@@ -67,10 +67,10 @@ We plot the data using `plot_data()`.
 plot_data(ys = list("Participant data" = y), fs = fs)
 ```
 
-Different colours in the plotted data (left) represent different alleles. The
-legend (right) shows all alleles per marker with one column per marker. The
+Different colours in the plotted data (top) represent different alleles. The
+legend (bottom) shows all alleles per marker with one row per marker. The
 order of the markers in the legend is the same as that in the plotted data (see
-horizontal axis, left). When allele frequencies are specified, the heights of
+vertical axis, top). When allele frequencies are specified, the widths of
 differently coloured areas in the legend are proportional to allele frequencies,
 s.t. rare alleles have relatively small legend areas (e.g., T at m2 is rare).
 
