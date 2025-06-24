@@ -63,7 +63,7 @@ suppressMessages(compute_posterior(y = y_full, fs)$marg)
 # Plot data:
 plot_data(list(meiotic = y_meitotic,
                parents = y_parents,
-               full = y_full), marker_annotate = F)
+               full = y_full), marker.annotate = F)
 
 # Check siblings are related as expected:
 all_pairs <- gtools::combinations(4,2)

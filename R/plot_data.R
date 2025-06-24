@@ -16,7 +16,7 @@
 #' contrast of hue between adjacent colours, is always used; the adjacent
 #' colours areinterpolated only if a given marker has more than 12 alleles. The
 #' names of the alleles are printed on top of their colours if
-#' \code{marker_annotate} is set to \code{TRUE}.
+#' \code{marker.annotate} is set to \code{TRUE}.
 #'
 #'@param ys A nested list of per-patient, per-episode, per-marker allelic data.
 #'  Specifically, a per-patient list of a per-episode list of a per-marker list
@@ -32,32 +32,40 @@
 #'  large legend areas, and rare alleles have relatively small legend areas.
 #'  Specify fs to fix the colour of a given allele across plots of different
 #'  data lists, thereby facilitating cross-comparison.
-#'@param patient_vert Logical. If true, patient IDs are printed vertically;
+#'@param patient.vert Logical. If true, patient IDs are printed vertically;
 #'  otherwise they are printed horizontally (default).
 #'@param mar A vector which gives the number of lines of margin for the main
 #'  plot; see the entry for `mar` in \code{\link[graphics]{par}}.
 #'@param gridlines Logical. If true (default), white gridlines separating
 #'  patients and markers will be drawn.
-#'@param legendsize Float representing the proportion of the plot that the
-#'  legend occupies.
 #'@param palette Colour palette for alleles, see return value of
 #'  \code{\link[RColorBrewer]{brewer.pal}}. Colour interpolation takes place
 #'  when the number of alleles exceeds the number of colours defining the
 #'  palette.
-#'@param marker_annotate Logical. If true (default), the names of the alleles
+#'@param marker.annotate Logical. If true (default), the names of the alleles
 #'  are printed on top of their colours in the legend.
+#'@param legend.lab Label for the axis of the color legend, defaults to "Allele frequencies".
+#'  Set to \code{NA} if not desired. If this is the case, consider adjusting
+#'  \code{legend.ylim} to use more plotting space.
+#'@param legend.line Distance in units of character height of the legend label
+#'  from the colour bar, defaults to 1.5.
+#'@param legend.ylim Vector of two floats representing the y-coordinate limits
+#'  of the legend in device coordinates (between 0 and 1). Defaults to c(0.05, 0.2).
 #'@param cex.maj Float representing the font scaling of major axis labels.
 #'@param cex.min Float representing the font scaling of minor axis labels.
 #'@param cex.text Float representing the font scaling for the allele labels.
+#'@param x.line Distance between top x-axis and x-axis label, defaults to 0.2.
+#'@param y.line Distance between left y-axis and y-axis label, defaults to 2.5.
 #'
 #' @examples
 #'
 #' # Plot example Plasmodium vivax data set
 #' mar <- c(2, 3.5, 1.5, 1) # extra vertical margin for vertical patient labels
-#' plot_data(ys = ys_VHX_BPD, patient_vert = TRUE, mar = mar)
-#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, patient_vert = TRUE, mar = mar)
-#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = FALSE,
-#'           patient_vert = TRUE, mar = mar)
+#' plot_data(ys = ys_VHX_BPD, patient.vert = TRUE, mar = mar, legend.lab = NA)
+#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, patient.vert = TRUE, mar = mar,
+#'           legend.lab = NA)
+#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker.annotate = FALSE,
+#'           patient.vert = TRUE, mar = mar, legend.lab = NA)
 #'
 #' # Demonstrating the adaptive nature of the colour scheme:
 #' ys <- ys_VHX_BPD["VHX_52"] # A single patient
@@ -68,13 +76,16 @@
 #' @export
 plot_data = function(ys,
                      fs = NULL,
-                     patient_vert = FALSE,
+                     patient.vert = FALSE,
                      mar = c(1.5, 3.5, 1.5, 1),
                      gridlines = TRUE,
-                     legendsize = 0.2,
                      palette = RColorBrewer::brewer.pal(12, "Paired"),
-                     marker_annotate = TRUE,
-                     cex.maj = 0.7, cex.min = 0.5, cex.text = 0.5
+                     marker.annotate = TRUE,
+                     legend.lab = "Allele frequencies",
+                     legend.line = 0.2,
+                     legend.ylim = c(0.05, 0.2),
+                     cex.maj = 0.7, cex.min = 0.5, cex.text = 0.5,
+                     x.line = 0.2, y.line = 2.5
 ){
   # Function to create ramped colours based on "Paired" brewer.pal
   cols <- grDevices::colorRampPalette(palette)
@@ -194,8 +205,9 @@ plot_data = function(ys,
 
   # Plot
   graphics::par(mfrow = c(1,1),
-                fig = c(0,1,legendsize+0.01,1), # fig = c(x1, x2, y1, y2) (to leave room for the legend)
+                fig = c(0,1,legend.ylim[2]+0.01,1), # fig = c(x1, x2, y1, y2) (to leave room for the legend)
                 mar = mar) # mar = c(bottom, left, top, right)
+  figsize <- par("fin")
   n_x <- nrow(marker_data_wide_factor)
   n_y <- ncol(marker_data_wide_factor)
   x_coords <- seq(1, 2*n_x-1, 2)/(2*n_x)
@@ -217,10 +229,11 @@ plot_data = function(ys,
     Y = marker_data_wide_factor
     Y[,-(COLs[i]:(COLs[i]+(factorial_maxMOI)-1))] = NA
     if (all(is.na(Y))) next # If no data skip to next maker
+    n_alleles <- marker_cardinalities[i]
     #graphics::image(t(rbind(-1, cbind(NA, Y, NA), -1)),
     graphics::image(x_coords, y_coords, Y,
-                    col = c(grDevices::grey(0), cols(marker_cardinalities[i])),
-                    axes = FALSE, add = TRUE, zlim = c(-1, marker_cardinalities[i]))
+                    col = c(grDevices::grey(0), cols(n_alleles+2)[(1:n_alleles)+1]),
+                    axes = FALSE, add = TRUE, zlim = c(-1, n_alleles))
   }
 
   # Add gridlines
@@ -241,21 +254,22 @@ plot_data = function(ys,
   graphics::mtext(text = rep('Grouping', 2), side = 2, at = c(-0.5,rim_ratio+0.5)/rim_ratio,
                   line = 0.2, cex = cex.min, las = 2)
   graphics::mtext(text = pids, side = 1, at = ID_midpoints, cex = cex.min,
-                  las = ifelse(patient_vert, 3, 1), line = ifelse(patient_vert, 0.2, 0))
+                  las = ifelse(patient.vert, 3, 1), line = ifelse(patient.vert, 0.2, 0))
   xlabel <- ifelse(n_patients > 1,
                    sprintf("%s episodes in %s people (one column per episode, grouped by person)", n_episodes, n_patients),
                    sprintf("%s episodes in 1 person (one column per episode)", n_episodes))
-  graphics::mtext(text = xlabel, line = 0.2, cex = cex.maj)
+  graphics::mtext(text = xlabel, line = x.line, cex = cex.maj)
   graphics::title(ylab = 'Marker (number of distinct alleles)',
-                  line = 2.5, cex.lab = cex.maj)
+                  line = y.line, cex.lab = cex.maj)
 
   # Add legend
   graphics::par(fig = c(0,1,0,1)) # Critical to avoid odd placement of first legend column
+  legendsize <- legend.ylim[2] - legend.ylim[1]
   rowsize = legendsize/n_markers
-  for(marker in markers){ # For each marker in turn
-    i = which(marker == markers)
+  for(i in 1:n_markers){ # For each marker in turn
+    marker <- markers[i]
     SMALLplot = c(0.05, 0.95,
-                  0.01 + rowsize*(n_markers-i), 0.01 + rowsize*(n_markers-i+1))
+                  legend.ylim[1] + rowsize*(n_markers-i), legend.ylim[1] + rowsize*(n_markers-i+1))
     if (marker_cardinalities[marker] == 1) {
       Breaks <- c(0,1)
       At <- 0.5
@@ -273,7 +287,7 @@ plot_data = function(ys,
       stop("Some near-zero frequencies: set fs to NULL to enable plotting")
     }
     matrix_to_plot[is.na(matrix_to_plot)] <- 0
-    if (marker_annotate) {
+    if (marker.annotate) {
       Labels <- marker_alleles[[marker]]
       # let n be the number of characters in the allele label
       min_spaces <- 0.01*sapply(Labels, nchar)
@@ -290,10 +304,14 @@ plot_data = function(ys,
     } else {
       Labels <- rep(NA, marker_cardinalities[marker])
     }
+    n_alleles <- marker_cardinalities[marker]
     fields::image.plot(abs(matrix_to_plot), # Two z values: 0 and 1
-                       col = cols(marker_cardinalities[marker]),
+                       col = cols(n_alleles+2)[(1:n_alleles)+1],
                        breaks = Breaks,
                        legend.only = TRUE,
+                       legend.lab = ifelse(i == n_markers, legend.lab, NA),
+                       legend.line = legend.line,
+                       legend.cex = cex.maj,
                        horizontal = TRUE,
                        add = TRUE,
                        axis.args = list(cex.axis = 0.5, tick = FALSE, labels = FALSE),

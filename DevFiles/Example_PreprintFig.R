@@ -63,8 +63,8 @@ y_phased <- list(as.list(children[3,]),
                  as.list(strangers[,3]))
 
 # Plot the data
-plot_data(ys = list(example = y_phased), fs = fs, marker_annotate = F)
-plot_data(ys = list(example = y), fs = fs, marker_annotate = F)
+plot_data(ys = list(example = y_phased), fs = fs, marker.annotate = F)
+plot_data(ys = list(example = y), fs = fs, marker.annotate = F)
 
 # Reduce the number of markers evaluated
 for(n_markers_eval in 1:10){

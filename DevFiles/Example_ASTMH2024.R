@@ -52,7 +52,7 @@ relapse <- apply(rbind(children[1:2,], strangers[,3]), 2, unique, simplify = F)
 y <- list(initial, relapse)
 
 # Plot the data
-plot_data(ys = list(example = y), fs = fs, marker_annotate = F)
+plot_data(ys = list(example = y), fs = fs, marker.annotate = F)
 
 # Reduce the number of markers evaluated
 for(n_markers_eval in 1:n_markers){

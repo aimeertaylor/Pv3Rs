@@ -7,15 +7,19 @@
 plot_data(
   ys,
   fs = NULL,
-  patient_vert = FALSE,
+  patient.vert = FALSE,
   mar = c(1.5, 3.5, 1.5, 1),
   gridlines = TRUE,
-  legendsize = 0.2,
   palette = RColorBrewer::brewer.pal(12, "Paired"),
-  marker_annotate = TRUE,
+  marker.annotate = TRUE,
+  legend.lab = "Allele frequencies",
+  legend.line = 0.2,
+  legend.ylim = c(0.05, 0.2),
   cex.maj = 0.7,
   cex.min = 0.5,
-  cex.text = 0.5
+  cex.text = 0.5,
+  x.line = 0.2,
+  y.line = 2.5
 )
 }
 \arguments{
@@ -35,31 +39,42 @@ large legend areas, and rare alleles have relatively small legend areas.
 Specify fs to fix the colour of a given allele across plots of different
 data lists, thereby facilitating cross-comparison.}
 
-\item{patient_vert}{Logical. If true, patient IDs are printed vertically;
+\item{patient.vert}{Logical. If true, patient IDs are printed vertically;
 otherwise they are printed horizontally (default).}
 
 \item{mar}{A vector which gives the number of lines of margin for the main
-plot; see the entry for \code{mar} in \link[graphics]{par}.}
+plot; see the entry for \code{mar} in \code{\link[graphics]{par}}.}
 
 \item{gridlines}{Logical. If true (default), white gridlines separating
 patients and markers will be drawn.}
 
-\item{legendsize}{Float representing the proportion of the plot that the
-legend occupies.}
-
 \item{palette}{Colour palette for alleles, see return value of
-\link{RColorBrewer::brewer.pal}. Colour interpolation takes place
+\code{\link[RColorBrewer]{brewer.pal}}. Colour interpolation takes place
 when the number of alleles exceeds the number of colours defining the
 palette.}
 
-\item{marker_annotate}{Logical. If true (default), the names of the alleles
+\item{marker.annotate}{Logical. If true (default), the names of the alleles
 are printed on top of their colours in the legend.}
+
+\item{legend.lab}{Label for the axis of the color legend, defaults to "Allele frequencies".
+Set to \code{NA} if not desired. If this is the case, consider adjusting
+\code{legend.ylim} to use more plotting space.}
+
+\item{legend.line}{Distance in units of character height of the legend label
+from the colour bar, defaults to 1.5.}
+
+\item{legend.ylim}{Vector of two floats representing the y-coordinate limits
+of the legend in device coordinates (between 0 and 1). Defaults to c(0.05, 0.2).}
 
 \item{cex.maj}{Float representing the font scaling of major axis labels.}
 
 \item{cex.min}{Float representing the font scaling of minor axis labels.}
 
 \item{cex.text}{Float representing the font scaling for the allele labels.}
+
+\item{x.line}{Distance between top x-axis and x-axis label, defaults to 0.2.}
+
+\item{y.line}{Distance between left y-axis and y-axis label, defaults to 2.5.}
 }
 \description{
 Plots the alleles (colours), which are observed in different episodes (rows),
@@ -79,16 +94,17 @@ alleles as much as  ossible: the maximum range of qualitative scheme, with
 contrast of hue between adjacent colours, is always used; the adjacent
 colours areinterpolated only if a given marker has more than 12 alleles. The
 names of the alleles are printed on top of their colours if
-\code{marker_annotate} is set to \code{TRUE}.
+\code{marker.annotate} is set to \code{TRUE}.
 }
 \examples{
 
 # Plot example Plasmodium vivax data set
 mar <- c(2, 3.5, 1.5, 1) # extra vertical margin for vertical patient labels
-plot_data(ys = ys_VHX_BPD, patient_vert = TRUE, mar = mar)
-plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, patient_vert = TRUE, mar = mar)
-plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker_annotate = FALSE,
-          patient_vert = TRUE, mar = mar)
+plot_data(ys = ys_VHX_BPD, patient.vert = TRUE, mar = mar, legend.lab = NA)
+plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, patient.vert = TRUE, mar = mar,
+          legend.lab = NA)
+plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker.annotate = FALSE,
+          patient.vert = TRUE, mar = mar, legend.lab = NA)
 
 # Demonstrating the adaptive nature of the colour scheme:
 ys <- ys_VHX_BPD["VHX_52"] # A single patient
