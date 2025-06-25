@@ -74,7 +74,7 @@ population structure is best understood using complementary population genetic
 and sensitivity analyses.
 
 ```{r echo = FALSE}
-# get RG vertex labels, RGs, recurrent state sequences RGs are compatible with
+# get RG vertex labels, RGs, recurrence state sequences RGs are compatible with
 get_graph_dist <- function(x) { 
   gs <- paste0("g", 1:sum(x)) # genotype names (graph vertices)
   ts <- 1:length(x) # episode indices
@@ -416,11 +416,11 @@ compatible with relapse.
 ## Posterior bounds 
 
 Because we assume *a priori* that relationship graphs compatible with a given
-recurrent state sequence are uniformly distributed, and because relationship
+recurrence state sequence are uniformly distributed, and because relationship
 graphs compatible with sequences of recrudescence / reinfection are a subset of
 those compatible with sequences of relapse, bounds induced by the prior on
 non-marginal posterior probabilities can be computed *a priori* as a function of
-the prior on the recurrent state sequences and the prior on the relationship
+the prior on the recurrence state sequences and the prior on the relationship
 graphs; see `vignette("understand-graph-prior", "Pv3Rs")`.
 
 Because the probability mass function of a uniformly distributed discrete random
@@ -457,7 +457,7 @@ y_mismatch <- list(enrol = all_As, recur = all_Bs)
 ```
 
 ```{r echo = FALSE}
-# Assuming recurrent state sequences are equally likely a priori
+# Assuming recurrence state sequences are equally likely a priori
 results_match <- sapply(MOIs, function(x) 
   suppressMessages(compute_posterior(y = y_match, fs, MOIs = x)$marg))
 results_mismatch <- sapply(MOIs, function(x) 
@@ -672,7 +672,7 @@ maxima <- lapply(1:length(MOIs), FUN = function(i) {
   RGs_C_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_C_1st %in% x))
   RGs_I_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_I_1st %in% x))
   
-  # Numbers of graphs compatible with each recurrent state sequence
+  # Numbers of graphs compatible with each recurrence state sequence
   num_comp <- sapply(sqstr, function(seq) { # All graphs
     sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x))})
   num_comp_RGs_I_1st <- sapply(sqstr, function(seq) { # With reinfection 1st
@@ -959,10 +959,10 @@ exceed 0.75, even if their data are highly informative of reinfection:
 y <- list(enrol = all_As, recur = all_Bs)
 fs <- sapply(ms, FUN = function(m) c("A" = 0.5, "B" = 0.5), simplify = FALSE)
 
-# Using the default uniform prior on recurrent states
+# Using the default uniform prior on recurrence states
 suppressMessages(compute_posterior(y, fs))$marg
 
-# Using a non-uniform prior on recurrent states
+# Using a non-uniform prior on recurrence states
 prior <- as.matrix(data.frame("C" = 0.25, "L" = 0.25, "I" = 0.5))
 suppressMessages(compute_posterior(y, fs, prior))$marg
 ```
@@ -983,7 +983,7 @@ or three meiotic siblings and a recurrent
 - regular sibling 
 - meiotic sibling
 
-Posterior probabilities are computed assuming recurrent states are equally
+Posterior probabilities are computed assuming recurrence states are equally
 likely *a priori*.
 
 ## Results

@@ -25,7 +25,7 @@ In this vignette we demonstrate the basic `Pv3Rs` work flow for a single study
 participant; i.e.,
 
 1) Plot data
-2) Estimate recurrent state probabilities 
+2) Estimate recurrence state probabilities 
 3) Plot probability estimates
 
 And we show how one might explore relationship graphs and their log likelihoods.
@@ -80,15 +80,15 @@ in the three episodes respectively (a genotype is here defined as a realisation
 of the haploid parasite genome representing a group of clonal parasites). In
 this synthetic example, markers are quart-allelic for brevity; this imposes a
 rather low upper bound on MOI estimates based on maximum per-marker allele
-counts. In reality, more diverse markers are recommended for recurrent state
+counts. In reality, more diverse markers are recommended for recurrence state
 inference. If better MOI estimates were available based on more diverse markers,
 the data from those more diverse markers could be added to the data input `y` of
 `compute_posterior()`. If better MOI estimates based on heteroallelic marker
-counts across many markers were available, they could be used in recurrent state
+counts across many markers were available, they could be used in recurrence state
 inference by specifying the `MOI` argument in the function
 `compute_posterior()`.
 
-When performing genetic recurrent state inference, the bulk of the computational
+When performing genetic recurrence state inference, the bulk of the computational
 time lies in computing log-likelihoods of graphs of relationships between
 genotypes.
 
