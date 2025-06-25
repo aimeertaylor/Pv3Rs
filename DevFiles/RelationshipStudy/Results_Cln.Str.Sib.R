@@ -79,7 +79,7 @@ for(case in cases){
   # Plot simplex (helpful when the posterior evades the expected state)
   par(mar = c(0,0,0,0))
   V_labels <- c("Recrudescence", "Relapse", "Reinfection")
-  plot_simplex(v_labels = V_labels, v_cutoff = 0.5)
+  plot_simplex(v.labels = V_labels, v.cutoff = 0.5)
   for(MOIs in MOIs_per_infection) {
     LTY = ifelse(MOIs == "2_1", 1, 2)
     for(i in 1:n_repeats){
