@@ -337,12 +337,12 @@ reinfection are also compatible with relapse.</p>
 <h3 id="posterior-bounds">Posterior bounds<a class="anchor" aria-label="anchor" href="#posterior-bounds"></a>
 </h3>
 <p>Because we assume <em>a priori</em> that relationship graphs
-compatible with a given recurrent state sequence are uniformly
+compatible with a given recurrence state sequence are uniformly
 distributed, and because relationship graphs compatible with sequences
 of recrudescence / reinfection are a subset of those compatible with
 sequences of relapse, bounds induced by the prior on non-marginal
 posterior probabilities can be computed <em>a priori</em> as a function
-of the prior on the recurrent state sequences and the prior on the
+of the prior on the recurrence state sequences and the prior on the
 relationship graphs; see
 <code>vignette("understand-graph-prior", "Pv3Rs")</code>.</p>
 <p>Because the probability mass function of a uniformly distributed
@@ -604,12 +604,12 @@ reinfection:</p>
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="va">all_As</span>, recur <span class="op">=</span> <span class="va">all_Bs</span><span class="op">)</span></span>
 <span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">ms</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Using the default uniform prior on recurrent states</span></span>
+<span><span class="co"># Using the default uniform prior on recurrence states</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span></span>
 <span><span class="co">#&gt;       C    L    I</span></span>
 <span><span class="co">#&gt; recur 0 0.25 0.75</span></span>
 <span></span>
-<span><span class="co"># Using a non-uniform prior on recurrent states</span></span>
+<span><span class="co"># Using a non-uniform prior on recurrence states</span></span>
 <span><span class="va">prior</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"C"</span> <span class="op">=</span> <span class="fl">0.25</span>, <span class="st">"L"</span> <span class="op">=</span> <span class="fl">0.25</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span>, <span class="va">prior</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span></span>
 <span><span class="co">#&gt;       C         L         I</span></span>
@@ -632,7 +632,7 @@ containing two or three meiotic siblings and a recurrent</p>
 <li>regular sibling</li>
 <li>meiotic sibling</li>
 </ul>
-<p>Posterior probabilities are computed assuming recurrent states are
+<p>Posterior probabilities are computed assuming recurrence states are
 equally likely <em>a priori</em>.</p>
 </div>
 <div class="section level3">

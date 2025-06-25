@@ -215,7 +215,7 @@ abundance of the alleles detected).</p></li>
 <span class="r-in"><span><span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span>, progress.bar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 250</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 250 RGs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrence states</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $marg</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                C         L         I</span>
@@ -247,7 +247,7 @@ abundance of the alleles detected).</p></li>
 <span class="r-in"><span><span class="va">posterior_probs</span> <span class="op">&lt;-</span> <span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span>, progress.bar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 30</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 30 RGs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrence states</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot posterior probabilities on the simplex</span></span></span>
@@ -382,22 +382,22 @@ abundance of the alleles detected).</p></li>
 <span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ys</span>, <span class="kw">function</span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="fu">compute_posterior</span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span>, progress.bar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 3</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 3 RGs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrence states</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episode recur2 has no data</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 12</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 12 RGs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrence states</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episodes recur2 &amp; recur3 have no data</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 60</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 60 RGs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrence states</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Episodes recur2 &amp; recur3 &amp; recur4 have no data</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 358</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 358 RGs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrent states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrence states</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract results for the first recurrence</span></span></span>
