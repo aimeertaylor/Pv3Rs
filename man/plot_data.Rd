@@ -49,9 +49,11 @@ plot; see the entry for \code{mar} in \code{\link[graphics]{par}}.}
 patients and markers will be drawn.}
 
 \item{palette}{Colour palette for alleles, see return value of
-\code{\link[RColorBrewer]{brewer.pal}}. Colour interpolation takes place
-when the number of alleles exceeds the number of colours defining the
-palette.}
+\code{\link[RColorBrewer]{brewer.pal}}. Generally, the colours are
+interpolated. If a marker has \code{d} possible alleles, then the colours
+used are the \code{1/(d+1), ..., d/(d+1)} quantiles of the colours in
+\code{palette}. This is done such that markers with different number of
+possible alleles would generally use different colours.}
 
 \item{marker.annotate}{Logical. If true (default), the names of the alleles
 are printed on top of their colours in the legend.}
@@ -77,24 +79,22 @@ of the legend in device coordinates (between 0 and 1). Defaults to c(0.05, 0.2).
 \item{y.line}{Distance between left y-axis and y-axis label, defaults to 2.5.}
 }
 \description{
-Plots the alleles (colours), which are observed in different episodes (rows),
-on different markers (columns), where episodes are grouped by patient. The
-patients and per-patient episodes are plotted from bottom to top. If more
-than one allele is detected per episode per marker, the corresponding
-row-column entry is subdivided into different colours. The order of markers
-follow the allele frequencies, if provided. Otherwise, markers are ordered
-lexicographically.
+Plots the alleles (colours), which are observed in different episodes
+(columns), on different markers (rows), where episodes are grouped by
+patient. The per-patient episodes are plotted from left to right in
+chronological order. If more than one allele is detected per episode per
+marker, the corresponding row is subdivided into rows of different colours.
+The order of markers follow the allele frequencies, if provided. Otherwise,
+markers are ordered lexicographically.
 }
 \details{
-The legend depicts the alleles of the markers as the markers appear from left
-to right in the main plot. Otherwise stated, the legend is ordered by the
-order of markers stated on on the vertical axis of the main plot. The default
-colour scheme is adaptive. It is designed to visually differentiate the
-alleles as much as  ossible: the maximum range of qualitative scheme, with
-contrast of hue between adjacent colours, is always used; the adjacent
-colours areinterpolated only if a given marker has more than 12 alleles. The
-names of the alleles are printed on top of their colours if
-\code{marker.annotate} is set to \code{TRUE}.
+The legend depicts the alleles of the markers in the same vertical order as
+the main plot. The default colour scheme is adaptive. It is designed to
+visually differentiate the alleles as much as possible: the maximum range of
+qualitative scheme, with contrast of hue between adjacent colours.
+Interpolation is used to make different colour palettes for markers with
+different numbers of possible alleles. The names of the alleles are printed
+on top of their colours if \code{marker.annotate} is set to \code{TRUE}.
 }
 \examples{
 

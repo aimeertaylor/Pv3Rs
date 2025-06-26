@@ -1,7 +1,7 @@
-#' Compute posterior probabilities of \emph{P. vivax} recurrent states
+#' Compute posterior probabilities of \emph{P. vivax} recurrence states
 #'
 #' @description
-#' Compute posterior probabilities of \emph{P. vivax} recurrent states relapse,
+#' Compute posterior probabilities of \emph{P. vivax} recurrence states relapse,
 #' reinfection and recrudescence using genetic data.
 #'
 #' Please note, the progress bar does not necessarily increment uniformly (see
@@ -70,7 +70,7 @@
 #'   chronological order. The column names must be C, L, and I for
 #'   recrudescence, relapse and reinfection respectively. Row names can be
 #'   specified but they are not used. If `prior` is NULL (default), per-episode
-#'   recurrent states are equally likely.
+#'   recurrence states are equally likely.
 #' @param MOIs Multiplicity of infection for each episode. If MOIs are not
 #'   provided, the most parsimonious MOIs compatible with the data will be used;
 #'   see \code{\link{determine_MOIs}}.
@@ -95,11 +95,11 @@
 #' @return List containing:
 #'   \describe{
 #'     \item{`marg`}{Matrix of marginal posterior probabilities of
-#'       recurrent states for each recurrence, one row per recurrence with "C"
+#'       recurrence states for each recurrence, one row per recurrence with "C"
 #'       for recrudescence, "L" for relapse, and "I" for reinfection. `marg` is
 #'       a simple summary of `joint` (see next): each marginal probability of a
-#'       recurrent state is a sum over a subset of joint probabilities of
-#'       recurrent state sequences. For example, the marginal probability of "C"
+#'       recurrence state is a sum over a subset of joint probabilities of
+#'       recurrence state sequences. For example, the marginal probability of "C"
 #'       at the first of two recurrences is a sum over the joint probabilities
 #'       of "CC", "CL", and "CI".}
 #'     \item{`joint`}{Vector of joint posterior probabilities of each recurrent
@@ -407,7 +407,7 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
   RG_i <- 0
   n.RG <- length(RGs)
   if (progress.bar) pbar <- msg_progress_bar(n.RG)
-  message("Finding log-likelihood of each vector of recurrent states")
+  message("Finding log-likelihood of each vector of recurrence states")
   max.logp <- max(sapply(RGs, "[[", "logp"))
   for (RG in RGs) {
     # subtract maximum to avoid underflow

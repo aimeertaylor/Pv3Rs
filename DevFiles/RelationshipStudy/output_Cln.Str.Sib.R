@@ -142,7 +142,7 @@ for(case in cases){
   c <- 100 # For uniform allele frequencies only
   fs <- fs_store[[as.character(c)]] # Extract frequencies
 
-  # Specify the recurrent state with largest expected posterior
+  # Specify the recurrence state with largest expected posterior
   if (case == "Clone") {
     exp_state <- "C"
   } else if (case == "Stranger") {

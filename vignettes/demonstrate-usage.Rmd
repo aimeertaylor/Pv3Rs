@@ -25,7 +25,7 @@ In this vignette we demonstrate the basic `Pv3Rs` work flow for a single study
 participant; i.e.,
 
 1) Plot data
-2) Estimate recurrent state probabilities 
+2) Estimate recurrence state probabilities 
 3) Plot probability estimates
 
 And we show how one might explore relationship graphs and their log likelihoods.
@@ -46,24 +46,24 @@ We first look at a synthetic example of three episodes (episode names are option
 three markers (marker names are obligatory) whose alleles have known frequencies.
 
 ```{r}
-y <- list("Enrollment" = list(m1 = c('C','G','T'), 
-                              m2 = c('A','C'),
-                              m3 = c('C','G','T')),
-          "Recurrence 1" = list(m1 = c('C','T'), 
-                                m2 = c('A'), 
-                                m3 = c('A','C')),
-          "Recurrence 2" = list(m1 = c('T'), 
-                                m2 = c('A'), 
-                                m3 = c('A')))
+y <- list("Enrollment" = list(m1 = c('b','c','d'), 
+                              m2 = c('a','b'),
+                              m3 = c('b','c','d')),
+          "Recurrence 1" = list(m1 = c('b','d'), 
+                                m2 = c('a'), 
+                                m3 = c('a','b')),
+          "Recurrence 2" = list(m1 = c('d'), 
+                                m2 = c('a'), 
+                                m3 = c('a')))
 
-fs <- list(m1 = c(A = 0.27, C = 0.35, G = 0.18, T = 0.20),
-           m2 = c(A = 0.78, C = 0.14, G = 0.07, T = 0.01),
-           m3 = c(A = 0.21, C = 0.45, G = 0.26, T = 0.08))
+fs <- list(m1 = c(a = 0.27, b = 0.35, c = 0.18, d = 0.20),
+           m2 = c(a = 0.78, b = 0.14, c = 0.07, d = 0.01),
+           m3 = c(a = 0.21, b = 0.45, c = 0.26, d = 0.08))
 ```
 
 We plot the data using `plot_data()`. 
 
-```{r, fig.align='center'}
+```{r, fig.align='center', fig.height=6}
 plot_data(ys = list("Participant data" = y), fs = fs)
 ```
 
@@ -72,7 +72,7 @@ legend (bottom) shows all alleles per marker with one row per marker. The
 order of the markers in the legend is the same as that in the plotted data (see
 vertical axis, top). When allele frequencies are specified, the widths of
 differently coloured areas in the legend are proportional to allele frequencies,
-s.t. rare alleles have relatively small legend areas (e.g., T at m2 is rare).
+s.t. rare alleles have relatively small legend areas (e.g., `d` at `m2` is rare).
 
 **Aside** Given the maximum number of alleles observed per-episode, the most parsimonious
 explanation is that there are `r determine_MOIs(y)` distinct parasite genotypes
@@ -80,15 +80,15 @@ in the three episodes respectively (a genotype is here defined as a realisation
 of the haploid parasite genome representing a group of clonal parasites). In
 this synthetic example, markers are quart-allelic for brevity; this imposes a
 rather low upper bound on MOI estimates based on maximum per-marker allele
-counts. In reality, more diverse markers are recommended for recurrent state
+counts. In reality, more diverse markers are recommended for recurrence state
 inference. If better MOI estimates were available based on more diverse markers,
 the data from those more diverse markers could be added to the data input `y` of
 `compute_posterior()`. If better MOI estimates based on heteroallelic marker
-counts across many markers were available, they could be used in recurrent state
+counts across many markers were available, they could be used in recurrence state
 inference by specifying the `MOI` argument in the function
 `compute_posterior()`.
 
-When performing genetic recurrent state inference, the bulk of the computational
+When performing genetic recurrence state inference, the bulk of the computational
 time lies in computing log-likelihoods of graphs of relationships between
 genotypes.
 
@@ -111,21 +111,8 @@ function `plot_simplex()`.
 ```{r}
 # Plot simplex
 par(mar = rep(0.1,4))
-plot_simplex(v_labels = c(C = "Recrudescence", 
-                          L = "Relapse", 
-                          I = "Reinfection")[colnames(post$marg)])
-
-# Project marginal posterior probabilties onto 2D coordinates
-xy <- apply(post$marg, 1, project2D) 
-xy_prior <- project2D(rep(1/3,3)) 
-
-# Plot projection on the simplex
-points(x = xy["x",], y = xy["y",], pch = 20) 
-text(x = xy["x",], y = xy["y",], pos = 3, labels = gsub("_", " ", rownames(post$marg)))
-
-# Add default prior per recurrence
-points(x = xy_prior["x"], y = xy_prior["y"], pch = 20)
-text(x = xy_prior["x"], y = xy_prior["y"], pos = 3, labels = "Prior probability")
+p.coords <- rbind(post$marg, rep(1/3, 3))
+plot_simplex(p.coords = p.coords, p.labels = c("Prior", "Posterior"))
 ```
 
 The point in the yellow region is most likely a recrudescence with posterior
@@ -218,7 +205,9 @@ up to within-episode genotype permutations. The user should note that, as in the
 current example, the relationship graph(s) with the largest likelihood (e.g.,
 those above) might not be in the equivalence class for which the data are most
 probable when all relationship graphs in that class are summed over (e.g., those
-below). 
+below). In the following code, we place two graphs in the same equivalence class 
+if they share the same likelihood. This is not ideal, as two graphs that are not 
+isomorphic up to permutation can share the same likelihood.
 
 The user should also note that, 
 

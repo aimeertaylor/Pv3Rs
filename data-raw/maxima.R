@@ -1,6 +1,6 @@
 ################################################################################
 # Script to generate maximum probabilities for MOI vectors summing to at-most
-# eight assuming recurrent states are equally likely a priori. Run time ~ 20 min
+# eight assuming recurrence states are equally likely a priori. Run time ~ 20 min
 ################################################################################
 rm(list = ls())
 

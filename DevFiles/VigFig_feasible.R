@@ -22,7 +22,7 @@ png("../vignettes/figures/feasible.png", width = 4, height = 4, units = "in", re
 
 par(mar=rep(0,4))
 V_labels <- c("Recrudescence", "Relapse", "Reinfection")
-plot_simplex(v_labels =  V_labels, v_colours=rep("white",3))
+plot_simplex(v.labels =  V_labels, v.colours=rep("white",3))
 segments(recru['x'], recru['y'], relap.reinf['x'], relap.reinf['y'], lty=2)
 segments(reinf['x'], reinf['y'], relap.recru['x'], relap.recru['y'], lty=2)
 

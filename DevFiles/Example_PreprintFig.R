@@ -80,7 +80,7 @@ for(n_markers_eval in 1:10){
 
   # Plot result on the simplex:
   xy <- apply(post$marg, 1, project2D)
-  plot_simplex(v_labels = c("", "", ""), 0.75, c("blue", "purple", "red")) # make it so can pass more information
+  plot_simplex(v.labels = c("", "", ""), 0.75, c("blue", "purple", "red")) # make it so can pass more information
   points(x = xy["x",], xy["y",], pch = 21, cex = 4, bg = c("purple", "blue", "red"))
   text(x = xy["x",], xy["y",], labels = rep(n_markers_eval, 3), col = "white")
 }
