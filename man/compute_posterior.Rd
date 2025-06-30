@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_posterior.R
 \name{compute_posterior}
 \alias{compute_posterior}
-\title{Compute posterior probabilities of \emph{P. vivax} recurrent states}
+\title{Compute posterior probabilities of \emph{P. vivax} recurrence states}
 \usage{
 compute_posterior(
   y,
@@ -38,7 +38,7 @@ recurrent episode. Each row corresponds to an episode in increasing
 chronological order. The column names must be C, L, and I for
 recrudescence, relapse and reinfection respectively. Row names can be
 specified but they are not used. If \code{prior} is NULL (default), per-episode
-recurrent states are equally likely.}
+recurrence states are equally likely.}
 
 \item{MOIs}{Multiplicity of infection for each episode. If MOIs are not
 provided, the most parsimonious MOIs compatible with the data will be used;
@@ -67,11 +67,11 @@ it may seem stuck when the code is still running.}
 List containing:
 \describe{
 \item{\code{marg}}{Matrix of marginal posterior probabilities of
-recurrent states for each recurrence, one row per recurrence with "C"
+recurrence states for each recurrence, one row per recurrence with "C"
 for recrudescence, "L" for relapse, and "I" for reinfection. \code{marg} is
 a simple summary of \code{joint} (see next): each marginal probability of a
-recurrent state is a sum over a subset of joint probabilities of
-recurrent state sequences. For example, the marginal probability of "C"
+recurrence state is a sum over a subset of joint probabilities of
+recurrence state sequences. For example, the marginal probability of "C"
 at the first of two recurrences is a sum over the joint probabilities
 of "CC", "CL", and "CI".}
 \item{\code{joint}}{Vector of joint posterior probabilities of each recurrent
@@ -83,7 +83,7 @@ Only returned if \code{return.RG} is \code{TRUE}. See
 }
 }
 \description{
-Compute posterior probabilities of \emph{P. vivax} recurrent states relapse,
+Compute posterior probabilities of \emph{P. vivax} recurrence states relapse,
 reinfection and recrudescence using genetic data.
 
 Please note, the progress bar does not necessarily increment uniformly (see
