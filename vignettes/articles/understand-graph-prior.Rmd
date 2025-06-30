@@ -8,5 +8,5 @@ pdf vignettes; see
 [pkgdown issue 781](https://github.com/r-lib/pkgdown/issues/781). 
 When Pv3Rs is on CRAN, this signpost will be replaced by a link to the pdf
 vignette on CRAN. For the time being, please access "Understand graph prior
-ramifications" by calling `vignette(topic = "graph-prior", package = "Pv3Rs")`
-in R.
+ramifications" by installing Pv3Rs and calling 
+`vignette(topic = "graph-prior", package = "Pv3Rs")` in R.

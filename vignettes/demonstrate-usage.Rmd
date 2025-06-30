@@ -111,8 +111,8 @@ function `plot_simplex()`.
 ```{r}
 # Plot simplex
 par(mar = rep(0.1,4))
-p.coords <- rbind(post$marg, rep(1/3, 3))
-plot_simplex(p.coords = p.coords, p.labels = c("Prior", "Posterior"))
+p.coords <- rbind(post$marg, prior = rep(1/3, 3))
+plot_simplex(p.coords = p.coords)
 ```
 
 The point in the yellow region is most likely a recrudescence with posterior
@@ -122,12 +122,12 @@ greater than 0.5 (it falls in the bright red region).
 
 Joint posterior probabilities (probabilities of chronological sequences of
 recrudescence `C`, relapse `L`, and reinfection `I`) are stored in `post$joint`.
-Here, we find the most likely sequence of recurrence states is `r
-names(which.max(post$joint))` with posterior probability `r
-post$joint[which.max(post$joint)]`
+Here, we find the most likely sequence of recurrence states is 
+`r names(which.max(post$joint))` with posterior probability 
+`r post$joint[which.max(post$joint)]`
 
 ```{r}
-post$joint
+sort(post$joint, decreasing = T)
 ```
 
 Aside: we do not recommend running `compute_posterior()` for data whose total
@@ -163,7 +163,7 @@ post <- compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE)
 We recover the same posterior as before
 
 ```{r, cache=TRUE}
-post$joint
+sort(post$joint, decreasing = T)
 ```
 
 The log-likelihood of each relationship graph is also returned in the output.
