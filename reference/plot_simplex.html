@@ -68,7 +68,8 @@ one) can be projected; see <code><a href="project2D.html">project2D()</a></code>
 <span>  plot.tri <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  p.coords <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  p.labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">p.coords</span><span class="op">)</span>,</span>
-<span>  pos <span class="op">=</span> <span class="fl">3</span></span>
+<span>  p.labels.pos <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -109,11 +110,15 @@ a single row.</p></dd>
 set this to <code>NA</code>. The default is to use the row names of <code>p.coords</code>.</p></dd>
 
 
-<dt id="arg-pos">pos<a class="anchor" aria-label="anchor" href="#arg-pos"></a></dt>
+<dt id="arg-p-labels-pos">p.labels.pos<a class="anchor" aria-label="anchor" href="#arg-p-labels-pos"></a></dt>
 <dd><p>Which side to plot the <code>p.labels</code>. Values of <code>1</code>,
 <code>2</code>, <code>3</code> and <code>4</code>, respectively indicate positions below, to
 the left of, above and to the right of the points. Can be either a single
 integer (default 3) or a vector of integers.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Further graphical parameters passed to points.</p></dd>
 
 </dl></div>
 
@@ -122,7 +127,7 @@ integer (default 3) or a vector of integers.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Plot 2D simplex</span></span></span>
 <span class="r-in"><span><span class="fu">plot_simplex</span><span class="op">(</span>p.coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>             p.labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(1,0,0)"</span>, <span class="st">"(0,1,0)"</span>, <span class="st">"(0,0,1)"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>             pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>             p.labels.pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_simplex-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># ==============================================================================</span></span></span>

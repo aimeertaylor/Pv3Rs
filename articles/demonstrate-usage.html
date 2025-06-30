@@ -173,8 +173,8 @@ the function <code><a href="../reference/plot_simplex.html">plot_simplex()</a></
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot simplex</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">p.coords</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">marg</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="va">p.coords</span>, p.labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Prior"</span>, <span class="st">"Posterior"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">p.coords</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">marg</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="va">p.coords</span><span class="op">)</span></span></code></pre></div>
 <p><img src="demonstrate-usage_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>The point in the yellow region is most likely a recrudescence with
 posterior probability greater than 0.5 (it falls in the bright yellow
@@ -184,15 +184,14 @@ region).</p>
 <p>Joint posterior probabilities (probabilities of chronological
 sequences of recrudescence <code>C</code>, relapse <code>L</code>, and
 reinfection <code>I</code>) are stored in <code>post$joint</code>. Here,
-we find the most likely sequence of recurrence states is
-<code>r names(which.max(post$joint))</code> with posterior probability
-<code>r post$joint[which.max(post$joint)]</code></p>
+we find the most likely sequence of recurrence states is IC with
+posterior probability 0.4568231</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">post</span><span class="op">$</span><span class="va">joint</span></span>
-<span><span class="co">#&gt;         CC         LC         IC         CL         LL         IL         CI </span></span>
-<span><span class="co">#&gt; 0.00000000 0.21338194 0.45682305 0.00000000 0.08501504 0.15385932 0.00000000 </span></span>
-<span><span class="co">#&gt;         LI         II </span></span>
-<span><span class="co">#&gt; 0.03105856 0.05986209</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">joint</span>, decreasing <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         IC         LC         IL         LL         II         LI         CC </span></span>
+<span><span class="co">#&gt; 0.45682305 0.21338194 0.15385932 0.08501504 0.05986209 0.03105856 0.00000000 </span></span>
+<span><span class="co">#&gt;         CL         CI </span></span>
+<span><span class="co">#&gt; 0.00000000 0.00000000</span></span></code></pre></div>
 <p>Aside: we do not recommend running <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>
 for data whose total genotype count (sum of per-episode multiplicities
 of infection) exceeds eight. That said, we have not imposed a hard limit
@@ -232,11 +231,11 @@ are summed over when <code>return.logp = TRUE</code>.</p>
 <span><span class="co">#&gt; =============================================================================|</span></span></code></pre></div>
 <p>We recover the same posterior as before</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">post</span><span class="op">$</span><span class="va">joint</span></span>
-<span><span class="co">#&gt;         CC         LC         IC         CL         LL         IL         CI </span></span>
-<span><span class="co">#&gt; 0.00000000 0.21338194 0.45682305 0.00000000 0.08501504 0.15385932 0.00000000 </span></span>
-<span><span class="co">#&gt;         LI         II </span></span>
-<span><span class="co">#&gt; 0.03105856 0.05986209</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">joint</span>, decreasing <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         IC         LC         IL         LL         II         LI         CC </span></span>
+<span><span class="co">#&gt; 0.45682305 0.21338194 0.15385932 0.08501504 0.05986209 0.03105856 0.00000000 </span></span>
+<span><span class="co">#&gt;         CL         CI </span></span>
+<span><span class="co">#&gt; 0.00000000 0.00000000</span></span></code></pre></div>
 <p>The log-likelihood of each relationship graph is also returned in the
 output. We plot the relationship graph(s) with the largest
 likelihood.</p>
