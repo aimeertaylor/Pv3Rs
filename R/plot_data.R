@@ -207,7 +207,7 @@ plot_data = function(ys,
   graphics::par(mfrow = c(1,1),
                 fig = c(0,1,legend.ylim[2]+0.01,1), # fig = c(x1, x2, y1, y2) (to leave room for the legend)
                 mar = mar) # mar = c(bottom, left, top, right)
-  figsize <- par("fin")
+  figsize <- graphics::par("fin")
   n_x <- nrow(marker_data_wide_factor)
   n_y <- ncol(marker_data_wide_factor)
   x_coords <- seq(1, 2*n_x-1, 2)/(2*n_x)
