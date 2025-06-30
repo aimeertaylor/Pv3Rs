@@ -24,16 +24,19 @@
 #'   a single row.
 #' @param p.labels Labels of the points \code{p.coords}. If labels are undesired,
 #'   set this to \code{NA}. The default is to use the row names of \code{p.coords}.
-#' @param pos Which side to plot the \code{p.labels}. Values of \code{1},
+#'
+#' @param p.labels.pos Which side to plot the \code{p.labels}. Values of \code{1},
 #' \code{2}, \code{3} and \code{4}, respectively indicate positions below, to
 #' the left of, above and to the right of the points. Can be either a single
 #' integer (default 3) or a vector of integers.
+#'
+#' @param ... Further graphical parameters passed to points.
 #'
 #' @examples
 #' # Plot 2D simplex
 #' plot_simplex(p.coords = diag(3),
 #'              p.labels = c("(1,0,0)", "(0,1,0)", "(0,0,1)"),
-#'              pos = c(1,3,3))
+#'              p.labels.pos = c(1,3,3))
 #'
 #' # ==============================================================================
 #' # Given data on an enrollment episode and a recurrence,
@@ -76,7 +79,8 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
                          plot.tri = T,
                          p.coords = NULL,
                          p.labels = rownames(p.coords),
-                         pos = 3) {
+                         p.labels.pos = 3,
+                         ...) {
 
   # Define some constants:
   h <- sqrt(3)/2 # Height of equilateral triangle with unit sides
@@ -151,8 +155,8 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
   if(is.vector(p.coords)) p.coords <- t(p.coords)
   # note that p.coords has one point per row, p_2Dcoords has one point per column
   xy <- apply(p.coords, 1, project2D)
-  points(x = xy["x",], y = xy["y",], pch = 20)
-  text(x = xy["x",], y = xy["y",], pos = pos, labels = p.labels)
+  graphics::points(x = xy["x",], y = xy["y",], ...)
+  graphics::text(x = xy["x",], y = xy["y",], pos = p.labels.pos, labels = p.labels)
 }
 
 

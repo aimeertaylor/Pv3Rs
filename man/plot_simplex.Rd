@@ -11,7 +11,8 @@ plot_simplex(
   plot.tri = T,
   p.coords = NULL,
   p.labels = rownames(p.coords),
-  pos = 3
+  p.labels.pos = 3,
+  ...
 )
 }
 \arguments{
@@ -36,10 +37,12 @@ a single row.}
 \item{p.labels}{Labels of the points \code{p.coords}. If labels are undesired,
 set this to \code{NA}. The default is to use the row names of \code{p.coords}.}
 
-\item{pos}{Which side to plot the \code{p.labels}. Values of \code{1},
+\item{p.labels.pos}{Which side to plot the \code{p.labels}. Values of \code{1},
 \code{2}, \code{3} and \code{4}, respectively indicate positions below, to
 the left of, above and to the right of the points. Can be either a single
 integer (default 3) or a vector of integers.}
+
+\item{...}{Further graphical parameters passed to points.}
 }
 \description{
 Plots a 2D simplex, a triangle with unit sides centered at the origin, onto
@@ -51,7 +54,7 @@ one) can be projected; see \code{\link[=project2D]{project2D()}} and examples be
 # Plot 2D simplex
 plot_simplex(p.coords = diag(3),
              p.labels = c("(1,0,0)", "(0,1,0)", "(0,0,1)"),
-             pos = c(1,3,3))
+             p.labels.pos = c(1,3,3))
 
 # ==============================================================================
 # Given data on an enrollment episode and a recurrence,
