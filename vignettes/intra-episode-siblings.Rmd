@@ -21,6 +21,8 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo = FALSE}
 library(Pv3Rs)
+# Access non-exported internal function
+recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs") 
 ```
 
 As the following example illustrates, Pv3Rs sums over graphs with cliques of

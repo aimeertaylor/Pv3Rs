@@ -19,7 +19,7 @@
 #' chrs_per_marker <- round(seq(0.51, n_chrs + 0.5, length.out = n_markers))
 #' recombine_parent_ids(chrs_per_marker)
 #'
-#' @export
+#' @noRd
 recombine_parent_ids <- function(chrs_per_marker) {
 
   if(!all(cummax(chrs_per_marker) == chrs_per_marker)) {
