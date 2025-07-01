@@ -4,7 +4,8 @@
 # Numerical results validate theoretical ones.
 ################################################################################
 rm(list = ls())
-
+source("enumerate_halfsib_alleles.R")
+source("locus_type_summary.R")
 attached <- search()
 if("output" %in% attached) detach(output)
 if(exists("output")) rm("output")

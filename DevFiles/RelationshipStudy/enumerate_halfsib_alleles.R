@@ -1,21 +1,20 @@
-#' List all allelic draws for three half siblings
-#'
-#' Given a specified number of alleles for a single marker,
-#' `generate_halfsib_alleles()` enumerates all the ways three half
-#' siblings can draw alleles from their respective parents by firstly
-#' enumerating all allelic combinations for the parents, and by secondly
-#' enumerating all the inheritable combinations for the children.
-#'
-#' @param n_alleles Positive whole number specifying a per-marker number of
-#'   alleles, otherwise known as marker cardinality.
-#'
-#' @returns A character matrix. Each column is an individual. Each row is a
-#'   possible allelic draw. Alleles are represented by the first `n_alleles`
-#'   letters of the latin alphabet.
-#' @examples
-#' enumerate_halfsib_alleles(3)
-#'
-#' @export
+# List all allelic draws for three half siblings
+#
+# Given a specified number of alleles for a single marker,
+# `generate_halfsib_alleles()` enumerates all the ways three half
+# siblings can draw alleles from their respective parents by firstly
+# enumerating all allelic combinations for the parents, and by secondly
+# enumerating all the inheritable combinations for the children.
+#
+# @param n_alleles Positive whole number specifying a per-marker number of
+#   alleles, otherwise known as marker cardinality.
+#
+# @returns A character matrix. Each column is an individual. Each row is a
+#   possible allelic draw. Alleles are represented by the first `n_alleles`
+#   letters of the latin alphabet.
+# @examples
+# enumerate_halfsib_alleles(3)
+
 enumerate_halfsib_alleles <- function(n_alleles){
 
 

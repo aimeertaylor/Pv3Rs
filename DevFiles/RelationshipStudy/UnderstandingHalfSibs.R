@@ -19,15 +19,14 @@
 rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack) # for rdirichlet
-set.seed(2) # for reproducibility
+set.seed(1) # for reproducibility
+source("enumerate_halfsib_alleles.R")
+source("locus_type_summary.R")
 
 # ==============================================================================
 # Yong See's example with three markers (one all different, one intra-match,
 # one inter-match) and bounds on odds (see half_siblings.tex for detail)
 # ==============================================================================
-library(Pv3Rs)
-library(MCMCpack) # for rdirichlet
-set.seed(1)
 
 p <- runif(1, min=0, max=0.1) # sample rare allele that suggests initial genotypes are siblings
 q <- runif(1, min=0, max=0.001) # sample very rare allele that suggests all genotypes are siblings
