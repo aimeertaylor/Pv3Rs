@@ -26,7 +26,7 @@
 #' RG <- sample_RG(c(2, 1, 2))
 #' enumerate_IPs_RG(RG)
 #'
-#' @export
+#' @noRd
 enumerate_IPs_RG <- function(RG, compat = TRUE) {
   # for each sibling cluster, `split_two` lists all ways for the cluster to
   # be split into 1 or 2 IBD cells

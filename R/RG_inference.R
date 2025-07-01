@@ -97,7 +97,7 @@ RG_inference <- function(MOIs, fs, alleles_per_m, progress.bar = TRUE) {
 
     IP_i <- 1
     for (IP in IPs_RG) {
-      IP_str <- hash.IP(IP, gs)
+      IP_str <- hash_IP(IP, gs)
       # p(y | IP) is sum of p(a | IP), where p(a | IP) is decomposed by marker
       for (m in ms) { # for each marker m
         IP.prob <- IP_lookups[[m]][[IP_str]] # look up p(a_m | IP) in hash table

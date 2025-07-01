@@ -203,12 +203,12 @@ compatible_rstrs <- function(RG, gs_per_ts) {
 #' gs <- paste0("g", 1:3)
 #' IP1 <- list(c("g1", "g3"), c("g2"))
 #' IP2 <- list(c("g2"), c("g3", "g1"))
-#' hash1 <- hash.IP(IP1, gs)
-#' hash2 <- hash.IP(IP2, gs)
+#' hash1 <- hash_IP(IP1, gs)
+#' hash2 <- hash_IP(IP2, gs)
 #' hash1 == hash2 # TRUE, even though the order is different
 #'
-#' @export
-hash.IP <- function(IP, gs) {
+#' @noRd
+hash_IP <- function(IP, gs) {
   ibd_vec <- stats::setNames(gs, gs)
   ibd_i <- 1
   # use of `order` on the 'min' genotype name of each IBD cell ensures that the
@@ -240,7 +240,7 @@ hash.IP <- function(IP, gs) {
 #' # or 2 genotypes in one vector and the last in one vector (3 possibilties)
 #' split_two(gs)
 #'
-#' @export
+#' @noRd
 split_two <- function(s) {
   n <- length(s)
   # special case of one genotype only
@@ -283,7 +283,7 @@ split_two <- function(s) {
 #'
 #' prep_data(y)
 #'
-#' @export
+#' @noRd
 prep_data <- function(y) {
   warned_rep <- F
   warned_na <- F
@@ -327,6 +327,7 @@ prep_data <- function(y) {
 #'
 #' @author Mans Magnusson (MansMeg @ github)
 #' @importFrom methods new
+#' @noRd
 msg_progress_bar <-
   methods::setRefClass(
     Class = "msg_progress_bar",
@@ -368,4 +369,3 @@ msg_progress_bar <-
       }
     )
   )
-

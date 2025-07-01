@@ -20,7 +20,7 @@ enumerate_halfsib_alleles <- function(n_alleles){
 
 
   # Check positive integer
-  if(!(n_alleles > 0 & is.wholenumber(n_alleles))) {
+  if(!(n_alleles > 0 & is_wholenumber(n_alleles))) {
     stop ("n_alleles should be a positive wholenumber")
   }
 

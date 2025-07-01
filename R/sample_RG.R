@@ -23,7 +23,7 @@
 #' @export
 sample_RG <- function(MOIs, igraph = T) {
   # Check MOIs are positive whole numbers
-  if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
+  if (!all(is_wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
   if(sum(MOIs) > 10) warning(
     "Total MOI > 10 may lead to high memory use", immediate=T

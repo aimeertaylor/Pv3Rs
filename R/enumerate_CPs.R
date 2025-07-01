@@ -16,9 +16,9 @@
 #' @examples
 #' enumerate_CPs(c(2, 2))
 #'
-#' @export
+#' @noRd
 enumerate_CPs <- function(MOIs) {
-  if (!all(is.wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
+  if (!all(is_wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 
   infection_count <- length(MOIs) # Number of time points
   gs_count <- sum(MOIs) # Number of genotypes
