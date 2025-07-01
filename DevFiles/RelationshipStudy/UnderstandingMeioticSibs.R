@@ -10,6 +10,7 @@
 rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack)
+recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs")
 max_n_markers <- 150
 all_markers <- paste0("m", 1:max_n_markers)
 n_alleles <- 5

@@ -2,9 +2,10 @@
 # Made up example, based on modification of Figure 1 of the 2022 medRxiv preprint
 # ==============================================================================
 rm(list = ls())
-# library(Pv3Rs)
-# library(MCMCpack) # For rdirichlet
-# library(tictoc) # For timing
+library(Pv3Rs)
+library(MCMCpack) # For rdirichlet
+library(tictoc) # For timing
+recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs")
 
 # Magic numbers / quantities
 set.seed(5) # For reproducibility

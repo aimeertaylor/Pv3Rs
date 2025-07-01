@@ -29,6 +29,7 @@
 rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack) # For rdirichlet
+recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs")
 
 #===============================================================================
 # Magic numbers / quantities
