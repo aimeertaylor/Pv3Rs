@@ -15,23 +15,24 @@ compute_posterior(
 )
 }
 \arguments{
-\item{y}{Observed data in the form of a list of lists. The outer list is a
-list of episodes in increasing chronological order. The inner list is a list of named
-markers per episode. Episode names can be specified, but they are not used.
-Markers must be named. Each episode must list the same markers. If not all
-markers are typed per episode, data on untyped markers can be encoded as
-missing (see below). For each marker, one must specify an allelic vector: a
-set of distinct alleles detected at that marker. \code{NA}s encode missing
-per-marker data, i.e., when no alleles are observed for a given marker.
-\code{NA} entries in allelic vectors that contain both \code{NA} and
-non-\code{NA} entries are ignored. Allele names are arbitrary, but must
-correspond with frequency names (see examples below). The same names can be
-used for alleles belonging to different markers. As such, frequencies must
-be specified per named allele per named marker.}
+\item{y}{Allelic data in the form of a list of lists; see examples below. The
+outer list is a list of episodes in increasing chronological order. The
+inner list is a list of named markers per episode. Episode names can be
+specified, but they are not used. Markers must be named. Each episode must
+list the same markers. If not all markers are typed per episode, data on
+untyped markers can be encoded as missing (see below). For each marker, one
+must specify an allelic vector: a set of distinct alleles detected at that
+marker. \code{NA}s encode missing per-marker data, i.e., when no alleles
+are observed for a given marker. \code{NA} entries in allelic vectors that
+contain both \code{NA} and non-\code{NA} entries are ignored. Allele names
+are arbitrary, but must correspond with frequency names. The same names can
+be used for alleles belonging to different markers. As such, frequencies
+must be specified per named allele per named marker.}
 
-\item{fs}{List of per-marker allele frequency vectors. Names of the list must match
-with the marker names in \code{y}. Within lists (i.e., for each marker),
-frequencies must be specified per allele name.}
+\item{fs}{List of per-marker allele frequency vectors. Names of the list must
+match with the marker names in \code{y}. Within lists (i.e., for each marker),
+one frequency must be specified per allele name. Per-marker frequencies
+must sum to one.}
 
 \item{prior}{Matrix of prior probabilities of the recurrence states for each
 recurrent episode. Each row corresponds to an episode in increasing
@@ -40,7 +41,7 @@ recrudescence, relapse and reinfection respectively. Row names can be
 specified but they are not used. If \code{prior} is NULL (default), per-episode
 recurrence states are equally likely.}
 
-\item{MOIs}{Multiplicity of infection for each episode. If MOIs are not
+\item{MOIs}{Multiplicity of infection (MOI) for each episode. If MOIs are not
 provided, the most parsimonious MOIs compatible with the data will be used;
 see \code{\link{determine_MOIs}}.}
 
@@ -53,10 +54,11 @@ relationship graph.}
 relationship graph, defaults to \code{FALSE}. When setting \code{return.logp} to
 \code{TRUE}, \code{return.RG} should also be set to \code{TRUE}. Setting \code{return.logp} to
 \code{FALSE} allows for permutation symmetries to be exploited to save
-computational time, see \code{\link{enumerate_alleles}}. Setting this to
-\code{TRUE} will result in longer runtimes, especially when multiplicities of
-infection are large. Note that this argument does not affect the output of
-the posterior probabilities.}
+computational time, see the maximum-likelihood relationship graphs example
+in \code{vignette("demonstrate-usage")}. Setting this to \code{TRUE} will result in
+longer runtimes, especially when multiplicities of infection are large.
+Note that this argument does not affect the output of the posterior
+probabilities.}
 
 \item{progress.bar}{Boolean for printing progress bars. When \code{TRUE}
 (default), the progress bar is printed to the screen. Please note that the
@@ -102,17 +104,17 @@ sums over
 vector to be a set of distinct alleles. Allele repeats at markers with
 observed data, and \code{NA} repeats at markers with missing data, are
 removed in a data pre-processing step. \code{NA}s in allelic vectors that
-also contain non-\code{NA} values are removed in a data pre-processing step.
+also contain non-\code{NA} values are also removed in the data pre-processing
+step.
 
 We enumerate all possible relationship graphs between haploid genotypes,
 where pairs of genotypes can either be clones, siblings, or strangers. The
 likelihood of a sequence of recurrence states can be determined from the
 likelihood of all relationship graphs compatible with said sequence. More
-details on the enumeration and likelihood calculation of relationship graphs
-can be found in \code{\link{enumerate_RGs}} and \code{\link{RG_inference}}
-respectively. For each relationship graph, the model sums over all possible
-identity-by-descent partitions. Because some relationship graphs are
-compatible with more identity-by-descent partitions than others, the log
+details on the enumeration of relationship graphs can be found in
+\code{\link{enumerate_RGs}}. For each relationship graph, the model sums over
+all possible identity-by-descent partitions. Because some relationship graphs
+are compatible with more identity-by-descent partitions than others, the log
 p(Y|RG) progress bar does not necessarily increment uniformly.
 
 Notable model assumptions and limitations:
@@ -152,9 +154,9 @@ compute_posterior(y, fs, progress.bar = FALSE)
 # Example where alleles are named arbitrarily and probabilities are plotted
 # ===========================================================================
 # Data
-y <- list(episode0 = list(marker1 = c("Tinky Winky", "Dipsy"),
+y <- list(enrolment = list(marker1 = c("Tinky Winky", "Dipsy"),
                           marker2 = c("Tinky Winky", "Laa-Laa", "Po")),
-          episode1 = list(marker1 = "Tinky Winky",
+          recurrence = list(marker1 = "Tinky Winky",
                           marker2 = "Laa-Laa"))
 
 # Allele frequencies
@@ -164,10 +166,8 @@ fs <- list(marker1 = c("Tinky Winky" = 0.4, "Dipsy" = 0.6),
 # Compute posterior probabilities using default prior
 posterior_probs <- compute_posterior(y, fs, progress.bar = FALSE)
 
-# Plot posterior probabilities on the simplex
-plot_simplex(c("Recrudescence", "Relapse", "Reinfection"), 0.5) # Simplex
-xy <- project2D(posterior_probs$marg[1,]) # Project probabilities
-points(x = xy["x"], y = xy["y"], pch = 20) # Plot projected probabilities
+# Plot posterior on the simplex
+plot_simplex(p.coords = posterior_probs$marg)
 
 
 #============================================================================
@@ -253,13 +253,12 @@ f_A <- 0.1; fs <- list(m1 = c("A" = f_A, "Other" = 1-f_A))
 results <- lapply(ys, function(y) compute_posterior(y, fs, progress.bar = FALSE)$marg)
 
 # Extract results for the first recurrence
-results_recur1 <- sapply(results, function(result) result[1,])
+results_recur1 <- t(sapply(results, function(result) result[1,]))
 results_recur1 # Results are different for different scenarios
 
 # Visualise the change in the marginal probability of the first recurrence
-plot_simplex(c("Recrudescence", "Relapse", "Reinfection")) # Plot simplex
-xy <- apply(results_recur1, 2, project2D) # Project probabilities
-points(x = xy["x", ], y = xy["y", ], pch = "-", col = 1:4) # Plot projections
+plot_simplex(p.coords = results_recur1, p.labels = rep(NA, 4),
+             col = 1:4, pch = "-") # Plot simplex
 legend("left", col = 1:4, pch = "-", pt.cex = 2, bty = "n", legend = 1:4,
 title = "Recurrence \n count") # legend
 

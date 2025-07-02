@@ -24,7 +24,7 @@ MOIs <- determine_MOIs(y)
 ts_per_gs <- rep(1:length(y), MOIs)
 gs_per_ts <- split(paste0("g", 1:sum(MOIs)), rep(1:length(MOIs), MOIs))
 
-rstrs_list <- lapply(post$RGs, compatible_rstrs, gs_per_ts)
+rstrs_list <- lapply(post$RGs, Pv3Rs:::compatible_rstrs, gs_per_ts)
 n_RGs <- length(post$RGs)
 
 

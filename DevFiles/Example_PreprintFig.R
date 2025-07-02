@@ -5,7 +5,6 @@ rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack) # For rdirichlet
 library(tictoc) # For timing
-recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs")
 
 # Magic numbers / quantities
 set.seed(5) # For reproducibility
@@ -37,7 +36,7 @@ parents <- strangers[, 1:2]
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = n_markers))
 
 # Sample parental allocations dependently (generates meiotic siblings)
-cs <- recombine_parent_ids(chrs_per_marker)
+cs <- Pv3Rs:::recombine_parent_ids(chrs_per_marker)
 
 # Construct children from parental allocations
 children <- sapply(1:n_markers, function(i) {
@@ -94,7 +93,7 @@ gs <- paste0("g", 1:sum(MOIs))
 ts_per_gs <- rep(1:length(MOIs), MOIs)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0, vertex.size=20, vertex_palette = "Blues")
-seqs_comp_MLE_RG <- compatible_rstrs(RG, split(gs, ts_per_gs))
+seqs_comp_MLE_RG <- Pv3Rs:::compatible_rstrs(RG, split(gs, ts_per_gs))
 
 y <- list(list(m1 = c("A", "B")), list(m1 = "A"))
 fs <- list(m1 = c("A" = 0.9, "B" = 0.1))

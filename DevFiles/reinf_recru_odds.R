@@ -17,7 +17,7 @@ list.compat <- function(MOI1, MOI2) {
   MOIs <- c(MOI1, MOI2)
   RGs <- suppressMessages(enumerate_RGs(MOIs=MOIs))
   gs_per_ts <- split(paste0("g", 1:sum(MOIs)), rep(1:length(MOIs), MOIs))
-  compat <- lapply(RGs, compatible_rstrs,  gs_per_ts)
+  compat <- lapply(RGs, Pv3Rs:::compatible_rstrs,  gs_per_ts)
   return(list(C=sapply(compat, function(rs) "C" %in% rs),
               L=sapply(compat, function(rs) "L" %in% rs),
               I=sapply(compat, function(rs) "I" %in% rs)))

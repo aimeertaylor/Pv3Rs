@@ -27,7 +27,7 @@ logps <- sapply(res$RGs, function(RG) RG$logp)
 # there may be multiple RGs with max logp
 RG_modes <- res$RGs[which(near(logps, max(logps)))]
 for(RG_mode in RG_modes) {
-  print(compatible_rstrs(RG_mode, gs_per_ts)) # not compatible with I
+  print(Pv3Rs:::compatible_rstrs(RG_mode, gs_per_ts)) # not compatible with I
   par(mar = rep(0.1,4))
   plot_RG(RG_to_igraph(RG_mode, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
 }
@@ -41,7 +41,7 @@ logps <- sapply(res$RGs, function(RG) RG$logp)
 # there may be multiple RGs with max logp
 RG_modes <- res$RGs[which(near(logps, max(logps)))]
 for(RG_mode in RG_modes) {
-  print(compatible_rstrs(RG_mode, gs_per_ts)) # some are not compatible with C
+  print(Pv3Rs:::compatible_rstrs(RG_mode, gs_per_ts)) # some are not compatible with C
   par(mar = rep(0.1,4))
   plot_RG(RG_to_igraph(RG_mode, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
 }
@@ -65,6 +65,6 @@ for(s in 1:50) {
   logps <- sapply(res$RGs, function(RG) RG$logp)
   # there may be multiple RGs with max logp
   RG_modes <- res$RGs[which(near(logps, max(logps)))]
-  is_compat <- function(RG_mode) post_r %in% compatible_rstrs(RG_mode, gs_per_ts)
+  is_compat <- function(RG_mode) post_r %in% Pv3Rs:::compatible_rstrs(RG_mode, gs_per_ts)
   if(!any(sapply(RG_modes, is_compat))) print(s)
 }

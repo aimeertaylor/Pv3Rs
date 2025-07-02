@@ -20,7 +20,7 @@ ts_per_gs <- rep(ts, MOIs) # episode index of each genotype
 gs_per_ts <- split(gs, ts_per_gs) # genotypes grouped by episode
 
 result <- compute_posterior(y, fs, MOIs = MOIs, return.RG = TRUE, return.logp = TRUE)
-CIL_gvn_RGs <- sapply(result$RGs, compatible_rstrs, gs_per_ts) # compatible states
+CIL_gvn_RGs <- sapply(result$RGs, Pv3Rs:::compatible_rstrs, gs_per_ts) # compatible states
 CC_CI_CL_log <- t(sapply(CIL_gvn_RGs, function(x) c("CC", "CI", "CL") %in% x))
 RGlogps <- sapply(result$RGs, function(x) x$logp)
 unique(RGlogps)

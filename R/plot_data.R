@@ -256,8 +256,8 @@ plot_data = function(ys,
   graphics::mtext(text = pids, side = 1, at = ID_midpoints, cex = cex.min,
                   las = ifelse(patient.vert, 3, 1), line = ifelse(patient.vert, 0.2, 0))
   xlabel <- ifelse(n_patients > 1,
-                   sprintf("%s episodes in %s people (one column per episode, grouped by person)", n_episodes, n_patients),
-                   sprintf("%s episodes in 1 person (one column per episode)", n_episodes))
+                   sprintf("%s episodes in %s people (one column per episode, grouped by person; for each person, episodes are ordered chronologically from left to right)", n_episodes, n_patients),
+                   sprintf("%s episodes in 1 person (one column per episode, ordered chronologically from left to right)", n_episodes))
   graphics::mtext(text = xlabel, line = x.line, cex = cex.maj)
   graphics::title(ylab = 'Marker (number of distinct alleles)',
                   line = y.line, cex.lab = cex.maj)

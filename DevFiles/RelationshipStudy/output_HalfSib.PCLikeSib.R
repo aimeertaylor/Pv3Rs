@@ -29,7 +29,6 @@
 rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack) # For rdirichlet
-recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs")
 
 #===============================================================================
 # Magic numbers / quantities
@@ -119,7 +118,7 @@ for(case in cases) {
           while (children_clones) {
 
             # Sample parental allocations for a single recombinant
-            cs <- recombine_parent_ids(chrs_per_marker)[,1]
+            cs <- Pv3Rs:::recombine_parent_ids(chrs_per_marker)[,1]
             names(cs) <- all_markers
 
             # Create recombinant
@@ -155,7 +154,7 @@ for(case in cases) {
           parents23 <- cbind(parent2, parent3)
 
           # Sample parental allocations independently
-          cs <- sapply(1:3, function(i) recombine_parent_ids(chrs_per_marker)[,1])
+          cs <- sapply(1:3, function(i) Pv3Rs:::recombine_parent_ids(chrs_per_marker)[,1])
           rownames(cs) <- all_markers
 
           # Construct children genotypes from parental allocations

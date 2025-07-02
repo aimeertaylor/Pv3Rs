@@ -3,10 +3,10 @@
 #' The likelihood of a relationship graph (RG) can be decomposed over markers,
 #' as we assume that marker data is conditionally independent across markers
 #' given the RG. The likelihood of a RG for one marker is then found by
-#' integrating over all possible IBD (identity-by-descent) partitions that are
-#' consistent with the RG. The probability distribution of these IBD partitions
-#' are always uniform. Since different RGs may use the same IBD, the likelihood
-#' of IPs for each marker are stored in hash tables for improved computational
+#' integrating over all possible IBD (identity-by-descent) partitions (IPs) that
+#' are consistent with the RG. The probability distribution of these IPs are
+#' always uniform. Since different RGs may use the same IP, the likelihood of
+#' IPs for each marker are stored in hash tables for improved computational
 #' efficiency.
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
@@ -37,7 +37,7 @@
 #' alleles_per_m <- list(m1 = al_df1, m2 = al_df2)
 #' RGs <- RG_inference(MOIs, fs, alleles_per_m)
 #'
-#' @export
+#' @noRd
 RG_inference <- function(MOIs, fs, alleles_per_m, progress.bar = TRUE) {
   # check that allele assignments are given as data frames
   for (al.df in alleles_per_m) stopifnot(class(al.df)[1] == "data.frame")

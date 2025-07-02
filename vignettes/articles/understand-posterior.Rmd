@@ -81,7 +81,7 @@ get_graph_dist <- function(x) {
   ts_per_gs <- rep(ts, x) # episode index of each genotype
   gs_per_ts <- split(gs, ts_per_gs) # genotypes grouped by episode
   RGs <- suppressMessages(enumerate_RGs(x)) # all relationship graphs
-  CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts) # compatible states
+  CIL_gvn_RGs <- sapply(RGs, Pv3Rs:::compatible_rstrs, gs_per_ts) # compatible states
   return(list(gs = gs, RGs = RGs, CIL_gvn_RGs = CIL_gvn_RGs))
 }
 ```

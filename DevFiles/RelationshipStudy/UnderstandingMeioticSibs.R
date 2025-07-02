@@ -10,7 +10,6 @@
 rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack)
-recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs")
 max_n_markers <- 150
 all_markers <- paste0("m", 1:max_n_markers)
 n_alleles <- 5
@@ -22,8 +21,8 @@ parent1 <- sapply(all_markers, function(i) sample(alleles, size = 1, prob = fs[[
 parent2 <- sapply(all_markers, function(i) sample(alleles, size = 1, prob = fs[[i]]))
 parents <- cbind(parent1, parent2)
 chrs_per_marker <- round(seq(0.51, 14.5, length.out = max_n_markers))
-cs_meiotic <- recombine_parent_ids(chrs_per_marker)
-cs_full <- sapply(1:4, function(i) recombine_parent_ids(chrs_per_marker)[,1])
+cs_meiotic <- Pv3Rs:::recombine_parent_ids(chrs_per_marker)
+cs_full <- sapply(1:4, function(i) Pv3Rs:::recombine_parent_ids(chrs_per_marker)[,1])
 
 # Construct children genotypes from parental allocations
 children_meiotic <- sapply(1:max_n_markers, function(i) {

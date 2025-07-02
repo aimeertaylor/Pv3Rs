@@ -2,6 +2,7 @@
 # Script to generate maximum probabilities for MOI vectors summing to at-most
 # eight assuming recurrence states are equally likely a priori. Run time ~ 20 min
 ################################################################################
+library(Pv3Rs)
 rm(list = ls())
 
 # Generate all MOI combinations given a single recurrence
@@ -40,7 +41,7 @@ maxima <- sapply(all_MOIs, function(MOIs){
   intra_edges <- igraph::as_ids(igraph::E(graph))
 
   RGs <- enumerate_RGs(MOIs) # Get graphs
-  CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts) # compatible states
+  CIL_gvn_RGs <- sapply(RGs, Pv3Rs:::compatible_rstrs, gs_per_ts) # compatible states
   states <- unique(unlist(CIL_gvn_RGs))
   states_C_1st <- states[do.call(rbind, strsplit(states, split = ""))[,1] == "C"]
   states_I_1st <- states[do.call(rbind, strsplit(states, split = ""))[,1] == "I"]

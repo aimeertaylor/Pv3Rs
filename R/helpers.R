@@ -68,7 +68,7 @@ determine_MOIs <- function(y, return.names = FALSE) {
 #' # 1 assignment for m2 (accounting for permutation symmetry)
 #' # 1 assignment for m3 (CCC)
 #'
-#' @export
+#' @noRd
 enumerate_alleles <- function(y.inf, gs.inf, use.sym = TRUE) {
   # edge case: only one genotype
   if (length(gs.inf) == 1) {
@@ -146,7 +146,7 @@ enumerate_alleles <- function(y.inf, gs.inf, use.sym = TRUE) {
 #' plot_RG(RG, edge.curved = 0.2)
 #' compatible_rstrs(RG, gs_per_ts) # "LL" "IL" "LC" "IC"
 #'
-#' @export
+#' @noRd
 compatible_rstrs <- function(RG, gs_per_ts) {
   infection_count <- length(gs_per_ts)
   n_recur <- infection_count - 1

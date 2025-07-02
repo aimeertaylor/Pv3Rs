@@ -10,7 +10,6 @@
 rm(list = ls())
 library(Pv3Rs)
 library(MCMCpack) # For rdirichlet
-recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs")
 
 #===============================================================================
 # Magic numbers / quantities
@@ -89,11 +88,11 @@ for(case in cases){
         # Sample parental allocations
         if(case == "Regular_sibling") {
           # independently for fourth child
-          cs <- cbind(recombine_parent_ids(chrs_per_marker)[,1:3],
-                      recombine_parent_ids(chrs_per_marker)[,1]) # Regular sibling
+          cs <- cbind(Pv3Rs::recombine_parent_ids(chrs_per_marker)[,1:3],
+                      Pv3Rs::recombine_parent_ids(chrs_per_marker)[,1]) # Regular sibling
         } else {
           # Sample parental allocations dependently
-          cs <- recombine_parent_ids(chrs_per_marker)
+          cs <- Pv3Rs::recombine_parent_ids(chrs_per_marker)
         }
 
         # Construct children from parental allocations

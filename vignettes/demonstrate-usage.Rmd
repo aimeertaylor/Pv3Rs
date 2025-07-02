@@ -25,14 +25,14 @@ In this vignette we demonstrate the basic `Pv3Rs` work flow for a single study
 participant; i.e.,
 
 1) Plot data
-2) Estimate recurrence state probabilities 
-3) Plot probability estimates
+2) Compute recurrence state posterior probabilities 
+3) Plot per-recurrence probabilities 
 
-And we show how one might explore relationship graphs and their log likelihoods.
-In one or more upcoming scientific publications, we plan to publish a more
-elaborate study-level `Pv3Rs` tutorial including examples of
+We also show how one might like to explore relationship graphs and their log
+likelihoods. In one or more upcoming scientific publications, we plan to publish
+a more elaborate study-level `Pv3Rs` tutorial including examples of
 
-- how to generate estimates pairwise when the total genotype count over multiple recurrences exceeds eight
+- how to generate pairwise probabilities when the total genotype count over multiple recurrences exceeds eight
 - how to compute false discovery rates 
 - how to do a sensitivity analysis for genotyping errors
 - how to do a sensitivity analysis for sibling misspecification
@@ -46,7 +46,7 @@ We first look at a synthetic example of three episodes (episode names are option
 three markers (marker names are obligatory) whose alleles have known frequencies.
 
 ```{r}
-y <- list("Enrollment" = list(m1 = c('b','c','d'), 
+y <- list("Enrolment" = list(m1 = c('b','c','d'), 
                               m2 = c('a','b'),
                               m3 = c('b','c','d')),
           "Recurrence 1" = list(m1 = c('b','d'), 
@@ -77,16 +77,18 @@ s.t. rare alleles have relatively small legend areas (e.g., `d` at `m2` is rare)
 **Aside** Given the maximum number of alleles observed per-episode, the most parsimonious
 explanation is that there are `r determine_MOIs(y)` distinct parasite genotypes
 in the three episodes respectively (a genotype is here defined as a realisation
-of the haploid parasite genome representing a group of clonal parasites). In
-this synthetic example, markers are quart-allelic for brevity; this imposes a
-rather low upper bound on MOI estimates based on maximum per-marker allele
-counts. In reality, more diverse markers are recommended for recurrence state
-inference. If better MOI estimates were available based on more diverse markers,
-the data from those more diverse markers could be added to the data input `y` of
-`compute_posterior()`. If better MOI estimates based on heteroallelic marker
-counts across many markers were available, they could be used in recurrence state
-inference by specifying the `MOI` argument in the function
-`compute_posterior()`.
+of the haploid parasite genome; i.e., a DNA sequence representing a group of
+clonal parasites). In this synthetic example, markers are quart-allelic for
+brevity; this imposes a rather low upper bound on MOI estimates based on maximum
+per-marker allele counts. In reality, more diverse markers are recommended for
+recurrence state inference. If better MOI estimates were available based on more
+diverse markers, the data from those more diverse markers could be added to the
+data input `y` of `compute_posterior()`. If better MOI estimates based on
+heteroallelic marker counts across many markers were available, they could be
+used in recurrence state inference by specifying the `MOI` argument in the
+function `compute_posterior()`. Because the Pv3Rs model does not account for
+genotyping errors, including false positive alleles, user-specified MOIs must be
+greater than or equal to those based on maximum per-marker allele counts.
 
 When performing genetic recurrence state inference, the bulk of the computational
 time lies in computing log-likelihoods of graphs of relationships between
@@ -98,21 +100,21 @@ post <- compute_posterior(y, fs)
 
 In the call to `compute_posterior()` above we did not specify a prior, and so a
 uniform prior across all three recurrence states per recurrence is assumed by
-default. Marginal posterior probabilities (probabilities of recrudescence `C`,
+default. Marginal per-recurrence posterior probabilities (probabilities of recrudescence `C`,
 relapse `L`, and reinfection `I` for each recurrence) are stored in `post$marg`.
 
 ```{r}
 post$marg
 ```
 
-Marginal posterior probabilities can be plotted on the simplex using the
+Per-recurrence posterior probabilities can be plotted on the simplex using the
 function `plot_simplex()`.
 
 ```{r}
 # Plot simplex
 par(mar = rep(0.1,4))
-p.coords <- rbind(post$marg, prior = rep(1/3, 3))
-plot_simplex(p.coords = p.coords)
+p.coords <- rbind(post$marg, Prior = rep(1/3, 3))
+plot_simplex(p.coords = p.coords, pch = 20)
 ```
 
 The point in the yellow region is most likely a recrudescence with posterior
@@ -131,29 +133,30 @@ sort(post$joint, decreasing = T)
 ```
 
 Aside: we do not recommend running `compute_posterior()` for data whose total
-genotype count (sum of per-episode multiplicities of infection) exceeds eight.
-That said, we have not imposed a hard limit on the code. It is possible, but
-very long, to generate estimates using data with a total genotype count up to 10
-(see code below, which we time out after 2 seconds); above 10 genotypes, calls to
+genotype count (sum of per-episode MOIs) exceeds eight. That said, we have not
+imposed a hard limit on the code. In our experience, it is possible, but very
+long, to generate estimates using data with a total genotype count up to 10 (see
+code below, which we time out after 2 seconds); above 10 genotypes, calls to
 `compute_posterior()` are liable cause memory-use problems and fail.
 
-## Exploration of relationship graphs and their log likelihoods
+## Exploration of relationship graphs 
 
 If we want to explore relationship graphs and their log likelihoods we need to
 set both `return.RG` and `return.logp` to `TRUE` when computing the posterior;
-they are `FALSE` by default (see below).
+they are `FALSE` by default.
 
 To compute the posterior, summations over per-marker allelic assignments that
 are equivalent up to within-episode genotype permutations are redundant. As
 such, by default, `compute_posterior()` does not sum over them, conserving both
-memory and compute time; see `enumerate_alleles()`. The exploitation of
-permutation symmetry requires a scheme to choose a single representative among
-permutations that are otherwise equivalent. When user-specified MOIs are greater
-than those based on per-marker allele counts, `compute_posterior()` sums over
-all permutations because the scheme is too complicated. Likewise, to compute
+memory and compute time. The exploitation of permutation symmetry requires a
+scheme to choose a single representative among permutations that are otherwise
+equivalent. When user-specified MOIs are greater than those based on per-marker
+allele counts, `compute_posterior()` sums over all permutations because the
+representative-choosing scheme is too complicated. Likewise, to compute
 meaningful graph likelihood values (i.e., values that are not dependent on the
-aforementioned representative-choosing scheme), all permutations are summed over
-when `return.logp = TRUE`.
+representative-choosing scheme), all permutations are summed over when
+`return.logp = TRUE`. This increases compute time, especially when MOIs are
+large.
  
 
 ```{r, cache=TRUE}
@@ -171,19 +174,16 @@ We plot the relationship graph(s) with the largest likelihood.
 
 ```{r}
 # Extract all log likelihoods
-lliks <- sapply(post$RGs, function(RG) RG$logp)
+llikes <- sapply(post$RGs, function(RG) RG$logp)
 
 # Extract the relationship graphs (RGs) with the largest log likelihood
-RGs <- post$RGs[which(abs(lliks - max(lliks)) < .Machine$double.eps^0.5)]
+RGs <- post$RGs[which(abs(llikes - max(llikes)) < .Machine$double.eps^0.5)]
 
 # Generate genotype names 
 gs <- paste0("g", 1:6) 
 
 # Generate episode indices for genotypes
 ts_per_gs <- rep(1:length(y), determine_MOIs(y)) 
-
-# The sequences of states compatible with RGs
-seqs_comp <- sapply(RGs, compatible_rstrs, gs_per_ts = split(gs, ts_per_gs))
 
 # Plot RG
 par(mar = rep(0.1,4), mfrow = c(1,2))
@@ -192,11 +192,11 @@ for(i in 1:length(RGs)) {
   box()
 }
 
-# Generate infection colours in order to add a legend
-infection_colours <- RColorBrewer::brewer.pal(n = 8, "Set2") 
+# Generate episode colours in order to add a legend
+episode_colours <- RColorBrewer::brewer.pal(n = 8, "Set2") 
 
 # Add a legend
-legend("bottomright", pch = 21, pt.bg = infection_colours[unique(ts_per_gs)], 
+legend("bottomright", pch = 21, pt.bg = episode_colours[unique(ts_per_gs)], 
        bty = "n", legend = names(y), title = "Episode")
 ```
 
@@ -205,9 +205,11 @@ up to within-episode genotype permutations. The user should note that, as in the
 current example, the relationship graph(s) with the largest likelihood (e.g.,
 those above) might not be in the equivalence class for which the data are most
 probable when all relationship graphs in that class are summed over (e.g., those
-below). In the following code, we place two graphs in the same equivalence class 
-if they share the same likelihood. This is not ideal, as two graphs that are not 
-isomorphic up to permutation can share the same likelihood.
+below). In the following code, we place two graphs in the same equivalence class
+if they share the same likelihood. This is not ideal, because two graphs that
+are not isomorphic up to permutation could share the same likelihood; but for a
+small number of graphs, plots can be used to check there are no non-isomorphic
+graphs among those placed in the same equivalence class.
 
 The user should also note that, 
 
@@ -225,23 +227,23 @@ that are incompatible with `r names(which.max(post$joint))`).
 the possibility that both are true without further exploration -->
 
 ```{r}
-sorted_lliks <- sort(lliks, decreasing = T) # Sort log likelihoods
-adj_equal <- abs(diff(sorted_lliks, lag = 1)) < .Machine$double.eps^0.5 # Find matches
+sorted_llikes <- sort(llikes, decreasing = T) # Sort log likelihoods
+adj_equal <- abs(diff(sorted_llikes, lag = 1)) < .Machine$double.eps^0.5 # Find matches
 decr_idxs <- which(adj_equal == FALSE) # Change points: 2, 8, 14, 20, 32, ...
 class_sizes <- c(decr_idxs[1], diff(decr_idxs)) # Number of graphs per class
 
 # log likelihood of representative from each 'equivalence class' (EC)
-lliks_unique <- sorted_lliks[decr_idxs]
+llikes_unique <- sorted_llikes[decr_idxs]
 
 # EC likelihood
-class_ps <- exp(lliks_unique)*class_sizes
+class_ps <- exp(llikes_unique)*class_sizes
 max_class_p <- which(class_ps == max(class_ps)) # ML EC index 
 max_idx <- decr_idxs[max_class_p] # Index of last graph in ML EC
 max_size <- class_sizes[max_class_p] # Number of graphs in ML EC
 
 # Plot all graphs within the ML EC 
 par(mar = rep(0.1,4), mfrow = c(3,4))
-RG_order <- order(lliks, decreasing = T) # order RGs by logl
+RG_order <- order(llikes, decreasing = T) # order RGs by logl
 for(i in (max_idx-max_size+1):max_idx) { # EC consists of the RGs with logl rank 21-32
   RG <- post$RGs[[RG_order[i]]]
   RG_igraph <- RG_to_igraph(RG, gs, ts_per_gs)

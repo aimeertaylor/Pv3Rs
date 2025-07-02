@@ -15,7 +15,7 @@ counts <- sapply(n_recur, function(k){
   ts_per_gs <- rep(ts, MOIs) # episode index of each genotype
   gs_per_ts <- split(gs, ts_per_gs) # genotypes grouped by episode
   RGs <- enumerate_RGs(MOIs, igraph = F) # Get graphs
-  CIL_gvn_RGs <- sapply(RGs, compatible_rstrs, gs_per_ts) # compatible states
+  CIL_gvn_RGs <- sapply(RGs, Pv3Rs:::compatible_rstrs, gs_per_ts) # compatible states
 
   # C / I compatibility with first recur (g1 to g2 edge clone / stranger)
   if (all(ts < 3)) {
