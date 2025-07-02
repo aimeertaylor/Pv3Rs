@@ -77,25 +77,26 @@ details below); it may seem stuck when the code is still running.</p>
 
 
 <dl><dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
-<dd><p>Observed data in the form of a list of lists. The outer list is a
-list of episodes in increasing chronological order. The inner list is a list of named
-markers per episode. Episode names can be specified, but they are not used.
-Markers must be named. Each episode must list the same markers. If not all
-markers are typed per episode, data on untyped markers can be encoded as
-missing (see below). For each marker, one must specify an allelic vector: a
-set of distinct alleles detected at that marker. <code>NA</code>s encode missing
-per-marker data, i.e., when no alleles are observed for a given marker.
-<code>NA</code> entries in allelic vectors that contain both <code>NA</code> and
-non-<code>NA</code> entries are ignored. Allele names are arbitrary, but must
-correspond with frequency names (see examples below). The same names can be
-used for alleles belonging to different markers. As such, frequencies must
-be specified per named allele per named marker.</p></dd>
+<dd><p>Allelic data in the form of a list of lists; see examples below. The
+outer list is a list of episodes in increasing chronological order. The
+inner list is a list of named markers per episode. Episode names can be
+specified, but they are not used. Markers must be named. Each episode must
+list the same markers. If not all markers are typed per episode, data on
+untyped markers can be encoded as missing (see below). For each marker, one
+must specify an allelic vector: a set of distinct alleles detected at that
+marker. <code>NA</code>s encode missing per-marker data, i.e., when no alleles
+are observed for a given marker. <code>NA</code> entries in allelic vectors that
+contain both <code>NA</code> and non-<code>NA</code> entries are ignored. Allele names
+are arbitrary, but must correspond with frequency names. The same names can
+be used for alleles belonging to different markers. As such, frequencies
+must be specified per named allele per named marker.</p></dd>
 
 
 <dt id="arg-fs">fs<a class="anchor" aria-label="anchor" href="#arg-fs"></a></dt>
-<dd><p>List of per-marker allele frequency vectors. Names of the list must match
-with the marker names in <code>y</code>. Within lists (i.e., for each marker),
-frequencies must be specified per allele name.</p></dd>
+<dd><p>List of per-marker allele frequency vectors. Names of the list must
+match with the marker names in <code>y</code>. Within lists (i.e., for each marker),
+one frequency must be specified per allele name. Per-marker frequencies
+must sum to one.</p></dd>
 
 
 <dt id="arg-prior">prior<a class="anchor" aria-label="anchor" href="#arg-prior"></a></dt>
@@ -108,7 +109,7 @@ recurrence states are equally likely.</p></dd>
 
 
 <dt id="arg-mois">MOIs<a class="anchor" aria-label="anchor" href="#arg-mois"></a></dt>
-<dd><p>Multiplicity of infection for each episode. If MOIs are not
+<dd><p>Multiplicity of infection (MOI) for each episode. If MOIs are not
 provided, the most parsimonious MOIs compatible with the data will be used;
 see <code><a href="determine_MOIs.html">determine_MOIs</a></code>.</p></dd>
 
@@ -125,10 +126,11 @@ relationship graph.</p></dd>
 relationship graph, defaults to <code>FALSE</code>. When setting <code>return.logp</code> to
 <code>TRUE</code>, <code>return.RG</code> should also be set to <code>TRUE</code>. Setting <code>return.logp</code> to
 <code>FALSE</code> allows for permutation symmetries to be exploited to save
-computational time, see <code><a href="enumerate_alleles.html">enumerate_alleles</a></code>. Setting this to
-<code>TRUE</code> will result in longer runtimes, especially when multiplicities of
-infection are large. Note that this argument does not affect the output of
-the posterior probabilities.</p></dd>
+computational time, see the maximum-likelihood relationship graphs example
+in <code><a href="../articles/demonstrate-usage.html">vignette("demonstrate-usage")</a></code>. Setting this to <code>TRUE</code> will result in
+longer runtimes, especially when multiplicities of infection are large.
+Note that this argument does not affect the output of the posterior
+probabilities.</p></dd>
 
 
 <dt id="arg-progress-bar">progress.bar<a class="anchor" aria-label="anchor" href="#arg-progress-bar"></a></dt>
@@ -172,16 +174,16 @@ sums over</p><ul><li><p>ways to phase allelic data onto haploid genotypes</p></l
 vector to be a set of distinct alleles. Allele repeats at markers with
 observed data, and <code>NA</code> repeats at markers with missing data, are
 removed in a data pre-processing step. <code>NA</code>s in allelic vectors that
-also contain non-<code>NA</code> values are removed in a data pre-processing step.</p>
+also contain non-<code>NA</code> values are also removed in the data pre-processing
+step.</p>
 <p>We enumerate all possible relationship graphs between haploid genotypes,
 where pairs of genotypes can either be clones, siblings, or strangers. The
 likelihood of a sequence of recurrence states can be determined from the
 likelihood of all relationship graphs compatible with said sequence. More
-details on the enumeration and likelihood calculation of relationship graphs
-can be found in <code><a href="enumerate_RGs.html">enumerate_RGs</a></code> and <code><a href="RG_inference.html">RG_inference</a></code>
-respectively. For each relationship graph, the model sums over all possible
-identity-by-descent partitions. Because some relationship graphs are
-compatible with more identity-by-descent partitions than others, the log
+details on the enumeration of relationship graphs can be found in
+<code><a href="enumerate_RGs.html">enumerate_RGs</a></code>. For each relationship graph, the model sums over
+all possible identity-by-descent partitions. Because some relationship graphs
+are compatible with more identity-by-descent partitions than others, the log
 p(Y|RG) progress bar does not necessarily increment uniformly.</p>
 <p>Notable model assumptions and limitations:</p><ul><li><p>Perfect detection of alleles (no genotyping error)</p></li>
 <li><p>No within-host <em>de novo</em> mutations</p></li>
@@ -234,9 +236,9 @@ abundance of the alleles detected).</p></li>
 <span class="r-in"><span><span class="co"># Example where alleles are named arbitrarily and probabilities are plotted</span></span></span>
 <span class="r-in"><span><span class="co"># ===========================================================================</span></span></span>
 <span class="r-in"><span><span class="co"># Data</span></span></span>
-<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>episode0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>marker1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tinky Winky"</span>, <span class="st">"Dipsy"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrolment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>marker1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tinky Winky"</span>, <span class="st">"Dipsy"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                          marker2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tinky Winky"</span>, <span class="st">"Laa-Laa"</span>, <span class="st">"Po"</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>          episode1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>marker1 <span class="op">=</span> <span class="st">"Tinky Winky"</span>,</span></span>
+<span class="r-in"><span>          recurrence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>marker1 <span class="op">=</span> <span class="st">"Tinky Winky"</span>,</span></span>
 <span class="r-in"><span>                          marker2 <span class="op">=</span> <span class="st">"Laa-Laa"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Allele frequencies</span></span></span>
@@ -250,11 +252,8 @@ abundance of the alleles detected).</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrence states</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plot posterior probabilities on the simplex</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_simplex.html">plot_simplex</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Recrudescence"</span>, <span class="st">"Relapse"</span>, <span class="st">"Reinfection"</span><span class="op">)</span>, <span class="fl">0.5</span><span class="op">)</span> <span class="co"># Simplex</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="project2D.html">project2D</a></span><span class="op">(</span><span class="va">posterior_probs</span><span class="op">$</span><span class="va">marg</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">)</span> <span class="co"># Project probabilities</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xy</span><span class="op">[</span><span class="st">"x"</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">xy</span><span class="op">[</span><span class="st">"y"</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="co"># Plot projected probabilities</span></span></span>
+<span class="r-in"><span><span class="co"># Plot posterior on the simplex</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="va">posterior_probs</span><span class="op">$</span><span class="va">marg</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="compute_posterior-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
@@ -401,18 +400,17 @@ abundance of the alleles detected).</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract results for the first recurrence</span></span></span>
-<span class="r-in"><span><span class="va">results_recur1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">results</span>, <span class="kw">function</span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="va">result</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">results_recur1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">results</span>, <span class="kw">function</span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="va">result</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">results_recur1</span> <span class="co"># Results are different for different scenarios</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    scenario1  scenario2  scenario3  scenario4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> C 0.60606061 0.61538462 0.62294515 0.62925894</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> L 0.33333333 0.32307692 0.31476034 0.30781517</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> I 0.06060606 0.06153846 0.06229451 0.06292589</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   C         L          I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> scenario1 0.6060606 0.3333333 0.06060606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> scenario2 0.6153846 0.3230769 0.06153846</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> scenario3 0.6229451 0.3147603 0.06229451</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> scenario4 0.6292589 0.3078152 0.06292589</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Visualise the change in the marginal probability of the first recurrence</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_simplex.html">plot_simplex</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Recrudescence"</span>, <span class="st">"Relapse"</span>, <span class="st">"Reinfection"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Plot simplex</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-in"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">results_recur1</span>, <span class="fl">2</span>, <span class="va">project2D</span><span class="op">)</span> <span class="co"># Project probabilities</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xy</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span>, y <span class="op">=</span> <span class="va">xy</span><span class="op">[</span><span class="st">"y"</span>, <span class="op">]</span>, pch <span class="op">=</span> <span class="st">"-"</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span> <span class="co"># Plot projections</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="va">results_recur1</span>, p.labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>             col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, pch <span class="op">=</span> <span class="st">"-"</span><span class="op">)</span> <span class="co"># Plot simplex</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"left"</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, pch <span class="op">=</span> <span class="st">"-"</span>, pt.cex <span class="op">=</span> <span class="fl">2</span>, bty <span class="op">=</span> <span class="st">"n"</span>, legend <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,</span></span>
 <span class="r-in"><span>title <span class="op">=</span> <span class="st">"Recurrence \n count"</span><span class="op">)</span> <span class="co"># legend</span></span></span>
 <span class="r-plt img"><img src="compute_posterior-2.png" alt="" width="700" height="433"></span>

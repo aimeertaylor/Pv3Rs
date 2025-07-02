@@ -80,15 +80,15 @@
 flow for a single study participant; i.e.,</p>
 <ol style="list-style-type: decimal">
 <li>Plot data</li>
-<li>Estimate recurrence state probabilities</li>
-<li>Plot probability estimates</li>
+<li>Compute recurrence state posterior probabilities</li>
+<li>Plot per-recurrence probabilities</li>
 </ol>
-<p>And we show how one might explore relationship graphs and their log
-likelihoods. In one or more upcoming scientific publications, we plan to
-publish a more elaborate study-level <code>Pv3Rs</code> tutorial
-including examples of</p>
+<p>We also show how one might like to explore relationship graphs and
+their log likelihoods. In one or more upcoming scientific publications,
+we plan to publish a more elaborate study-level <code>Pv3Rs</code>
+tutorial including examples of</p>
 <ul>
-<li>how to generate estimates pairwise when the total genotype count
+<li>how to generate pairwise probabilities when the total genotype count
 over multiple recurrences exceeds eight</li>
 <li>how to compute false discovery rates</li>
 <li>how to do a sensitivity analysis for genotyping errors</li>
@@ -106,7 +106,7 @@ be used estimate treatment efficacy</li>
 are optional) with three markers (marker names are obligatory) whose
 alleles have known frequencies.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Enrollment"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'b'</span>,<span class="st">'c'</span>,<span class="st">'d'</span><span class="op">)</span>, </span>
+<code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Enrolment"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'b'</span>,<span class="st">'c'</span>,<span class="st">'d'</span><span class="op">)</span>, </span>
 <span>                              m2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'a'</span>,<span class="st">'b'</span><span class="op">)</span>,</span>
 <span>                              m3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'b'</span>,<span class="st">'c'</span>,<span class="st">'d'</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>          <span class="st">"Recurrence 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'b'</span>,<span class="st">'d'</span><span class="op">)</span>, </span>
@@ -134,18 +134,22 @@ is rare).</p>
 <p><strong>Aside</strong> Given the maximum number of alleles observed
 per-episode, the most parsimonious explanation is that there are 3, 2, 1
 distinct parasite genotypes in the three episodes respectively (a
-genotype is here defined as a realisation of the haploid parasite genome
-representing a group of clonal parasites). In this synthetic example,
-markers are quart-allelic for brevity; this imposes a rather low upper
-bound on MOI estimates based on maximum per-marker allele counts. In
-reality, more diverse markers are recommended for recurrence state
-inference. If better MOI estimates were available based on more diverse
-markers, the data from those more diverse markers could be added to the
-data input <code>y</code> of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. If better
-MOI estimates based on heteroallelic marker counts across many markers
-were available, they could be used in recurrence state inference by
-specifying the <code>MOI</code> argument in the function
-<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>.</p>
+genotype is here defined as a realisation of the haploid parasite
+genome; i.e., a DNA sequence representing a group of clonal parasites).
+In this synthetic example, markers are quart-allelic for brevity; this
+imposes a rather low upper bound on MOI estimates based on maximum
+per-marker allele counts. In reality, more diverse markers are
+recommended for recurrence state inference. If better MOI estimates were
+available based on more diverse markers, the data from those more
+diverse markers could be added to the data input <code>y</code> of
+<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. If better MOI estimates based on
+heteroallelic marker counts across many markers were available, they
+could be used in recurrence state inference by specifying the
+<code>MOI</code> argument in the function
+<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. Because the Pv3Rs model does not
+account for genotyping errors, including false positive alleles,
+user-specified MOIs must be greater than or equal to those based on
+maximum per-marker allele counts.</p>
 <p>When performing genetic recurrence state inference, the bulk of the
 computational time lies in computing log-likelihoods of graphs of
 relationships between genotypes.</p>
@@ -159,22 +163,22 @@ relationships between genotypes.</p>
 <span><span class="co">#&gt; =============================================================================|</span></span></code></pre></div>
 <p>In the call to <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> above we did not
 specify a prior, and so a uniform prior across all three recurrence
-states per recurrence is assumed by default. Marginal posterior
-probabilities (probabilities of recrudescence <code>C</code>, relapse
-<code>L</code>, and reinfection <code>I</code> for each recurrence) are
-stored in <code>post$marg</code>.</p>
+states per recurrence is assumed by default. Marginal per-recurrence
+posterior probabilities (probabilities of recrudescence <code>C</code>,
+relapse <code>L</code>, and reinfection <code>I</code> for each
+recurrence) are stored in <code>post$marg</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">post</span><span class="op">$</span><span class="va">marg</span></span>
 <span><span class="co">#&gt;                     C         L          I</span></span>
 <span><span class="co">#&gt; Recurrence 1 0.000000 0.3294555 0.67054446</span></span>
 <span><span class="co">#&gt; Recurrence 2 0.670205 0.2388744 0.09092065</span></span></code></pre></div>
-<p>Marginal posterior probabilities can be plotted on the simplex using
-the function <code><a href="../reference/plot_simplex.html">plot_simplex()</a></code>.</p>
+<p>Per-recurrence posterior probabilities can be plotted on the simplex
+using the function <code><a href="../reference/plot_simplex.html">plot_simplex()</a></code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot simplex</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">p.coords</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">marg</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="va">p.coords</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">p.coords</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">marg</span>, Prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="va">p.coords</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
 <p><img src="demonstrate-usage_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>The point in the yellow region is most likely a recrudescence with
 posterior probability greater than 0.5 (it falls in the bright yellow
@@ -193,34 +197,35 @@ posterior probability 0.4568231</p>
 <span><span class="co">#&gt;         CL         CI </span></span>
 <span><span class="co">#&gt; 0.00000000 0.00000000</span></span></code></pre></div>
 <p>Aside: we do not recommend running <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>
-for data whose total genotype count (sum of per-episode multiplicities
-of infection) exceeds eight. That said, we have not imposed a hard limit
-on the code. It is possible, but very long, to generate estimates using
+for data whose total genotype count (sum of per-episode MOIs) exceeds
+eight. That said, we have not imposed a hard limit on the code. In our
+experience, it is possible, but very long, to generate estimates using
 data with a total genotype count up to 10 (see code below, which we time
 out after 2 seconds); above 10 genotypes, calls to
 <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> are liable cause memory-use problems
 and fail.</p>
 </div>
 <div class="section level2">
-<h2 id="exploration-of-relationship-graphs-and-their-log-likelihoods">Exploration of relationship graphs and their log likelihoods<a class="anchor" aria-label="anchor" href="#exploration-of-relationship-graphs-and-their-log-likelihoods"></a>
+<h2 id="exploration-of-relationship-graphs">Exploration of relationship graphs<a class="anchor" aria-label="anchor" href="#exploration-of-relationship-graphs"></a>
 </h2>
 <p>If we want to explore relationship graphs and their log likelihoods
 we need to set both <code>return.RG</code> and <code>return.logp</code>
 to <code>TRUE</code> when computing the posterior; they are
-<code>FALSE</code> by default (see below).</p>
+<code>FALSE</code> by default.</p>
 <p>To compute the posterior, summations over per-marker allelic
 assignments that are equivalent up to within-episode genotype
 permutations are redundant. As such, by default,
 <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> does not sum over them, conserving both
-memory and compute time; see <code><a href="../reference/enumerate_alleles.html">enumerate_alleles()</a></code>. The
-exploitation of permutation symmetry requires a scheme to choose a
-single representative among permutations that are otherwise equivalent.
-When user-specified MOIs are greater than those based on per-marker
-allele counts, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> sums over all
-permutations because the scheme is too complicated. Likewise, to compute
+memory and compute time. The exploitation of permutation symmetry
+requires a scheme to choose a single representative among permutations
+that are otherwise equivalent. When user-specified MOIs are greater than
+those based on per-marker allele counts,
+<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> sums over all permutations because the
+representative-choosing scheme is too complicated. Likewise, to compute
 meaningful graph likelihood values (i.e., values that are not dependent
-on the aforementioned representative-choosing scheme), all permutations
-are summed over when <code>return.logp = TRUE</code>.</p>
+on the representative-choosing scheme), all permutations are summed over
+when <code>return.logp = TRUE</code>. This increases compute time,
+especially when MOIs are large.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">post</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span>, return.RG <span class="op">=</span> <span class="cn">TRUE</span>, return.logp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Number of valid relationship graphs (RGs) is 1315</span></span>
@@ -241,19 +246,16 @@ output. We plot the relationship graph(s) with the largest
 likelihood.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extract all log likelihoods</span></span>
-<span><span class="va">lliks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">RGs</span>, <span class="kw">function</span><span class="op">(</span><span class="va">RG</span><span class="op">)</span> <span class="va">RG</span><span class="op">$</span><span class="va">logp</span><span class="op">)</span></span>
+<span><span class="va">llikes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">RGs</span>, <span class="kw">function</span><span class="op">(</span><span class="va">RG</span><span class="op">)</span> <span class="va">RG</span><span class="op">$</span><span class="va">logp</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Extract the relationship graphs (RGs) with the largest log likelihood</span></span>
-<span><span class="va">RGs</span> <span class="op">&lt;-</span> <span class="va">post</span><span class="op">$</span><span class="va">RGs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">lliks</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">lliks</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">RGs</span> <span class="op">&lt;-</span> <span class="va">post</span><span class="op">$</span><span class="va">RGs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">llikes</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">llikes</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co"># Generate genotype names </span></span>
 <span><span class="va">gs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"g"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="co"># Generate episode indices for genotypes</span></span>
 <span><span class="va">ts_per_gs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="../reference/determine_MOIs.html">determine_MOIs</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> </span>
-<span></span>
-<span><span class="co"># The sequences of states compatible with RGs</span></span>
-<span><span class="va">seqs_comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">RGs</span>, <span class="va">compatible_rstrs</span>, gs_per_ts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">gs</span>, <span class="va">ts_per_gs</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Plot RG</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span>,<span class="fl">4</span><span class="op">)</span>, mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -262,11 +264,11 @@ likelihood.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/box.html" class="external-link">box</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="co"># Generate infection colours in order to add a legend</span></span>
-<span><span class="va">infection_colours</span> <span class="op">&lt;-</span> <span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">8</span>, <span class="st">"Set2"</span><span class="op">)</span> </span>
+<span><span class="co"># Generate episode colours in order to add a legend</span></span>
+<span><span class="va">episode_colours</span> <span class="op">&lt;-</span> <span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">8</span>, <span class="st">"Set2"</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="co"># Add a legend</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>, pch <span class="op">=</span> <span class="fl">21</span>, pt.bg <span class="op">=</span> <span class="va">infection_colours</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">ts_per_gs</span><span class="op">)</span><span class="op">]</span>, </span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>, pch <span class="op">=</span> <span class="fl">21</span>, pt.bg <span class="op">=</span> <span class="va">episode_colours</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">ts_per_gs</span><span class="op">)</span><span class="op">]</span>, </span>
 <span>       bty <span class="op">=</span> <span class="st">"n"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, title <span class="op">=</span> <span class="st">"Episode"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="demonstrate-usage_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>N.B. There are two symmetric graphs with maximum likelihood: they are
@@ -276,8 +278,11 @@ largest likelihood (e.g., those above) might not be in the equivalence
 class for which the data are most probable when all relationship graphs
 in that class are summed over (e.g., those below). In the following
 code, we place two graphs in the same equivalence class if they share
-the same likelihood. This is not ideal, as two graphs that are not
-isomorphic up to permutation can share the same likelihood.</p>
+the same likelihood. This is not ideal, because two graphs that are not
+isomorphic up to permutation could share the same likelihood; but for a
+small number of graphs, plots can be used to check there are no
+non-isomorphic graphs among those placed in the same equivalence
+class.</p>
 <p>The user should also note that,</p>
 <ul>
 <li><p>the maximum-likelihood graph(s) might be incompatible with the
@@ -291,23 +296,23 @@ graphs with sibling edges that are incompatible with IC).</p></li>
 </ul>
 <!-- We suspect one of these cases above has to be false, but we cannot rule out
 the possibility that both are true without further exploration --><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sorted_lliks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">lliks</span>, decreasing <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="co"># Sort log likelihoods</span></span>
-<span><span class="va">adj_equal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">sorted_lliks</span>, lag <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span> <span class="co"># Find matches</span></span>
+<code class="sourceCode R"><span><span class="va">sorted_llikes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">llikes</span>, decreasing <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="co"># Sort log likelihoods</span></span>
+<span><span class="va">adj_equal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">sorted_llikes</span>, lag <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span> <span class="co"># Find matches</span></span>
 <span><span class="va">decr_idxs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">adj_equal</span> <span class="op">==</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># Change points: 2, 8, 14, 20, 32, ...</span></span>
 <span><span class="va">class_sizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">decr_idxs</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">decr_idxs</span><span class="op">)</span><span class="op">)</span> <span class="co"># Number of graphs per class</span></span>
 <span></span>
 <span><span class="co"># log likelihood of representative from each 'equivalence class' (EC)</span></span>
-<span><span class="va">lliks_unique</span> <span class="op">&lt;-</span> <span class="va">sorted_lliks</span><span class="op">[</span><span class="va">decr_idxs</span><span class="op">]</span></span>
+<span><span class="va">llikes_unique</span> <span class="op">&lt;-</span> <span class="va">sorted_llikes</span><span class="op">[</span><span class="va">decr_idxs</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co"># EC likelihood</span></span>
-<span><span class="va">class_ps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">lliks_unique</span><span class="op">)</span><span class="op">*</span><span class="va">class_sizes</span></span>
+<span><span class="va">class_ps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">llikes_unique</span><span class="op">)</span><span class="op">*</span><span class="va">class_sizes</span></span>
 <span><span class="va">max_class_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">class_ps</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">class_ps</span><span class="op">)</span><span class="op">)</span> <span class="co"># ML EC index </span></span>
 <span><span class="va">max_idx</span> <span class="op">&lt;-</span> <span class="va">decr_idxs</span><span class="op">[</span><span class="va">max_class_p</span><span class="op">]</span> <span class="co"># Index of last graph in ML EC</span></span>
 <span><span class="va">max_size</span> <span class="op">&lt;-</span> <span class="va">class_sizes</span><span class="op">[</span><span class="va">max_class_p</span><span class="op">]</span> <span class="co"># Number of graphs in ML EC</span></span>
 <span></span>
 <span><span class="co"># Plot all graphs within the ML EC </span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span>,<span class="fl">4</span><span class="op">)</span>, mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">RG_order</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">lliks</span>, decreasing <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="co"># order RGs by logl</span></span>
+<span><span class="va">RG_order</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">llikes</span>, decreasing <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="co"># order RGs by logl</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="op">(</span><span class="va">max_idx</span><span class="op">-</span><span class="va">max_size</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">max_idx</span><span class="op">)</span> <span class="op">{</span> <span class="co"># EC consists of the RGs with logl rank 21-32</span></span>
 <span>  <span class="va">RG</span> <span class="op">&lt;-</span> <span class="va">post</span><span class="op">$</span><span class="va">RGs</span><span class="op">[[</span><span class="va">RG_order</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="va">RG_igraph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/RG_to_igraph.html">RG_to_igraph</a></span><span class="op">(</span><span class="va">RG</span>, <span class="va">gs</span>, <span class="va">ts_per_gs</span><span class="op">)</span></span>
