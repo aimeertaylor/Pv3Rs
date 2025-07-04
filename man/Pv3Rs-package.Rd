@@ -8,13 +8,13 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Estimate per-person posterior probabilities that each recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse, reinfection (3Rs) using per-person P. vivax genetic data on two or more infections.
+Estimate per-person posterior probabilities that each recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse, or reinfection (3Rs) using per-person P. vivax genetic data on two or more infections.
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/aimeertaylor/Pv3Rs}
   \item \url{https://aimeertaylor.github.io/Pv3Rs/}
+  \item \url{https://github.com/aimeertaylor/Pv3Rs}
   \item Report bugs at \url{https://github.com/aimeertaylor/Pv3Rs/issues}
 }
 

@@ -72,8 +72,10 @@ for more details on relationship graphs, see \code{\link{enumerate_RGs}}.}
 }
 \description{
 Computes posterior probabilities of \emph{P. vivax} recurrence states
-relapse, reinfection and recrudescence using genetic data; for usage see \strong{Examples} below and
-\code{vignette("demonstrate-usage")}, for a more complete understanding of the posterior output see
+relapse, reinfection and recrudescence using genetic data; for usage see
+\strong{Examples} below and
+\href{"../doc/demonstrate-usage.html"}{vignette("demonstrate-usage")}, for a more
+complete understanding of the posterior output see
 \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 
 Note: The progress bar increments non-uniformly (see
@@ -164,7 +166,7 @@ suppressMessages(compute_posterior(y_missing, fs = list(m1 = c("A" = 1)),
 
 
 # Beware provision of unpaired data: the prior is not necessarily returned;
-# for more details, see link above to understand-posterior.htm
+# for more details, see link above to "Understand posterior estimates"
 y_het <- list(list(m1 = c('1', '2')), list(m1 = NA))
 y_hom <- list(list(m1 = '1'), list(m1 = NA))
 fs = list(m1 = c('1' = 0.5, '2' = 0.5))
