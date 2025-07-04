@@ -4,7 +4,7 @@
 #' Computes posterior probabilities of \emph{P. vivax} recurrence states
 #' relapse, reinfection and recrudescence using genetic data; for usage see
 #' **Examples** below and
-#' [vignette("demonstrate-usage")](../doc/enumerate.pdf), for a more
+#' [vignette("enumerate")](../doc/enumerate.pdf) for a more
 #' complete understanding of the posterior output see
 #' ["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'
