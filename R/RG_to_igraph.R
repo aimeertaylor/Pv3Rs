@@ -1,18 +1,21 @@
-#' Converts a relationship graph to an \code{igraph} object
+#' Converts a relationship graph (RG) encoded as a list to an \code{igraph} object
 #'
-#' @param RG Relationship graph output by \code{\link{enumerate_RGs}} when
-#'   \code{igraph = FALSE}.
-#' @param gs Vector of genotype names.
-#' @param ts_per_gs Vector of episode numbers for each genotype. This can be
-#'   inferred from the data `y` using `rep(1:length(y), determine_MOIs(y))`.
+#' @param RG List encoding a RG; see **Value** of
+#'   \code{\link{enumerate_RGs}} when \code{igraph = FALSE}.
+#' @param gs Character vector of genotype names.
+#' @param ts_per_gs Numeric vector containing episode number for each genotype,
+#'   e.g., `rep(1:length(y), determine_MOIs(y))`.
 #'
 #' @return An \code{igraph} object along with the original variables in
 #'   \code{RG}.
 #'
 #' @examples
 #' set.seed(20)
-#' RG <- sample_RG(c(2, 2))
-#' RG <- RG_to_igraph(RG, c("g1", "g2", "g3", "g4"), c(1, 1, 2, 2))
+#' RG_as_list <- sample_RG(c(2, 2), igraph = FALSE)
+#' RG_as_list
+#' RG_as_igraph <- RG_to_igraph(RG_as_list, c("g1", "g2", "g3", "g4"), c(1, 1, 2, 2))
+#' RG_as_igraph
+#' plot_RG(RG_as_igraph)
 #'
 #' @export
 RG_to_igraph <- function(RG, gs, ts_per_gs) {

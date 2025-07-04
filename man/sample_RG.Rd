@@ -2,13 +2,12 @@
 % Please edit documentation in R/sample_RG.R
 \name{sample_RG}
 \alias{sample_RG}
-\title{Sample a transitive relationship graph}
+\title{Sample a relationship graph (RG)}
 \usage{
-sample_RG(MOIs, igraph = T)
+sample_RG(MOIs, igraph = TRUE)
 }
 \arguments{
-\item{MOIs}{A numeric vector specifying, for each infection, the number of
-distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).}
+\item{MOIs}{Numeric vector containing per-episode multiplicities of infection (MOI).}
 
 \item{igraph}{Logical for whether to return an \code{igraph} object.}
 }
@@ -17,17 +16,18 @@ A relationship graph, i.e. one entry of the list returned by
 \code{\link{enumerate_RGs}}.
 }
 \description{
-Uses the techniques in \code{\link{enumerate_RGs}} to uniformly sample
-a relationship graph. All clonal partitions are generated, and the number
-of sibling partitions consistent with each clonal partition is determined. A
-clonal partition is randomly selected with probability proportional to the
-corresponding number of sibling partitions, and a sibling partition is then
-uniformly sampled. The nested partition is equivalent to a relationship
-graph. See \code{\link{enumerate_RGs}} for details on the nested
+Uses the techniques in \code{\link{enumerate_RGs}} to sample a relationship
+graph uniformly at random. All clonal partitions are generated, and the
+number of sibling partitions consistent with each clonal partition is
+determined. A clonal partition is randomly selected with probability
+proportional to the corresponding number of sibling partitions, and a sibling
+partition is then uniformly sampled. The nested partition is equivalent to a
+relationship graph. See \code{\link{enumerate_RGs}} for details on the nested
 partition representation of a relationship graph.
 }
 \examples{
-set.seed(20)
-RG <- sample_RG(c(2, 2))
+set.seed(1)
+RG <- sample_RG(c(3, 2))
+plot_RG(RG)
 
 }

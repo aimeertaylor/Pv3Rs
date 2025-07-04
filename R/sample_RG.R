@@ -1,27 +1,27 @@
-#' Sample a transitive relationship graph
+#' Sample a relationship graph (RG)
 #'
-#' Uses the techniques in \code{\link{enumerate_RGs}} to uniformly sample
-#' a relationship graph. All clonal partitions are generated, and the number
-#' of sibling partitions consistent with each clonal partition is determined. A
-#' clonal partition is randomly selected with probability proportional to the
-#' corresponding number of sibling partitions, and a sibling partition is then
-#' uniformly sampled. The nested partition is equivalent to a relationship
-#' graph. See \code{\link{enumerate_RGs}} for details on the nested
+#' Uses the techniques in \code{\link{enumerate_RGs}} to sample a relationship
+#' graph uniformly at random. All clonal partitions are generated, and the
+#' number of sibling partitions consistent with each clonal partition is
+#' determined. A clonal partition is randomly selected with probability
+#' proportional to the corresponding number of sibling partitions, and a sibling
+#' partition is then uniformly sampled. The nested partition is equivalent to a
+#' relationship graph. See \code{\link{enumerate_RGs}} for details on the nested
 #' partition representation of a relationship graph.
 #'
-#' @param MOIs A numeric vector specifying, for each infection, the number of
-#'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).
+#' @param MOIs Numeric vector containing per-episode multiplicities of infection (MOI).
 #' @param igraph Logical for whether to return an \code{igraph} object.
 #'
 #' @return A relationship graph, i.e. one entry of the list returned by
 #'   \code{\link{enumerate_RGs}}.
 #'
 #' @examples
-#' set.seed(20)
-#' RG <- sample_RG(c(2, 2))
+#' set.seed(1)
+#' RG <- sample_RG(c(3, 2))
+#' plot_RG(RG)
 #'
 #' @export
-sample_RG <- function(MOIs, igraph = T) {
+sample_RG <- function(MOIs, igraph = TRUE) {
   # Check MOIs are positive whole numbers
   if (!all(is_wholenumber(MOIs)) | any(MOIs < 1)) stop("MOIs should be positive integers")
 

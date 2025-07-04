@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Estimate per-person posterior probabilities that each recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse, or reinfection (3Rs) using per-person P. vivax genetic data on two or more infections.
+Estimate per-person posterior probabilities that each recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse, or reinfection (3Rs) using per-person P. vivax genetic data on two or more episodes.
 }
 \seealso{
 Useful links:
@@ -29,7 +29,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item European Union, Project 101110393 — PvRecur [funder]
+  \item European Union, Project 101110393 [funder]
 }
 
 }

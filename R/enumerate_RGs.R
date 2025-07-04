@@ -1,4 +1,4 @@
-#' Enumerate relationship graphs
+#' Enumerate relationship graphs (RGs)
 #'
 #' A relationship graph is a complete graph on all genotypes (one per vertex),
 #' where each edge is annotated as a clone, sibling, or stranger edge. The
@@ -8,7 +8,7 @@
 #'   \item{The subgraph induced by the clone edges and sibling edges is a cluster
 #'   graph.}
 #'   \item{Clone edges are only allowed for two genotypes from different
-#'   infections.}
+#'   episodes.}
 #' }
 #'
 #' Relationship graphs are enumerated by generating nested set partitions that

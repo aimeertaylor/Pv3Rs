@@ -2,29 +2,32 @@
 % Please edit documentation in R/RG_to_igraph.R
 \name{RG_to_igraph}
 \alias{RG_to_igraph}
-\title{Converts a relationship graph to an \code{igraph} object}
+\title{Converts a relationship graph (RG) encoded as a list to an \code{igraph} object}
 \usage{
 RG_to_igraph(RG, gs, ts_per_gs)
 }
 \arguments{
-\item{RG}{Relationship graph output by \code{\link{enumerate_RGs}} when
-\code{igraph = FALSE}.}
+\item{RG}{List encoding a RG; see \strong{Value} of
+\code{\link{enumerate_RGs}} when \code{igraph = FALSE}.}
 
-\item{gs}{Vector of genotype names.}
+\item{gs}{Character vector of genotype names.}
 
-\item{ts_per_gs}{Vector of episode numbers for each genotype. This can be
-inferred from the data \code{y} using \code{rep(1:length(y), determine_MOIs(y))}.}
+\item{ts_per_gs}{Numeric vector containing episode number for each genotype,
+e.g., \code{rep(1:length(y), determine_MOIs(y))}.}
 }
 \value{
 An \code{igraph} object along with the original variables in
 \code{RG}.
 }
 \description{
-Converts a relationship graph to an \code{igraph} object
+Converts a relationship graph (RG) encoded as a list to an \code{igraph} object
 }
 \examples{
 set.seed(20)
-RG <- sample_RG(c(2, 2))
-RG <- RG_to_igraph(RG, c("g1", "g2", "g3", "g4"), c(1, 1, 2, 2))
+RG_as_list <- sample_RG(c(2, 2), igraph = FALSE)
+RG_as_list
+RG_as_igraph <- RG_to_igraph(RG_as_list, c("g1", "g2", "g3", "g4"), c(1, 1, 2, 2))
+RG_as_igraph
+plot_RG(RG_as_igraph)
 
 }

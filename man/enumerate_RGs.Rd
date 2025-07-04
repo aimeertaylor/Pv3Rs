@@ -2,7 +2,7 @@
 % Please edit documentation in R/enumerate_RGs.R
 \name{enumerate_RGs}
 \alias{enumerate_RGs}
-\title{Enumerate relationship graphs}
+\title{Enumerate relationship graphs (RGs)}
 \usage{
 enumerate_RGs(MOIs, igraph = TRUE, progress.bar = TRUE)
 }
@@ -41,7 +41,7 @@ enumerated relationship graphs satisfy the following constraints:
 \item{The subgraph induced by the clone edges and sibling edges is a cluster
 graph.}
 \item{Clone edges are only allowed for two genotypes from different
-infections.}
+episodes.}
 }
 }
 \details{

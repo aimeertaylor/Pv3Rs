@@ -1,14 +1,15 @@
 #' Compute posterior probabilities of \emph{P. vivax} recurrence states
 #'
 #' @description
-#' Computes posterior probabilities of \emph{P. vivax} recurrence states
-#' relapse, reinfection and recrudescence using genetic data; for usage see
+#' Computes per-person posterior probabilities of *P. vivax* recurrence states
+#' relapse, reinfection and recrudescence using per-person genetic data on two
+#' or more episodes; for usage see
 #' **Examples** below and
 #' [vignette("demonstrate-usage")](../doc/demonstrate-usage.html) for a more
-#' complete understanding of the posterior output see
-#' ["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
+#' complete understanding of the posterior output see ["Understand posterior
+#' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'
-#' Note: The progress bar increments non-uniformly (see
+#' Note: The progress bar may increment non-uniformly (see
 #' **Details**); it may appear stuck when computations are ongoing.
 #'
 #' @details
@@ -19,26 +20,17 @@
 #' - graphs of relationships between haploid genotypes
 #' - ways to partition alleles into clusters of identity-by-descent
 #'
-#' \code{compute_posterior()} expects each per-episode, per-marker allelic
-#' vector to contain distinct alleles only. Allele repeats at markers with
-#' observed data, and \code{NA} repeats at markers with missing data, are
-#' removed in a data pre-processing step. \code{NA}s in allelic vectors that
-#' also contain non-\code{NA} values are also removed in the data pre-processing
-#' step.
-#'
 #' We enumerate all possible relationship graphs between haploid genotypes,
 #' where pairs of genotypes can either be clones, siblings, or strangers. The
 #' likelihood of a sequence of recurrence states can be determined from the
 #' likelihood of all relationship graphs compatible with said sequence. More
 #' details on the enumeration of relationship graphs can be found in
 #' \code{\link{enumerate_RGs}}. For each relationship graph, the model sums over
-#' all possible identity-by-descent partitions. Because some graphs
-#' are compatible with more partitions than others, the log
-#' p(Y|RG) progress bar may advance non-uniformly.
-#'
-#' We do not recommend running `compute_posterior() when the total genotype
-#' count (sum of MOIs) exceeds eight because there are too many relationship
-#' graphs.
+#' all possible identity-by-descent partitions. Because some graphs are
+#' compatible with more partitions than others, the log p(Y|RG) progress bar may
+#' advance non-uniformly. We do not recommend running `compute_posterior() when
+#' the total genotype count (sum of MOIs) exceeds eight because there are too
+#' many relationship graphs.
 #'
 #' Notable model assumptions and limitations:
 #' \itemize{
@@ -54,14 +46,14 @@
 #'
 #'
 #' @param y List of lists encoding allelic data. The outer list contains
-#'   episodes in increasing chronological order. The inner list contains named
+#'   episodes in chronological order. The inner list contains named
 #'   markers per episode. Marker names must be consistent across episodes. `NA`
-#'   indicates missing marker data; otherwise, one must specify a per-marker
+#'   indicates missing marker data; otherwise, specify a per-marker
 #'   vector of distinct alleles detected (presently, `compute_posterior` does
 #'   not support data on the proportional abundance of detected alleles).
-#'   \code{NA} entries within allelic vectors are ignored. Allele names are
-#'   arbitrary, allowing for different data types, but must correspond with
-#'   frequency names.
+#'   Repeat alleles and \code{NA} entries within allelic vectors are ignored.
+#'   Allele names are arbitrary, allowing for different data types, but must
+#'   correspond with frequency names.
 #' @param fs List of per-marker allele frequency vectors, with names matching
 #'   marker names in `y`. Per-marker alleles frequencies mut contain one
 #'   frequency per named allele, with names matching alleles in `y`. Per-marker
@@ -74,17 +66,16 @@
 #' @param MOIs Vector of multiplicity of infection (MOI) per
 #'   episode. If `NULL` (default), the most parsimonious MOIs compatible
 #'   with the data are used; see \code{\link{determine_MOIs}}.
-#' @param return.RG Logical; whether to return the relationship graphs,
+#' @param return.RG Logical; whether to return the relationship graphs
 #'   (default `FALSE`). Automatically set to `TRUE` if `return.logp = TRUE`.
 #' @param return.logp Logical; whether to return the log-likelihood for each
 #'   relationship graph (default `FALSE`). Setting `TRUE` disables permutation
-#'   symmetry optimisation; increasing runtime, especially when MOIs are large.
+#'   symmetry optimisation and thus increases runtime, especially when MOIs are large.
 #'   Does not affect the output of the posterior probabilities; see
-#'   `vignette("demonstrate-usage")`, which also example of permutation
-#'   symmetry.
+#'   [vignette("demonstrate-usage")](../doc/demonstrate-usage.html), which also
+#'   contains an example of permutation symmetry.
 #' @param progress.bar Logical; whether to print progress bars (default `TRUE`).
-#'   Note that the progress bar may update non-uniformly and appear when the
-#'   code is still running.
+#'   Note that the progress bar may update non-uniformly.
 #'
 #'
 #' @return List containing:
@@ -96,7 +87,7 @@
 #'       "C" at the first of two recurrences sums over the joint probabilities
 #'       of "CC", "CL", and "CI".}
 #'     \item{`joint`}{Vector of joint posterior probabilities for each recurrence
-#'       state sequence; within a sequence "C", "L", and "I" are used as above}
+#'       state sequence; within a sequence "C", "L", and "I" are used as above.}
 #'     \item{`RGs`}{List of relationship graphs returned if
 #'       `return.RG = TRUE`, with log-likelihoods if `return.logp = TRUE`;
 #'       for more details on relationship graphs, see \code{\link{enumerate_RGs}}.}
@@ -146,11 +137,9 @@
 #'
 #' # Beware provision of unpaired data: the prior is not necessarily returned;
 #' # for more details, see link above to "Understand posterior estimates"
-#' y_het <- list(list(m1 = c('1', '2')), list(m1 = NA))
-#' y_hom <- list(list(m1 = '1'), list(m1 = NA))
-#' fs = list(m1 = c('1' = 0.5, '2' = 0.5))
-#' suppressMessages(compute_posterior(y = y_het, fs))$marg
-#' suppressMessages(compute_posterior(y = y_hom, fs, MOIs = c(2,1)))$marg
+#' y <- list(list(m1 = c('1', '2')), list(m1 = NA))
+#' fs <- list(m1 = c('1' = 0.5, '2' = 0.5))
+#' suppressMessages(compute_posterior(y, fs))$marg
 #'
 #' @export
 compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,

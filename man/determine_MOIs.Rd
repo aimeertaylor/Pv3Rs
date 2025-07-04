@@ -2,45 +2,37 @@
 % Please edit documentation in R/determine_MOIs.R
 \name{determine_MOIs}
 \alias{determine_MOIs}
-\title{Determine MOIs from unphased data}
+\title{Determine multiplicities of infection (MOIs)}
 \usage{
 determine_MOIs(y, return.names = FALSE)
 }
 \arguments{
-\item{y}{Observed data in the form of a list of lists. The outer list is a
-list of episodes in chronological order. The inner list is a list of named
-markers per episode. For each marker, one must specify an allelic vector: a
-set of distinct alleles detected at that marker.}
+\item{y}{List of lists encoding allelic data; see
+\code{\link{compute_posterior}} for more details. The outer list contains
+episodes in chronological order. The inner list contains named markers per
+episode. For each marker, one must specify an allelic vector: a set of
+distinct alleles detected at that marker; or \code{NA} if marker data are
+missing.}
 
-\item{return.names}{Logical; if TRUE and episodes are named, episode names
-are returned.}
+\item{return.names}{Logical; if TRUE and \code{y} has named episodes, episode
+names are returned.}
 }
 \value{
-Returns a vector of the (minimum) multiplicity of infection (MOI) for
-each infection.
+Numeric vector containing one MOI per episode, each MOI representing
+the maximum number of alleles observed at any marker per episode.
 }
 \description{
-The MOIs returned correspond to the parsimonious explanation of the data,
-i.e., the minimal MOIs required to support the observed allelic diversity.
+Calculates a MOI for each episode based on allelic diversity
+across markers.
 }
 \details{
-For a given episode, the minimal MOI required to support the observed allelic
-diversity is equal to the maximum number of per-marker alleles observed
-across markers. These MOIs are the default used by
+For a given episode, the MOI is the maximum number distinct alleles observed
+at any marker within that episode. These MOIs are the default used by
 \code{\link{compute_posterior}}.
-
-At present, \code{Pv3Rs} only supports prevalence data (categorical data that
-signal the detection of alleles), not quantitative (proportional abundance)
-data. Allele repeats at markers with observed data, and repeat \code{NA}s at
-markers with missing data, are removed. \code{NA}s in allelic vectors that
-also contain non-\code{NA} values are ignored.
 }
 \examples{
-# two infections, three markers
-y <- list(
-  list(m1 = c("A", "B"), m2 = c("A"), m3 = c("C")),
-  list(m1 = c("B"), m2 = c("B", "C"), m3 = c("A", "B", "C"))
-)
-determine_MOIs(y) # should be c(2, 3)
+y <- list(enrol = list(m1 = c("A", "B"), m2 = c("A"), m3 = c("C")),
+          recur = list(m1 = c("B"), m2 = c("B", "C"), m3 = c("A", "B", "C")))
+determine_MOIs(y) # returns c(2, 3)
 
 }
