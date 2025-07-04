@@ -7,13 +7,12 @@
 sample_RG(MOIs, igraph = TRUE)
 }
 \arguments{
-\item{MOIs}{Numeric vector containing per-episode multiplicities of infection (MOI).}
+\item{MOIs}{Numeric vector containing per-episode multiplicities of infection (MOIs).}
 
-\item{igraph}{Logical for whether to return an \code{igraph} object.}
+\item{igraph}{Logical; returns RG as an \code{igraph} object (default \code{TRUE}).}
 }
 \value{
-A relationship graph, i.e. one entry of the list returned by
-\code{\link{enumerate_RGs}}.
+An RG; see \code{\link{enumerate_RGs}}) for more details.
 }
 \description{
 Uses the techniques in \code{\link{enumerate_RGs}} to sample a relationship

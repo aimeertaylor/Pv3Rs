@@ -9,11 +9,10 @@
 #' relationship graph. See \code{\link{enumerate_RGs}} for details on the nested
 #' partition representation of a relationship graph.
 #'
-#' @param MOIs Numeric vector containing per-episode multiplicities of infection (MOI).
-#' @param igraph Logical for whether to return an \code{igraph} object.
+#' @param MOIs Numeric vector containing per-episode multiplicities of infection (MOIs).
+#' @param igraph Logical; returns RG as an \code{igraph} object (default `TRUE`).
 #'
-#' @return A relationship graph, i.e. one entry of the list returned by
-#'   \code{\link{enumerate_RGs}}.
+#' @return An RG; see \code{\link{enumerate_RGs}}) for more details.
 #'
 #' @examples
 #' set.seed(1)

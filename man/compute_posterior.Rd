@@ -36,9 +36,9 @@ and "I" for recrudescence, relapse and reinfection, respectively. Row names
 are ignored. If \code{NULL} (default), per-episode recurrence states are assumed
 equally likely \emph{a priori}.}
 
-\item{MOIs}{Vector of multiplicity of infection (MOI) per
-episode. If \code{NULL} (default), the most parsimonious MOIs compatible
-with the data are used; see \code{\link{determine_MOIs}}.}
+\item{MOIs}{Vector of per-episode multiplicities of infection (MOIs). If
+\code{NULL} (default), the most parsimonious MOIs compatible with the data are
+used; see \code{\link{determine_MOIs}}.}
 
 \item{return.RG}{Logical; whether to return the relationship graphs
 (default \code{FALSE}). Automatically set to \code{TRUE} if \code{return.logp = TRUE}.}
@@ -64,14 +64,18 @@ subset of joint probabilities. For example, the marginal probability of
 of "CC", "CL", and "CI".}
 \item{\code{joint}}{Vector of joint posterior probabilities for each recurrence
 state sequence; within a sequence "C", "L", and "I" are used as above.}
-\item{\code{RGs}}{List of relationship graphs returned if
-\code{return.RG = TRUE}, with log-likelihoods if \code{return.logp = TRUE};
-for more details on relationship graphs, see \code{\link{enumerate_RGs}}.}
+\item{\code{RGs}}{List of lists encoding relationship graphs; returned only if
+\code{return.RG = TRUE} (default \code{FALSE}), and with log-likelihoods if
+\code{return.logp = TRUE} (default \code{FALSE}). A relationship graph
+encoded as a list can be converted into a \code{igraph} object using
+\code{\link{RG_to_igraph}} and thus plotted using
+\code{\link{plot_RG}}. For more details on relationship graphs, see
+\code{\link{enumerate_RGs}}.}
 }
 }
 \description{
-Computes per-person posterior probabilities of \emph{P. vivax} recurrence states
-relapse, reinfection and recrudescence using per-person genetic data on two
+Computes per-person posterior probabilities of \emph{P. vivax} recurrence states —
+recrudescence, relapse, reinfection — using per-person genetic data on two
 or more episodes; for usage see
 \strong{Examples} below and
 \href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")} for a more

@@ -1,8 +1,8 @@
 #' Compute posterior probabilities of \emph{P. vivax} recurrence states
 #'
 #' @description
-#' Computes per-person posterior probabilities of *P. vivax* recurrence states
-#' relapse, reinfection and recrudescence using per-person genetic data on two
+#' Computes per-person posterior probabilities of *P. vivax* recurrence states —
+#' recrudescence, relapse, reinfection — using per-person genetic data on two
 #' or more episodes; for usage see
 #' **Examples** below and
 #' [vignette("demonstrate-usage")](../doc/demonstrate-usage.html) for a more
@@ -63,9 +63,9 @@
 #'   and "I" for recrudescence, relapse and reinfection, respectively. Row names
 #'   are ignored. If `NULL` (default), per-episode recurrence states are assumed
 #'   equally likely \emph{a priori}.
-#' @param MOIs Vector of multiplicity of infection (MOI) per
-#'   episode. If `NULL` (default), the most parsimonious MOIs compatible
-#'   with the data are used; see \code{\link{determine_MOIs}}.
+#' @param MOIs Vector of per-episode multiplicities of infection (MOIs). If
+#'   `NULL` (default), the most parsimonious MOIs compatible with the data are
+#'   used; see \code{\link{determine_MOIs}}.
 #' @param return.RG Logical; whether to return the relationship graphs
 #'   (default `FALSE`). Automatically set to `TRUE` if `return.logp = TRUE`.
 #' @param return.logp Logical; whether to return the log-likelihood for each
@@ -88,9 +88,13 @@
 #'       of "CC", "CL", and "CI".}
 #'     \item{`joint`}{Vector of joint posterior probabilities for each recurrence
 #'       state sequence; within a sequence "C", "L", and "I" are used as above.}
-#'     \item{`RGs`}{List of relationship graphs returned if
-#'       `return.RG = TRUE`, with log-likelihoods if `return.logp = TRUE`;
-#'       for more details on relationship graphs, see \code{\link{enumerate_RGs}}.}
+#'     \item{`RGs`}{List of lists encoding relationship graphs; returned only if
+#'       `return.RG = TRUE` (default `FALSE`), and with log-likelihoods if
+#'       `return.logp = TRUE` (default `FALSE`). A relationship graph
+#'       encoded as a list can be converted into a `igraph` object using
+#'       \code{\link{RG_to_igraph}} and thus plotted using
+#'       \code{\link{plot_RG}}. For more details on relationship graphs, see
+#'       \code{\link{enumerate_RGs}}.}
 #'   }
 #'
 #' @examples
