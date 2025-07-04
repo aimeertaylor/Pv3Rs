@@ -74,7 +74,7 @@ for more details on relationship graphs, see \code{\link{enumerate_RGs}}.}
 Computes posterior probabilities of \emph{P. vivax} recurrence states
 relapse, reinfection and recrudescence using genetic data; for usage see
 \strong{Examples} below and
-\href{../doc/enumerate.pdf}{vignette("demonstrate-usage")} for a more
+\href{../doc/understand-half-sibs.pdf}{vignette("demonstrate-usage")} for a more
 complete understanding of the posterior output see
 \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 
