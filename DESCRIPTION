@@ -9,11 +9,11 @@ Authors@R: c(
   )
 Description: Estimate per-person posterior probabilities that each
     recurrent Plasmodium vivax (Pv) infection is a recrudescence, relapse,
-    reinfection (3Rs) using per-person P. vivax genetic data on two or
+    or reinfection (3Rs) using per-person P. vivax genetic data on two or
     more infections.
 License: MIT + file LICENSE
-URL: https://github.com/aimeertaylor/Pv3Rs,
-    https://aimeertaylor.github.io/Pv3Rs/
+URL: https://aimeertaylor.github.io/Pv3Rs/,
+     https://github.com/aimeertaylor/Pv3Rs
 BugReports: https://github.com/aimeertaylor/Pv3Rs/issues
 Depends: 
     R (>= 3.5)

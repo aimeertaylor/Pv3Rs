@@ -2,8 +2,10 @@
 #'
 #' @description
 #' Computes posterior probabilities of \emph{P. vivax} recurrence states
-#' relapse, reinfection and recrudescence using genetic data; for usage see **Examples** below and
-#' `vignette("demonstrate-usage")`, for a more complete understanding of the posterior output see
+#' relapse, reinfection and recrudescence using genetic data; for usage see
+#' **Examples** below and
+#' [vignette("demonstrate-usage")](../doc/demonstrate-usage.html), for a more
+#' complete understanding of the posterior output see
 #' ["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'
 #' Note: The progress bar increments non-uniformly (see
@@ -143,7 +145,7 @@
 #'
 #'
 #' # Beware provision of unpaired data: the prior is not necessarily returned;
-#' # for more details, see link above to understand-posterior.htm
+#' # for more details, see link above to "Understand posterior estimates"
 #' y_het <- list(list(m1 = c('1', '2')), list(m1 = NA))
 #' y_hom <- list(list(m1 = '1'), list(m1 = NA))
 #' fs = list(m1 = c('1' = 0.5, '2' = 0.5))
