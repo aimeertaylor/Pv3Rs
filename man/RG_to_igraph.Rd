@@ -2,17 +2,17 @@
 % Please edit documentation in R/RG_to_igraph.R
 \name{RG_to_igraph}
 \alias{RG_to_igraph}
-\title{Converts relationship graph to an \code{igraph} object}
+\title{Converts a relationship graph to an \code{igraph} object}
 \usage{
 RG_to_igraph(RG, gs, ts_per_gs)
 }
 \arguments{
-\item{RG}{Relationship graph output by \code{\link{enumerate_RGs}} with
-\code{igraph=FALSE}.}
+\item{RG}{Relationship graph output by \code{\link{enumerate_RGs}} when
+\code{igraph = FALSE}.}
 
 \item{gs}{Vector of genotype names.}
 
-\item{ts_per_gs}{Vector of infection numbers for each genotype. This can be
+\item{ts_per_gs}{Vector of episode numbers for each genotype. This can be
 inferred from the data \code{y} using \code{rep(1:length(y), determine_MOIs(y))}.}
 }
 \value{
@@ -20,7 +20,7 @@ An \code{igraph} object along with the original variables in
 \code{RG}.
 }
 \description{
-Converts relationship graph to an \code{igraph} object
+Converts a relationship graph to an \code{igraph} object
 }
 \examples{
 set.seed(20)

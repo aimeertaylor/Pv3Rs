@@ -15,85 +15,73 @@ compute_posterior(
 )
 }
 \arguments{
-\item{y}{Allelic data in the form of a list of lists; see examples below. The
-outer list is a list of episodes in increasing chronological order. The
-inner list is a list of named markers per episode. Episode names can be
-specified, but they are not used. Markers must be named. Each episode must
-list the same markers. If not all markers are typed per episode, data on
-untyped markers can be encoded as missing (see below). For each marker, one
-must specify an allelic vector: a set of distinct alleles detected at that
-marker. \code{NA}s encode missing per-marker data, i.e., when no alleles
-are observed for a given marker. \code{NA} entries in allelic vectors that
-contain both \code{NA} and non-\code{NA} entries are ignored. Allele names
-are arbitrary, but must correspond with frequency names. The same names can
-be used for alleles belonging to different markers. As such, frequencies
-must be specified per named allele per named marker.}
+\item{y}{List of lists encoding allelic data. The outer list contains
+episodes in increasing chronological order. The inner list contains named
+markers per episode. Marker names must be consistent across episodes. \code{NA}
+indicates missing marker data; otherwise, one must specify a per-marker
+vector of distinct alleles detected (presently, \code{compute_posterior} does
+not support data on the proportional abundance of detected alleles).
+\code{NA} entries within allelic vectors are ignored. Allele names are
+arbitrary, allowing for different data types, but must correspond with
+frequency names.}
 
-\item{fs}{List of per-marker allele frequency vectors. Names of the list must
-match with the marker names in \code{y}. Within lists (i.e., for each marker),
-one frequency must be specified per allele name. Per-marker frequencies
-must sum to one.}
+\item{fs}{List of per-marker allele frequency vectors, with names matching
+marker names in \code{y}. Per-marker alleles frequencies mut contain one
+frequency per named allele, with names matching alleles in \code{y}. Per-marker
+frequencies must sum to one.}
 
-\item{prior}{Matrix of prior probabilities of the recurrence states for each
-recurrent episode. Each row corresponds to an episode in increasing
-chronological order. The column names must be C, L, and I for
-recrudescence, relapse and reinfection respectively. Row names can be
-specified but they are not used. If \code{prior} is NULL (default), per-episode
-recurrence states are equally likely.}
+\item{prior}{Matrix of prior probabilities of recurrence states per episode,
+with rows as episodes in chronological order, and columns named "C", "L",
+and "I" for recrudescence, relapse and reinfection, respectively. Row names
+are ignored. If \code{NULL} (default), per-episode recurrence states are assumed
+equally likely \emph{a priori}.}
 
-\item{MOIs}{Multiplicity of infection (MOI) for each episode. If MOIs are not
-provided, the most parsimonious MOIs compatible with the data will be used;
-see \code{\link{determine_MOIs}}.}
+\item{MOIs}{Vector of multiplicity of infection (MOI) per
+episode. If \code{NULL} (default), the most parsimonious MOIs compatible
+with the data are used; see \code{\link{determine_MOIs}}.}
 
-\item{return.RG}{Boolean for whether to return the relationship graphs,
-defaults to \code{FALSE}. If \code{return.logp} is set to \code{TRUE}, then \code{return.RG}
-is overridden to be \code{TRUE}, as log-probabilities are returned for each
-relationship graph.}
+\item{return.RG}{Logical; whether to return the relationship graphs,
+(default \code{FALSE}). Automatically set to \code{TRUE} if \code{return.logp = TRUE}.}
 
-\item{return.logp}{Boolean for whether to return the log-likelihood for each
-relationship graph, defaults to \code{FALSE}. When setting \code{return.logp} to
-\code{TRUE}, \code{return.RG} should also be set to \code{TRUE}. Setting \code{return.logp} to
-\code{FALSE} allows for permutation symmetries to be exploited to save
-computational time, see the maximum-likelihood relationship graphs example
-in \code{vignette("demonstrate-usage")}. Setting this to \code{TRUE} will result in
-longer runtimes, especially when multiplicities of infection are large.
-Note that this argument does not affect the output of the posterior
-probabilities.}
+\item{return.logp}{Logical; whether to return the log-likelihood for each
+relationship graph (default \code{FALSE}). Setting \code{TRUE} disables permutation
+symmetry optimisation; increasing runtime, especially when MOIs are large.
+Does not affect the output of the posterior probabilities; see
+\code{vignette("demonstrate-usage")}, which also example of permutation
+symmetry.}
 
-\item{progress.bar}{Boolean for printing progress bars. When \code{TRUE}
-(default), the progress bar is printed to the screen. Please note that the
-progress bar does not necessarily increment uniformly (see details below);
-it may seem stuck when the code is still running.}
+\item{progress.bar}{Logical; whether to print progress bars (default \code{TRUE}).
+Note that the progress bar may update non-uniformly and appear when the
+code is still running.}
 }
 \value{
 List containing:
 \describe{
-\item{\code{marg}}{Matrix of marginal posterior probabilities of
-recurrence states for each recurrence, one row per recurrence with "C"
-for recrudescence, "L" for relapse, and "I" for reinfection. \code{marg} is
-a simple summary of \code{joint} (see next): each marginal probability of a
-recurrence state is a sum over a subset of joint probabilities of
-recurrence state sequences. For example, the marginal probability of "C"
-at the first of two recurrences is a sum over the joint probabilities
+\item{\code{marg}}{Matrix of marginal posterior probabilities for each recurrence,
+with rows as recurrences and columns as "C" (recrudescence), "L"
+(relapse), and "I" (reinfection). Each marginal probability sums over a
+subset of joint probabilities. For example, the marginal probability of
+"C" at the first of two recurrences sums over the joint probabilities
 of "CC", "CL", and "CI".}
-\item{\code{joint}}{Vector of joint posterior probabilities of each recurrent
-state sequence, where within a sequence "C" denotes recrudescence,
-"L" denotes relapse, and "I" denotes reinfection.}
-\item{\code{RGs}}{List of relationship graphs with their log-likelihoods stored.
-Only returned if \code{return.RG} is \code{TRUE}. See
-\code{\link{enumerate_RGs}}.}
+\item{\code{joint}}{Vector of joint posterior probabilities for each recurrence
+state sequence; within a sequence "C", "L", and "I" are used as above}
+\item{\code{RGs}}{List of relationship graphs returned if
+\code{return.RG = TRUE}, with log-likelihoods if \code{return.logp = TRUE};
+for more details on relationship graphs, see \code{\link{enumerate_RGs}}.}
 }
 }
 \description{
-Compute posterior probabilities of \emph{P. vivax} recurrence states relapse,
-reinfection and recrudescence using genetic data.
+Computes posterior probabilities of \emph{P. vivax} recurrence states
+relapse, reinfection and recrudescence using genetic data; for usage see \strong{Examples} below and
+\code{vignette("demonstrate-usage")}, for a more complete understanding of the posterior output see
+\href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 
-Please note, the progress bar does not necessarily increment uniformly (see
-details below); it may seem stuck when the code is still running.
+Note: The progress bar increments non-uniformly (see
+\strong{Details}); it may appear stuck when computations are ongoing.
 }
 \details{
-\code{compute_posterior()} computes posterior probabilities proportional to the likelihood multiplied by the prior. The likelihood
-sums over
+\code{compute_posterior()} computes posterior probabilities proportional to
+the likelihood multiplied by the prior. The likelihood sums over:
 \itemize{
 \item ways to phase allelic data onto haploid genotypes
 \item graphs of relationships between haploid genotypes
@@ -101,7 +89,7 @@ sums over
 }
 
 \code{compute_posterior()} expects each per-episode, per-marker allelic
-vector to be a set of distinct alleles. Allele repeats at markers with
+vector to contain distinct alleles only. Allele repeats at markers with
 observed data, and \code{NA} repeats at markers with missing data, are
 removed in a data pre-processing step. \code{NA}s in allelic vectors that
 also contain non-\code{NA} values are also removed in the data pre-processing
@@ -113,153 +101,74 @@ likelihood of a sequence of recurrence states can be determined from the
 likelihood of all relationship graphs compatible with said sequence. More
 details on the enumeration of relationship graphs can be found in
 \code{\link{enumerate_RGs}}. For each relationship graph, the model sums over
-all possible identity-by-descent partitions. Because some relationship graphs
-are compatible with more identity-by-descent partitions than others, the log
-p(Y|RG) progress bar does not necessarily increment uniformly.
+all possible identity-by-descent partitions. Because some graphs
+are compatible with more partitions than others, the log
+p(Y|RG) progress bar may advance non-uniformly.
+
+We do not recommend running `compute_posterior() when the total genotype
+count (sum of MOIs) exceeds eight because there are too many relationship
+graphs.
 
 Notable model assumptions and limitations:
 \itemize{
-\item{Perfect detection of alleles (no genotyping error)}
-\item{No within-host \emph{de novo} mutations}
-\item{Parasites are outbred}
 \item{All siblings are regular siblings}
-\item{Relationship graphs compatible with a given sequence of recurrent
-states are equally likely \emph{a priori}}
-\item{We do not recommend running `compute_posterior() when the total
-genotype count (sum of per-episode multiplicities of infection) exceeds
-eight, because there are too many relationship graphs.}
-\item{Presently, \code{Pv3Rs} only supports prevalence data (categorical data that
-signal the detection of alleles), not quantitative data (data that signal the proportional
-abundance of the alleles detected).}
+\item{Recrudescent parasites derive only from the immediately preceding
+episode}
+\item{Recrudescence, relapse and reinfection are mutually exclusive}
+\item{Undetected alleles, genotyping errors, and \emph{de novo} mutations
+are not modelled}
+\item{Population structure and various other complexities that confound
+molecular correction are not modelled}
 }
 }
 \examples{
-# ===========================================================================
-# Example where alleles are named numerically
-# ===========================================================================
-# Data
-y <- list(enroll = list(m1 = c('3','2'), m2 = c('1','2')),
+# Numerically named alleles
+y <- list(enrol = list(m1 = c('3','2'), m2 = c('1','2')),
           recur1 = list(m1 = c('1','4'), m2 = c('1')),
           recur2 = list(m1 = c('1'), m2 = NA))
-
-# Allele frequencies
 fs <- list(m1 = c('1' = 0.78, '2' = 0.14, '3' = 0.07, '4' = 0.01),
            m2 = c('1' = 0.27, '2' = 0.73))
-
-# Compute posterior probabilities using default prior
 compute_posterior(y, fs, progress.bar = FALSE)
 
 
-# ===========================================================================
-# Example where alleles are named arbitrarily and probabilities are plotted
-# ===========================================================================
-# Data
+# Arbitrarily named alleles, plotting per-recurrence posteriors
 y <- list(enrolment = list(marker1 = c("Tinky Winky", "Dipsy"),
                           marker2 = c("Tinky Winky", "Laa-Laa", "Po")),
           recurrence = list(marker1 = "Tinky Winky",
                           marker2 = "Laa-Laa"))
-
-# Allele frequencies
 fs <- list(marker1 = c("Tinky Winky" = 0.4, "Dipsy" = 0.6),
            marker2 = c("Tinky Winky" = 0.1, "Laa-Laa" = 0.1, "Po" = 0.8))
-
-# Compute posterior probabilities using default prior
-posterior_probs <- compute_posterior(y, fs, progress.bar = FALSE)
-
-# Plot posterior on the simplex
-plot_simplex(p.coords = posterior_probs$marg)
+plot_simplex(p.coords = compute_posterior(y, fs, progress.bar = FALSE)$marg)
 
 
-#============================================================================
-# Demonstrating the return of the prior when all data are missing
-#============================================================================
-# Data
-y_missing <- list(enroll = list(m1 = NA),
-                  recur1 = list(m1 = NA),
-                  recur2 = list(m1 = NA))
+# Episode names are cosmetic: "r1_prior" is returned for "r2"
+y <- list(enrol = list(m1 = NA), r2 = list(m1 = NA), r1 = list(m1 = NA))
+prior <- matrix(c(0.6,0.7,0.2,0.3,0.2,0), ncol = 3,
+                dimnames = list(c("r1_prior", "r2_prior"), c("C", "L", "I")))
+suppressMessages(compute_posterior(y, fs = list(m1 = c(a = 1)), prior))$marg
+prior
 
-# Return of the prior
+
+# Prior is returned when all data are missing
+y_missing <- list(enrol = list(m1 = NA), recur = list(m1 = NA))
 suppressMessages(compute_posterior(y_missing, fs = list(m1 = c("A" = 1))))
 
-# Return of the prior re-weighted to the exclusion of recrudescence
-suppressMessages(compute_posterior(y_missing, fs = list(m1 = c("A" = 1)),
-                 MOIs = c(1,2,3)))
 
+# Return of the prior re-weighted to the exclusion of recrudescence:
+suppressMessages(compute_posterior(y_missing, fs = list(m1 = c("A" = 1)),
+                 MOIs = c(1,2)))
 # (Recrudescing parasites are clones of previous blood-stage parasites. The
 # Pv3R model assumes no within-host de-novo mutations and perfect allele
 # detection. As such, recrudescence is incompatible with an MOI increase on
 # the preceding infection.)
 
 
-# ===========================================================================
-# Demonstrating the cosmetic-only nature of episode names
-# ===========================================================================
-# Data
-y <- list(enroll = list(m1 = NA),
-          recur2 = list(m1 = NA),
-          recur1 = list(m1 = NA))
-
-# Use a non-uniform prior for the purpose of illustration
-prior <- matrix(c(0.2,0.2,0.6,0.7,0.1,0.2), byrow = TRUE, nrow = 2,
-                dimnames = list(c("recur1_prior", "recur2_prior"),
-                                c("C", "L", "I")))
-
-# Print posterior and prior, noting that "recur1_prior" is returned for
-# "recur2", and "recur2_prior" is returned for "recur1"
-suppressMessages(compute_posterior(y, fs = list(m1 = c(a = 1)), prior))$marg
-prior
-
-
-#============================================================================
-# Demonstrating the informative nature of non-recurrent data
-#============================================================================
-# Data and allele frequencies
+# Beware provision of unpaired data: the prior is not necessarily returned;
+# for more details, see link above to understand-posterior.htm
 y_het <- list(list(m1 = c('1', '2')), list(m1 = NA))
 y_hom <- list(list(m1 = '1'), list(m1 = NA))
 fs = list(m1 = c('1' = 0.5, '2' = 0.5))
-
-# The prior is not returned despite there being no recurrent data.
 suppressMessages(compute_posterior(y = y_het, fs))$marg
 suppressMessages(compute_posterior(y = y_hom, fs, MOIs = c(2,1)))$marg
-
-
-
-#============================================================================
-# Demonstrating the effect of increasingly large relationship graphs: the
-# marginal probability of the first recurrence changes slightly, albeit at a
-# decreasing rate, as the number of additional recurrences (all without data)
-# increases. The change is greatest when the observed allele is rare.
-#============================================================================
-# Data for different recurrence counts where only the 1st recurrence has data
-ys <- list(scenario1 = list(enroll = list(m1 = "A"),
-                            recur1 = list(m1 = "A")),
-           scenario2 = list(enroll = list(m1 = "A"),
-                            recur1 = list(m1 = "A"),
-                            recur2 = list(m1 = NA)),
-           scenario3 = list(enroll = list(m1 = "A"),
-                            recur1 = list(m1 = "A"),
-                            recur2 = list(m1 = NA),
-                            recur3 = list(m1 = NA)),
-           scenario4 = list(enroll = list(m1 = "A"),
-                            recur1 = list(m1 = "A"),
-                            recur2 = list(m1 = NA),
-                            recur3 = list(m1 = NA),
-                            recur4 = list(m1 = NA)))
-
-# Allele frequencies: smaller f_A leads to larger change
-f_A <- 0.1; fs <- list(m1 = c("A" = f_A, "Other" = 1-f_A))
-
-# Compute posterior probabilities and extract marginal probabilities
-results <- lapply(ys, function(y) compute_posterior(y, fs, progress.bar = FALSE)$marg)
-
-# Extract results for the first recurrence
-results_recur1 <- t(sapply(results, function(result) result[1,]))
-results_recur1 # Results are different for different scenarios
-
-# Visualise the change in the marginal probability of the first recurrence
-plot_simplex(p.coords = results_recur1, p.labels = rep(NA, 4),
-             col = 1:4, pch = "-") # Plot simplex
-legend("left", col = 1:4, pch = "-", pt.cex = 2, bty = "n", legend = 1:4,
-title = "Recurrence \n count") # legend
 
 }

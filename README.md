@@ -144,14 +144,16 @@ thus underflow problems.
 ### Population-level allele frequencies: 
 
 In addition to paired data, `compute_posterior()` requires as input
-population-level allele frequencies. To avoid bias due to within-host selection
-of recrudescent parasites, we recommend using only enrolment episodes to
-estimate population-level allele frequencies. That said, if most recurrences are
-either reinfections or relapses, both of which are draws from the mosquito
-population (albeit a delayed draw in the case of a relapse), assuming there is
-no systematic within-patient selection (as might occur when infections encounter
-lingering drug pressure), estimates based on all episodes should be unbiased and
-more precise than those based on enrolment episodes only.
+population-level allele frequencies. To minimise bias due to within-host
+selection of recrudescent parasites, we recommend using only enrolment episodes
+to estimate population-level allele frequencies, and ideally enrolment episodes
+from study participants selected at random, not only study participants who
+experience recurrence. That said, if most recurrences are either reinfections or
+relapses, both of which are draws from the mosquito population (albeit a delayed
+draw in the case of a relapse), assuming there is no systematic within-patient
+selection (as might occur when infections encounter lingering drug pressure),
+estimates based on all episodes should be unbiased and more precise than those
+based on enrolment episodes only.
 
 ### Read-count data: 
 
