@@ -66,15 +66,15 @@
 #' @param MOIs Vector of per-episode multiplicities of infection (MOIs). If
 #'   `NULL` (default), the most parsimonious MOIs compatible with the data are
 #'   used; see \code{\link{determine_MOIs}}.
-#' @param return.RG Logical; whether to return the relationship graphs
+#' @param return.RG Logical; returns the relationship graphs
 #'   (default `FALSE`). Automatically set to `TRUE` if `return.logp = TRUE`.
-#' @param return.logp Logical; whether to return the log-likelihood for each
+#' @param return.logp Logical; returns the log-likelihood for each
 #'   relationship graph (default `FALSE`). Setting `TRUE` disables permutation
 #'   symmetry optimisation and thus increases runtime, especially when MOIs are large.
 #'   Does not affect the output of the posterior probabilities; see
 #'   [vignette("demonstrate-usage")](../doc/demonstrate-usage.html), which also
 #'   contains an example of permutation symmetry.
-#' @param progress.bar Logical; whether to print progress bars (default `TRUE`).
+#' @param progress.bar Logical; show progress bars (default `TRUE`).
 #'   Note that the progress bar may update non-uniformly.
 #'
 #'

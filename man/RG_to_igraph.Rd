@@ -7,7 +7,7 @@
 RG_to_igraph(RG, gs, ts_per_gs)
 }
 \arguments{
-\item{RG}{List encoding a RG; see \strong{Value} of
+\item{RG}{List encoding an RG; see \strong{Value} of
 \code{\link{enumerate_RGs}} when \code{igraph = FALSE}.}
 
 \item{gs}{Character vector of genotype names.}
@@ -16,18 +16,20 @@ RG_to_igraph(RG, gs, ts_per_gs)
 e.g., \code{rep(1:length(y), determine_MOIs(y))}.}
 }
 \value{
-An \code{igraph} object along with the original variables in
-\code{RG}.
+A weighted graph whose edge weights 1 and 0.5 encode clonal and
+sibling relationships, respectively.
 }
 \description{
-Converts a relationship graph (RG) encoded as a list to an \code{igraph} object
+Converts an RG encoded as a list to an \code{igraph} object, which requires
+more memory allocation but can be plotted using \code{\link{Plot_RG}}.
 }
 \examples{
-set.seed(20)
-RG_as_list <- sample_RG(c(2, 2), igraph = FALSE)
-RG_as_list
-RG_as_igraph <- RG_to_igraph(RG_as_list, c("g1", "g2", "g3", "g4"), c(1, 1, 2, 2))
-RG_as_igraph
+set.seed(5)
+RG_as_list <- sample_RG(c(3, 2), igraph = FALSE)
+utils::object.size(RG_as_list)
+RG_as_igraph <- RG_to_igraph(RG_as_list, paste0("g", 1:5), c(1, 1, 1, 2, 2))
+utils::object.size(RG_as_igraph)
 plot_RG(RG_as_igraph)
+igraph::E(RG_as_igraph)$weight
 
 }

@@ -1,18 +1,19 @@
 #' Sample a relationship graph (RG)
 #'
-#' Uses the techniques in \code{\link{enumerate_RGs}} to sample a relationship
-#' graph uniformly at random. All clonal partitions are generated, and the
-#' number of sibling partitions consistent with each clonal partition is
-#' determined. A clonal partition is randomly selected with probability
-#' proportional to the corresponding number of sibling partitions, and a sibling
-#' partition is then uniformly sampled. The nested partition is equivalent to a
-#' relationship graph. See \code{\link{enumerate_RGs}} for details on the nested
-#' partition representation of a relationship graph.
+#' Uses the techniques in \code{\link{enumerate_RGs}} to sample a single RG
+#' uniformly. All clonal partitions are generated, each weighted by its number
+#' of consistent sibling partitions. A clonal partition is sampled proportional
+#' to its weight, then a consistent sibling partition is drawn uniformly. The
+#' resulting nested partition represents the RG; see \code{\link{enumerate_RGs}}
+#' for details.
 #'
-#' @param MOIs Numeric vector containing per-episode multiplicities of infection (MOIs).
-#' @param igraph Logical; returns RG as an \code{igraph} object (default `TRUE`).
+#' @param MOIs Vector of per-episode multiplicities of infection (MOIs),
+#' i.e., numbers of vertices per episode.
+#' @param igraph Logical; if `TRUE` (default), returns the RG as an
+#'   \code{igraph} object.
 #'
-#' @return An RG; see \code{\link{enumerate_RGs}}) for more details.
+#' @return An RG encoded either as an `igraph` object (default), or as a list;
+#'   see \code{\link{enumerate_RGs}} for details.
 #'
 #' @examples
 #' set.seed(1)

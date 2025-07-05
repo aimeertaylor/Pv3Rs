@@ -40,17 +40,17 @@ equally likely \emph{a priori}.}
 \code{NULL} (default), the most parsimonious MOIs compatible with the data are
 used; see \code{\link{determine_MOIs}}.}
 
-\item{return.RG}{Logical; whether to return the relationship graphs
+\item{return.RG}{Logical; returns the relationship graphs
 (default \code{FALSE}). Automatically set to \code{TRUE} if \code{return.logp = TRUE}.}
 
-\item{return.logp}{Logical; whether to return the log-likelihood for each
+\item{return.logp}{Logical; returns the log-likelihood for each
 relationship graph (default \code{FALSE}). Setting \code{TRUE} disables permutation
 symmetry optimisation and thus increases runtime, especially when MOIs are large.
 Does not affect the output of the posterior probabilities; see
 \href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")}, which also
 contains an example of permutation symmetry.}
 
-\item{progress.bar}{Logical; whether to print progress bars (default \code{TRUE}).
+\item{progress.bar}{Logical; show progress bars (default \code{TRUE}).
 Note that the progress bar may update non-uniformly.}
 }
 \value{
