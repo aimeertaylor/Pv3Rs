@@ -99,8 +99,6 @@ RGcheck <- sapply(c_params, function(c) {
 if (!all(RGcheck)) stop("graphs not returned in the same order")
 example_y <- ys_store[[1]][[1]][[1]]
 example_MOIs <- determine_MOIs(example_y)
-ts_per_gs <- rep(1:length(example_y), example_MOIs)
-gs <- paste0("g", 1:sum(example_MOIs))
 
 #-------------------------------------------------------------------------------
 # Loop over migrant and non-migrant scenarios
@@ -170,7 +168,7 @@ for(admixture in c("admixture_FALSE", "admixture_TRUE")) {
     ps <- ps_store[[1]][[1]][[1]][[1]]
     RG <- ps$RGs[[g]]
     par(mar = c(0.5, 0.5, 0.5, 0.5))
-    igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
+    igraphRG <- RG_to_igraph(RG, example_MOIs) # Convert to igraph object
     plot_RG(RG =  igraphRG, vertex_palette = "Greys", vertex.label = NA)
     box(col = graph_cols[as.character(g)], lwd = 3)
   }

@@ -122,8 +122,6 @@ for(case in cases){
       MOIs_num <- determine_MOIs(ys_store[[as.character(c)]][[MOIs]][[as.character(i)]])
     }
 
-    ts_per_gs <- rep(1:length(MOIs_num), MOIs_num)
-    gs <- paste0("g", 1:sum(MOIs_num))
     RGs <- enumerate_RGs(MOIs = MOIs_num, igraph = T)
     graph_cols <- colorRamp(RColorBrewer::brewer.pal(n = 9, "Paired"))(seq(0, 1, length.out = length(RGs)))
     graph_cols <- apply(round(graph_cols), 1, function(x) rgb(x[1], x[2], x[3], maxColorValue = 255))
@@ -136,7 +134,7 @@ for(case in cases){
     for(g in graph_plot_order) {
       RG <- RGs[[g]]
       par(mar = c(0.5, 0.5, 0.5, 0.5))
-      igraphRG <- RG_to_igraph(RG, gs, ts_per_gs) # Convert to igraph object
+      igraphRG <- RG_to_igraph(RG, MOIs_num) # Convert to igraph object
       plot_RG(RG =  igraphRG, vertex_palette = "Greys", vertex.label = NA)
       box(col = graph_cols[as.character(g)], lwd = 3)
     }

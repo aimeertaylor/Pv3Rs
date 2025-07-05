@@ -92,12 +92,11 @@ MOIs <- determine_MOIs(y)
 gs <- paste0("g", 1:sum(MOIs))
 ts_per_gs <- rep(1:length(MOIs), MOIs)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
-plot_RG(RG_to_igraph(RG, gs, ts_per_gs), edge.curved=0, vertex.size=20, vertex_palette = "Blues")
+plot_RG(RG_to_igraph(RG, MOIs), edge.curved=0, vertex.size=20, vertex_palette = "Blues")
 seqs_comp_MLE_RG <- Pv3Rs:::compatible_rstrs(RG, split(gs, ts_per_gs))
 
 y <- list(list(m1 = c("A", "B")), list(m1 = "A"))
 fs <- list(m1 = c("A" = 0.9, "B" = 0.1))
 ps <- compute_posterior(y, fs, return.logp = T)
 ps$marg
-plot_RG(RG_to_igraph(ps$RGs[[which.max(sapply(ps$RGs, function(x) x$logp))]],
-             gs = paste0("g", 1:3), ts_per_gs = c(1,1,2)))
+plot_RG(RG_to_igraph(ps$RGs[[which.max(sapply(ps$RGs, function(x) x$logp))]], MOIs))

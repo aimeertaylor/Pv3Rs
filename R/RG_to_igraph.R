@@ -1,29 +1,43 @@
 #' Converts a relationship graph (RG) encoded as a list to an \code{igraph} object
 #'
 #' Converts an RG encoded as a list to an \code{igraph} object, which requires
-#' more memory allocation but can be plotted using \code{\link{Plot_RG}}.
+#' more memory allocation but can be plotted using \code{\link{plot_RG}}.
 #'
 #' @param RG List encoding an RG; see **Value** of
 #'   \code{\link{enumerate_RGs}} when \code{igraph = FALSE}.
-#' @param gs Character vector of genotype names.
-#' @param ts_per_gs Numeric vector containing episode number for each genotype,
-#'   e.g., `rep(1:length(y), determine_MOIs(y))`.
+#' @param MOIs Vector of per-episode multiplicities of infection (MOIs), i.e.,
+#'   numbers of vertices per episode; adds to the graph an attribute
+#'   that is used by \code{\link{plot_RG}} to group genotypes by episodes.
 #'
 #' @return A weighted graph whose edge weights 1 and 0.5 encode clonal and
 #'   sibling relationships, respectively.
 #'
 #' @examples
-#' set.seed(5)
-#' RG_as_list <- sample_RG(c(3, 2), igraph = FALSE)
+#' MOIs <- c(3,2)
+#' set.seed(6)
+#' RG_as_list <- sample_RG(MOIs, igraph = FALSE)
+#' RG_as_igraph <- RG_to_igraph(RG_as_list,  MOIs)
+#'
+#' # RG encoded as a list requires less memory allocation
 #' utils::object.size(RG_as_list)
-#' RG_as_igraph <- RG_to_igraph(RG_as_list, paste0("g", 1:5), c(1, 1, 1, 2, 2))
 #' utils::object.size(RG_as_igraph)
+#'
+#' # RG encoded as an igraph object can be plotted using plot_RG() and
+#' # manipulated using igraph functions
 #' plot_RG(RG_as_igraph)
+#'
+#' # Edge weights 1 and 0.5 encode clonal and sibling relationships
 #' igraph::E(RG_as_igraph)$weight
 #'
+#' # Vertex attribute group encodes episode membership
+#' igraph::V(RG_as_igraph)$group
+#'
 #' @export
-RG_to_igraph <- function(RG, gs, ts_per_gs) {
-  gs_count <- length(gs)
+RG_to_igraph <- function(RG, MOIs) {
+
+  ts_per_gs <- rep(1:length(MOIs), MOIs)
+  gs_count <- sum(MOIs)
+  gs <- unlist(RG$clone)
 
   n.sib.clones <- max(RG$sib.vec) # number of sibling cells
   n.clones <- max(RG$clone.vec) # number of clonal cells

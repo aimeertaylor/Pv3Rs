@@ -29,7 +29,7 @@ RG_modes <- res$RGs[which(near(logps, max(logps)))]
 for(RG_mode in RG_modes) {
   print(Pv3Rs:::compatible_rstrs(RG_mode, gs_per_ts)) # not compatible with I
   par(mar = rep(0.1,4))
-  plot_RG(RG_to_igraph(RG_mode, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
+  plot_RG(RG_to_igraph(RG_mode, MOIs), edge.curved=0.25, vertex.size=20)
 }
 # this one is hard to interpret because posterior probabilities are close
 
@@ -43,7 +43,7 @@ RG_modes <- res$RGs[which(near(logps, max(logps)))]
 for(RG_mode in RG_modes) {
   print(Pv3Rs:::compatible_rstrs(RG_mode, gs_per_ts)) # some are not compatible with C
   par(mar = rep(0.1,4))
-  plot_RG(RG_to_igraph(RG_mode, gs, ts_per_gs), edge.curved=0.25, vertex.size=20)
+  plot_RG(RG_to_igraph(RG_mode, MOIs), edge.curved=0.25, vertex.size=20)
 }
 # one of these RGs has all siblings edges, which is the one not compatible with C
 

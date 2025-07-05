@@ -53,7 +53,7 @@ plot_RG <- function(RG,
   MOIs <- as.vector(table(ts_per_gs)) # extract MOIs
   infection_count <- length(MOIs)
 
-  if (layout_by_group) { # Compute graph layout, grouping genotypes per infection
+  if (layout_by_group) { # Compute graph layout, grouping genotypes per episode
     gs_count <- sum(MOIs)
     RG_layout <- array(dim = c(gs_count, 2))
     X <- rbind(seq(0, 1, length.out = infection_count), MOIs)

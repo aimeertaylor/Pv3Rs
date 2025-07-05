@@ -39,7 +39,6 @@ sample_RG <- function(MOIs, igraph = TRUE) {
   }
 
   gs <- paste0("g", 1:gs_count) # Genotype names
-  ts_per_gs <- rep(1:infection_count, MOIs)
 
   # get clonal partitions, accounting for no intra-infection clones
   CP_list <- enumerate_CPs(MOIs)
@@ -72,7 +71,7 @@ sample_RG <- function(MOIs, igraph = TRUE) {
     sib.vec = sib.vec
   )
 
-  if (igraph) RG <- RG_to_igraph(RG, gs, ts_per_gs)
+  if (igraph) RG <- RG_to_igraph(RG, MOIs)
 
   return(RG)
 }

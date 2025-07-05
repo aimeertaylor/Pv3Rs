@@ -4,16 +4,15 @@
 \alias{RG_to_igraph}
 \title{Converts a relationship graph (RG) encoded as a list to an \code{igraph} object}
 \usage{
-RG_to_igraph(RG, gs, ts_per_gs)
+RG_to_igraph(RG, MOIs)
 }
 \arguments{
 \item{RG}{List encoding an RG; see \strong{Value} of
 \code{\link{enumerate_RGs}} when \code{igraph = FALSE}.}
 
-\item{gs}{Character vector of genotype names.}
-
-\item{ts_per_gs}{Numeric vector containing episode number for each genotype,
-e.g., \code{rep(1:length(y), determine_MOIs(y))}.}
+\item{MOIs}{Vector of per-episode multiplicities of infection (MOIs), i.e.,
+numbers of vertices per episode; adds to the graph an attribute
+that is used by \code{\link{plot_RG}} to group genotypes by episodes.}
 }
 \value{
 A weighted graph whose edge weights 1 and 0.5 encode clonal and
@@ -21,15 +20,26 @@ sibling relationships, respectively.
 }
 \description{
 Converts an RG encoded as a list to an \code{igraph} object, which requires
-more memory allocation but can be plotted using \code{\link{Plot_RG}}.
+more memory allocation but can be plotted using \code{\link{plot_RG}}.
 }
 \examples{
-set.seed(5)
-RG_as_list <- sample_RG(c(3, 2), igraph = FALSE)
+MOIs <- c(3,2)
+set.seed(6)
+RG_as_list <- sample_RG(MOIs, igraph = FALSE)
+RG_as_igraph <- RG_to_igraph(RG_as_list,  MOIs)
+
+# RG encoded as a list requires less memory allocation
 utils::object.size(RG_as_list)
-RG_as_igraph <- RG_to_igraph(RG_as_list, paste0("g", 1:5), c(1, 1, 1, 2, 2))
 utils::object.size(RG_as_igraph)
+
+# RG encoded as an igraph object can be plotted using plot_RG() and
+# manipulated using igraph functions
 plot_RG(RG_as_igraph)
+
+# Edge weights 1 and 0.5 encode clonal and sibling relationships
 igraph::E(RG_as_igraph)$weight
+
+# Vertex attribute group encodes episode membership
+igraph::V(RG_as_igraph)$group
 
 }

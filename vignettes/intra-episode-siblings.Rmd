@@ -155,7 +155,7 @@ ts_per_gs <- rep(1:length(MOIs), MOIs) # Episode indices per genotype
 llikes <- sapply(ppost$RGs, function(RG) RG$logp) # Extract log likelihoods
 par(mar = c(0, 0.5, 0, 0.5), mfrow = c(1,5)) # Plotting parameters
 for(RG in ppost$RGs[which(is.infinite(llikes))]) {
-plot_RG(RG_to_igraph(RG, gs, ts_per_gs),
+plot_RG(RG_to_igraph(RG, MOIs),
         vertex_palette = "Greys",
         edge.curved = 0.08,
         vertex.size = 40,

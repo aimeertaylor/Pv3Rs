@@ -80,7 +80,7 @@ MOIs <- determine_MOIs(y)
 gs <- paste0("g", 1:sum(MOIs))
 ts_per_gs <- rep(1:length(MOIs), MOIs)
 par(mar = c(0.5, 0.5, 0.5, 0.5))
-plot_RG(RG_to_igraph(RG, gs, ts_per_gs),
+plot_RG(RG_to_igraph(RG, MOIs),
         vertex_palette = "Greys",
         edge.curved = 0.08,
         vertex.size = 40,

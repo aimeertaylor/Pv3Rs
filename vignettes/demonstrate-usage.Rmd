@@ -179,16 +179,10 @@ llikes <- sapply(post$RGs, function(RG) RG$logp)
 # Extract the relationship graphs (RGs) with the largest log likelihood
 RGs <- post$RGs[which(abs(llikes - max(llikes)) < .Machine$double.eps^0.5)]
 
-# Generate genotype names 
-gs <- paste0("g", 1:6) 
-
-# Generate episode indices for genotypes
-ts_per_gs <- rep(1:length(y), determine_MOIs(y)) 
-
 # Plot RG
 par(mar = rep(0.1,4), mfrow = c(1,2))
 for(i in 1:length(RGs)) {
-  plot_RG(RG_to_igraph(RGs[[i]], gs, ts_per_gs), vertex.size = 20)
+  plot_RG(RG_to_igraph(RGs[[i]], determine_MOIs(y)), vertex.size = 20)
   box()
 }
 
@@ -196,7 +190,7 @@ for(i in 1:length(RGs)) {
 episode_colours <- RColorBrewer::brewer.pal(n = 8, "Set2") 
 
 # Add a legend
-legend("bottomright", pch = 21, pt.bg = episode_colours[unique(ts_per_gs)], 
+legend("bottomright", pch = 21, pt.bg = episode_colours[1:length(y)], 
        bty = "n", legend = names(y), title = "Episode")
 ```
 
@@ -246,7 +240,7 @@ par(mar = rep(0.1,4), mfrow = c(3,4))
 RG_order <- order(llikes, decreasing = T) # order RGs by logl
 for(i in (max_idx-max_size+1):max_idx) { # EC consists of the RGs with logl rank 21-32
   RG <- post$RGs[[RG_order[i]]]
-  RG_igraph <- RG_to_igraph(RG, gs, ts_per_gs)
+  RG_igraph <- RG_to_igraph(RG, determine_MOIs(y))
   plot_RG(RG_igraph, vertex.size = 25, vertex.label = NA)
   box()
 }
