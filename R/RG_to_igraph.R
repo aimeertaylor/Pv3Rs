@@ -39,6 +39,8 @@ RG_to_igraph <- function(RG, MOIs) {
   gs_count <- sum(MOIs)
   gs <- unlist(RG$clone)
 
+  if (length(gs) != gs_count) stop("sum(MOIs) should equal number of genotypes in RG")
+
   n.sib.clones <- max(RG$sib.vec) # number of sibling cells
   n.clones <- max(RG$clone.vec) # number of clonal cells
   clones <- RG$clone # clonal partition as list
