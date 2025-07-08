@@ -76,7 +76,7 @@ prior <- array(c(0.2, 0.3, 0.5), dim = c(1,3),
                dimnames = list(NULL, c("C", "L", "I")))
 
 # Compute posterior probabilities
-post <- compute_posterior(y, fs, prior)
+post <- compute_posterior(y, fs, prior, progress.bar = FALSE)
 
 # Plot simplex with the prior and posterior
 plot_simplex(p.coords = rbind(prior, post$marg),

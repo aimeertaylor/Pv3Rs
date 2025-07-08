@@ -79,7 +79,7 @@ recrudescence, relapse, reinfection — using per-person genetic data on two
 or more episodes; for usage see
 \strong{Examples} below and
 \code{vignette("demonstrate-usage")} (use this link online)
-\href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")} for a more
+\code{vignette("demonstrate-usage")}(../doc/demonstrate-usage.html) for a more
 complete understanding of the posterior output see \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 
 Note: The progress bar may increment non-uniformly (see

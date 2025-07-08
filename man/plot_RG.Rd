@@ -43,7 +43,7 @@ relationships.}
 This function is a wrapper around \code{\link[igraph]{plot.igraph}}, written
 to group parasite genotypes by episode both spatially and using vertex
 colour (specifically, parasite genotypes within episodes are vertically
-distributed with some horizontal jitter when \code{layout.by.group} is TRUE
+distributed with some horizontal jitter when \code{layout.by.group = TRUE}
 (default), and equicolored), and to ensure clone and sibling edges
 are plotted using different line types.
 }
@@ -53,7 +53,7 @@ are plotted using different line types.
 }
 
 \examples{
-RGs <- enumerate_RGs(c(2, 1, 1))
+RGs <- enumerate_RGs(c(2, 1, 1), progress.bar = FALSE)
 cpar <- par(no.readonly = TRUE) # record current par before changing
 par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
 for (i in 12:23) {
