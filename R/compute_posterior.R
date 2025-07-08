@@ -11,6 +11,8 @@
 #' complete understanding of the posterior output see ["Understand posterior
 #' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'
+#' `vignettes(topic = "understand-posterior", package = "Pv3Rs")
+#'
 #' Note: The progress bar may increment non-uniformly (see
 #' **Details**); it may appear stuck when computations are ongoing.
 #'
