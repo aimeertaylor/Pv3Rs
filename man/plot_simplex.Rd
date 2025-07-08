@@ -8,7 +8,7 @@ plot_simplex(
   v.labels = c("Recrudescence", "Relapse", "Reinfection"),
   v.cutoff = 0.5,
   v.colours = c("yellow", "purple", "red"),
-  plot.tri = T,
+  plot.tri = TRUE,
   p.coords = NULL,
   p.labels = rownames(p.coords),
   p.labels.pos = 3,
@@ -16,39 +16,43 @@ plot_simplex(
 )
 }
 \arguments{
-\item{v.labels}{A vector of labels that annotate vertices anticlockwise from
+\item{v.labels}{Vector of labels that annotate vertices anticlockwise from
 top (default: "Recrudescence", "Relapse", "Reinfection"). If NULL, vertices
 are not annotated.}
 
-\item{v.cutoff}{An arbitrary number between 0.5 and 1 that separates regions
+\item{v.cutoff}{Number between 0.5 and 1 that separates regions
 of lower and higher probability. Beware the use of cut-offs for probable
 recrudescence classification and probable reinfection classification; see
 \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.}
 
-\item{v.colours}{A vector of colours associated with the vertices
-anticlockwise from top; see example below.}
+\item{v.colours}{Vector of colours associated with the vertices
+anticlockwise from top.}
 
-\item{plot.tri}{Whether to plot the triangular boundary (default true).}
+\item{plot.tri}{Logical; plots the triangular boundary if \code{TRUE} (default).}
 
-\item{p.coords}{Matrix of simplex coordinates (3D) to plot with \code{points},
-one row per point. If a vector is given, this is converted to a matrix with
-a single row.}
+\item{p.coords}{Matrix of 3D simplex coordinates (e.g., per-recurrence
+probabilities of recrudescence, relapse and reinfection), one set of
+coordinates per row, each row is projected onto 2D coordinates using
+\code{\link[=project2D]{project2D()}}, then plotted as a single simplex point using
+\code{\link[graphics:points]{graphics::points()}}. If the user provides a vector, it is converted to a
+matrix with one row.}
 
-\item{p.labels}{Labels of the points \code{p.coords}. If labels are undesired,
-set this to \code{NA}. The default is to use the row names of \code{p.coords}.}
+\item{p.labels}{Labels used to annotate points given by \code{p.coords}.
+Equal to the row names of \code{p.coords} by default. Points are not
+annotated if \code{NA}.}
 
-\item{p.labels.pos}{Which side to plot the \code{p.labels}. Values of \code{1},
+\item{p.labels.pos}{Position specifier for \code{p.labels}. Values of \code{1},
 \code{2}, \code{3} and \code{4}, respectively indicate positions below, to
 the left of, above and to the right of the points. Can be either a single
 integer (default 3) or a vector of integers.}
 
-\item{...}{Further graphical parameters passed to points.}
+\item{...}{Further graphical parameters passed to \code{\link[graphics:points]{graphics::points()}}.}
 }
 \description{
 Plots a 2D simplex, a triangle with unit sides centered at the origin, onto
-which marginal posterior probabilities of relapse, reinfection and
-recrudescence (or any other vector of three numbers in zero to one summing to
-one) can be projected; see \code{\link[=project2D]{project2D()}} and examples below.
+which per-recurrence posterior probabilities of recrudescence, relapse,
+reinfection (or any other vector of three numbers in zero to one that sum to
+one) can be projected; see \code{\link[=project2D]{project2D()}} and \strong{Examples} below.
 }
 \examples{
 # Plot 2D simplex
@@ -77,15 +81,13 @@ prior <- array(c(0.2, 0.3, 0.5), dim = c(1,3),
 # Compute posterior probabilities
 post <- compute_posterior(y, fs, prior)
 
-p.coords <- rbind(prior, post$marg)
+# Plot simplex with the prior and posterior
+plot_simplex(p.coords = rbind(prior, post$marg),
+             p.labels = c("Prior", "Posterior"),
+             pch = 20)
 
-# Plot simplex with probability greater than 0.8 considered relatively
-# certain
-plot_simplex(v.cutoff = 0.8, p.coords = p.coords,
-             p.labels = c("Prior", "Posterior"))
-
-# Plot the deviation of the posterior from the prior, this requires manually
-# obtaining 2D coordinates
+# Add the deviation between the prior and posterior: requires obtaining 2D
+# coordinates manually
 xy_prior <- project2D(as.vector(prior))
 xy_post <- project2D(as.vector(post$marg))
 arrows(x0 = xy_prior["x"], x1 = xy_post["x"],

@@ -1,36 +1,41 @@
 #' Plots a 2D simplex
 #'
 #' Plots a 2D simplex, a triangle with unit sides centered at the origin, onto
-#' which marginal posterior probabilities of relapse, reinfection and
-#' recrudescence (or any other vector of three numbers in zero to one summing to
-#' one) can be projected; see [project2D()] and examples below.
+#' which per-recurrence posterior probabilities of recrudescence, relapse,
+#' reinfection (or any other vector of three numbers in zero to one that sum to
+#' one) can be projected; see [project2D()] and **Examples** below.
 #'
-#' @param v.labels A vector of labels that annotate vertices anticlockwise from
+#' @param v.labels Vector of labels that annotate vertices anticlockwise from
 #'   top (default: "Recrudescence", "Relapse", "Reinfection"). If NULL, vertices
 #'   are not annotated.
 #'
-#' @param v.cutoff An arbitrary number between 0.5 and 1 that separates regions
+#' @param v.cutoff Number between 0.5 and 1 that separates regions
 #'   of lower and higher probability. Beware the use of cut-offs for probable
 #'   recrudescence classification and probable reinfection classification; see
 #'   ["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'
-#' @param v.colours A vector of colours associated with the vertices
-#'   anticlockwise from top; see example below.
+#' @param v.colours Vector of colours associated with the vertices
+#'   anticlockwise from top.
 #'
-#' @param plot.tri Whether to plot the triangular boundary (default true).
+#' @param plot.tri Logical; plots the triangular boundary if `TRUE` (default).
 #'
-#' @param p.coords Matrix of simplex coordinates (3D) to plot with \code{points},
-#'   one row per point. If a vector is given, this is converted to a matrix with
-#'   a single row.
-#' @param p.labels Labels of the points \code{p.coords}. If labels are undesired,
-#'   set this to \code{NA}. The default is to use the row names of \code{p.coords}.
+#' @param p.coords Matrix of 3D simplex coordinates (e.g., per-recurrence
+#'   probabilities of recrudescence, relapse and reinfection), one set of
+#'   coordinates per row, each row is projected onto 2D coordinates using
+#'   [project2D()], then plotted as a single simplex point using
+#'   [graphics::points()]. If the user provides a vector, it is converted to a
+#'   matrix with one row.
 #'
-#' @param p.labels.pos Which side to plot the \code{p.labels}. Values of \code{1},
+#' @param p.labels Labels used to annotate points given by \code{p.coords}.
+#'   Equal to the row names of \code{p.coords} by default. Points are not
+#'   annotated if `NA`.
+#'
+#' @param p.labels.pos Position specifier for \code{p.labels}. Values of \code{1},
 #' \code{2}, \code{3} and \code{4}, respectively indicate positions below, to
 #' the left of, above and to the right of the points. Can be either a single
 #' integer (default 3) or a vector of integers.
 #'
-#' @param ... Further graphical parameters passed to points.
+#' @param ... Further graphical parameters passed to [graphics::points()].
 #'
 #' @examples
 #' # Plot 2D simplex
@@ -59,15 +64,13 @@
 #' # Compute posterior probabilities
 #' post <- compute_posterior(y, fs, prior)
 #'
-#' p.coords <- rbind(prior, post$marg)
+#' # Plot simplex with the prior and posterior
+#' plot_simplex(p.coords = rbind(prior, post$marg),
+#'              p.labels = c("Prior", "Posterior"),
+#'              pch = 20)
 #'
-#' # Plot simplex with probability greater than 0.8 considered relatively
-#' # certain
-#' plot_simplex(v.cutoff = 0.8, p.coords = p.coords,
-#'              p.labels = c("Prior", "Posterior"))
-#'
-#' # Plot the deviation of the posterior from the prior, this requires manually
-#' # obtaining 2D coordinates
+#' # Add the deviation between the prior and posterior: requires obtaining 2D
+#' # coordinates manually
 #' xy_prior <- project2D(as.vector(prior))
 #' xy_post <- project2D(as.vector(post$marg))
 #' arrows(x0 = xy_prior["x"], x1 = xy_post["x"],
@@ -76,7 +79,7 @@
 plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection"),
                          v.cutoff = 0.5,
                          v.colours = c("yellow","purple","red"),
-                         plot.tri = T,
+                         plot.tri = TRUE,
                          p.coords = NULL,
                          p.labels = rownames(p.coords),
                          p.labels.pos = 3,
