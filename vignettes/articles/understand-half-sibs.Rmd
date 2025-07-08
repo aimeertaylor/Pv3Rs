@@ -2,10 +2,13 @@
 title: "Understand half-sibling misspecification"
 ---
 
-"Understand half-sibling misspecification" is a pdf vignette. At present, pkgdown (the R package used to create this website) does 
-not support pdf vignettes; see 
-[pkgdown issue 781](https://github.com/r-lib/pkgdown/issues/781). 
-When Pv3Rs is on CRAN, this signpost will be replaced by a link to the pdf
-vignette on CRAN. For the time being, please access "Understand half-sibling misspecification" by 
-installing Pv3Rs and calling `vignette(topic = "half-siblings", package = "Pv3Rs")` in
-R.
+"Understand half-sibling misspecification" is a pdf vignette. At present,
+pkgdown (the R package used to create this website) does not support pdf
+vignettes; see [pkgdown issue 781](https://github.com/r-lib/pkgdown/issues/781).
+Please access "Understand half-sibling misspecification" by installing Pv3Rs and
+calling `vignette(topic = "understand-half-sibs", package = "Pv3Rs")` in R.
+
+
+
+
+
