@@ -31,9 +31,9 @@ anticlockwise from top.}
 \item{plot.tri}{Logical; plots the triangular boundary if \code{TRUE} (default).}
 
 \item{p.coords}{Matrix of 3D simplex coordinates (e.g., per-recurrence
-probabilities of recrudescence, relapse and reinfection), one set of
-coordinates per row, each row is projected onto 2D coordinates using
-\code{\link[=project2D]{project2D()}}, then plotted as a single simplex point using
+probabilities of recrudescence, relapse and reinfection), one vector of
+3D coordinates per row, each row is projected onto 2D coordinates using
+\code{\link[=project2D]{project2D()}} and then plotted as a single simplex point using
 \code{\link[graphics:points]{graphics::points()}}. If the user provides a vector, it is converted to a
 matrix with one row.}
 

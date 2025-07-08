@@ -11,19 +11,37 @@ project2D(v)
 }
 \value{
 A numeric vector of two coordinates that can be used to plot the
-probability vector \code{v} on the origin-centred 2D simplex (see
-\code{\link[=plot_simplex]{plot_simplex()}}), where the top, left, and right vertices of the simplex
-correspond with the first, second and third entries of \code{v}
-respectively.
+probability vector \code{v} on the origin-centred 2D simplex.
 }
 \description{
-Project three probabilities that sum to one (e.g., the marginal probabilities
-of the 3Rs) onto the coordinates of a 2D simplex centred at the origin
-(i.e., a triangle centred at (0,0) with unit sides). Each probability is
-proportional to the distance between the point and the side opposite to the
-corner corresponding to the probability.
+Project three probabilities that sum to one (e.g., per-recurrence
+probabilities of recrudescence, relapse and reinfection) onto the coordinates
+of a 2D simplex centred at the origin (i.e., a triangle centred at (0,0) with
+unit-length sides).
+}
+\details{
+The top, left, and right vertices of the 2D simplex correspond with the
+first, second and third entries of \code{v}, respectively. Each probability is
+proportional to the distance from the point on the simplex to the side
+opposite the corresponding probability; see \strong{Examples} below and
+\code{\link[=plot_simplex]{plot_simplex()}} for more details.
 }
 \examples{
-project2D(v = c(0.75,0.20,0.05))
+probabilities_of_v1_v2_v3 <- c(0.75,0.20,0.05)
+coordinates <- project2D(v = probabilities_of_v1_v2_v3)
+
+# Plot probability vector on 2D simplex
+plot_simplex(v.labels = c("v1", "v2", "v3"))
+points(x = coordinates[1], y = coordinates[2], pch = 20)
+
+# Plot the distances that represent probabilities
+# get vertices, get points on edges by orthogonal projection, plot arrows
+v <- apply(matrix(c(1,0,0,0,1,0,0,0,1), nrow = 3), 1, project2D)
+p3 <- v[,1] + sum((coordinates - v[,1]) * (v[,2] - v[,1])) * (v[,2] - v[,1])
+p1 <- v[,2] + sum((coordinates - v[,2]) * (v[,3] - v[,2])) * (v[,3] - v[,2])
+p2 <- v[,3] + sum((coordinates - v[,3]) * (v[,1] - v[,3])) * (v[,1] - v[,3])
+arrows(x0 = coordinates[1], y0 = coordinates[2], x1 = p1[1], y1 = p1[2], length = 0.1)
+arrows(x0 = coordinates[1], y0 = coordinates[2], x1 = p2[1], y1 = p2[2], length = 0.1)
+arrows(x0 = coordinates[1], y0 = coordinates[2], x1 = p3[1], y1 = p3[2], length = 0.1)
 
 }
