@@ -50,6 +50,6 @@ membership vector (either \code{clone.vec} or \code{sib.vec}). By default, an RG
 encoded as a list is converted to an \code{igraph} object.
 }
 \examples{
-graphs <- enumerate_RGs(c(2, 1, 2)) # nine graphs
+graphs <- enumerate_RGs(c(2, 1, 2), progress.bar = FALSE) # nine graphs
 
 }

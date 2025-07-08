@@ -30,9 +30,8 @@ maxima
 \description{
 Upper bounds on posterior probabilities of 1st-recurrence recrudescence and
 reinfection (rows) for various MOI vectors (columns) that sum to at most
-eight.
-#' These upper bounds feature in
-\href{../doc/understand-graph-prior.pdf}{vignette("understand-graph-prior ")} and
+eight. These upper bounds feature in
+\href{../doc/understand-graph-prior.pdf}{vignette("understand-graph-prior")} and
 \href{../doc/intra-episode-siblings.html}{vignette("intra-episode-siblings")}.
 For a single recurrence (MOI vectors of length two), upper bounds are
 induced by the prior. For more than one recurrence (MOI vectors of length

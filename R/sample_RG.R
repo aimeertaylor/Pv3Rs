@@ -18,7 +18,7 @@
 #' @examples
 #' set.seed(1)
 #' RG <- sample_RG(c(3, 2))
-#' plot_RG(RG)
+#' plot_RG(RG, vertex.label = NA)
 #'
 #' @export
 sample_RG <- function(MOIs, igraph = TRUE) {

@@ -4,9 +4,9 @@
 #' extracted from study participants enrolled in the Best Primaquine Dose (BPD) and Vivax
 #' History (VHX) trials; see
 #' [Taylor & Watson et al. 2019](https://www.nature.com/articles/s41467-019-13412-x)
-#' for more details of the genetic data; for more details of the trials, see
+#' for more details of the genetic data; for more details of the VHX and BPD trials, see
 #' [Chu et al. 2018a](https://doi.org/10.1093/cid/ciy319) and
-#' [Chu et al. 2018b](https://doi.org/10.1093/cid/ciy735).
+#' [Chu et al. 2018b](https://doi.org/10.1093/cid/ciy735), respectively.
 #'
 #' @format A list of 217 study participants; for each study participant, a list of one or more
 #' episodes; for each episode, a list of three or more microsatellite markers;
@@ -48,8 +48,7 @@
 #'
 #' Upper bounds on posterior probabilities of 1st-recurrence recrudescence and
 #' reinfection (rows) for various MOI vectors (columns) that sum to at most
-#' eight.
-#' #' These upper bounds feature in
+#' eight. These upper bounds feature in
 #' [vignette("understand-graph-prior")](../doc/understand-graph-prior.pdf) and
 #' [vignette("intra-episode-siblings")](../doc/intra-episode-siblings.html).
 #' For a single recurrence (MOI vectors of length two), upper bounds are

@@ -5,6 +5,7 @@
 #' recrudescence, relapse, reinfection — using per-person genetic data on two
 #' or more episodes; for usage see
 #' **Examples** below and
+#' `vignette("demonstrate-usage")` (use this link online)
 #' [vignette("demonstrate-usage")](../doc/demonstrate-usage.html) for a more
 #' complete understanding of the posterior output see ["Understand posterior
 #' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).

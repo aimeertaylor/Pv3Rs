@@ -38,7 +38,7 @@
 #'   (see \code{\link{RG_to_igraph}}).
 #'
 #' @examples
-#' graphs <- enumerate_RGs(c(2, 1, 2)) # nine graphs
+#' graphs <- enumerate_RGs(c(2, 1, 2), progress.bar = FALSE) # nine graphs
 #'
 #' @export
 enumerate_RGs <- function(MOIs, igraph = TRUE, progress.bar = TRUE) {
