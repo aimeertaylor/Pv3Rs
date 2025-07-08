@@ -3,10 +3,12 @@
 #' @description
 #' Computes per-person posterior probabilities of *P. vivax* recurrence states —
 #' recrudescence, relapse, reinfection — using per-person genetic data on two
-#' or more episodes; for usage see
+#' or more episodes. For usage see
 #' **Examples** below and
-#' `vignette("demonstrate-usage")` (use this link online)
-#' `vignette("demonstrate-usage")`(../doc/demonstrate-usage.html) for a more
+#' [`vignette("demonstrate-usage")`](../doc/demonstrate-usage.html) /
+#' [vignette("demonstrate-usage")](../doc/demonstrate-usage.html)
+#' (use former link online, latter link within R)
+#' For a more
 #' complete understanding of the posterior output see ["Understand posterior
 #' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'

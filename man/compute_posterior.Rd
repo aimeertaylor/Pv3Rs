@@ -76,10 +76,12 @@ encoded as a list can be converted into a \code{igraph} object using
 \description{
 Computes per-person posterior probabilities of \emph{P. vivax} recurrence states —
 recrudescence, relapse, reinfection — using per-person genetic data on two
-or more episodes; for usage see
+or more episodes. For usage see
 \strong{Examples} below and
-\code{vignette("demonstrate-usage")} (use this link online)
-\code{vignette("demonstrate-usage")}(../doc/demonstrate-usage.html) for a more
+\href{../doc/demonstrate-usage.html}{\code{vignette("demonstrate-usage")}} /
+\href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")}
+(use former link online, latter link within R)
+For a more
 complete understanding of the posterior output see \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 
 Note: The progress bar may increment non-uniformly (see
