@@ -49,8 +49,11 @@
 #' Upper bounds on posterior probabilities of 1st-recurrence recrudescence and
 #' reinfection (rows) for various MOI vectors (columns) that sum to at most
 #' eight. These upper bounds feature in
-#' [vignette("understand-graph-prior")](../doc/understand-graph-prior.pdf) and
-#' [vignette("intra-episode-siblings")](../doc/intra-episode-siblings.html).
+#' `vignette("understand-graph-prior")` (online link) /
+#' [vignette("understand-graph-prior")](../doc/understand-graph-prior.pdf) (R link)
+#' and
+#' `vignette("intra-episode-siblings")` (online link)
+#' [vignette("intra-episode-siblings")](../doc/intra-episode-siblings.html) (R link).
 #' For a single recurrence (MOI vectors of length two), upper bounds are
 #' induced by the prior. For more than one recurrence (MOI vectors of length
 #' three or more), upper bounds assume all but the first recurrence has data;

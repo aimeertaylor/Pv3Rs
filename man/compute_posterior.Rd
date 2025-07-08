@@ -43,12 +43,13 @@ used; see \code{\link{determine_MOIs}}.}
 \item{return.RG}{Logical; returns the relationship graphs
 (default \code{FALSE}). Automatically set to \code{TRUE} if \code{return.logp = TRUE}.}
 
-\item{return.logp}{Logical; returns the log-likelihood for each
-relationship graph (default \code{FALSE}). Setting \code{TRUE} disables permutation
-symmetry optimisation and thus increases runtime, especially when MOIs are large.
+\item{return.logp}{Logical; returns the log-likelihood for each relationship
+graph (default \code{FALSE}). Setting \code{TRUE} disables permutation symmetry
+optimisation and thus increases runtime, especially when MOIs are large.
 Does not affect the output of the posterior probabilities; see
-\href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")}, which also
-contains an example of permutation symmetry.}
+\code{vignette("demonstrate-usage")} (online link) /
+\href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")} (R link),
+which also contains an example of permutation symmetry.}
 
 \item{progress.bar}{Logical; show progress bars (default \code{TRUE}).
 Note that the progress bar may update non-uniformly.}
@@ -78,9 +79,8 @@ Computes per-person posterior probabilities of \emph{P. vivax} recurrence states
 recrudescence, relapse, reinfection — using per-person genetic data on two
 or more episodes. For usage see
 \strong{Examples} below and
-\href{../doc/demonstrate-usage.html}{\code{vignette("demonstrate-usage")}} /
-\href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")}
-(use former link online, latter link within R)
+\code{vignette("demonstrate-usage")} (online link)
+\href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")} (R link)
 For a more
 complete understanding of the posterior output see \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 

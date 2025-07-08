@@ -5,9 +5,8 @@
 #' recrudescence, relapse, reinfection — using per-person genetic data on two
 #' or more episodes. For usage see
 #' **Examples** below and
-#' [`vignette("demonstrate-usage")`](../doc/demonstrate-usage.html) /
-#' [vignette("demonstrate-usage")](../doc/demonstrate-usage.html)
-#' (use former link online, latter link within R)
+#' `vignette("demonstrate-usage")` (online link)
+#' [vignette("demonstrate-usage")](../doc/demonstrate-usage.html) (R link)
 #' For a more
 #' complete understanding of the posterior output see ["Understand posterior
 #' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
@@ -71,12 +70,13 @@
 #'   used; see \code{\link{determine_MOIs}}.
 #' @param return.RG Logical; returns the relationship graphs
 #'   (default `FALSE`). Automatically set to `TRUE` if `return.logp = TRUE`.
-#' @param return.logp Logical; returns the log-likelihood for each
-#'   relationship graph (default `FALSE`). Setting `TRUE` disables permutation
-#'   symmetry optimisation and thus increases runtime, especially when MOIs are large.
+#' @param return.logp Logical; returns the log-likelihood for each relationship
+#'   graph (default `FALSE`). Setting `TRUE` disables permutation symmetry
+#'   optimisation and thus increases runtime, especially when MOIs are large.
 #'   Does not affect the output of the posterior probabilities; see
-#'   [vignette("demonstrate-usage")](../doc/demonstrate-usage.html), which also
-#'   contains an example of permutation symmetry.
+#'   `vignette("demonstrate-usage")` (online link) /
+#'   [vignette("demonstrate-usage")](../doc/demonstrate-usage.html) (R link),
+#'   which also contains an example of permutation symmetry.
 #' @param progress.bar Logical; show progress bars (default `TRUE`).
 #'   Note that the progress bar may update non-uniformly.
 #'
