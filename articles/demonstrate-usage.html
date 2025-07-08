@@ -77,33 +77,32 @@
 
     
     
-<p>In this vignette we demonstrate the basic <code>Pv3Rs</code> work
-flow for a single study participant; i.e.,</p>
+<p>This vignette demonstrates the basic <code>Pv3Rs</code> workflow for
+a single study participant:</p>
 <ol style="list-style-type: decimal">
 <li>Plot data</li>
 <li>Compute recurrence state posterior probabilities</li>
 <li>Plot per-recurrence probabilities</li>
 </ol>
-<p>We also show how one might like to explore relationship graphs and
-their log likelihoods. In one or more upcoming scientific publications,
-we plan to publish a more elaborate study-level <code>Pv3Rs</code>
-tutorial including examples of</p>
+<p>We also show how to explore relationship graphs and their log
+likelihoods. A more elaborate study-level <code>Pv3Rs</code> tutorial is
+planned, covering</p>
 <ul>
-<li>how to generate pairwise probabilities when the total genotype count
-over multiple recurrences exceeds eight</li>
-<li>how to compute false discovery rates</li>
-<li>how to do a sensitivity analysis for genotyping errors</li>
-<li>how to do a sensitivity analysis for sibling misspecification</li>
-<li>an alternative genetic distance based approach using whole-genome
+<li>Generating pairwise probabilities when the total genotype count over
+multiple recurrences exceeds eight</li>
+<li>Computing false discovery rates</li>
+<li>Sensitivity analysis for genotyping errors</li>
+<li>Sensitivity analysis for sibling misspecification</li>
+<li>Alternative approach using genetic distance and whole-genome
 sequence data</li>
-<li>how posterior probabilities (rather than binary classifications) can
-be used estimate treatment efficacy</li>
-<li>an estimation of a false negative rate</li>
+<li>Using posterior probabilities (rather than binary classifications)
+to estimate treatment efficacy</li>
+<li>Estimating false negative rates</li>
 </ul>
 <div class="section level2">
 <h2 id="basic-workflow">Basic workflow<a class="anchor" aria-label="anchor" href="#basic-workflow"></a>
 </h2>
-<p>We first look at a synthetic example of three episodes (episode names
+<p>We begin with a synthetic example of three episodes (episode names
 are optional) with three markers (marker names are obligatory) whose
 alleles have known frequencies.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -120,40 +119,42 @@ alleles have known frequencies.</p>
 <span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">0.27</span>, b <span class="op">=</span> <span class="fl">0.35</span>, c <span class="op">=</span> <span class="fl">0.18</span>, d <span class="op">=</span> <span class="fl">0.20</span><span class="op">)</span>,</span>
 <span>           m2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">0.78</span>, b <span class="op">=</span> <span class="fl">0.14</span>, c <span class="op">=</span> <span class="fl">0.07</span>, d <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span>,</span>
 <span>           m3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">0.21</span>, b <span class="op">=</span> <span class="fl">0.45</span>, c <span class="op">=</span> <span class="fl">0.26</span>, d <span class="op">=</span> <span class="fl">0.08</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="plot-data">1) Plot data<a class="anchor" aria-label="anchor" href="#plot-data"></a>
+</h3>
 <p>We plot the data using <code><a href="../reference/plot_data.html">plot_data()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_data.html">plot_data</a></span><span class="op">(</span>ys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Participant data"</span> <span class="op">=</span> <span class="va">y</span><span class="op">)</span>, fs <span class="op">=</span> <span class="va">fs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="demonstrate-usage_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>Different colours in the plotted data (top) represent different
-alleles. The legend (bottom) shows all alleles per marker with one row
-per marker. The order of the markers in the legend is the same as that
-in the plotted data (see vertical axis, top). When allele frequencies
-are specified, the widths of differently coloured areas in the legend
-are proportional to allele frequencies, s.t. rare alleles have
-relatively small legend areas (e.g., <code>d</code> at <code>m2</code>
-is rare).</p>
+<p>Per marker, each colour in the main grid represents a different
+allele. The legend below the main grid shows allele frequencies via
+colour proportions, with one row per marker (e.g., <code>d</code> at
+<code>m2</code> is rare). The order of the markers in the legend is the
+same as that in the main grid.</p>
 <p><strong>Aside</strong> Given the maximum number of alleles observed
 per-episode, the most parsimonious explanation is that there are 3, 2, 1
 distinct parasite genotypes in the three episodes respectively (a
-genotype is here defined as a realisation of the haploid parasite
-genome; i.e., a DNA sequence representing a group of clonal parasites).
-In this synthetic example, markers are quart-allelic for brevity; this
-imposes a rather low upper bound on MOI estimates based on maximum
-per-marker allele counts. In reality, more diverse markers are
-recommended for recurrence state inference. If better MOI estimates were
-available based on more diverse markers, the data from those more
-diverse markers could be added to the data input <code>y</code> of
-<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. If better MOI estimates based on
-heteroallelic marker counts across many markers were available, they
-could be used in recurrence state inference by specifying the
-<code>MOI</code> argument in the function
+genotype is here defined as a haploid DNA sequence, which is distinct
+within episode, and represents a group of parasites). In this synthetic
+example, markers are quart-allelic for brevity; this imposes a rather
+low upper bound on MOI estimates based on maximum per-marker allele
+counts. In reality, more diverse markers are recommended for recurrence
+state inference. If better MOI estimates were available based on more
+diverse markers, the data from those more diverse markers could be added
+to the data input <code>y</code> of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. If
+better MOI estimates based on heteroallelic marker counts across many
+markers were available, they could be used in recurrence state inference
+by specifying the <code>MOI</code> argument in the function
 <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. Because the Pv3Rs model does not
 account for genotyping errors, including false positive alleles,
 user-specified MOIs must be greater than or equal to those based on
 maximum per-marker allele counts.</p>
-<p>When performing genetic recurrence state inference, the bulk of the
-computational time lies in computing log-likelihoods of graphs of
-relationships between genotypes.</p>
+</div>
+<div class="section level3">
+<h3 id="compute-posterior-recurrence-state-posterior-probabilities">1) Compute posterior recurrence state posterior probabilities<a class="anchor" aria-label="anchor" href="#compute-posterior-recurrence-state-posterior-probabilities"></a>
+</h3>
+<p>The bulk of the computational time lies in computing log-likelihoods
+of graphs of relationships between genotypes.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">post</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Number of valid relationship graphs (RGs) is 1315</span></span>
@@ -205,6 +206,7 @@ data with a total genotype count up to 10 (see code below, which we time
 out after 2 seconds); above 10 genotypes, calls to
 <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> are liable cause memory-use problems
 and fail.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="exploration-of-relationship-graphs">Exploration of relationship graphs<a class="anchor" aria-label="anchor" href="#exploration-of-relationship-graphs"></a>
