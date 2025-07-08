@@ -69,41 +69,31 @@ plot_data(ys = list("Participant data" = y), fs = fs)
 ```
 
 Per marker, each colour in the main grid represents a different allele. The
-legend below the main grid shows allele frequencies via colour proportions, with
-one row per marker (e.g., `d` at `m2` is rare). The order of the markers in the
-legend is the same as that in the main grid.
+legend below the main grid shows per-marker allele frequencies via colour
+proportions, with one row per marker, ordered as in the main grid; e.g., `d` at
+`m2` is rare.
 
-**Aside** Given the maximum number of alleles observed per-episode, the most parsimonious
-explanation is that there are `r determine_MOIs(y)` distinct parasite genotypes
-in the three episodes respectively (a genotype is here defined as a DNA
-sequence representing a group of clonal parasites). In this synthetic example,
-markers are quart-allelic for brevity; this imposes a rather low upper bound on
-MOI estimates based on maximum per-marker allele counts. In reality, more
-diverse markers are recommended for recurrence state inference. If better MOI
-estimates were available based on more diverse markers, the data from those more
-diverse markers could be added to the data input `y` of `compute_posterior()`.
-If better MOI estimates based on heteroallelic marker counts across many markers
-were available, they could be used in recurrence state inference by specifying
-the `MOI` argument in the function `compute_posterior()`. Because the Pv3Rs
-model does not account for genotyping errors, including false positive alleles,
-user-specified MOIs must be greater than or equal to those based on maximum
-per-marker allele counts.
-
+**Aside** Assuming no undected alleles or genotyping errors, the function
+`determine_MOIs()` computes the minimum number of distinct parasite genotypes
+within episodes based on maximum alleles per marker (a genotype is here defined
+as a DNA sequence representing a group of clonal parasites). In this synthetic
+example, markers are quart-allelic, imposing a low upper bound on MOI estimates
+based on maximum per-marker allele counts. More diverse markers are recommended
+for MOI estimation and recurrence state inference.
 
 ### 1) Compute posterior recurrence state posterior probabilities 
 
-The bulk of the computational
-time lies in computing log-likelihoods of graphs of relationships between
-genotypes.
+The bulk of the computational time lies in computing log-likelihoods of graphs
+of relationships between genotypes.
 
 ```{r, cache=TRUE}
 post <- compute_posterior(y, fs)
 ```
 
 In the call to `compute_posterior()` above we did not specify a prior, and so a
-uniform prior across all three recurrence states per recurrence is assumed by
-default. Marginal per-recurrence posterior probabilities (probabilities of recrudescence `C`,
-relapse `L`, and reinfection `I` for each recurrence) are stored in `post$marg`.
+uniform prior across all three recurrence states per recurrence was assumed by
+default. Per-recurrence posterior probabilities of recrudescence `C`, relapse
+`L`, and reinfection `I` are stored in `post$marg`.
 
 ```{r}
 post$marg

@@ -26,9 +26,9 @@ Calculates a MOI for each episode based on allelic diversity across markers.
 }
 \details{
 The MOI of an episode is the number of genetically distinct groups of clonal
-parasites within an infection, each distict clonal group is represented by a
-distinct DNA sequence, which we call a genotype. In other words, the MOI of
-an episode is the number of distinct genotypes per episode.
+parasites within the episode. Each clonal group is represented by a distinct
+DNA sequence, which we call a genotype. As such, an episode's MOI is its
+distinct parasite genotype count.
 
 For a given episode, the MOI is the maximum number distinct alleles observed
 at any marker within that episode. These MOIs are the default used by
