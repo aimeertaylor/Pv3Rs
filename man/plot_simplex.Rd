@@ -16,42 +16,39 @@ plot_simplex(
 )
 }
 \arguments{
-\item{v.labels}{Vector of labels that annotate vertices anticlockwise from
-top (default: "Recrudescence", "Relapse", "Reinfection"). If NULL, vertices
-are not annotated.}
+\item{v.labels}{Vertex labels anticlockwise from top (default:
+"Recrudescence", "Relapse", "Reinfection"). If NULL, vertices are not
+labelled.}
 
-\item{v.cutoff}{Number between 0.5 and 1 that separates regions
-of lower and higher probability. Beware the use of cut-offs for probable
-recrudescence classification and probable reinfection classification; see
+\item{v.cutoff}{Number between 0.5 and 1 that separates lower vs higher
+probability regions. Use with caution for recrudescence and reinfection
+classification; see
 \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.}
 
-\item{v.colours}{Vector of colours associated with the vertices
-anticlockwise from top.}
+\item{v.colours}{Vertex colours anticlockwise from top.}
 
-\item{plot.tri}{Logical; plots the triangular boundary if \code{TRUE} (default).}
+\item{plot.tri}{Logical; draws the triangular boundary if \code{TRUE} (default).}
 
 \item{p.coords}{Matrix of 3D simplex coordinates (e.g., per-recurrence
-probabilities of recrudescence, relapse and reinfection), one vector of
-3D coordinates per row, each row is projected onto 2D coordinates using
-\code{\link[=project2D]{project2D()}} and then plotted as a single simplex point using
-\code{\link[graphics:points]{graphics::points()}}. If the user provides a vector, it is converted to a
-matrix with one row.}
+probabilities of recrudescence, relapse and reinfection), one vector of 3D
+coordinates per row, each row is projected onto 2D coordinates using
+\code{\link[=project2D]{project2D()}} and plotted as a single simplex point using
+\code{\link[graphics:points]{graphics::points()}}. If the user provides a vector encoding a probability
+triplet summing to one, it is converted to a matrix with one row.}
 
-\item{p.labels}{Labels used to annotate points given by \code{p.coords}.
-Equal to the row names of \code{p.coords} by default. Points are not
-annotated if \code{NA}.}
+\item{p.labels}{Labels of points in \code{p.coords} (default row names of
+\code{p.coords}) No labels if \code{NA}.}
 
-\item{p.labels.pos}{Position specifier for \code{p.labels}. Values of \code{1},
-\code{2}, \code{3} and \code{4}, respectively indicate positions below, to
-the left of, above and to the right of the points. Can be either a single
-integer (default 3) or a vector of integers.}
+\item{p.labels.pos}{Position of \code{p.labels}: \code{1} = below, \code{2} =
+left, \code{3} = above (default) and \code{4} = right. Can be a single
+value or a vector.}
 
-\item{...}{Further graphical parameters passed to \code{\link[graphics:points]{graphics::points()}}.}
+\item{...}{Additional parameters passed to \code{\link[graphics:points]{graphics::points()}}.}
 }
 \description{
-Plots a 2D simplex, a triangle with unit sides centered at the origin, onto
+Plots a 2D simplex (a triangle with unit sides centered at the origin) onto
 which per-recurrence posterior probabilities of recrudescence, relapse,
-reinfection (or any other vector of three numbers in zero to one that sum to
+reinfection (or any other probability triplet summing to
 one) can be projected; see \code{\link[=project2D]{project2D()}} and \strong{Examples} below.
 }
 \examples{

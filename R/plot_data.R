@@ -1,82 +1,80 @@
 #' Plots the data
 #'
-#' Plots the alleles (colours), which are observed in different episodes
-#' (columns), on different markers (rows), where episodes are grouped by
-#' patient. The per-patient episodes are plotted from left to right in
-#' chronological order. If more than one allele is detected per episode per
-#' marker, the corresponding row is subdivided into rows of different colours.
-#' The order of markers follow the allele frequencies, if provided. Otherwise,
-#' markers are ordered lexicographically.
+#' Plots allelic data as a grid of coloured rectangles.
 #'
-#' The legend depicts the alleles of the markers in the same vertical order as
-#' the main plot. The default colour scheme is adaptive. It is designed to
-#' visually differentiate the alleles as much as possible: the maximum range of
-#' qualitative scheme, with contrast of hue between adjacent colours.
+#' This function plots alleles (colours), which are observed in different
+#' episodes (columns), on different markers (rows), with episodes grouped by
+#' person. Per-person episodes are plotted from left to right in chronological
+#' order. If multiple alleles are detected for a marker within an episode, the
+#' corresponding grid element is subdivided vertically into different colours.
+#'
+#' By default, markers are ordered lexicographically. If `fs` is provided,
+#' markers are ordered to match the order within `fs`.
+#'
+#' The legend depicts the alleles for each marker in the same vertical order as
+#' the main plot. The default colour scheme is adaptive, designed to
+#' visually differentiate the alleles as clearly as possible by maximizing hue contrast within a qualitative palette.
 #' Interpolation is used to make different colour palettes for markers with
 #' different numbers of possible alleles. The names of the alleles are printed
 #' on top of their colours if \code{marker.annotate} is set to \code{TRUE}.
 #'
-#'@param ys A nested list of per-patient, per-episode, per-marker allelic data.
-#'  Specifically, a per-patient list of a per-episode list of a per-marker list
-#'  of character vectors of observed alleles.
-#'@param fs A per-marker list of numeric vectors of allele frequencies. If NULL
-#'  (default), for a given marker, only the alleles present in the data are
-#'  represented in the legend, and each allele is represented equally. Because
-#'  the colour scheme is adaptive (see introduction), the same allele will have
-#'  a different colour in a plot of an alternative data list if more or fewer
-#'  alleles are observed at the given marker across the alternative data list.
-#'  If fs is specified, all possible alleles are represented and legend areas
-#'  are proportional to allele frequencies; i.e., common alleles have relatively
-#'  large legend areas, and rare alleles have relatively small legend areas.
-#'  Specify fs to fix the colour of a given allele across plots of different
-#'  data lists, thereby facilitating cross-comparison.
-#'@param patient.vert Logical. If true, patient IDs are printed vertically;
-#'  otherwise they are printed horizontally (default).
-#'@param mar A vector which gives the number of lines of margin for the main
-#'  plot; see the entry for `mar` in \code{\link[graphics]{par}}.
-#'@param gridlines Logical. If true (default), white gridlines separating
-#'  patients and markers will be drawn.
-#'@param palette Colour palette for alleles, see return value of
-#'  \code{\link[RColorBrewer]{brewer.pal}}. Generally, the colours are
-#'  interpolated. If a marker has \code{d} possible alleles, then the colours
-#'  used are the \code{1/(d+1), ..., d/(d+1)} quantiles of the colours in
-#'  \code{palette}. This is done such that markers with different number of
-#'  possible alleles would generally use different colours.
+#'
+#'@param ys Nested list of per-person, per-episode, per-marker allelic data;
+#'  see **Examples** and [compute_posterior()] for the expected per-person structure.
+#'@param fs A per-marker list of numeric vectors of allele frequencies. If
+#'  `NULL` (default), only the alleles present in `ys` are shown in the the
+#'  legend, with all per-marker alleles represented equally. Because the colour
+#'  scheme is adaptive, the same allele may have different colours given
+#'  different `ys`. If `fs` is specified, all alleles in `fs` feature in the
+#'  legend with areas proportional to allele frequencies, so that common alleles
+#'  occupy larger areas than rarer alleles. Specify `fs` to fix the allele
+#'  colour scheme across plots of different `ys`.
+#'@param person.vert Logical. If `TRUE` (default), person IDs are printed
+#'  vertically; otherwise, they are printed horizontally.
+#'@param mar Vector of numbers of lines of margin for the main
+#'  plot; see `mar` entry of \code{\link[graphics]{par}}.
+#'@param gridlines Logical. If true (default), white grid lines separating
+#'  people and markers are drawn.
+#'@param palette Colour palette for alleles, see the **Value** section of
+#'  \code{\link[RColorBrewer]{brewer.pal}}. Generally, colours are interpolated:
+#'  if a marker has \code{d} possible alleles, then the colours used are the
+#'  \code{1/(d+1), ..., d/(d+1)} quantiles of the palette to ensure that markers
+#'  with different allele counts use different colours.
 #'@param marker.annotate Logical. If true (default), the names of the alleles
-#'  are printed on top of their colours in the legend.
-#'@param legend.lab Label for the axis of the color legend, defaults to "Allele frequencies".
-#'  Set to \code{NA} if not desired. If this is the case, consider adjusting
-#'  \code{legend.ylim} to use more plotting space.
-#'@param legend.line Distance in units of character height of the legend label
-#'  from the colour bar, defaults to 1.5.
-#'@param legend.ylim Vector of two floats representing the y-coordinate limits
+#'are printed on top of their colours in the legend.
+#'@param legend.lab Label for the axis of the legend. Defaults to "Allele
+#'  frequencies". Set to \code{NA} to omit the label; if so, consider
+#'  adjusting \code{legend.ylim} to use more plotting space.
+#'@param legend.line Distance (in character heights) from the colour bar
+#'  to the legend label (defaults to `1.5`).
+#'@param legend.ylim Vector specifying the y-coordinate limits
 #'  of the legend in device coordinates (between 0 and 1). Defaults to c(0.05, 0.2).
-#'@param cex.maj Float representing the font scaling of major axis labels.
-#'@param cex.min Float representing the font scaling of minor axis labels.
-#'@param cex.text Float representing the font scaling for the allele labels.
+#'@param cex.maj Numeric; font scaling of major axis labels.
+#'@param cex.min Numeric; font scaling of minor axis labels.
+#'@param cex.text Numeric; font scaling of the allele labels.
 #'@param x.line Distance between top x-axis and x-axis label, defaults to 0.2.
 #'@param y.line Distance between left y-axis and y-axis label, defaults to 2.5.
 #'
 #' @examples
 #'
 #' # Plot example Plasmodium vivax data set
-#' mar <- c(2, 3.5, 1.5, 1) # extra vertical margin for vertical patient labels
-#' plot_data(ys = ys_VHX_BPD, patient.vert = TRUE, mar = mar, legend.lab = NA)
-#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, patient.vert = TRUE, mar = mar,
-#'           legend.lab = NA)
-#' plot_data(ys = ys_VHX_BPD, fs = fs_VHX_BPD, marker.annotate = FALSE,
-#'           patient.vert = TRUE, mar = mar, legend.lab = NA)
+#' mar <- c(2, 3.5, 1.5, 1) # extra vertical margin for vertical person labels
+#' plot_data(ys = ys_VHX_BPD, person.vert = TRUE, mar = mar, legend.lab = NA)
+#' plot_data(ys = ys_VHX_BPD, person.vert = TRUE, mar = mar, legend.lab = NA,
+#'           fs = fs_VHX_BPD)
+#' plot_data(ys = ys_VHX_BPD, person.vert = TRUE, mar = mar, legend.lab = NA,
+#'           fs = fs_VHX_BPD, marker.annotate = FALSE)
 #'
 #' # Demonstrating the adaptive nature of the colour scheme:
-#' ys <- ys_VHX_BPD["VHX_52"] # A single patient
-#' plot_data(ys, fs = fs_VHX_BPD) # Colours and the legend match plots above
+#' ys <- ys_VHX_BPD["VHX_52"] # A single person
+#' plot_data(ys, fs = fs_VHX_BPD, marker.annotate = FALSE) # Colours match above
 #' plot_data(ys) # Colours and the legend adapt to alleles detected in VHX_52
 #'
 #'
 #' @export
 plot_data = function(ys,
                      fs = NULL,
-                     patient.vert = FALSE,
+                     person.vert = FALSE,
                      mar = c(1.5, 3.5, 1.5, 1),
                      gridlines = TRUE,
                      palette = RColorBrewer::brewer.pal(12, "Paired"),
@@ -90,31 +88,31 @@ plot_data = function(ys,
   # Function to create ramped colours based on "Paired" brewer.pal
   cols <- grDevices::colorRampPalette(palette)
 
-  # Extract patients and episode counts and names
-  n_patients <- length(ys)
+  # Extract persons and episode counts and names
+  n_persons <- length(ys)
   n_episodes <- sum(unlist(lapply(ys, length)))
-  patient_names <- names(ys)
+  person_names <- names(ys)
   episode_names <- unlist(lapply(ys, names), use.names = FALSE)
 
-  # Name patients if unnamed or not uniquely named
-  if (is.null(patient_names) | !identical(unique(patient_names), patient_names)) {
-    names(ys) <- paste0("p", 1:n_patients)
+  # Name persons if unnamed or not uniquely named
+  if (is.null(person_names) | !identical(unique(person_names), person_names)) {
+    names(ys) <- paste0("p", 1:n_persons)
   }
 
   # Name episodes if unnamed or not uniquely named
   if (is.null(episode_names) | !identical(unique(episode_names), episode_names)) {
-    ys <- sapply(patient_names, function(patient_name) {
-      y <- ys[[patient_name]]
-      names(y) <- paste(patient_name, 1:length(y), sep = "_")
+    ys <- sapply(person_names, function(person_name) {
+      y <- ys[[person_name]]
+      names(y) <- paste(person_name, 1:length(y), sep = "_")
       return(y)
     }, USE.NAMES = T, simplify = F)
   }
 
-  # Extract patient and episode unique identifiers
+  # Extract person and episode unique identifiers
   pids <- names(ys)
   eids <- unlist(lapply(ys, names), use.names = FALSE)
 
-  # Remove patient-level list - redundant since episodes now have unique identifiers
+  # Remove person-level list - redundant since episodes now have unique identifiers
   ys_by_epi <- unlist(ys, recursive = F, use.names = FALSE)
   names(ys_by_epi) <- eids
 
@@ -195,7 +193,7 @@ plot_data = function(ys,
     }
   }
 
-  # episode axis, note that patient IDs are unique
+  # episode axis, note that person IDs are unique
   ID_midpoints <- rep(NA, length(pids))
   names(ID_midpoints) <- pids
   for(ID in pids){
@@ -254,9 +252,9 @@ plot_data = function(ys,
   graphics::mtext(text = rep('Grouping', 2), side = 2, at = c(-0.5,rim_ratio+0.5)/rim_ratio,
                   line = 0.2, cex = cex.min, las = 2)
   graphics::mtext(text = pids, side = 1, at = ID_midpoints, cex = cex.min,
-                  las = ifelse(patient.vert, 3, 1), line = ifelse(patient.vert, 0.2, 0))
-  xlabel <- ifelse(n_patients > 1,
-                   sprintf("%s episodes in %s people (one column per episode, grouped by person; for each person, episodes are ordered chronologically from left to right)", n_episodes, n_patients),
+                  las = ifelse(person.vert, 3, 1), line = ifelse(person.vert, 0.2, 0))
+  xlabel <- ifelse(n_persons > 1,
+                   sprintf("%s episodes in %s people (one column per episode, grouped by person; for each person, episodes are ordered chronologically from left to right)", n_episodes, n_persons),
                    sprintf("%s episodes in 1 person (one column per episode, ordered chronologically from left to right)", n_episodes))
   graphics::mtext(text = xlabel, line = x.line, cex = cex.maj)
   graphics::title(ylab = 'Marker (number of distinct alleles)',

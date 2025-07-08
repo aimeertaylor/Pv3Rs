@@ -1,41 +1,38 @@
 #' Plots a 2D simplex
 #'
-#' Plots a 2D simplex, a triangle with unit sides centered at the origin, onto
+#' Plots a 2D simplex (a triangle with unit sides centered at the origin) onto
 #' which per-recurrence posterior probabilities of recrudescence, relapse,
-#' reinfection (or any other vector of three numbers in zero to one that sum to
+#' reinfection (or any other probability triplet summing to
 #' one) can be projected; see [project2D()] and **Examples** below.
 #'
-#' @param v.labels Vector of labels that annotate vertices anticlockwise from
-#'   top (default: "Recrudescence", "Relapse", "Reinfection"). If NULL, vertices
-#'   are not annotated.
+#' @param v.labels Vertex labels anticlockwise from top (default:
+#'   "Recrudescence", "Relapse", "Reinfection"). If NULL, vertices are not
+#'   labelled.
 #'
-#' @param v.cutoff Number between 0.5 and 1 that separates regions
-#'   of lower and higher probability. Beware the use of cut-offs for probable
-#'   recrudescence classification and probable reinfection classification; see
+#' @param v.cutoff Number between 0.5 and 1 that separates lower vs higher
+#'   probability regions. Use with caution for recrudescence and reinfection
+#'   classification; see
 #'   ["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'
-#' @param v.colours Vector of colours associated with the vertices
-#'   anticlockwise from top.
+#' @param v.colours Vertex colours anticlockwise from top.
 #'
-#' @param plot.tri Logical; plots the triangular boundary if `TRUE` (default).
+#' @param plot.tri Logical; draws the triangular boundary if `TRUE` (default).
 #'
 #' @param p.coords Matrix of 3D simplex coordinates (e.g., per-recurrence
-#'   probabilities of recrudescence, relapse and reinfection), one vector of
-#'   3D coordinates per row, each row is projected onto 2D coordinates using
-#'   [project2D()] and then plotted as a single simplex point using
-#'   [graphics::points()]. If the user provides a vector, it is converted to a
-#'   matrix with one row.
+#'   probabilities of recrudescence, relapse and reinfection), one vector of 3D
+#'   coordinates per row, each row is projected onto 2D coordinates using
+#'   [project2D()] and plotted as a single simplex point using
+#'   [graphics::points()]. If the user provides a vector encoding a probability
+#'   triplet summing to one, it is converted to a matrix with one row.
 #'
-#' @param p.labels Labels used to annotate points given by \code{p.coords}.
-#'   Equal to the row names of \code{p.coords} by default. Points are not
-#'   annotated if `NA`.
+#' @param p.labels Labels of points in \code{p.coords} (default row names of
+#'   \code{p.coords}) No labels if `NA`.
 #'
-#' @param p.labels.pos Position specifier for \code{p.labels}. Values of \code{1},
-#' \code{2}, \code{3} and \code{4}, respectively indicate positions below, to
-#' the left of, above and to the right of the points. Can be either a single
-#' integer (default 3) or a vector of integers.
+#' @param p.labels.pos Position of \code{p.labels}: \code{1} = below, \code{2} =
+#'   left, \code{3} = above (default) and \code{4} = right. Can be a single
+#'   value or a vector.
 #'
-#' @param ... Further graphical parameters passed to [graphics::points()].
+#' @param ... Additional parameters passed to [graphics::points()].
 #'
 #' @examples
 #' # Plot 2D simplex

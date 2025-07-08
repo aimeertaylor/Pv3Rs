@@ -24,7 +24,7 @@
 #'
 #' # RG encoded as an igraph object can be plotted using plot_RG() and
 #' # manipulated using igraph functions
-#' plot_RG(RG_as_igraph)
+#' plot_RG(RG_as_igraph, margin = rep(0,4), vertex.label.cex = 2)
 #'
 #' # Edge weights 1 and 0.5 encode clonal and sibling relationships
 #' igraph::E(RG_as_igraph)$weight

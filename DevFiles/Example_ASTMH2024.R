@@ -85,7 +85,6 @@ plot_RG(RG_to_igraph(RG, MOIs),
         edge.curved = 0.08,
         vertex.size = 40,
         edge.width = 3,
-        vertex.frame.width = 2,
         vertex.label.cex = 4,
         vertex.label.color = "black")
 seqs_comp_MLE_RG <- Pv3Rs:::compatible_rstrs(RG, split(gs, ts_per_gs))
