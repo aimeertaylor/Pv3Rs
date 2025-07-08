@@ -134,17 +134,17 @@ same as that in the main grid.</p>
 <p><strong>Aside</strong> Given the maximum number of alleles observed
 per-episode, the most parsimonious explanation is that there are 3, 2, 1
 distinct parasite genotypes in the three episodes respectively (a
-genotype is here defined as a haploid DNA sequence, which is distinct
-within episode, and represents a group of parasites). In this synthetic
-example, markers are quart-allelic for brevity; this imposes a rather
-low upper bound on MOI estimates based on maximum per-marker allele
-counts. In reality, more diverse markers are recommended for recurrence
-state inference. If better MOI estimates were available based on more
-diverse markers, the data from those more diverse markers could be added
-to the data input <code>y</code> of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. If
-better MOI estimates based on heteroallelic marker counts across many
-markers were available, they could be used in recurrence state inference
-by specifying the <code>MOI</code> argument in the function
+genotype is here defined as a DNA sequence representing a group of
+clonal parasites). In this synthetic example, markers are quart-allelic
+for brevity; this imposes a rather low upper bound on MOI estimates
+based on maximum per-marker allele counts. In reality, more diverse
+markers are recommended for recurrence state inference. If better MOI
+estimates were available based on more diverse markers, the data from
+those more diverse markers could be added to the data input
+<code>y</code> of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. If better MOI
+estimates based on heteroallelic marker counts across many markers were
+available, they could be used in recurrence state inference by
+specifying the <code>MOI</code> argument in the function
 <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. Because the Pv3Rs model does not
 account for genotyping errors, including false positive alleles,
 user-specified MOIs must be greater than or equal to those based on
