@@ -1,7 +1,11 @@
 #' Determine multiplicities of infection (MOIs)
 #'
-#' Calculates a MOI for each episode based on allelic diversity
-#' across markers.
+#' Calculates a MOI for each episode based on allelic diversity across markers.
+#'
+#' The MOI of an episode is the number of genetically distinct groups of clonal
+#' parasites within the episode. Each clonal group is represented by a distinct
+#' DNA sequence, which we call a genotype. As such, the MOI of an episode is a
+#' distinct parasite genotype count.
 #'
 #' For a given episode, the MOI is the maximum number distinct alleles observed
 #' at any marker within that episode. These MOIs are the default used by
