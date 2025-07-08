@@ -3,7 +3,7 @@
 \docType{data}
 \name{fs_VHX_BPD}
 \alias{fs_VHX_BPD}
-\title{Allele frequencies computed from example Plasmodium vivax data}
+\title{Allele frequencies computed using example \emph{Plasmodium vivax} data}
 \format{
 A list of nine markers; for each marker a named vector of allele frequencies
 that sum to one.
@@ -19,8 +19,8 @@ fs_VHX_BPD
 }
 \description{
 The posterior mean of a multinomial-Dirichlet model with uniform prior fit to
-data on allele prevalence in initial episodes. Because the model is fit to
-allele prevalence (observed) not allele frequency (would requires
+data on allele prevalence in initial episodes of \link{ys_VHX_BPD}. Because the
+model is fit to allele prevalence (observed) not allele frequency ( requires
 integrating-out unknown multiplicities of infection) it is liable to
 underestimate the frequencies of common alleles and overestimate those of
 rare but detected alleles.

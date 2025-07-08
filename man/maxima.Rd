@@ -7,18 +7,18 @@
 \format{
 A matrix with 4 rows and 247 columns:
 \describe{
-\item{C_with}{Upper bound on the posterior probability of recrudescence
-when summation includes graphs with cliques of three or more intra-episode siblings}
-\item{C_wout}{Upper bound on the posterior probability of recrudescence
-when summation excludes graphs with cliques of three or more intra-episode siblings}
-\item{I_with}{Upper bound on the posterior probability of reinfection when
-summation includes graphs with cliques of three or more intra-episode siblings}
-\item{I_wout}{Upper bound on the posterior probability of reinfection when
-summation excludes graphs with cliques of three or more intra-episode siblings}
-\item{11}{MOI vector (1, 1)}
-\item{12}{MOI vector (1, 2)}
+\item{C_with}{Row name; upper bound on the posterior probability of recrudescence
+when summation includes graphs with cliques of three or more intra-episode siblings.}
+\item{C_wout}{Row name; upper bound on the posterior probability of recrudescence
+when summation excludes graphs with cliques of three or more intra-episode siblings.}
+\item{I_with}{Row name; upper bound on the posterior probability of reinfection when
+summation includes graphs with cliques of three or more intra-episode siblings.}
+\item{I_wout}{Row name; upper bound on the posterior probability of reinfection when
+summation excludes graphs with cliques of three or more intra-episode siblings.}
+\item{11}{Column name; MOI vector (1, 1).}
+\item{12}{Column name; MOI vector (1, 2).}
 ...
-\item{11111111}{MOI vector (1, 1, 1, 1, 1, 1, 1, 1)}
+\item{11111111}{Column name; MOI vector (1, 1, 1, 1, 1, 1, 1, 1).}
 }
 }
 \source{
@@ -28,20 +28,23 @@ summation excludes graphs with cliques of three or more intra-episode siblings}
 maxima
 }
 \description{
-Upper bounds on posterior probabilities of first recurrence recrudescence and
+Upper bounds on posterior probabilities of 1st-recurrence recrudescence and
 reinfection (rows) for various MOI vectors (columns) that sum to at most
-eight. For a single recurrence (MOI vectors of length two), upper bounds are
+eight.
+#' These upper bounds feature in
+\href{../doc/understand-graph-prior.pdf}{vignette("understand-graph-prior ")} and
+\href{../doc/intra-episode-siblings.html}{vignette("intra-episode-siblings")}.
+For a single recurrence (MOI vectors of length two), upper bounds are
 induced by the prior. For more than one recurrence (MOI vectors of length
 three or more), upper bounds assume all but the first recurrence has data;
-these bounds are only valid for monoclonal episodes. Two upper bounds for
-each recurrence state are reported: one where summation over graphs includes
-graphs with cliques of three or more intra-episode siblings, another where
-summation over graphs excludes graphs with cliques of three or more
-intra-episode siblings. Since graphs with cliques of three or more
+these bounds are only valid for monoclonal episodes; see XXX. Two upper
+bounds for each recurrence state are reported: one where summation over
+graphs includes graphs with cliques of three or more intra-episode siblings,
+another where summation over graphs excludes graphs with cliques of three or
+more intra-episode siblings. Since graphs with cliques of three or more
 intra-episode siblings only apply when MOI vectors include MOIs of three or
 more, these two bounds only differ for MOI vectors that include MOIs of three
-or more (see example below). The column names represent MOI vectors whose
-MOIs are all less than or equal to eight.
+or more; see \strong{Examples}.
 }
 \examples{
 # Convert column names to MOI character vectors

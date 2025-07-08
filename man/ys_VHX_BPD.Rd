@@ -3,16 +3,16 @@
 \docType{data}
 \name{ys_VHX_BPD}
 \alias{ys_VHX_BPD}
-\title{Example Plasmodium vivax data}
+\title{Example \emph{Plasmodium vivax} data}
 \format{
-A list of 217 patients; for each patient, a list of one or more
+A list of 217 study participants; for each study participant, a list of one or more
 episodes; for each episode, a list of three or more microsatellite markers;
 for each marker, a vector of observed alleles (repeat lengths). For example:
 \describe{
-\item{BPD_103}{Patient identifier: patient 103 in the BPD trial}
-\item{BPD_103_1}{Episode identifier: episode one of patient 103 in the BPD trial}
-\item{PV.3.27}{Marker identifier: Plasmodium vivax 3.27}
-\item{18}{Repeat length: 18}
+\item{BPD_103}{Study participant identifier: study participant 103 in the BPD trial}
+\item{BPD_103_1}{Episode identifier: episode one of study participant 103 in the BPD trial}
+\item{PV.3.27}{Marker identifier: \emph{P. vivax} 3.27}
+\item{18}{Allele identifier: 18 repeat lengths}
 }
 }
 \source{
@@ -25,9 +25,12 @@ for each marker, a vector of observed alleles (repeat lengths). For example:
 ys_VHX_BPD
 }
 \description{
-Previously-published microsatellite data on Plasmodium vivax parasites
-extracted from patients enrolled in the Best Primaquine Dose (BPD) and Vivax
+Previously-published microsatellite data on \emph{P. vivax} parasites
+extracted from study participants enrolled in the Best Primaquine Dose (BPD) and Vivax
 History (VHX) trials; see
-\url{https://www.nature.com/articles/s41467-019-13412-x}.
+\href{https://www.nature.com/articles/s41467-019-13412-x}{Taylor & Watson et al. 2019}
+for more details of the genetic data; for more details of the trials, see
+\href{https://doi.org/10.1093/cid/ciy319}{Chu et al. 2018a} and
+\href{https://doi.org/10.1093/cid/ciy735}{Chu et al. 2018b}.
 }
 \keyword{datasets}
