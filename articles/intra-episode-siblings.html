@@ -78,42 +78,35 @@
     
     
 <p>As the following example illustrates, Pv3Rs sums over graphs with
-cliques of three or more intra-episode siblings when MOIs used by the
-Pv3Rs model exceed two. However, when the data input via the
-<code>y</code> argument of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> are as
-diverse as the MOIs used by the Pv3Rs model, graphs with cliques of
-three or more intra-episode sibling parasites have zero likelihood; when
-MOIs used by the Pv3Rs model are more diverse than the data input via
-the <code>y</code> argument of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> (e.g.,
-because the user inputs elevated MOIs into
-<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>), graphs with cliques of three or more
-intra-episode siblings have non-zero likelihoods. In either case,
-provided MOIs used by the Pv3Rs model are based on estimates from
-per-episode parasite genetic data generated and analysed in bulk (i.e.,
-not single-cell data), groups of three or more not-half intra-episode
-siblings collapse to groups of two because</p>
+cliques of three or more intra-episode siblings whenever the MOIs used
+by the Pv3Rs model exceed two. However, these graphs only acquire
+non-zero likelihoods if the user specifies MOIs that exceed the
+diversity in the data <code>y</code>.</p>
+<p>In any case, when MOIs estimates are based on bulk parasite genetic
+data (i.e., not single-cell data), groups of three or more non-half
+intra-episode siblings collapse to groups of two, because:</p>
 <ul>
-<li><p>MOI estimates based on maximum per-marker allele counts are at
-most two for groups of three or more not-half siblings because groups of
-not-half siblings can draw from at most two parental alleles per
+<li><p>MOI estimates based on maximum per-marker allele counts cannot
+exceed two for groups of three or more non-half siblings, because groups
+of non-half siblings can draw from at most two parental alleles per
 marker.</p></li>
-<li><p>MOI estimates based on heteroallelic marker counts count at most
-two for groups of three or more not-half siblings because data from a
-group of not-half siblings can be at most as diverse across markers as
-the two parental genotypes from which they draw.</p></li>
+<li><p>MOI estimates based on heteroallelic marker counts cannot exceed
+two for groups of three or more non-half siblings because their
+heteroallelic marker count cannot exceed that of the two parental
+genotypes from which they derive.</p></li>
 </ul>
 <div class="section level3">
 <h3 id="example-of-a-group-of-four-intra-episode-siblings-collapsing-to-two">Example of a group of four intra-episode siblings collapsing to
 two<a class="anchor" aria-label="anchor" href="#example-of-a-group-of-four-intra-episode-siblings-collapsing-to-two"></a>
 </h3>
-<p>Before showing how groups of intra-episode siblings collapse to pairs
-of intra-episode siblings, we write a function to simulate data of a
-given allelic richness (marker cardinality) on an enrolment episode
-comprising a stranger plus a group of four siblings, two from one
-oocyst, two from another, all drawing from the same two unrelated
-parental genotypes, and a recurrence with one sibling. Technically, the
-enrolment episode contains five genetically distinct genotypes and thus
-has a MOI of five.</p>
+<p>Before demonstrating how intra-episode sibling groups collapse to
+pairs, we write a function to simulate data with specified allelic
+richness (marker cardinality) for an enrolment episode comprising a
+stranger plus a group of four siblings, two from one oocyst, two from
+another, all drawing from the same two unrelated parental genotypes, and
+a recurrence with one sibling. Technically, the enrolment episode
+contains five genetically distinct genotypes and thus has a MOI of
+five.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">simulate_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">marker_cardinality</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
@@ -180,11 +173,12 @@ three and one when markers are polyallelic:</p>
 external software that exploits heteroallelic marker counts (rather than
 the maximum number of per-marker alleles), and input those external
 estimates into <code>compute_posterior</code>. Providing data are
-simulated on a large number of markers (200 above), we recover almost
+simulated on a large number of markers (200 markers are hard coded in
+the <code>simulate_data</code> function above), we recover almost
 exactly the same posterior probabilities using both the</p>
 <ul>
 <li>polyallelic data without user-specified MOIs</li>
-<li>biallelic data with user-specified MOIs three and one</li>
+<li>biallelic data with user-specified MOIs of three and one</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ppost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">polyallelic</span><span class="op">$</span><span class="va">data</span>, </span>
@@ -200,10 +194,10 @@ exactly the same posterior probabilities using both the</p>
 <span><span class="va">bpost</span><span class="op">$</span><span class="va">marg</span></span>
 <span><span class="co">#&gt;               C         L            I</span></span>
 <span><span class="co">#&gt; recur 0.6666663 0.3333337 4.625927e-18</span></span></code></pre></div>
-<p>However, given the polyallelic data the likelihoods of the following
-graphs with cliques of three intra-episode siblings are zero:</p>
+<p>However, given the polyallelic data the following graphs with cliques
+of three intra-episode siblings have zero likelihood:</p>
 <p><img src="intra-episode-siblings_files/figure-html/unnamed-chunk-6-1.png" width="100%"></p>
-<p>Whereas, all relationships have non-zero likelihoods given the
+<p>Whereas, all relationships have non-zero likelihood given the
 biallelic data:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">llikes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">bpost</span><span class="op">$</span><span class="va">RGs</span>, <span class="kw">function</span><span class="op">(</span><span class="va">RG</span><span class="op">)</span> <span class="va">RG</span><span class="op">$</span><span class="va">logp</span><span class="op">)</span> <span class="co"># Extract log likelihoods</span></span>
@@ -221,13 +215,14 @@ uniform prior on graphs. However, for upper bounds on the probability of
 reinfection / recrudescence given a single recurrence the contribution
 is very small, especially for reinfection:</p>
 <p><img src="intra-episode-siblings_files/figure-html/unnamed-chunk-9-1.png" width="100%"></p>
+<p><img src="intra-episode-siblings_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
 <p>For recrudescence, 3 MOI vectors (circled below) result in an
 absolute difference greater than 0.0175. They are those that feature
-large MOIs (MOI vectors 52, 62, 71) and thus those whose graph spaces
-include graphs with the largest cliques of intra-episode siblings.</p>
-<p><img src="intra-episode-siblings_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
-<p>The contribution is likely smaller for all vectors of three or more
-MOIs that are computationally feasible under Pv3Rs because their
+large MOIs (MOI vectors 5 2 , 6 2 , 7 1 ) and thus those whose graph
+spaces include graphs with the largest cliques of intra-episode
+siblings.</p>
+<p>The contribution is likely even smaller for all vectors of three or
+more MOIs that are computationally feasible under Pv3Rs because their
 constituent MOIs are necessarily less than 7 (computationally feasible
 MOI vectors are those where the total genotype count is at most
 eight).</p>
