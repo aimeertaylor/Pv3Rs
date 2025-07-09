@@ -127,28 +127,17 @@ alleles have known frequencies.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_data.html">plot_data</a></span><span class="op">(</span>ys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Participant data"</span> <span class="op">=</span> <span class="va">y</span><span class="op">)</span>, fs <span class="op">=</span> <span class="va">fs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="demonstrate-usage_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>Per marker, each colour in the main grid represents a different
-allele. The legend below the main grid shows allele frequencies via
-colour proportions, with one row per marker (e.g., <code>d</code> at
-<code>m2</code> is rare). The order of the markers in the legend is the
-same as that in the main grid.</p>
-<p><strong>Aside</strong> Given the maximum number of alleles observed
-per-episode, the most parsimonious explanation is that there are 3, 2, 1
-distinct parasite genotypes in the three episodes respectively (a
-genotype is here defined as a DNA sequence representing a group of
-clonal parasites). In this synthetic example, markers are quart-allelic
-for brevity; this imposes a rather low upper bound on MOI estimates
-based on maximum per-marker allele counts. In reality, more diverse
-markers are recommended for recurrence state inference. If better MOI
-estimates were available based on more diverse markers, the data from
-those more diverse markers could be added to the data input
-<code>y</code> of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. If better MOI
-estimates based on heteroallelic marker counts across many markers were
-available, they could be used in recurrence state inference by
-specifying the <code>MOI</code> argument in the function
-<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>. Because the Pv3Rs model does not
-account for genotyping errors, including false positive alleles,
-user-specified MOIs must be greater than or equal to those based on
-maximum per-marker allele counts.</p>
+allele. The legend below the main grid shows per-marker allele
+frequencies via colour proportions, with one row per marker, ordered as
+in the main grid; e.g., <code>d</code> at <code>m2</code> is rare.</p>
+<p><strong>Aside</strong> Assuming no undected alleles or genotyping
+errors, the function <code><a href="../reference/determine_MOIs.html">determine_MOIs()</a></code> computes the minimum
+number of distinct parasite genotypes within episodes based on maximum
+alleles per marker (a genotype is here defined as a DNA sequence
+representing a group of clonal parasites). In this synthetic example,
+markers are quart-allelic, imposing a low upper bound on MOI estimates
+based on maximum per-marker allele counts. More diverse markers are
+recommended for MOI estimation and recurrence state inference.</p>
 </div>
 <div class="section level3">
 <h3 id="compute-posterior-recurrence-state-posterior-probabilities">1) Compute posterior recurrence state posterior probabilities<a class="anchor" aria-label="anchor" href="#compute-posterior-recurrence-state-posterior-probabilities"></a>
@@ -165,10 +154,9 @@ of graphs of relationships between genotypes.</p>
 <span><span class="co">#&gt; =============================================================================|</span></span></code></pre></div>
 <p>In the call to <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> above we did not
 specify a prior, and so a uniform prior across all three recurrence
-states per recurrence is assumed by default. Marginal per-recurrence
-posterior probabilities (probabilities of recrudescence <code>C</code>,
-relapse <code>L</code>, and reinfection <code>I</code> for each
-recurrence) are stored in <code>post$marg</code>.</p>
+states per recurrence was assumed by default. Per-recurrence posterior
+probabilities of recrudescence <code>C</code>, relapse <code>L</code>,
+and reinfection <code>I</code> are stored in <code>post$marg</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">post</span><span class="op">$</span><span class="va">marg</span></span>
 <span><span class="co">#&gt;                     C         L          I</span></span>
