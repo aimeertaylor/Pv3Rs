@@ -5,12 +5,11 @@
 #' recrudescence, relapse, reinfection — using per-person genetic data on two
 #' or more episodes. For usage, see
 #' **Examples** below and
-#' `vignette("demonstrate-usage")` — clickable online; otherwise, use
-#' [offline link](../doc/demonstrate-usage.html).
+#' `vignette("demonstrate-usage")` — clickable online
+#' [(offline link)](../doc/demonstrate-usage.html).
 #' For a more
 #' complete understanding of the posterior output, see ["Understand posterior
 #' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
-#'
 #'
 #' Note: The progress bar may increment non-uniformly (see
 #' **Details**); it may appear stuck when computations are ongoing.
@@ -77,8 +76,8 @@
 #'   graph (default `FALSE`). Setting `TRUE` disables permutation symmetry
 #'   optimisation and thus increases runtime, especially when MOIs are large.
 #'   Does not affect the output of the posterior probabilities; see
-#'   `vignette("demonstrate-usage")` - clickable online; otherwise, use
-#'   [offline link](../doc/demonstrate-usage.html) —
+#'   `vignette("demonstrate-usage")` - clickable online
+#'   [(offline link)](../doc/demonstrate-usage.html) —
 #'   which also contains an example of permutation symmetry.
 #' @param progress.bar Logical; show progress bars (default `TRUE`).
 #'   Note that the progress bar may update non-uniformly.

@@ -49,8 +49,8 @@ see \code{determine_MOIs(y)}. These are the estimates used when
 graph (default \code{FALSE}). Setting \code{TRUE} disables permutation symmetry
 optimisation and thus increases runtime, especially when MOIs are large.
 Does not affect the output of the posterior probabilities; see
-\code{vignette("demonstrate-usage")} - clickable online; otherwise, use
-\href{../doc/demonstrate-usage.html}{offline link} —
+\code{vignette("demonstrate-usage")} - clickable online
+\href{../doc/demonstrate-usage.html}{(offline link)} —
 which also contains an example of permutation symmetry.}
 
 \item{progress.bar}{Logical; show progress bars (default \code{TRUE}).
@@ -81,8 +81,8 @@ Computes per-person posterior probabilities of \emph{P. vivax} recurrence states
 recrudescence, relapse, reinfection — using per-person genetic data on two
 or more episodes. For usage, see
 \strong{Examples} below and
-\code{vignette("demonstrate-usage")} — clickable online; otherwise, use
-\href{../doc/demonstrate-usage.html}{offline link}.
+\code{vignette("demonstrate-usage")} — clickable online
+\href{../doc/demonstrate-usage.html}{(offline link)}.
 For a more
 complete understanding of the posterior output, see \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 
