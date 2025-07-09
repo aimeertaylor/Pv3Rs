@@ -36,13 +36,13 @@ more elaborate study-level `Pv3Rs` tutorial is planned, covering
 - Sensitivity analysis for genotyping errors
 - Sensitivity analysis for sibling misspecification
 - Alternative approach using genetic distance and whole-genome sequence data
-- Using posterior probabilities (rather than binary classifications) to estimate treatment efficacy
+- Using posterior probabilities (rather than categorical classifications) to estimate treatment efficacy
 - Estimating false negative rates
 
 ## Basic workflow
 
 We begin with a synthetic example of three episodes (episode names are optional) with
-three markers (marker names are obligatory) whose alleles have known frequencies.
+three markers (marker names are obligatory) whose alleles have known frequencies, `fs`.
 
 ```{r}
 y <- list("Enrolment" = list(m1 = c('b','c','d'), 
@@ -68,32 +68,35 @@ We plot the data using `plot_data()`.
 plot_data(ys = list("Participant data" = y), fs = fs)
 ```
 
-Per marker, each colour in the main grid represents a different allele. The
+For each marker, different colours represent different alleles. The
 legend below the main grid shows per-marker allele frequencies via colour
 proportions, with one row per marker, ordered as in the main grid; e.g., `d` at
 `m2` is rare.
 
-**Aside** The most parsimonious MOI estimates compatible with the above data are
-`r determine_MOIs(y, return.names = TRUE)` computed using `determine_MOIs()`. By
-default, `compute_posterior` uses these MOI estimates. In this synthetic
-example, markers are quart-allelic, imposing low upper bounds on MOI estimates
-based on maximum per-marker allele counts. More diverse markers are recommended
-for MOI estimation and recurrence state inference.
+The most parsimonious MOI estimates compatible with the above data, `r
+determine_MOIs(y)`, are computed using `determine_MOIs()`. By default, these MOI
+estimates are used by `compute_posterior` (next step). The total genotype count
+(sum over MOIs) is `r sum(determine_MOIs(y))`.
+
+**Aside** In this synthetic example, markers are quart-allelic, imposing low 
+upper bounds on MOI estimates based on maximum per-marker allele counts. More
+diverse markers are recommended for MOI estimation and recurrence state
+inference.
 
 ### 2) Compute posterior recurrence state posterior probabilities 
 
-**Aside** We do not recommend running `compute_posterior()` for data whose total
-genotype count (sum of MOIs) exceeds eight. That said, we have not encoded a
-hard limit. In our experience, it is possible, but very long, to generate
-estimates using data with a total genotype count up to 10; above 10 genotypes,
-calls to `compute_posterior()` are liable cause memory-use problems and fail.
-
 The bulk of the computational time lies in computing log-likelihoods of graphs
-of relationships between genotypes.
+of relationships between genotypes. The number of graphs depends on the MOIs. 
 
 ```{r, cache=TRUE}
 post <- compute_posterior(y, fs)
 ```
+
+**Aside** We do not recommend running `compute_posterior()` for data whose total 
+genotype count (sum of MOIs) exceeds eight. That said, we have not encoded a
+hard limit. In our experience, it is possible, but very long, to generate
+estimates using data with a total genotype count up to 10; above 10 genotypes,
+calls to `compute_posterior()` are liable cause memory-use problems and fail.
 
 In the call to `compute_posterior()` above we did not specify a prior, and so by
 default all three recurrence states were assumed equally likely per recurrence.
@@ -102,7 +105,7 @@ Posterior probabilities of recurrent state sequences (where `C` is
 recrudescence, `L` is relapse, and `I` is reinfection) are stored in
 `post$joint`. Here, we find the most likely sequence of recurrence states is 
 `r names(which.max(post$joint))` with posterior probability 
-`r post$joint[which.max(post$joint)]`:
+`r round(post$joint[which.max(post$joint)],4)`:
 
 ```{r}
 sort(post$joint, decreasing = T)
@@ -115,14 +118,13 @@ reinfection `I` are stored in `post$marg`.
 post$marg
 ```
 
-Per-recurrence probabilities are computed by simply summing over probabilities
-of a subset of states sequences:
+We refer to per-recurrence probabilities as `marg` (shorthand for marginal)
+because they are computed by summing over state sequence probabilities. For
+example, the probability of `L` at `Recurrence 1` above, is the sum of
+probabilities over `LC`, `LL` and `LI`:
 
 ```{r}
-sprintf('post$marg for first-recurrence relapse, %s, is equal to %s, 
-        the sum of probabilities over LC, LL and LI', 
-        round(post$marg["Recurrence 1", "L"], 4), 
-        round(post$joint["LC"] + post$joint["LL"] + post$joint["LI"], 4))
+round(post$joint["LC"] + post$joint["LL"] + post$joint["LI"], 4)
 ```
 
 
@@ -131,7 +133,6 @@ sprintf('post$marg for first-recurrence relapse, %s, is equal to %s,
 Per-recurrence posterior probabilities are plotted on the simplex using `plot_simplex()`.
 
 ```{r}
-# Plot simplex
 par(mar = rep(0.1,4))
 p.coords <- rbind(post$marg, Prior = rep(1/3, 3))
 plot_simplex(p.coords = p.coords, pch = 20)
@@ -150,28 +151,28 @@ and `return.logp` to `TRUE`:
 post <- compute_posterior(y, fs, return.RG = TRUE, return.logp = TRUE)
 ```
 
-We recover the same posterior as before
+We recover the same posterior as before,
 
 ```{r}
 sort(post$joint, decreasing = T)
 ```
 
-but computation was longer: To compute the posterior, summations over per-marker
-allelic assignments that are equivalent up to within-episode genotype
+but the compute time was longer: To compute the posterior, summations over
+per-marker allelic assignments that are equivalent up to within-episode genotype
 permutations are redundant. As such, by default, `compute_posterior()` does not
 sum over them, conserving both memory and compute time. The exploitation of
 permutation symmetry requires a scheme to choose a single representative among
 permutations that are otherwise equivalent. To compute meaningful graph
 likelihood values (values that do not depend on the representative-choosing
 scheme), all permutations are summed over when `return.logp = TRUE`, increasing
-compute time, especially when MOIs are large. Also, when user-specified MOIs are
-greater than those given by `determine_MOIs()`, `compute_posterior()` sums over
-all permutations because the representative-choosing scheme is too complicated.
+compute time, especially when MOIs are large. Also, when user-specified MOIs
+exceed those of `determine_MOIs()`, all permutations are summed over because the
+representative-choosing scheme is too complicated.
  
-The log-likelihood of each relationship graph is returned in the output. We plot
+The log-likelihood of each relationship graph is returned. We plot
 the relationship graph(s) with the largest likelihood. There are two graphs with
 maximum likelihood; they are isomorphic up to within-episode genotype
-permutations:
+permutations.
 
 ```{r}
 # Extract all log likelihoods
@@ -196,24 +197,8 @@ legend("bottomright", pch = 21,
        bty = "n", legend = names(y), title = "Episode")
 ```
 
-Important considerations:
-
-- The relationship graph(s) with the largest likelihood (e.g.,
-those above) might not be in the equivalence class for which the data are most
-probable when all relationship graphs in that class are summed over; see below. 
-
-- The maximum-likelihood graph(s) might be incompatible with the
-maximum-posterior state sequence, although they are compatible in this example;
-recall the most-likely sequence is `r names(which.max(post$joint))`. 
-<!-- see example in DevFiles/Investigate_Symmetries --> 
-
-- The graphs in the maximum-likelihood equivalence class might be incompatible
-with the maximum-posterior state sequence (true of the current example,
-given the class with the largest likelihood contains graphs with sibling edges
-that are incompatible with `r names(which.max(post$joint))`).
-
-<!-- We suspect one of these cases above has to be false, but we cannot rule out
-the possibility that both are true without further exploration -->
+Using log likelihoods, we can also find the equivalence class for which the data are most
+probable when all relationship graphs in that class are summed over. 
 
 ```{r}
 # In the following code, we place two graphs in the same equivalence class if
@@ -245,6 +230,25 @@ for(i in (max_idx-max_size+1):max_idx) { # EC consists of the RGs with logl rank
   box()
 }
 ```
+
+Important considerations:
+
+- The maximum-likelihood graph(s) might not be in the
+equivalence class for which the data are most probable when all relationship
+graphs in that class are summed over; e.g., see above.
+
+- The maximum-likelihood graph(s) might be incompatible with the
+maximum-posterior state sequence, (not the case in the above example;
+recall the most-likely sequence was `r names(which.max(post$joint))`). 
+<!-- see example in DevFiles/Investigate_Symmetries --> 
+
+- The graphs in the maximum-likelihood equivalence class might be incompatible
+with the maximum-posterior state sequence (true of the above example; the class
+with the largest likelihood contains graphs with sibling edges that are
+incompatible with `r names(which.max(post$joint))`).
+
+<!-- We suspect one of these cases above has to be false, but we cannot rule out
+the possibility that both are true without further exploration -->
 
 
 
