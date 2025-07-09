@@ -26,7 +26,7 @@ recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs")
 ```
 
 This vignette, which is rather niche, expands a digression in 
-["Understand posterior estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html). 
+[Understand posterior estimates](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html). 
 
 `compute_posterior()` sums over graphs with cliques of three or more
 intra-episode siblings whenever the `MOIs` used contain values that exceed
@@ -49,12 +49,12 @@ exceed that of the two parental genotypes from which they derive.
 ## Example of a group of four intra-episode siblings collapsing to two
 
 Before demonstrating how intra-episode sibling groups collapse to pairs, we
-write a function to simulate data on 200 markers with some specified allelic
-richness (marker cardinality) for an enrolment episode comprising a stranger
-plus a group of four siblings, two from one oocyst, two from another, all
-drawing from the same two unrelated parental genotypes, and a recurrence with
-one sibling. Technically, the enrolment episode contains five genetically
-distinct genotypes and thus has a MOI of five.
+write a function to simulate data on 200 markers all with the same
+user-specified allelic richness (marker cardinality) for an enrolment episode
+comprising a stranger plus a group of four siblings, two from one oocyst, two
+from another, all drawing from the same two unrelated parental genotypes, and a
+recurrence with one sibling. Technically, the enrolment episode contains five
+genetically distinct genotypes and thus has a MOI of five.
 
 ```{r}
 simulate_data <- function(marker_cardinality){
@@ -127,8 +127,8 @@ determine_MOIs(biallelic$data)
 Suppose we estimate MOIs of 3 and 1 for the biallelic data using an external
 software that exploits heteroallelic marker counts, and input those external
 estimates into `compute_posterior()`. Providing data are simulated on a large
-number of markers, we recover almost exactly the same posterior probabilities
-using both the
+number of markers (200 above), we recover almost exactly the same posterior
+probabilities using both the
 
 - polyallelic data without user-specified MOIs
 - biallelic data with user-specified MOIs of three and one
@@ -228,6 +228,6 @@ those whose graph spaces include graphs with the largest cliques of
 intra-episode siblings.
 
 The contribution is likely even smaller for all vectors of three or more MOIs
-that are computationally feasible under Pv3Rs because their constituent MOIs are
-necessarily less than 7 (recall that computationally feasible MOI vectors are
-those where the total genotype count is at most eight).
+that are computationally feasible under Pv3Rs, because their constituent MOIs
+are necessarily less than 7 (recall that computationally feasible MOI vectors
+are those that sum to at most eight).
