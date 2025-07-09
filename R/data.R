@@ -49,19 +49,19 @@
 #' Upper bounds on posterior probabilities of 1st-recurrence recrudescence and
 #' reinfection (rows) for various MOI vectors (columns) that sum to at most
 #' eight. These upper bounds feature in
-#' `vignette("understand-graph-prior")` — pdf vignette not clickable online
-#' [(offline link)](../doc/understand-graph-prior.pdf) —
-#' and
+#' `vignette("understand-graph-prior")` — pdf vignette, not clickable online
+#' [(offline link)](../doc/understand-graph-prior.pdf) — and
 #' `vignette("intra-episode-siblings")` — clickable online
 #' [(offline link)](../doc/intra-episode-siblings.html).
 #' For a single recurrence (MOI vectors of length two), upper bounds are
 #' induced by the prior. For more than one recurrence (MOI vectors of length
 #' three or more), upper bounds assume all but the first recurrence has data;
-#' these bounds are only valid for monoclonal episodes; see XXX. Two upper
-#' bounds for each recurrence state are reported: one where summation over
-#' graphs includes graphs with cliques of three or more intra-episode siblings,
-#' another where summation over graphs excludes graphs with cliques of three or
-#' more intra-episode siblings. Since graphs with cliques of three or more
+#' these bounds are only valid for monoclonal episodes;
+#' see `vignette("understand-graph-prior")` [(offline link)](../doc/understand-graph-prior.pdf).
+#' Two upper bounds for each recurrence state are reported: one where summation over graphs includes
+#' graphs with cliques of three or more intra-episode siblings, another where
+#' summation over graphs excludes graphs with cliques of three or more
+#' intra-episode siblings. Since graphs with cliques of three or more
 #' intra-episode siblings only apply when MOI vectors include MOIs of three or
 #' more, these two bounds only differ for MOI vectors that include MOIs of three
 #' or more; see **Examples**.
