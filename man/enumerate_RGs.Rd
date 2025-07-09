@@ -8,7 +8,7 @@ enumerate_RGs(MOIs, igraph = TRUE, progress.bar = TRUE)
 }
 \arguments{
 \item{MOIs}{Vector of per-episode multiplicities of infection (MOIs),
-i.e., numbers of vertices per episode.}
+i.e., numbers of per-episode genotypes / vertices.}
 
 \item{igraph}{Logical; returns RGs as \code{igraph} objects (default \code{TRUE}).}
 
@@ -29,7 +29,7 @@ If \code{igraph = TRUE} (default), each RG is encoded as an \code{igraph} object
 (see \code{\link{RG_to_igraph}}).
 }
 \description{
-An RG is a graph over all per-person parasite haploid genotypes (each as a
+An RG is a graph over all per-person parasite genotypes (each as a
 vertex), with edges between clone and sibling genotypes.
 Valid RGs satisfy:
 \itemize{

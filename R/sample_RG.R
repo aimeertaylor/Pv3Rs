@@ -8,7 +8,7 @@
 #' for details.
 #'
 #' @param MOIs Vector of per-episode multiplicities of infection (MOIs),
-#' i.e., numbers of vertices per episode.
+#' i.e., numbers of per-episode genotypes / vertices.
 #' @param igraph Logical; if `TRUE` (default), returns the RG as an
 #'   \code{igraph} object.
 #'

@@ -3,15 +3,14 @@
 #' @description
 #' Computes per-person posterior probabilities of *P. vivax* recurrence states —
 #' recrudescence, relapse, reinfection — using per-person genetic data on two
-#' or more episodes. For usage see
+#' or more episodes. For usage, see
 #' **Examples** below and
-#' `vignette("demonstrate-usage")` (online link)
-#' [vignette("demonstrate-usage")](../doc/demonstrate-usage.html) (R link)
+#' `vignette("demonstrate-usage")` — clickable online; otherwise, use
+#' [offline link](../doc/demonstrate-usage.html).
 #' For a more
-#' complete understanding of the posterior output see ["Understand posterior
+#' complete understanding of the posterior output, see ["Understand posterior
 #' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'
-#' `vignettes(topic = "understand-posterior", package = "Pv3Rs")`
 #'
 #' Note: The progress bar may increment non-uniformly (see
 #' **Details**); it may appear stuck when computations are ongoing.
@@ -66,18 +65,20 @@
 #'   with rows as episodes in chronological order, and columns named "C", "L",
 #'   and "I" for recrudescence, relapse and reinfection, respectively. Row names
 #'   are ignored. If `NULL` (default), per-episode recurrence states are assumed
-#'   equally likely \emph{a priori}.
-#' @param MOIs Vector of per-episode multiplicities of infection (MOIs). If
-#'   `NULL` (default), the most parsimonious MOIs compatible with the data are
-#'   used; see \code{\link{determine_MOIs}}.
+#'   equally likely *a priori*.
+#' @param MOIs Vector of per-episode multiplicities of infection (MOIs); because
+#'   the Pv3Rs model assumes no genotyping errors, `MOIs` must be greater than
+#'   or equal to the most parsimonious MOI estimates compatible with the data;
+#'   see `determine_MOIs(y)`. These are the estimates used when
+#'   `MOIs = NULL` (default).
 #' @param return.RG Logical; returns the relationship graphs
 #'   (default `FALSE`). Automatically set to `TRUE` if `return.logp = TRUE`.
 #' @param return.logp Logical; returns the log-likelihood for each relationship
 #'   graph (default `FALSE`). Setting `TRUE` disables permutation symmetry
 #'   optimisation and thus increases runtime, especially when MOIs are large.
 #'   Does not affect the output of the posterior probabilities; see
-#'   `vignette("demonstrate-usage")` (online link) /
-#'   [vignette("demonstrate-usage")](../doc/demonstrate-usage.html) (R link),
+#'   `vignette("demonstrate-usage")` - clickable online; otherwise, use
+#'   [offline link](../doc/demonstrate-usage.html) —
 #'   which also contains an example of permutation symmetry.
 #' @param progress.bar Logical; show progress bars (default `TRUE`).
 #'   Note that the progress bar may update non-uniformly.

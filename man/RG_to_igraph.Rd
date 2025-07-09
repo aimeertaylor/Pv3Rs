@@ -11,8 +11,8 @@ RG_to_igraph(RG, MOIs)
 \code{\link{enumerate_RGs}} when \code{igraph = FALSE}.}
 
 \item{MOIs}{Vector of per-episode multiplicities of infection (MOIs), i.e.,
-numbers of vertices per episode; adds to the graph an attribute
-that is used by \code{\link{plot_RG}} to group genotypes by episodes.}
+numbers of per-episode genotypes / vertices; adds to the graph an attribute
+that is used by \code{\link{plot_RG}} to group genotypes / vertices by episode.}
 }
 \value{
 A weighted graph whose edge weights 1 and 0.5 encode clonal and

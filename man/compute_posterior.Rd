@@ -36,9 +36,11 @@ and "I" for recrudescence, relapse and reinfection, respectively. Row names
 are ignored. If \code{NULL} (default), per-episode recurrence states are assumed
 equally likely \emph{a priori}.}
 
-\item{MOIs}{Vector of per-episode multiplicities of infection (MOIs). If
-\code{NULL} (default), the most parsimonious MOIs compatible with the data are
-used; see \code{\link{determine_MOIs}}.}
+\item{MOIs}{Vector of per-episode multiplicities of infection (MOIs); because
+the Pv3Rs model assumes no genotyping errors, \code{MOIs} must be greater than
+or equal to the most parsimonious MOI estimates compatible with the data;
+see \code{determine_MOIs(y)}. These are the estimates used when
+\code{MOIs = NULL} (default).}
 
 \item{return.RG}{Logical; returns the relationship graphs
 (default \code{FALSE}). Automatically set to \code{TRUE} if \code{return.logp = TRUE}.}
@@ -47,8 +49,8 @@ used; see \code{\link{determine_MOIs}}.}
 graph (default \code{FALSE}). Setting \code{TRUE} disables permutation symmetry
 optimisation and thus increases runtime, especially when MOIs are large.
 Does not affect the output of the posterior probabilities; see
-\code{vignette("demonstrate-usage")} (online link) /
-\href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")} (R link),
+\code{vignette("demonstrate-usage")} - clickable online; otherwise, use
+\href{../doc/demonstrate-usage.html}{offline link} —
 which also contains an example of permutation symmetry.}
 
 \item{progress.bar}{Logical; show progress bars (default \code{TRUE}).
@@ -77,14 +79,12 @@ encoded as a list can be converted into a \code{igraph} object using
 \description{
 Computes per-person posterior probabilities of \emph{P. vivax} recurrence states —
 recrudescence, relapse, reinfection — using per-person genetic data on two
-or more episodes. For usage see
+or more episodes. For usage, see
 \strong{Examples} below and
-\code{vignette("demonstrate-usage")} (online link)
-\href{../doc/demonstrate-usage.html}{vignette("demonstrate-usage")} (R link)
+\code{vignette("demonstrate-usage")} — clickable online; otherwise, use
+\href{../doc/demonstrate-usage.html}{offline link}.
 For a more
-complete understanding of the posterior output see \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
-
-\code{vignettes(topic = "understand-posterior", package = "Pv3Rs")}
+complete understanding of the posterior output, see \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 
 Note: The progress bar may increment non-uniformly (see
 \strong{Details}); it may appear stuck when computations are ongoing.

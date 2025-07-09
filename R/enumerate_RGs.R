@@ -1,6 +1,6 @@
 #' Enumerate relationship graphs (RGs)
 #'
-#' An RG is a graph over all per-person parasite haploid genotypes (each as a
+#' An RG is a graph over all per-person parasite genotypes (each as a
 #' vertex), with edges between clone and sibling genotypes.
 #' Valid RGs satisfy:
 #' \itemize{
@@ -22,7 +22,7 @@
 #' encoded as a list is converted to an `igraph` object.
 #'
 #' @param MOIs Vector of per-episode multiplicities of infection (MOIs),
-#' i.e., numbers of vertices per episode.
+#' i.e., numbers of per-episode genotypes / vertices.
 #' @param igraph Logical; returns RGs as \code{igraph} objects (default `TRUE`).
 #' @param progress.bar Logical; show progress bar (default `TRUE`).
 #'

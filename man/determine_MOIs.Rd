@@ -18,21 +18,25 @@ missing.}
 names are returned.}
 }
 \value{
-Numeric vector containing one MOI per episode, each MOI representing
-the maximum number of alleles observed at any marker per episode.
+Numeric vector containing one MOI estimate per episode, each estimate
+representing the maximum number of distinct alleles observed at any marker per
+episode.
 }
 \description{
-Calculates a MOI for each episode based on allelic diversity across markers.
+Returns a MOI estimate for each episode based on allelic diversity across
+markers.
 }
 \details{
-The MOI of an episode is the number of genetically distinct groups of clonal
-parasites within the episode. All parasites within a group share the same DNA
-sequence, which we call a genotype. As such, a MOI is also a distinct
-parasite genotype count.
-
-For a given episode, the MOI is the maximum number distinct alleles observed
-at any marker within that episode. These MOIs are the default used by
-\code{\link{compute_posterior}}.
+A true MOI is a number of genetically distinct groups of clonal parasites
+within an infection. Give or take \emph{de novo} mutations, all parasites within
+a clonal group share the same DNA sequence, which we call a genotype. As
+such, MOIs are distinct parasite genotype counts. Under the Pv3Rs model
+assumption that there are no genotyping errors, the true MOI of an episode is
+greater than or equal to the maximum distinct allele count for any marker in
+the data on that episode. In other words, under the assumption of no
+genotyping errors, maximum distinct allelic counts are the most
+parsimonious MOI estimates compatible with the data. By default, these MOI
+estimates are used by \code{\link{compute_posterior}}.
 }
 \examples{
 y <- list(enrol = list(m1 = c("A", "B"), m2 = c("A"), m3 = c("C")),
