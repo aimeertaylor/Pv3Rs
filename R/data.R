@@ -19,7 +19,7 @@
 #' }
 #'
 #' @source
-#' * <https://github.com/jwatowatson/RecurrentVivax/blob/master/RData/GeneticModel/MS_data_PooledAnalysis.RData>
+#' * <https://zenodo.org/records/3368828>
 #' * <https://github.com/aimeertaylor/Pv3Rs/blob/main/data-raw/ys_VHX_BPD.R>
 "ys_VHX_BPD"
 
@@ -39,7 +39,7 @@
 #' that sum to one.
 #'
 #' @source
-#' * <https://github.com/jwatowatson/RecurrentVivax/blob/master/RData/GeneticModel/MS_data_PooledAnalysis.RData>
+#' * <https://zenodo.org/records/3368828>
 #' * <https://github.com/aimeertaylor/Pv3Rs/blob/main/data-raw/fs_VHX_BPD.R>
 "fs_VHX_BPD"
 
@@ -49,7 +49,7 @@
 #' Upper bounds on posterior probabilities of 1st-recurrence recrudescence and
 #' reinfection (rows) for various MOI vectors (columns) that sum to at most
 #' eight. These upper bounds feature in
-#' `vignette("understand-graph-prior")` — clickable online
+#' `vignette("understand-graph-prior")` — pdf vignette not clickable online
 #' [(offline link)](../doc/understand-graph-prior.pdf) —
 #' and
 #' `vignette("intra-episode-siblings")` — clickable online
