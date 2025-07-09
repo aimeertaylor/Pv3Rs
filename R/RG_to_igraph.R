@@ -37,7 +37,7 @@ RG_to_igraph <- function(RG, MOIs) {
 
   ts_per_gs <- rep(1:length(MOIs), MOIs)
   gs_count <- sum(MOIs)
-  gs <- unlist(RG$clone)
+  gs <- paste0("g", 1:gs_count)
 
   if (length(gs) != gs_count) stop("sum(MOIs) should equal number of genotypes in RG")
 
