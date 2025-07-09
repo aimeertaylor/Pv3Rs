@@ -84,7 +84,7 @@ or more episodes. For usage see
 For a more
 complete understanding of the posterior output see \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
 
-`vignettes(topic = "understand-posterior", package = "Pv3Rs")
+\code{vignettes(topic = "understand-posterior", package = "Pv3Rs")}
 
 Note: The progress bar may increment non-uniformly (see
 \strong{Details}); it may appear stuck when computations are ongoing.
