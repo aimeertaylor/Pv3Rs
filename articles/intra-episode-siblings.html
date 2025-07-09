@@ -77,8 +77,8 @@
 
     
     
-<p>This vignette, which is rather niche, expands a digression in <a href="https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html">“Understand
-posterior estimates”</a>.</p>
+<p>This vignette, which is rather niche, expands a digression in <a href="https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html">Understand
+posterior estimates</a>.</p>
 <p><code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> sums over graphs with cliques of
 three or more intra-episode siblings whenever the <code>MOIs</code> used
 contain values that exceed two. However, these graphs only acquire
@@ -104,13 +104,13 @@ from which they derive.</p></li>
 two<a class="anchor" aria-label="anchor" href="#example-of-a-group-of-four-intra-episode-siblings-collapsing-to-two"></a>
 </h3>
 <p>Before demonstrating how intra-episode sibling groups collapse to
-pairs, we write a function to simulate data on 200 markers with some
-specified allelic richness (marker cardinality) for an enrolment episode
-comprising a stranger plus a group of four siblings, two from one
-oocyst, two from another, all drawing from the same two unrelated
-parental genotypes, and a recurrence with one sibling. Technically, the
-enrolment episode contains five genetically distinct genotypes and thus
-has a MOI of five.</p>
+pairs, we write a function to simulate data on 200 markers all with the
+same user-specified allelic richness (marker cardinality) for an
+enrolment episode comprising a stranger plus a group of four siblings,
+two from one oocyst, two from another, all drawing from the same two
+unrelated parental genotypes, and a recurrence with one sibling.
+Technically, the enrolment episode contains five genetically distinct
+genotypes and thus has a MOI of five.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">simulate_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">marker_cardinality</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
@@ -176,8 +176,9 @@ three and one when markers are polyallelic:</p>
 <p>Suppose we estimate MOIs of 3 and 1 for the biallelic data using an
 external software that exploits heteroallelic marker counts, and input
 those external estimates into <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>.
-Providing data are simulated on a large number of markers, we recover
-almost exactly the same posterior probabilities using both the</p>
+Providing data are simulated on a large number of markers (200 above),
+we recover almost exactly the same posterior probabilities using both
+the</p>
 <ul>
 <li>polyallelic data without user-specified MOIs</li>
 <li>biallelic data with user-specified MOIs of three and one</li>
@@ -225,10 +226,10 @@ feature large MOIs (MOI vectors 5 2 , 6 2 , 7 1 ) and thus those whose
 graph spaces include graphs with the largest cliques of intra-episode
 siblings.</p>
 <p>The contribution is likely even smaller for all vectors of three or
-more MOIs that are computationally feasible under Pv3Rs because their
+more MOIs that are computationally feasible under Pv3Rs, because their
 constituent MOIs are necessarily less than 7 (recall that
-computationally feasible MOI vectors are those where the total genotype
-count is at most eight).</p>
+computationally feasible MOI vectors are those that sum to at most
+eight).</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
