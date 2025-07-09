@@ -141,13 +141,13 @@ plot_data = function(ys,
   marker_cardinalities <- sapply(marker_alleles, length)
   n_markers = length(markers)
 
-  # Extract MOIs
+  # Extract MOI estimates
   mois <- unlist(sapply(ys_by_epi, function(epi) {
     moi <- max(sapply(epi, function(marker) {
       length(unique(marker[!is.na(marker)]))
     }))}), use.names = FALSE)
   names(mois) <- eids
-  maxMOI =  max(mois) # Maximum MOI
+  maxMOI =  max(mois) # Maximum
 
   # Reformat data s.t. columns house alternative alleles in polyclonal samples
   factorial_maxMOI = factorial(maxMOI) # For expanding to wide format

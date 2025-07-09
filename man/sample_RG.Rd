@@ -8,7 +8,7 @@ sample_RG(MOIs, igraph = TRUE)
 }
 \arguments{
 \item{MOIs}{Vector of per-episode multiplicities of infection (MOIs),
-i.e., numbers of vertices per episode.}
+i.e., numbers of per-episode genotypes / vertices.}
 
 \item{igraph}{Logical; if \code{TRUE} (default), returns the RG as an
 \code{igraph} object.}
