@@ -73,8 +73,8 @@ legend below the main grid shows per-marker allele frequencies via colour
 proportions, with one row per marker, ordered as in the main grid; e.g., `d` at
 `m2` is rare.
 
-The most parsimonious MOI estimates compatible with the above data, `r
-determine_MOIs(y)`, are computed using `determine_MOIs()`. The total genotype
+The most parsimonious MOI estimates compatible with the above data, 
+`r determine_MOIs(y)`, are computed using `determine_MOIs()`. The total genotype
 count (sum over MOIs) is `r sum(determine_MOIs(y))`.
 
 **Aside** In this synthetic example, markers are quart-allelic, imposing low 
@@ -119,12 +119,12 @@ post$marg
 ```
 
 We refer to per-recurrence probabilities as `marg` (shorthand for marginal)
-because they are computed by summing over state sequence probabilities. For
-example, the probability of `L` at `Recurrence 1` above, is the sum of
+because they are computed by simply summing over state sequence probabilities. 
+For example, the probability of `L` at `Recurrence 1` above is the sum of
 probabilities over `LC`, `LL` and `LI`:
 
 ```{r}
-round(post$joint["LC"] + post$joint["LL"] + post$joint["LI"], 4)
+post$joint["LC"] + post$joint["LL"] + post$joint["LI"]
 ```
 
 
