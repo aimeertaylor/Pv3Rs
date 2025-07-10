@@ -131,9 +131,8 @@ legend below the main grid shows per-marker allele frequencies via
 colour proportions, with one row per marker, ordered as in the main
 grid; e.g., <code>d</code> at <code>m2</code> is rare.</p>
 <p>The most parsimonious MOI estimates compatible with the above data,
-<code>r determine_MOIs(y)</code>, are computed using
-<code><a href="../reference/determine_MOIs.html">determine_MOIs()</a></code>. The total genotype count (sum over MOIs)
-is 6.</p>
+3, 2, 1, are computed using <code><a href="../reference/determine_MOIs.html">determine_MOIs()</a></code>. The total
+genotype count (sum over MOIs) is 6.</p>
 <p><strong>Aside</strong> In this synthetic example, markers are
 quart-allelic, imposing low upper bounds on MOI estimates based on
 maximum per-marker allele counts. More diverse markers are recommended
@@ -184,14 +183,15 @@ are stored in <code>post$marg</code>.</p>
 <span><span class="co">#&gt; Recurrence 1 0.000000 0.3294555 0.67054446</span></span>
 <span><span class="co">#&gt; Recurrence 2 0.670205 0.2388744 0.09092065</span></span></code></pre></div>
 <p>We refer to per-recurrence probabilities as <code>marg</code>
-(shorthand for marginal) because they are computed by summing over state
-sequence probabilities. For example, the probability of <code>L</code>
-at <code>Recurrence 1</code> above, is the sum of probabilities over
-<code>LC</code>, <code>LL</code> and <code>LI</code>:</p>
+(shorthand for marginal) because they are computed by simply summing
+over state sequence probabilities. For example, the probability of
+<code>L</code> at <code>Recurrence 1</code> above is the sum of
+probabilities over <code>LC</code>, <code>LL</code> and
+<code>LI</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">joint</span><span class="op">[</span><span class="st">"LC"</span><span class="op">]</span> <span class="op">+</span> <span class="va">post</span><span class="op">$</span><span class="va">joint</span><span class="op">[</span><span class="st">"LL"</span><span class="op">]</span> <span class="op">+</span> <span class="va">post</span><span class="op">$</span><span class="va">joint</span><span class="op">[</span><span class="st">"LI"</span><span class="op">]</span>, <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     LC </span></span>
-<span><span class="co">#&gt; 0.3295</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">post</span><span class="op">$</span><span class="va">joint</span><span class="op">[</span><span class="st">"LC"</span><span class="op">]</span> <span class="op">+</span> <span class="va">post</span><span class="op">$</span><span class="va">joint</span><span class="op">[</span><span class="st">"LL"</span><span class="op">]</span> <span class="op">+</span> <span class="va">post</span><span class="op">$</span><span class="va">joint</span><span class="op">[</span><span class="st">"LI"</span><span class="op">]</span></span>
+<span><span class="co">#&gt;        LC </span></span>
+<span><span class="co">#&gt; 0.3294555</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="plot-per-recurrence-probabilities">3) Plot per-recurrence probabilities<a class="anchor" aria-label="anchor" href="#plot-per-recurrence-probabilities"></a>
