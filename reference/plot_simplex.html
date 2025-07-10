@@ -70,6 +70,7 @@ one) can be projected; see <code><a href="project2D.html">project2D()</a></code>
 <span>  p.coords <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  p.labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">p.coords</span><span class="op">)</span>,</span>
 <span>  p.labels.pos <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  p.labels.cex <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -117,6 +118,11 @@ triplet summing to one, it is converted to a matrix with one row.</p></dd>
 <dd><p>Position of <code>p.labels</code>: <code>1</code> = below, <code>2</code> =
 left, <code>3</code> = above (default) and <code>4</code> = right. Can be a single
 value or a vector.</p></dd>
+
+
+<dt id="arg-p-labels-cex">p.labels.cex<a class="anchor" aria-label="anchor" href="#arg-p-labels-cex"></a></dt>
+<dd><p>Size expansion of <code>p.labels</code> passed to
+<code><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
