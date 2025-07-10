@@ -32,6 +32,9 @@
 #'   left, \code{3} = above (default) and \code{4} = right. Can be a single
 #'   value or a vector.
 #'
+#' @param p.labels.cex Size expansion of `p.labels` passed to
+#'   \code{\link[graphics]{text}}.
+#'
 #' @param ... Additional parameters passed to [graphics::points()].
 #'
 #' @examples
@@ -80,6 +83,7 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
                          p.coords = NULL,
                          p.labels = rownames(p.coords),
                          p.labels.pos = 3,
+                         p.labels.cex = 1,
                          ...) {
 
   # Define some constants:
@@ -156,7 +160,10 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
   # note that p.coords has one point per row, p_2Dcoords has one point per column
   xy <- apply(p.coords, 1, project2D)
   graphics::points(x = xy["x",], y = xy["y",], ...)
-  graphics::text(x = xy["x",], y = xy["y",], pos = p.labels.pos, labels = p.labels)
+  graphics::text(x = xy["x",], y = xy["y",],
+                 cex = p.labels.cex,
+                 pos = p.labels.pos,
+                 labels = p.labels)
 }
 
 

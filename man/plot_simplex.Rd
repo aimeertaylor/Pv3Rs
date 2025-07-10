@@ -12,6 +12,7 @@ plot_simplex(
   p.coords = NULL,
   p.labels = rownames(p.coords),
   p.labels.pos = 3,
+  p.labels.cex = 1,
   ...
 )
 }
@@ -42,6 +43,9 @@ triplet summing to one, it is converted to a matrix with one row.}
 \item{p.labels.pos}{Position of \code{p.labels}: \code{1} = below, \code{2} =
 left, \code{3} = above (default) and \code{4} = right. Can be a single
 value or a vector.}
+
+\item{p.labels.cex}{Size expansion of \code{p.labels} passed to
+\code{\link[graphics]{text}}.}
 
 \item{...}{Additional parameters passed to \code{\link[graphics:points]{graphics::points()}}.}
 }
