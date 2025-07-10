@@ -25,7 +25,7 @@ probability triplet summing to one.
 
 ## Please be aware of the following points!
 
-### Pre peer review state: 
+### Pre peer-review state: 
 
 The Pv3Rs R package is not yet peer-reviewed and thus liable to modification.
 The model is described in a preprint [1], building on a prototype in [2].
