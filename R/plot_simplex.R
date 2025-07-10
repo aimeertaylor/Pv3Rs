@@ -154,16 +154,17 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
   }
 
   # Plot points if given
-  if(is.null(p.coords)) return()
-  # if p.coords is a single vector, make it a matrix of one row
-  if(is.vector(p.coords)) p.coords <- t(p.coords)
-  # note that p.coords has one point per row, p_2Dcoords has one point per column
-  xy <- apply(p.coords, 1, project2D)
-  graphics::points(x = xy["x",], y = xy["y",], ...)
-  graphics::text(x = xy["x",], y = xy["y",],
-                 cex = p.labels.cex,
-                 pos = p.labels.pos,
-                 labels = p.labels)
+  if (!is.null(p.coords)) {
+    # if p.coords is a single vector, make it a matrix of one row
+    if(is.vector(p.coords)) p.coords <- t(p.coords)
+    # note that p.coords has one point per row, p_2Dcoords has one point per column
+    xy <- apply(p.coords, 1, project2D)
+    graphics::points(x = xy["x",], y = xy["y",], ...)
+    graphics::text(x = xy["x",], y = xy["y",],
+                   cex = p.labels.cex,
+                   pos = p.labels.pos,
+                   labels = p.labels)
+  }
 }
 
 
