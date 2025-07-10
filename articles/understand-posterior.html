@@ -82,54 +82,50 @@
 </h2>
 <p>In this vignette we document the output of
 <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> when the statistical model underpinning
-it is well specified and misspecified. Specifically, we document the
-output of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> when the model is well
-specified but</p>
+it is well specified but</p>
 <ul>
-<li>data are missing,</li>
-<li>data are uninformative,</li>
-<li>data are limited to only one episode,</li>
-<li>data are incomparable across episodes,</li>
-<li>data are limited to only one marker.</li>
+<li>Data are missing: <a href="#missing-data">Missing data</a>
+</li>
+<li><a href="#uniformative">Data are uninformative</a></li>
+<li>Data are limited to only one episode</li>
+<li>Data are incomparable across episodes</li>
+<li>Data are limited to only one marker</li>
 </ul>
-<p>When the model is well specified and there are data on many markers,
-we show how the maximum probability of recrudescence / reinfection
-depends on</p>
+<p>In addition, when the model is well specified and there are data on
+many markers, we show how maximum probabilities of recrudescence and
+reinfection depend on</p>
 <ul>
-<li>per-episode genotype counts (i.e., multiplicities of infections,
-MOIs),</li>
-<li>episode count,</li>
-<li>the position of a recurrence in a sequence of episodes,</li>
+<li>Per-episode multiplicities of infections (MOIs)</li>
+<li>Episode count</li>
+<li>Position of a recurrence in a sequence of episodes</li>
 </ul>
-<p>and thus comment on how the above dependencies impact the</p>
-<ul>
-<li>interpretation of uncertainty.</li>
-</ul>
+<p>and thus comment on how the above dependencies impact the
+interpretation of uncertainty.</p>
 <p>Finally, we summarise results on the output of
 <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> when the model is misspecified because
 of</p>
 <ul>
-<li>meiotic siblings,</li>
-<li>half siblings,</li>
-<li>parent child-like siblings,</li>
-<li>genotyping errors and <em>de novo</em> mutations [To-do].</li>
+<li>Meiotic siblings</li>
+<li>Half siblings</li>
+<li>Parent-child-like siblings</li>
 </ul>
-<p>For the more detailed result, see [development files of the Pv3Rs
-source package] (<a href="https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy" class="external-link uri">https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy</a>).
-We have not characterised model misspecification due to inbred
-parasites. Allele frequency estimates encode population-level
-relatedness locus-by-locus (<a href="https://doi.org/10.1093/g3journal/jkaf018" class="external-link">Mehra et al. 2025</a>).
+<p>For more detailed results on misspecification, see [development files
+of the Pv3Rs source package] (<a href="https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy" class="external-link uri">https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy</a>).</p>
+<p>We have not characterised model misspecification due to genotyping
+errors and undetected alleles or due to inbred parasites.</p>
+<p>Regarding misspecification due to inbred parasites, allele frequency
+estimates encode population-level average relatedness locus-by-locus (<a href="https://doi.org/10.1093/g3journal/jkaf018" class="external-link">Mehra et al.2025</a>).
 Allele frequency estimates are plugged into the statistical model
 underpinning Pv3Rs. Providing they are computed from a sample drawn from
 the parasite population from which trial participants also draw, there
-is no need to compensate further for elevated relatedness locus-by-locus
-on the population level. However, inter-locus dependence (linkage
+is no need to compensate further for population-level average
+relatedness locus-by-locus. However, inter-locus dependence (linkage
 disequilibrium) is liable to generate overconfident posterior
-probabilities. Population structure (e.g., household effects) could lead
-to the misclassification of reinfection as relapse / recrudescence. In
-our view, recurrence classification in the presence of population
+probabilities. Population structure (e.g., household effects) can also
+lead to the misclassification of reinfection as relapse / recrudescence.
+In our view, recurrence classification in the presence of population
 structure is best understood using complementary population genetic and
-sensitivity analyses.</p>
+sensitivity analyses (e.g., identity-by-descent networks).</p>
 </div>
 <div class="section level2">
 <h2 id="missing-data">Missing data<a class="anchor" aria-label="anchor" href="#missing-data"></a>
@@ -151,7 +147,7 @@ returns the prior re-weighted to the exclusion of recrudescence.</p>
 <span><span class="co">#&gt; recur 0 0.5 0.5</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="uniformative-data">Uniformative data<a class="anchor" aria-label="anchor" href="#uniformative-data"></a>
+<h2 id="uniformative">Uniformative data<a class="anchor" aria-label="anchor" href="#uniformative"></a>
 </h2>
 <p>When data are entirely uninformative because there is no genetic
 diversity, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> returns the prior.</p>
