@@ -339,7 +339,7 @@ posteriors <- rbind(suppressMessages(compute_posterior(match, fs_rare))$marg,
 
 # Plot per-recurrence estimates on the simplex
 par(mar = c(0,0,0,0))
-plot_simplex(p.coords = posteriors, pch = 20, 
+plot_simplex(p.coords = posteriors, pch = 20, p.labels.cex = 0.75, 
              p.labels = c("rare match", "common match", "mismatch", 
                           "partial common match", "partial rare match")) 
 ```
