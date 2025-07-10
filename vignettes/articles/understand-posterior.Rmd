@@ -27,17 +27,18 @@ load("../../DevFiles/RelationshipStudy/output_HalfSib.PCLikeSib.rda")
 
 # Summary of contents
 
-This vignette is a detailed sequel to `vignette(demonstrate-usage)`. In it, we
-start by documenting the output of `compute_posterior()` when the statistical
+This vignette is a detailed sequel to `vignette("demonstrate-usage", "Pv3Rs")`. 
+
+We start by documenting the output of `compute_posterior()` when the statistical
 model underpinning it is well specified but
 
 - [Data are missing](#missing)
 - [Data are uninformative](#uniformative)
-- [Data are limited to only one episode](#one episode)
+- [Data are limited to only one episode](#one-episode)
 - [Data are incomparable across episodes](#incomparable)
-- Data are limited to only [one marker](#one marker) and [two markers](#two markers)
+- Data are limited to only [one marker](#one-marker) and [two markers](#two-markers)
 
-Given [data on many markers](#many markers), 
+Given [data on many markers](#many-markers), 
 we then show under the well specified model how maximum probabilities of
 recrudescence and reinfection depend on
 
@@ -56,7 +57,7 @@ model is misspecified because of
 - [Half siblings](#half)
 - [Parent-child-like siblings](#parent-child-like)
 
-For more detailed results on misspecification can be found in the 
+More detailed results on misspecification can be found in the 
 [development files of the Pv3Rs source package](https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy). 
 
 We have not yet characterised model misspecification due to genotyping errors
@@ -68,19 +69,19 @@ and misspecification of relapse as reinfection.
 - Stranger parasites that are related insofar as the population is related on
 average are largely accounted for: Allele frequency estimates encode
 population-level average relatedness locus-by-locus
-([Mehra et al.2025](https://doi.org/10.1093/g3journal/jkaf018)). 
+([Mehra et al. 2025](https://doi.org/10.1093/g3journal/jkaf018)). 
 Allele frequency estimates are plugged into the statistical model underpinning
 Pv3Rs. Providing they are computed from a sample drawn from the parasite
 population from which trial participants also draw, there is no need to
 compensate further for population-level average relatedness locus-by-locus.
-However, inter-locus dependence (linkage disequilibrium) is liable to generate
+However, strong inter-locus dependence (linkage disequilibrium) could generate
 overconfident posterior probabilities.
 
 - Stranger parasites that related due to population structure (e.g., proximity in
 space and time; household effects) will likely lead to the misclassification of
 reinfection as relapse / recrudescence. In our view, recurrence classification
 in the presence of population structure is best understood using complementary
-population genetic and sensitivity analyses (e.g., identity-by-descent
+population-genetic and sensitivity analyses (e.g., identity-by-descent
 networks).
 
 ```{r echo = FALSE}
@@ -126,7 +127,7 @@ y = list(list(m1 = "A"), recur = list(m1 = "A")) # Data the only viable allele
 suppressMessages(compute_posterior(y, fs))$marg # Posterior
 ```
 
-# Data on only one episode {#one episode}
+# Data on only one episode {#one-episode}
 
 ## Homoallelic data without user-specified MOIs: prior return
 
@@ -299,7 +300,7 @@ suppressMessages(compute_posterior(y_het,fs))$marg # Prior proximity
 suppressMessages(compute_posterior(y_hom,fs,MOIs=c(2,2)))$marg # Prior departure
 ```
 
-# Data on only one marker {#one marker}
+# Data on only one marker {#one-marker}
 
 Given data on only one marker, the output of `compute_posterior()` depends on
 the observation type and the frequencies of the observed alleles:
@@ -343,7 +344,7 @@ plot_simplex(p.coords = posteriors, pch = 20,
                           "partial common match", "partial rare match")) 
 ```
 
-# Data on only two markers {#two markers}
+# Data on only two markers {#two-markers}
 
 Adding a second consistent observation generally strengthens inference  (see
 arrows in or entering regions of probability > 0.5). An exception is adding a
@@ -394,7 +395,7 @@ labels <- c("rare match + rare match", "common match + common match",
 text(x = xy_upd["x", ], y = xy_upd["y", ], pos = c(4,4,3,4,4), cex = 0.75, labels) 
 ```
 
-# Data on many markers {#many markers}
+# Data on many markers {#many-markers}
 
 Given non-zero prior probabilities, as the data increase with the number of
 markers, posterior probabilities for a given recurrence under the well specified
@@ -420,26 +421,29 @@ compatible with relapse.
 Because we assume *a priori* that relationship graphs compatible with a given
 recurrence state sequence are uniformly distributed, and because relationship
 graphs compatible with sequences of recrudescence / reinfection are a subset of
-those compatible with sequences of relapse, bounds induced by the prior on
+those compatible with sequences of relapse, prior-induced bounds on
 non-marginal posterior probabilities can be computed *a priori* as a function of
 the prior on the recurrence state sequences and the prior on the relationship
-graphs; see `vignette("understand-graph-prior", "Pv3Rs")`.
+graphs; see 
+[Understand graph prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html).
 
 Because the probability mass function of a uniformly distributed discrete random
 variable depends on the size of its support, the prior on uniformly distributed
-graphs (and thus bounds on the posterior induced by the prior) depends on the
-size of the graph space. Graph space size depends on constitute graph size (all
-graphs within a space are the same size). Graphs have as many vertices as
-parasite genotypes within and across episodes. As such, graph size depends on
-episode counts and per-episode MOIs, which vary across trial participants.
+graphs (and resulting prior-induced posterior bounds) depends on the size of the
+graph space. The size of this space is determined by the size of the graphs it
+contains, which have as many vertices as there are parasite genotypes within and
+across episodes. As such, graph size depends on the number of episodes and the
+per-episode MOIs, which vary across trial participants.
 
-Using rare matched and mismatched data on 100 markers, we demonstrate the
-dependency on per-episode MOIs of prior-induced posterior bounds for a single
-recurrence. We also demonstrate how maximum marginal probabilities of
-recrudescence / relapse depend on episode counts by adding recurrences with no
-recurrent data. However, these maxima are based on knowledge that there are no
-recurrent data on all but the first recurrence. In other words, they are not
-computable *a priori*.
+Using rare matched and mismatched data on 100 markers, we illustrate how
+prior-induced posterior bounds for a single recurrence depend on per-episode
+MOIs. We also demonstrate how maximum marginal probabilities of recrudescence /
+relapse depend on episode counts by adding recurrences with no recurrent data.
+However, these maxima rely on knowing that recurrent data are absent for all but
+the first recurrence and thus are not computable *a priori*.
+
+We start by defining some variables that will be used repeatedly in the
+following code chuncks.
 
 ```{r}
 marker_count <- 100 # Number of markers
@@ -447,7 +451,9 @@ ms <- paste0("m", 1:marker_count) # Marker names
 all_As <- sapply(ms, function(t) "A", simplify = F) # As for all markers
 all_Bs <- sapply(ms, function(t) "B", simplify = F) # Bs for all markers
 no_data <- sapply(ms, function(t) NA, simplify = F) # NAs for all markers
-fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.99), simplify = FALSE)
+fA <- 0.01 # Frequency of rare allele
+fB <- 1 - f_A # Frequency of common allele
+fs <- sapply(ms, function(m) c("A"=fA, "B"=fB), simplify = FALSE) # Frequencies
 ```
 
 ## Increasing per-episode MOIs {#mois}
@@ -458,7 +464,7 @@ y_match <- list(enrol = all_As, recur = all_As)
 y_mismatch <- list(enrol = all_As, recur = all_Bs)
 ```
 
-```{r echo = FALSE}
+```{r echo = FALSE, results = 'hide'}
 # Assuming recurrence state sequences are equally likely a priori
 results_match <- sapply(MOIs, function(x) 
   suppressMessages(compute_posterior(y = y_match, fs, MOIs = x)$marg))
