@@ -80,55 +80,69 @@
 <div class="section level2">
 <h2 id="summary-of-contents">Summary of contents<a class="anchor" aria-label="anchor" href="#summary-of-contents"></a>
 </h2>
-<p>In this vignette we document the output of
-<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> when the statistical model underpinning
-it is well specified but</p>
+<p>This vignette is a detailed sequel to
+<code>vignette(demonstrate-usage)</code>. In it, we start by documenting
+the output of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> when the statistical
+model underpinning it is well specified but</p>
 <ul>
-<li>Data are missing: <a href="#missing-data">Missing data</a>
-</li>
+<li><a href="#missing">Data are missing</a></li>
 <li><a href="#uniformative">Data are uninformative</a></li>
-<li>Data are limited to only one episode</li>
-<li>Data are incomparable across episodes</li>
-<li>Data are limited to only one marker</li>
+<li><a href="#one%20episode">Data are limited to only one
+episode</a></li>
+<li><a href="#incomparable">Data are incomparable across
+episodes</a></li>
+<li>Data are limited to only <a href="#one%20marker">one marker</a> and
+<a href="#two%20markers">two markers</a>
+</li>
 </ul>
-<p>In addition, when the model is well specified and there are data on
-many markers, we show how maximum probabilities of recrudescence and
-reinfection depend on</p>
+<p>Given <a href="#many%20markers">data on many markers</a>, we then
+show under the well specified model how maximum probabilities of
+recrudescence and reinfection depend on</p>
 <ul>
-<li>Per-episode multiplicities of infections (MOIs)</li>
-<li>Episode count</li>
-<li>Position of a recurrence in a sequence of episodes</li>
+<li><a href="#mois">Per-episode multiplicities of infections
+(MOIs)</a></li>
+<li><a href="#epi%20count">Episode count</a></li>
+<li><a href="#position">Position of a recurrence in a sequence of
+episodes</a></li>
 </ul>
-<p>and thus comment on how the above dependencies impact the
-interpretation of uncertainty.</p>
+<p>and thus comment on how the above dependencies impact the <a href="#uncertainty">interpretation of uncertainty</a> given probable but
+uncertain recrudescence and reinfection.</p>
 <p>Finally, we summarise results on the output of
 <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> when the model is misspecified because
 of</p>
 <ul>
-<li>Meiotic siblings</li>
-<li>Half siblings</li>
-<li>Parent-child-like siblings</li>
+<li><a href="#meiotic">Meiotic siblings</a></li>
+<li><a href="#half">Half siblings</a></li>
+<li><a href="#parent-child-like">Parent-child-like siblings</a></li>
 </ul>
-<p>For more detailed results on misspecification, see [development files
-of the Pv3Rs source package] (<a href="https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy" class="external-link uri">https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy</a>).</p>
-<p>We have not characterised model misspecification due to genotyping
-errors and undetected alleles or due to inbred parasites.</p>
-<p>Regarding misspecification due to inbred parasites, allele frequency
-estimates encode population-level average relatedness locus-by-locus (<a href="https://doi.org/10.1093/g3journal/jkaf018" class="external-link">Mehra et al.2025</a>).
+<p>For more detailed results on misspecification can be found in the <a href="https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy" class="external-link">development
+files of the Pv3Rs source package</a>.</p>
+<p>We have not yet characterised model misspecification due to
+genotyping errors nor stranger parasites with elevated relatedness:</p>
+<ul>
+<li><p>Genotyping errors will likely cause misspecification of
+recrudescence as relapse and misspecification of relapse as
+reinfection.</p></li>
+<li><p>Stranger parasites that are related insofar as the population is
+related on average are largely accounted for: Allele frequency estimates
+encode population-level average relatedness locus-by-locus (<a href="https://doi.org/10.1093/g3journal/jkaf018" class="external-link">Mehra et al.2025</a>).
 Allele frequency estimates are plugged into the statistical model
 underpinning Pv3Rs. Providing they are computed from a sample drawn from
 the parasite population from which trial participants also draw, there
 is no need to compensate further for population-level average
 relatedness locus-by-locus. However, inter-locus dependence (linkage
 disequilibrium) is liable to generate overconfident posterior
-probabilities. Population structure (e.g., household effects) can also
-lead to the misclassification of reinfection as relapse / recrudescence.
-In our view, recurrence classification in the presence of population
+probabilities.</p></li>
+<li><p>Stranger parasites that related due to population structure
+(e.g., proximity in space and time; household effects) will likely lead
+to the misclassification of reinfection as relapse / recrudescence. In
+our view, recurrence classification in the presence of population
 structure is best understood using complementary population genetic and
-sensitivity analyses (e.g., identity-by-descent networks).</p>
+sensitivity analyses (e.g., identity-by-descent networks).</p></li>
+</ul>
 </div>
 <div class="section level2">
-<h2 id="missing-data">Missing data<a class="anchor" aria-label="anchor" href="#missing-data"></a>
+<h2 id="missing">Missing data<a class="anchor" aria-label="anchor" href="#missing"></a>
 </h2>
 <p>When data are entirely missing, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code>
 returns the prior.</p>
@@ -149,17 +163,17 @@ returns the prior re-weighted to the exclusion of recrudescence.</p>
 <div class="section level2">
 <h2 id="uniformative">Uniformative data<a class="anchor" aria-label="anchor" href="#uniformative"></a>
 </h2>
-<p>When data are entirely uninformative because there is no genetic
-diversity, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> returns the prior.</p>
+<p>When data are uninformative because there is no genetic diversity,
+<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> returns the prior.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Unit allele frequency: no genetic diversity</span></span>
-<span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>, recur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Data: not missing</span></span>
+<span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span>, recur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Data the only viable allele</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span> <span class="co"># Posterior</span></span>
 <span><span class="co">#&gt;               C         L         I</span></span>
 <span><span class="co">#&gt; recur 0.3333333 0.3333333 0.3333333</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="data-on-only-one-episode">Data on only one episode<a class="anchor" aria-label="anchor" href="#data-on-only-one-episode"></a>
+<h2 id="data-on-only-one-episode-one-episode">Data on only one episode {#one episode}<a class="anchor" aria-label="anchor" href="#data-on-only-one-episode-one-episode"></a>
 </h2>
 <div class="section level3">
 <h3 id="homoallelic-data-without-user-specified-mois-prior-return">Homoallelic data without user-specified MOIs: prior return<a class="anchor" aria-label="anchor" href="#homoallelic-data-without-user-specified-mois-prior-return"></a>
@@ -178,13 +192,13 @@ prior.</p>
 <h3 id="heteroallelic-data-prior-proximity">Heteroallelic data: prior proximity<a class="anchor" aria-label="anchor" href="#heteroallelic-data-prior-proximity"></a>
 </h3>
 <p>When only one episode has heteroallelic data, the MOI under the model
-necessarily exceeds one because the model assumes no false positivity.
-The posterior is close to the prior but not equal to it because the data
-are slightly informative: for relationship graphs with intra-episode
-siblings, heteroallelic data limit summation over identity-by-descent
-partitions to partitions with at least two cells for the episode with
-data. The lower bound on the cell count increases with the number of
-distinct alleles observed.</p>
+necessarily exceeds one because the model assumes there are no false
+alleles. The posterior is close to the prior but not equal to it because
+the data are slightly informative: for relationship graphs with
+intra-episode siblings, heteroallelic data limit summation over
+identity-by-descent partitions to partitions with at least two cells for
+the episode with data. The lower bound on the cell count increases with
+the number of distinct alleles observed.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Allele frequencies </span></span>
 <span><span class="va">fs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'A'</span> <span class="op">=</span> <span class="fl">0.25</span>, <span class="st">'B'</span> <span class="op">=</span> <span class="fl">0.25</span>, <span class="st">'C'</span> <span class="op">=</span> <span class="fl">0.25</span>, <span class="st">'D'</span> <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> </span>
@@ -233,11 +247,11 @@ siblings</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="data-are-incomparable-across-episodes">Data are incomparable across episodes<a class="anchor" aria-label="anchor" href="#data-are-incomparable-across-episodes"></a>
+<h2 id="incomparable">Data are incomparable across episodes<a class="anchor" aria-label="anchor" href="#incomparable"></a>
 </h2>
-<p>When there are data on multiple episodes but no comparable data
-across episodes, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> behaves similarly to
-when data are limited to one episode:</p>
+<p>When there are data on multiple episodes but no common markers across
+episodes, <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> behaves similarly to when
+data are limited to one episode:</p>
 <ul>
 <li>it returns the prior when data are homoallelic without
 user-specified MOIs &gt; 1,</li>
@@ -259,26 +273,26 @@ with user-specified MOIs &gt; 1.</li>
 <span><span class="va">y_het</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>enrol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>, m2 <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>, </span>
 <span>              recur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m1 <span class="op">=</span> <span class="cn">NA</span>, m2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y_hom</span>, <span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span> <span class="co"># Prior return </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y_hom</span>,<span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span> <span class="co"># Prior return </span></span>
 <span><span class="co">#&gt;               C         L         I</span></span>
 <span><span class="co">#&gt; recur 0.3333333 0.3333333 0.3333333</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y_het</span>, <span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span> <span class="co"># Prior proximity</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y_het</span>,<span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span> <span class="co"># Prior proximity</span></span>
 <span><span class="co">#&gt;               C         L         I</span></span>
 <span><span class="co">#&gt; recur 0.3370787 0.3595506 0.3033708</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y_hom</span>, <span class="va">fs</span>, MOIs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span> <span class="co"># Prior departure</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y_hom</span>,<span class="va">fs</span>,MOIs<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">marg</span> <span class="co"># Prior departure</span></span>
 <span><span class="co">#&gt;               C         L        I</span></span>
 <span><span class="co">#&gt; recur 0.5142862 0.2183909 0.267323</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="data-on-only-one-marker">Data on only one marker<a class="anchor" aria-label="anchor" href="#data-on-only-one-marker"></a>
+<h2 id="data-on-only-one-marker-one-marker">Data on only one marker {#one marker}<a class="anchor" aria-label="anchor" href="#data-on-only-one-marker-one-marker"></a>
 </h2>
-<p>When data on a single marker are comparable across episodes, the
-output of <code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> depends on the observation
-type and the frequencies of the observed alleles. For example,</p>
+<p>Given data on only one marker, the output of
+<code><a href="../reference/compute_posterior.html">compute_posterior()</a></code> depends on the observation type and the
+frequencies of the observed alleles:</p>
 <ul>
 <li>A rare match is informative: it quashes the posterior probability of
 reinfection.</li>
-<li>A partial rare match is also informative, quashing the posterior
+<li>A partial rare match is informative: it quashes the posterior
 probability of reinfection.</li>
 <li>A match with a common allele is not very informative: all states are
 possible <em>a posteriori</em>.</li>
@@ -294,32 +308,30 @@ of recrudescence is quashed.</p>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="data-on-only-two-markers">Data on only two markers<a class="anchor" aria-label="anchor" href="#data-on-only-two-markers"></a>
+<h2 id="data-on-only-two-markers-two-markers">Data on only two markers {#two markers}<a class="anchor" aria-label="anchor" href="#data-on-only-two-markers-two-markers"></a>
 </h2>
-<p>When data on a second marker are added and the second observation is
-consistent with the first the strength of inference generally increases
-(see arrows in or entering regions of posterior probability greater than
-0.5); an exception being the addition of a common match to a common
-partial match, which is not very informative (central arrow). When a
-mismatch is added to a rare match (diamond), relapse becomes the most
-probable state. This demonstrates the requirement of multiple markers
-for relapse inference.</p>
+<p>Adding a second consistent observation generally strengthens
+inference (see arrows in or entering regions of probability &gt; 0.5).
+An exception is adding a common match to a common partial match, which
+adds little information (central arrow). When a mismatch is added to a
+rare match (diamond), relapse becomes the most probable state. This
+illustrates the multiple-marker requirement of relapse inference.</p>
 <p><img src="understand-posterior_files/figure-html/unnamed-chunk-14-1.png" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="data-on-many-markers">Data on many markers<a class="anchor" aria-label="anchor" href="#data-on-many-markers"></a>
+<h2 id="data-on-many-markers-many-markers">Data on many markers {#many markers}<a class="anchor" aria-label="anchor" href="#data-on-many-markers-many-markers"></a>
 </h2>
 <p>Given non-zero prior probabilities, as the data increase with the
-number of markers genotyped, posterior probabilities for a given
-recurrence converge to either</p>
+number of markers, posterior probabilities for a given recurrence under
+the well specified model converge to either</p>
 <ol style="list-style-type: decimal">
-<li><p>relapse with posterior probability one when the data suggest the
+<li><p>Relapse with posterior probability one when the data suggest the
 episode of interest is linked to previous episodes by regular sibling
 relationships</p></li>
-<li><p>recrudescence with posterior probability less than one when the
-data suggest the episode of interest is linked to the previous episode
-by clonal relationships</p></li>
-<li><p>reinfection with posterior probability less than one when the
+<li><p>Recrudescence with posterior probability less than one when the
+data suggest the episode of interest is linked to the directly preceding
+episode by clonal relationships</p></li>
+<li><p>Reinfection with posterior probability less than one when the
 data suggest the episode or interest is not linked to previous episodes
 by regular sibling or clonal relationships</p></li>
 </ol>
@@ -363,7 +375,7 @@ priori</em>.</p>
 <span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">ms</span>, <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span> <span class="op">=</span> <span class="fl">0.01</span>, <span class="st">"B"</span> <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="increasing-per-episode-mois">Increasing per-episode MOIs<a class="anchor" aria-label="anchor" href="#increasing-per-episode-mois"></a>
+<h3 id="mois">Increasing per-episode MOIs<a class="anchor" aria-label="anchor" href="#mois"></a>
 </h3>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MOIs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> </span>
@@ -421,7 +433,7 @@ three or more siblings are modelled as groups of two; see
 </div>
 </div>
 <div class="section level3">
-<h3 id="increasing-episode-counts">Increasing episode counts<a class="anchor" aria-label="anchor" href="#increasing-episode-counts"></a>
+<h3 id="increasing-episode-counts-epi-count">Increasing episode counts {#epi count}<a class="anchor" aria-label="anchor" href="#increasing-episode-counts-epi-count"></a>
 </h3>
 <p>Recurrences can be added without adding data</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -458,7 +470,7 @@ first recurrence; see
 <code>vignette("understand-graph-prior", "Pv3Rs")</code>.</p>
 </div>
 <div class="section level3">
-<h3 id="position-in-a-sequence">Position in a sequence<a class="anchor" aria-label="anchor" href="#position-in-a-sequence"></a>
+<h3 id="position">Position in a sequence<a class="anchor" aria-label="anchor" href="#position"></a>
 </h3>
 <p>Because the distribution over relationship graphs is not invariant to
 different orderings of states in a sequence (more graphs are compatible
@@ -575,7 +587,7 @@ the first recurrence having no data.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="interpreting-uncertainty">Interpreting uncertainty<a class="anchor" aria-label="anchor" href="#interpreting-uncertainty"></a>
+<h2 id="uncertainty">Interpreting uncertainty<a class="anchor" aria-label="anchor" href="#uncertainty"></a>
 </h2>
 <p>Uncertain posterior estimates can be uncertain for two reasons that
 are not mutually exclusive:</p>
@@ -612,7 +624,7 @@ recrudescence / reinfection depends on its position within a sequence,
 especially if one or more episodes has no data.</p>
 </div>
 <div class="section level2">
-<h2 id="meiotic-siblings">Meiotic siblings<a class="anchor" aria-label="anchor" href="#meiotic-siblings"></a>
+<h2 id="meiotic">Meiotic siblings<a class="anchor" aria-label="anchor" href="#meiotic"></a>
 </h2>
 <div class="section level3">
 <h3 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a>
@@ -678,7 +690,7 @@ correct MOIs (unknowable in practice) are provided externally.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="half-siblings">Half siblings<a class="anchor" aria-label="anchor" href="#half-siblings"></a>
+<h2 id="half">Half siblings<a class="anchor" aria-label="anchor" href="#half"></a>
 </h2>
 <div class="section level3">
 <h3 id="methods-1">Methods<a class="anchor" aria-label="anchor" href="#methods-1"></a>
@@ -737,7 +749,7 @@ edge.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="parent-child-like-siblings">Parent-child like siblings<a class="anchor" aria-label="anchor" href="#parent-child-like-siblings"></a>
+<h2 id="parent-child-like">Parent-child-like siblings<a class="anchor" aria-label="anchor" href="#parent-child-like"></a>
 </h2>
 <div class="section level3">
 <h3 id="methods-2">Methods<a class="anchor" aria-label="anchor" href="#methods-2"></a>
