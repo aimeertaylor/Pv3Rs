@@ -16,8 +16,8 @@ states) using *P. vivax* genetic data on two or more episodes.
 Two other important features:
 
 - `plot_data()` visualises genetic data for molecular
-correction, regardless of the analytical method (e.g., *P.
-falciparum* data intended for analysis using a WHO match-counting algorithm).
+correction, regardless of the analytical method (e.g., *Plasmodium falciparum* 
+data intended for analysis using a WHO match-counting algorithm).
 
 - `plot_simplex()` can be used to visualise per-recurrence
 probabilities of relapse, recrudescence, and reinfection, or any other
@@ -25,10 +25,10 @@ probability triplet summing to one.
 
 ## Please be aware of the following points!
 
-### Pre-release state: 
+### Pre peer review state: 
 
 The Pv3Rs R package is not yet peer-reviewed and thus liable to modification.
-The model is described in the preprint [1], building on a prototype in [2].
+The model is described in a preprint [1], building on a prototype in [2].
 
 [1] [Taylor, Foo & White, 2022](https://www.medrxiv.org/content/10.1101/2022.11.23.22282669v1)
 
@@ -66,12 +66,13 @@ In studies with untreated or accumulated infections, outputs may not
 be meaningful.
 
 #### Unmodelled complexities 
-We do not model population structure (e.g., household effects), failure to capture low-density clones in a blood sample of limited
-volume 
-[[Snounou & Beck, 1998]](https://doi.org/10.1016/S0169-4758(98)01340-4) or 
+We do not model all the complexities around molecular correction. For example,
+population structure, including household effects; failure to capture
+low-density clones in a blood sample of limited volume
+[[Snounou & Beck, 1998]](https://doi.org/10.1016/S0169-4758(98)01340-4); and 
 hidden biomass the spleen and bone marrow
 [[Markus, 2019]](https://doi.org/10.1016/j.pt.2019.08.009). Users must interpret
-outputs in context of study and sampling limitations. For example, we expect Pv3Rs to
+outputs in context of the study and its methods. For example, we expect Pv3Rs to
 output probable relapse if a person is reinfected by a new mosquito but with
 parasites that are recently related to those that caused a previous infection,
 as might happen in household transmission chains.
@@ -82,9 +83,9 @@ Relapsing parasites that are siblings of parasites in previous infections can be
 meiotic, parent-child-like, regular or half siblings, but we model all sibling
 parasites as regular siblings via the following assumptions: 
 
-- allele inheritance is independent (not true of meiotic siblings)
-- sibling relationships are transitive (not true of parent-child-like trios or some half-sibling trios)
-- alleles of a sibling cluster are drawn from at most two parental alleles (not true of half siblings).
+- Allele inheritance is independent (not true of meiotic siblings)
+- Aibling relationships are transitive (not true of parent-child-like trios or some half-sibling trios)
+- Alleles of a sibling cluster are drawn from at most two parental alleles (not true of half siblings)
 
 In our experience, half sibling misspecification leads to some misclassification
 of relapses as reinfections; see [Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
@@ -149,8 +150,8 @@ should be unbiased and more precise than those based on enrolment episodes only.
 
 ### Read-count data: 
 
-Unfortunately, the Pv3Rs model does not exploit read count data at present.
-However, read count data could be used to compute population-level allele
+Unfortunately, the Pv3Rs model does not exploit data on read counts at present.
+However, read-count data could be used to compute population-level allele
 frequencies, assuming they are not biased by experimental artefacts.
 
 
