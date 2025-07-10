@@ -11,7 +11,10 @@ inference of *P. vivax*
 
 The core function, `compute_posterior()`, computes per-person
 posterior probabilities of relapse, recrudescence, and reinfection (recurrence
-states) using *P. vivax* genetic data on two or more episodes.
+states) using *P. vivax* genetic data on two or more episodes. To fully understand
+`compute_posterior()`, we recommend reading the pre-print cited below,  
+`vignette("demonstrate-usage", "Pv3Rs")`, and the article 
+[Understand posterior estimates](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html). 
 
 Two other important features:
 
@@ -24,8 +27,6 @@ probabilities of relapse, recrudescence, and reinfection, or any other
 probability triplet summing to one.
 
 ## Please be aware of the following points!
-
-### Pre peer-review state: 
 
 The Pv3Rs R package is not yet peer-reviewed and thus liable to modification.
 The model is described in a preprint [1], building on a prototype in [2].
