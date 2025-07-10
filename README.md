@@ -88,7 +88,8 @@ parasites as regular siblings via the following assumptions:
 - Alleles of a sibling cluster are drawn from at most two parental alleles (not true of half siblings)
 
 In our experience, half sibling misspecification leads to some misclassification
-of relapses as reinfections; see [Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
+of relapses as reinfections; see 
+[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
 A descriptive study to explore the extent of half-sibling misspecification is 
 recommended (an example will be provided in an upcoming manuscript).
 

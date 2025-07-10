@@ -46,7 +46,7 @@ can draw from at most two parental alleles per marker.
 heteroallelic marker counts of groups of three or more non-half siblings cannot
 exceed that of the two parental genotypes from which they derive.
 
-## Example of a group of four intra-episode siblings collapsing to two
+# Example of a group of four intra-episode siblings collapsing to two
 
 Before demonstrating how intra-episode sibling groups collapse to pairs, we
 write a function to simulate data on 200 markers all with the same

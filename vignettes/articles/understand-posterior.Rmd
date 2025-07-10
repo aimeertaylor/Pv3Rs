@@ -43,7 +43,7 @@ we then show under the well specified model how maximum probabilities of
 recrudescence and reinfection depend on
 
 - [Per-episode multiplicities of infections (MOIs)](#mois)
-- [Episode count](#epi count) 
+- [Episode count](#epi-count) 
 - [Position of a recurrence in a sequence of episodes](#position)
 
 and thus comment on how the above dependencies impact the 
@@ -443,7 +443,7 @@ However, these maxima rely on knowing that recurrent data are absent for all but
 the first recurrence and thus are not computable *a priori*.
 
 We start by defining some variables that will be used repeatedly in the
-following code chuncks.
+following code chunks.
 
 ```{r}
 marker_count <- 100 # Number of markers
@@ -452,7 +452,7 @@ all_As <- sapply(ms, function(t) "A", simplify = F) # As for all markers
 all_Bs <- sapply(ms, function(t) "B", simplify = F) # Bs for all markers
 no_data <- sapply(ms, function(t) NA, simplify = F) # NAs for all markers
 fA <- 0.01 # Frequency of rare allele
-fB <- 1 - f_A # Frequency of common allele
+fB <- 1 - fA # Frequency of common allele
 fs <- sapply(ms, function(m) c("A"=fA, "B"=fB), simplify = FALSE) # Frequencies
 ```
 
@@ -464,7 +464,7 @@ y_match <- list(enrol = all_As, recur = all_As)
 y_mismatch <- list(enrol = all_As, recur = all_Bs)
 ```
 
-```{r echo = FALSE, results = 'hide'}
+```{r echo = FALSE}
 # Assuming recurrence state sequences are equally likely a priori
 results_match <- sapply(MOIs, function(x) 
   suppressMessages(compute_posterior(y = y_match, fs, MOIs = x)$marg))
@@ -520,9 +520,8 @@ legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs),
        legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
 ```
 
-The posterior probabilities of recrudescence increase with increasing graph size
-when the MOIs are balanced. The posterior probabilities of reinfection increase
-with increasing graph size.
+The posterior probabilities increase with increasing graph size, but only if the
+MOIs are balanced in the case of recrudescence.
 
 
 ### Digression: counts of intra-episode siblings 
@@ -530,12 +529,13 @@ with increasing graph size.
 To increase per-episode MOIs, we can do as above and increase user-specified
 MOIs without changing the data, or we can increase the allelic diversity of the
 data, s.t. MOIs modelled under Pv3Rs increase without user-specified MOIs.
-Either way, we get the same maximum probabilities:
+Either way, we get the same maximum probabilitie, but the graph likelihoods
+change:
 
-```{r}
-all_ACs <- sapply(ms, function(t) c("A", "C"), simplify = F) # A&C for all 
-all_BEs <- sapply(ms, function(t) c("B", "E"), simplify = F) # A&C for all 
-all_ACDs <- sapply(ms, function(t) c("A", "C", "D"), simplify = F) # A&C for all 
+```{r, echo = FALSE, include = FALSE}
+all_ACs <- sapply(ms, function(t) c("A", "C"), simplify = F) 
+all_BEs <- sapply(ms, function(t) c("B", "E"), simplify = F) 
+all_ACDs <- sapply(ms, function(t) c("A", "C", "D"), simplify = F)  
 fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.01, "C" = 0.01, 
                                "D" = 0.01, "E" = 0.96), simplify = FALSE)
 
@@ -550,7 +550,6 @@ rbind(suppressMessages(compute_posterior(hom_match_data, fs, MOIs = c(3,2))$marg
       suppressMessages(compute_posterior(het_mismatch_data, fs)$marg))
 ```
 
-But the graph likelihoods change: 
 
 ```{r echo = FALSE}
 # Classify graphs by state
@@ -576,14 +575,14 @@ llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
 
 # Plot log likelihoods by graph classification
 plot(llikes_sorted$x, pch = 20, col = "lightgray", bty = "n", ylim = c(-2500, -500), 
-     ylab = "Log-likelihood", xlab = "Relationship Graphs for MOIs 3 & 3")
+     ylab = "Log-likelihood", xlab = "Relationship Graphs")
 points(y = llikes_sorted$x[(RGs_C & allRGs_edges_within)[llikes_sorted$ix]], 
        x = which((RGs_C & allRGs_edges_within)[llikes_sorted$ix]), 
        col = "black", pch = 20)
 legend("topleft", pch = 20, bty= "n", cex = 0.75, col = c("black", "lightgray"), 
        legend = c("Graphs with intra-episode siblings and inter-episode clones",
                   "All other graphs"))
-title(main = sprintf("Recrudescence with probability %s", 
+title(main = sprintf("Homoallelic data with user-specified MOIs 3 and 2: \n recrudescence with probability %s", 
                      round(post$marg[,"C"],4)))
 
 # Get graph log likelihoods for polyclonal data without user-specified MOIs
@@ -601,25 +600,24 @@ points(y = llikes_sorted$x[(RGs_C & noRGs_edges_within)[llikes_sorted$ix]],
 legend("topleft", pch = 20, bty= "n", cex = 0.75, col = c("black", "lightgray"), 
        legend = c("Graphs with intra-episode strangers and inter-episode clones",
                   "All other graphs"))
-title(main = sprintf("Recrudescence with probability %s", round(post$marg[,"C"],4)))
+title(main = sprintf("Heteroallelic data with max. marker diversity 3 and 2: \n recrudescence with probability %s", 
+                     round(post$marg[,"C"],4)))
 ```
 
 For the homoallelic data with elevated user-specified MOIs, all intra-episode
 parasites in maximum likelihood graphs are siblings. For the heteroallelic data,
-all intra-episode parasites in maximum likelihood graphs are strangers. Both
-have the same maximum probabilities of recrudescence.
+all intra-episode parasites in maximum likelihood graphs are strangers. 
 
-One upshot of this is that maximum probabilities could be increased by
-increasing counts of intra-episode siblings. Arguably, maximum probabilities
-should not increase with more than two intra-episode siblings because siblings
-are not independent. In practice, when MOIs under the Pv3Rs model are based on 
-realistic MOI estimates, groups of three or
-more siblings are modelled as groups of two; see
+One upshot of this is that maximum probabilities could be arbitrarily increased
+by increasing counts of intra-episode siblings. Since siblings are not
+independent, these maxima arguably should not increase beyond two siblings per
+episode. Under the Pv3Rs model with realistic MOI estimates, groups of three or
+more siblings are effectively treated as pairs; see
 `vignette("intra-episode-siblings", "Pv3Rs")`.
 
 END OF DIGRESSION
 
-## Increasing episode counts {#epi count}
+## Increasing episode counts {#epi-count}
 
 Recurrences can be added without adding data
 
@@ -788,19 +786,23 @@ legend("left", legend = 1:3, title = "Number of recurrences", fill = 1:3,
        bty = "n")
 ```
 
-Note that the above maxima are not bounds imposed by the prior: they are based
+Recall that the above maxima are not bounds imposed by the prior: they are based
 on knowledge that there are no recurrent data on all but the first recurrence; 
-see `vignette("understand-graph-prior", "Pv3Rs")`.
+see 
+[Understand graph prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html).
 
 ## Position in a sequence {#position}
 
 Because the distribution over relationship graphs is not invariant to different
 orderings of states in a sequence (more graphs are compatible with a reinfection
 at the beginning versus the end of a sequence of three episodes, for example),
-the position of a recurrence in a sequence has a bearing on
-posterior estimates.
+the position of a recurrence in a sequence affects its per-recurrence posterior
+estimates. These examples also highlight why, under a well-specified model,
+jointly modelling data across more than two episodes is preferable to analysing
+episodes pairwise.
 
-This effect is negligible when all episodes have the same data on many markers:
+The effect of position is negligible when all episodes have the same data on
+many markers:
 
 ```{r}
 y <- list(enrol = all_As, 
@@ -928,10 +930,9 @@ On close inspection the upward orange 1 triangle makes intuitive sense: if you
 know a first recurrence is followed by a second MOI = 1 recurrence that is a
 clone of the MOI = 1 enrolment episode, it is very unlikely the second
 recurrence is a clone drawn from a new mosquito as it would be if it were a
-recrudescence of a reinfection. As such, the data on the enrolment episode and
-the second recurrence tell us something about the first recurrence, and thus the
-posterior estimate of the first recurrence deviates from the prior even though
-the first recurrence has no data.
+recrudescence of a reinfection. Thus, the enrolment and second recurrence data
+inform the first recurrence, causing its posterior estimate to deviate from the
+prior even though it has no data.
 
 The explanation for mismatch data (downward triangles) in the sequence <span style="color:
 darkorange;">ONO</span> is similar to that for match data: strong evidence for
@@ -954,14 +955,15 @@ mutually exclusive:
 1) more data are needed 
 2) the states are not fully identifiable
 
-It is also important to bear in mind the fact that, under the Pv3Rs model, trial
-participants with different epside counts and per-episode MOIs have different
-maximum probabilities of recrudescence / reinfection. For example, if we use a
-common threshold of 0.8 to classify probable reinfection assuming recurrence
-states are equally likely *a priori*, we can discount *a priori* all trail
-participants with a single monoclonal recurrence following a monoclonal
-enrolment episode because their posterior reinfection probabilities will never
-exceed 0.75, even if their data are highly informative of reinfection:
+It is also important to bear in mind the above-illustrated facts that, under the Pv3Rs model, trial
+participants with different [per-episode MOIs](#mois) and 
+[episode counts](#epi-counts) have different maximum probabilities of
+recrudescence / reinfection. For example, if we use a common threshold of 0.8 to
+classify probable reinfection assuming recurrence states are equally likely *a
+priori*, we can discount *a priori* all trail participants with a single
+monoclonal recurrence following a monoclonal enrolment episode because their
+posterior reinfection probabilities will never exceed 0.75, even if their data
+are highly informative of reinfection:
 
 ```{r}
 y <- list(enrol = all_As, recur = all_Bs)
@@ -976,8 +978,8 @@ suppressMessages(compute_posterior(y, fs, prior))$marg
 ```
 
 And that, for a given trial participant, the probability of recrudescence /
-reinfection depends on its position within a sequence, especially if one or more
-episodes has no data.
+reinfection depends on its [position within a sequence](#position), especially 
+if one or more episodes has no data.
 
 # Meiotic siblings {#meiotic}
 
@@ -1139,10 +1141,11 @@ Relationship graphs (not shown) are wrong for two reasons:
 
 - all the relationship graphs have two, not three, parasites in the initial
 infection because there are at most two alleles per marker. Although technically
-incorrect, this behaviour is arguably desirable (see digression above).
+incorrect, this behaviour is arguably desirable; see the digression in the above section 
+[Data on many markers](many-markers).
 - the highest likelihood relationship graphs have stranger parasites in the
 initial episode because prevalence data from three or four meiotic siblings are
-identical to bulk data from the parents who are strangers.
+identical to bulk data from the parents, who are strangers.
 
 We can force the graphs to have three distinct parasites in the initial episode
 by specifying external MOIs. Doing so recovers maximum likelihood on true
@@ -1230,12 +1233,15 @@ we can show theoretically that the system behaves erratically because a small
 perturbation to the ratio of observations (all alleles match across the three
 half siblings, all alleles are different, intra-episode alleles match,
 inter-episode alleles match) can lead to a large deviation in the odds of
-relapse versus reinfection; see `vignette("understand-half-sibs", "Pv3Rs")`. The purple, red,
+relapse versus reinfection; see 
+[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
+The purple, red,
 and green trajectories below have higher than the expected 0.5 intra-to-inter
 match ratios; moreover, the purple trajectory's intra-to-inter match ratio
 consistently exceeds $0.5\times \text{log}_2(\dfrac{2}{5})$, a condition found
 theoretically to concentrate posterior probability on reinfection under certain
-conditions; again, see `vignette("understand-half-sibs", "Pv3Rs")`.
+conditions; again, see 
+[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html).
 
 ```{r echo = FALSE, fig.height = 4}
 rm(list = "output")
@@ -1315,7 +1321,7 @@ the maximum likelihood graph is the one with one intra-episode sibling edge.
 # Parent-child-like siblings {#parent-child-like}
 
 ## Methods 
-We simulated data for three parent-child like siblings: 
+We simulated data for three parent-child-like siblings: 
 
 - child of selfed parent 1 in the initial episode
 - child of parents 1 and 2 in the initial episode
