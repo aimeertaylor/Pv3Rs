@@ -29,6 +29,7 @@ Authors:
 
 Other contributors:
 \itemize{
+  \item Mans Magnusson [contributor]
   \item European Union, Project 101110393 [funder]
 }
 
