@@ -36,7 +36,7 @@ model underpinning it is well specified but
 - [Data are uninformative](#uniformative)
 - [Data are limited to only one episode](#one-episode)
 - [Data are incomparable across episodes](#incomparable)
-- Data are limited to only [one marker](#one-marker) and [two markers](#two-markers)
+- Data are limited to only [one marker](#one-marker) or [two markers](#two-markers)
 
 Given [data on many markers](#many-markers), 
 we then show under the well specified model how maximum probabilities of
@@ -57,15 +57,13 @@ model is misspecified because of
 - [Half siblings](#half)
 - [Parent-child-like siblings](#parent-child-like)
 
-More detailed results on misspecification can be found in the 
+More detailed results on sibling misspecification can be found in the 
 [development files of the Pv3Rs source package](https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy). 
 
 We have not yet characterised model misspecification due to genotyping errors
 nor stranger parasites with elevated relatedness: 
-
 - Genotyping errors will likely cause misspecification of recrudescence as relapse
 and misspecification of relapse as reinfection.
-
 - Stranger parasites that are related insofar as the population is related on
 average are largely accounted for: Allele frequency estimates encode
 population-level average relatedness locus-by-locus
@@ -76,9 +74,8 @@ population from which trial participants also draw, there is no need to
 compensate further for population-level average relatedness locus-by-locus.
 However, strong inter-locus dependence (linkage disequilibrium) could generate
 overconfident posterior probabilities.
-
 - Stranger parasites that related due to population structure (e.g., proximity in
-space and time; household effects) will likely lead to the misclassification of
+space and time) will likely lead to the misclassification of
 reinfection as relapse / recrudescence. In our view, recurrence classification
 in the presence of population structure is best understood using complementary
 population-genetic and sensitivity analyses (e.g., identity-by-descent
@@ -957,7 +954,7 @@ mutually exclusive:
 
 It is also important to bear in mind the above-illustrated facts that, under the Pv3Rs model, trial
 participants with different [per-episode MOIs](#mois) and 
-[episode counts](#epi-counts) have different maximum probabilities of
+[episode counts](#epi-count) have different maximum probabilities of
 recrudescence / reinfection. For example, if we use a common threshold of 0.8 to
 classify probable reinfection assuming recurrence states are equally likely *a
 priori*, we can discount *a priori* all trail participants with a single
@@ -1142,7 +1139,7 @@ Relationship graphs (not shown) are wrong for two reasons:
 - all the relationship graphs have two, not three, parasites in the initial
 infection because there are at most two alleles per marker. Although technically
 incorrect, this behaviour is arguably desirable; see the digression in the above section 
-[Data on many markers](many-markers).
+[Data on many markers](#many-markers).
 - the highest likelihood relationship graphs have stranger parasites in the
 initial episode because prevalence data from three or four meiotic siblings are
 identical to bulk data from the parents, who are strangers.
