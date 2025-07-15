@@ -194,7 +194,7 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
   # Check all episodes have the same marker names
   if (!all(all(sapply(y, function(y_m) identical(sort(names(y_m)), sort(ms)))))){
     stop("Markers are inconsistent across episodes.
-    NB: If not all markers are typed per episode, data on untyped markers can be encoded as missing using NAs.")
+    NB: data on untyped markers can be encoded as missing using NAs.")
   }
 
   # Check all markers have allele frequencies
@@ -236,10 +236,10 @@ compute_posterior <- function(y, fs, prior = NULL, MOIs = NULL,
     sum(sapply(y, function(y.epi) any(!is.na(y.epi[[m]])))) < 2
   )
   if (sum(na_markers) == 1) {
-    warning(sprintf("Markers %s has data on one episode only\n",
+    warning(sprintf("Marker %s has data on fewer than two episodes\n",
                     names(which(na_markers))))
   } else if (sum(na_markers) > 1) {
-    warning(sprintf("Markers %s have data on one episode only\n",
+    warning(sprintf("Markers %s have data on fewer than two episodes\n",
                     paste(names(which(na_markers)), collapse = " & ")))
   }
 
