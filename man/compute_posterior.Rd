@@ -80,11 +80,9 @@ encoded as a list can be converted into a \code{igraph} object using
 Computes per-person posterior probabilities of \emph{P. vivax} recurrence states —
 recrudescence, relapse, reinfection — using per-person genetic data on two
 or more episodes. For usage, see
-\strong{Examples} below and
-\code{vignette("demonstrate-usage")} — clickable online
-\href{../doc/demonstrate-usage.html}{(offline link)}.
+\strong{Examples} below and \HTMLVignette{demonstrate-usage}{}{the vignette on Pv3Rs basic usage}.
 For a more
-complete understanding of the posterior output, see \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.
+complete understanding of the posterior output, see \HTMLVignette{understand-posterior}{}{more detailed description of the package functionalities}.
 
 Note: The progress bar may increment non-uniformly (see
 \strong{Details}); it may appear stuck when computations are ongoing.
@@ -122,14 +120,6 @@ are not modelled}
 molecular correction are not modelled}
 }
 }
-\section{Links}{
-
-There are some links to the vignettes:
-
-HTML links works locally and in pkgdown: \HTMLVignette{demonstrate-usage}{Basic workflow}{basic workflow of demonstrate usage vignette}
-PDF links works only locally, they would work in pkgdown, but firsly it is required to upload the pdfs to pkgdown somehow \PDFVignette{benchmarking}{}{pdf link to benchmarking}
-}
-
 \examples{
 # Numerically named alleles
 y <- list(enrol = list(m1 = c('3','2'), m2 = c('1','2')),
