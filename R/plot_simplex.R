@@ -37,6 +37,8 @@
 #'
 #' @param ... Additional parameters passed to [graphics::points()].
 #'
+#' @return None
+#'
 #' @examples
 #' # Plot 2D simplex
 #' plot_simplex(p.coords = diag(3),

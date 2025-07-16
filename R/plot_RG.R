@@ -29,6 +29,8 @@
 #' @section Provenance: This function was adapted from \code{plot_Vivax_model} at
 #' \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.
 #'
+#' @return None
+#'
 #' @examples
 #' RGs <- enumerate_RGs(c(2, 1, 1), progress.bar = FALSE)
 #' cpar <- par(no.readonly = TRUE) # record current par before changing

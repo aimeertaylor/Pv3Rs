@@ -55,6 +55,8 @@
 #'@param x.line Distance between top x-axis and x-axis label, defaults to 0.2.
 #'@param y.line Distance between left y-axis and y-axis label, defaults to 2.5.
 #'
+#' @return None
+#'
 #' @examples
 #'
 #' # Plot example Plasmodium vivax data set
