@@ -122,6 +122,13 @@ are not modelled}
 molecular correction are not modelled}
 }
 }
+\section{Links}{
+
+There are some links to the vignettes:
+HTML links works locally and in pkgdown: \HTMLVignette{demonstrate-usage}{Basic workflow}{basic workflow of demonstrate usage vignette}
+PDF links works only locally, they would work in pkgdown, but firsly it is required to upload the pdfs to pkgdown somehow \PDFVignette{}{}{}
+}
+
 \examples{
 # Numerically named alleles
 y <- list(enrol = list(m1 = c('3','2'), m2 = c('1','2')),

@@ -14,6 +14,12 @@
 #' Note: The progress bar may increment non-uniformly (see
 #' **Details**); it may appear stuck when computations are ongoing.
 #'
+#' @section Links:
+#' There are some links to the vignettes:
+#' HTML links works locally and in pkgdown: \HTMLVignette{demonstrate-usage}{Basic workflow}{basic workflow of demonstrate usage vignette}
+#' PDF links works only locally, they would work in pkgdown, but firsly it is required to upload the pdfs to pkgdown somehow \PDFVignette{}{}{}
+#'
+#'
 #' @details
 #' `compute_posterior()` computes posterior probabilities proportional to
 #' the likelihood multiplied by the prior. The likelihood sums over:
