@@ -16,8 +16,9 @@
 #'
 #' @section Links:
 #' There are some links to the vignettes:
+#'
 #' HTML links works locally and in pkgdown: \HTMLVignette{demonstrate-usage}{Basic workflow}{basic workflow of demonstrate usage vignette}
-#' PDF links works only locally, they would work in pkgdown, but firsly it is required to upload the pdfs to pkgdown somehow \PDFVignette{}{}{}
+#' PDF links works only locally, they would work in pkgdown, but firsly it is required to upload the pdfs to pkgdown somehow \PDFVignette{benchmarking}{}{pdf link to benchmarking}
 #'
 #'
 #' @details
