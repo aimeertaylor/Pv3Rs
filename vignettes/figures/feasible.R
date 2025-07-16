@@ -1,6 +1,5 @@
 ################################################################################
 # Plot possible posterior probabilities for MOI = (2, 1)
-# Figure 1 in graph-prior.tex
 ################################################################################
 
 library(Pv3Rs)
@@ -18,7 +17,7 @@ relap.recru <- project2D(c(9,4,0)/(9+4))
 relap.reinf <- project2D(c(0,2,9)/(9+2))
 intersect.pt <- project2D(c(9*2,4*2,9*4)/(9*2+4*2+9*4))
 
-png("../vignettes/figures/feasible.png", width = 4, height = 4, units = "in", res = 75)
+png("feasible.png", width = 4, height = 4, units = "in", res = 75)
 
 par(mar=rep(0,4))
 V_labels <- c("Recrudescence", "Relapse", "Reinfection")

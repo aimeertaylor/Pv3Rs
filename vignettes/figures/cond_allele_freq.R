@@ -9,7 +9,7 @@ library(MCMCpack)
 # eq:cond_dens in half_siblings.ltx
 myden <- function(x) (3*lambda+2)/(4*lambda+3) * (1+x) * dbeta(x, lambda+1,2*lambda+1)
 
-png("../vignettes/figures/cond_allele_freq.png", width = 6, height = 4, units = "in", res = 75)
+png("cond_allele_freq.png", width = 6, height = 4, units = "in", res = 75)
 
 lambda <- 10
 curve(myden, from=1e-4, to=1-1e-4, add=F, col=1,

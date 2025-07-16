@@ -5,6 +5,8 @@
 # script feature in graph-prior.tex.
 ################################################################################
 rm(list = ls())
+library(Pv3Rs)
+load("../vignette_data/maxima.rda")
 all_MOIs <- sapply(colnames(maxima), function(x) as.numeric(strsplit(x, split = "")[[1]]))
 maxMOIs <- sapply(all_MOIs, function(x) max(x))
 
@@ -18,7 +20,7 @@ MOI12diff <- sapply(all_MOIs, function(x) x[1] - x[2]) # Difference
 MOI1s_log <- sapply(all_MOIs, function(x) all(x == 1)) # MOI vectors of all 1s
 Episode_counts <- sort(unique(nMOI))
 
-png("../vignettes/figures/maxima%d.png", width = 6, height = 6, units = "in", res = 75)
+png("maxima%d.png", width = 6, height = 6, units = "in", res = 75)
 
 # Single recurrence reinfection
 plot(x = MOI12diff[nMOI < 3], y = maxima["I_with", nMOI < 3], ylim = c(0.6, 1),

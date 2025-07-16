@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
 library(Pv3Rs)
 # Access non-exported function
 recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs") 
+load("./vignette_data/maxima.rda")
 ```
 
 This vignette, which is rather niche, expands a digression in 
