@@ -4,15 +4,13 @@
 #' Computes per-person posterior probabilities of *P. vivax* recurrence states —
 #' recrudescence, relapse, reinfection — using per-person genetic data on two
 #' or more episodes. For usage, see
-#' **Examples** below and
-#' `vignette("demonstrate-usage")` — clickable online
-#' [(offline link)](../doc/demonstrate-usage.html).
+#' **Examples** below and \HTMLVignette{demonstrate-usage}{}{the vignette on Pv3Rs basic usage}.
 #' For a more
-#' complete understanding of the posterior output, see ["Understand posterior
-#' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
+#' complete understanding of the posterior output, see \HTMLVignette{understand-posterior}{}{more detailed description of the package functionalities}.
 #'
 #' Note: The progress bar may increment non-uniformly (see
 #' **Details**); it may appear stuck when computations are ongoing.
+#'
 #'
 #' @details
 #' `compute_posterior()` computes posterior probabilities proportional to
