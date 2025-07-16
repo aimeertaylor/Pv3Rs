@@ -73,6 +73,9 @@ of the legend in device coordinates (between 0 and 1). Defaults to c(0.05, 0.2).
 
 \item{y.line}{Distance between left y-axis and y-axis label, defaults to 2.5.}
 }
+\value{
+None
+}
 \description{
 Plots allelic data as a grid of coloured rectangles.
 }

@@ -39,6 +39,9 @@ relationships.}
 \item{...}{Additional arguments to pass to \code{\link[igraph]{plot.igraph}}, e.g.,
 \code{edge.curved}.}
 }
+\value{
+None
+}
 \description{
 This function is a wrapper around \code{\link[igraph]{plot.igraph}}, written
 to group parasite genotypes by episode both spatially and using vertex

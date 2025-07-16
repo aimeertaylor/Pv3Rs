@@ -49,6 +49,9 @@ value or a vector.}
 
 \item{...}{Additional parameters passed to \code{\link[graphics:points]{graphics::points()}}.}
 }
+\value{
+None
+}
 \description{
 Plots a 2D simplex (a triangle with unit sides centered at the origin) onto
 which per-recurrence posterior probabilities of recrudescence, relapse,
