@@ -7,7 +7,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-2337-8992")),
     person("Yong See", "Foo", role = "aut"),
     person("Mans", "Magnusson", role = "ctb"),
-    person("l'INSTITUT PASTEUR", role = "cph")
+    person("l'INSTITUT PASTEUR", role = "cph"),
     person("European Union, Project 101110393", role = "fnd")
   )
 Description: Estimate per-person posterior probabilities that each
