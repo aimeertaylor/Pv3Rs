@@ -1,7 +1,7 @@
 # Pv3Rs <img src="man/figures/logo.png" align="right" alt="" width="120" />
 
 An R package for *Plasmodium vivax* molecular correction via statistical genetic
-inference of *P. vivax*
+inference of 
 
 [//]: # (use same order as software note abstract)
 
@@ -30,11 +30,9 @@ probability triplet summing to one.
 ## Please be aware of the following points!
 
 The Pv3Rs R package is not yet peer-reviewed and thus liable to modification.
-The model is described in a preprint [1], building on a prototype in [2].
-
-[1] [Taylor, Foo & White, 2022](https://www.medrxiv.org/content/10.1101/2022.11.23.22282669v1)
-
-[2] [Taylor & Watson et al. 2019](https://www.nature.com/articles/s41467-019-13412-x)
+The model is described in the preprint 
+[Taylor, Foo & White, 2022](https://www.medrxiv.org/content/10.1101/2022.11.23.22282669v1), building on a prototype in 
+[Taylor & Watson et al. 2019](https://www.nature.com/articles/s41467-019-13412-x).
 
 ### Prior considerations: 
 
