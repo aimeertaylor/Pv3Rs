@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Understand posterior estimates • Pv3Rs</title>
+<title>Understand posterior probabilities • Pv3Rs</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Understand posterior estimates">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Understand posterior probabilities">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -39,7 +39,7 @@
     <li><a class="dropdown-item" href="../articles/intra-episode-siblings.html">Explore treatment of intra-episode siblings</a></li>
     <li><a class="dropdown-item" href="../articles/understand-graph-prior.html">Understand graph prior ramifications</a></li>
     <li><a class="dropdown-item" href="../articles/understand-half-sibs.html">Understand half-sibling misspecification</a></li>
-    <li><a class="dropdown-item" href="../articles/understand-posterior.html">Understand posterior estimates</a></li>
+    <li><a class="dropdown-item" href="../articles/understand-posterior.html">Understand posterior probabilities</a></li>
   </ul>
 </li>
       </ul>
@@ -68,7 +68,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Understand posterior estimates</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Understand posterior probabilities</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/aimeertaylor/Pv3Rs/blob/main/vignettes/articles/understand-posterior.Rmd" class="external-link"><code>vignettes/articles/understand-posterior.Rmd</code></a></small>
@@ -447,7 +447,7 @@ graph prior ramifications</a>.</p>
 different orderings of states in a sequence (more graphs are compatible
 with a reinfection at the beginning versus the end of a sequence of
 three episodes, for example), the position of a recurrence in a sequence
-affects its per-recurrence posterior estimates. These examples also
+affects its per-recurrence posterior probability. These examples also
 highlight why, under a well-specified model, jointly modelling data
 across more than two episodes is preferable to analysing episodes
 pairwise.</p>
@@ -538,8 +538,8 @@ recurrence that is a clone of the MOI = 1 enrolment episode, it is very
 unlikely the second recurrence is a clone drawn from a new mosquito as
 it would be if it were a recrudescence of a reinfection. Thus, the
 enrolment and second recurrence data inform the first recurrence,
-causing its posterior estimate to deviate from the prior even though it
-has no data.</p>
+causing its posterior to deviate from the prior even though it has no
+data.</p>
 <p>The explanation for mismatch data (downward triangles) in the
 sequence <span style="color:
 darkorange;">ONO</span> is similar to that for match data: strong
@@ -561,8 +561,8 @@ the first recurrence having no data.</p>
 <div class="section level2">
 <h2 id="uncertainty">Interpreting uncertainty<a class="anchor" aria-label="anchor" href="#uncertainty"></a>
 </h2>
-<p>Uncertain posterior estimates can be uncertain for two reasons that
-are not mutually exclusive:</p>
+<p>Uncertain posterior probabilities can be uncertain for two reasons
+that are not mutually exclusive:</p>
 <ol style="list-style-type: decimal">
 <li>more data are needed</li>
 <li>the states are not fully identifiable</li>
