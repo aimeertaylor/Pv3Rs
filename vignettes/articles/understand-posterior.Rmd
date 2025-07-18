@@ -1,5 +1,5 @@
 ---
-title: "Understand posterior estimates"
+title: "Understand posterior probabilities"
 ---
   
 ```{r, include = FALSE}
@@ -334,7 +334,7 @@ posteriors <- rbind(suppressMessages(compute_posterior(match, fs_rare))$marg,
                     suppressMessages(compute_posterior(parmatch, fs_comn))$marg,
                     suppressMessages(compute_posterior(parmatch, fs_rare))$marg)
 
-# Plot per-recurrence estimates on the simplex
+# Plot per-recurrence probabilities on the simplex
 par(mar = c(0,0,0,0))
 plot_simplex(p.coords = posteriors, pch = 20, p.labels.cex = 0.75, 
              p.labels = c("rare match", "common match", "mismatch", 
@@ -491,13 +491,13 @@ maxima <- lapply(1:length(MOIs), FUN = function(i) {
 par(mar = c(0,0,0,0)) # Visualise the change 
 plot_simplex() # Plot simplex
 
-# Match estimates
+# Match probabilities
 xy <- apply(results_match, 2, project2D) # Project 
 points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(MOIs)) # Plot 
 text(x = median(xy["x", ]), y = mean(xy["y", ]), 
      labels = "match data", pos = 2, offset = 1) # Annotate
 
-# Mismatch estimates
+# Mismatch probabilities
 xy <- apply(results_mismatch, 2, project2D) # Project 
 points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(MOIs)) # Plot 
 text(x = sum(range(xy["x", ]))/2, y = mean(xy["y", ]), 
@@ -512,7 +512,7 @@ for(i in 1:length(xys)) {
 
 # Add legends
 legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0,
-       legend = c("Bound induced by prior", "Posterior estimate"))
+       legend = c("Bound induced by prior", "Posterior probability"))
 legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs), 
        legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
 ```
@@ -707,12 +707,12 @@ reinfection depends on the total number of recurrences:
 par(mar = c(0,0,0,0))
 plot_simplex() # Plot simplex
 
-# Match estimates
+# Match probabilities
 xy <- apply(results_match_recur1, 2, project2D) 
 points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(ys_match)) 
 text(mean(xy["x", ]), mean(xy["y", ]), "match data", pos = 3, offset = 1) 
 
-# Mismatch estimates
+# Mismatch probabilities
 xy <- apply(results_mismatch_recur1, 2, project2D) 
 points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(ys_mismatch)) 
 text(mean(xy["x", ]), mean(xy["y", ]), "mismatch data", pos = 3, offset = 1) 
@@ -731,7 +731,7 @@ knowledge that all but the
 first recurrence has data 
 and that all episodes 
 are monoclonal", 
-         "Posterior estimate"))
+         "Posterior probability"))
 legend("right", col = c(1:length(xys)), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
        legend = c(1,2,3), title = "Recurrence\ncount") 
 ```
@@ -794,7 +794,7 @@ Because the distribution over relationship graphs is not invariant to different
 orderings of states in a sequence (more graphs are compatible with a reinfection
 at the beginning versus the end of a sequence of three episodes, for example),
 the position of a recurrence in a sequence affects its per-recurrence posterior
-estimates. These examples also highlight why, under a well-specified model,
+probability. These examples also highlight why, under a well-specified model,
 jointly modelling data across more than two episodes is preferable to analysing
 episodes pairwise.
 
@@ -928,7 +928,7 @@ know a first recurrence is followed by a second MOI = 1 recurrence that is a
 clone of the MOI = 1 enrolment episode, it is very unlikely the second
 recurrence is a clone drawn from a new mosquito as it would be if it were a
 recrudescence of a reinfection. Thus, the enrolment and second recurrence data
-inform the first recurrence, causing its posterior estimate to deviate from the
+inform the first recurrence, causing its posterior to deviate from the
 prior even though it has no data.
 
 The explanation for mismatch data (downward triangles) in the sequence <span style="color:
@@ -946,7 +946,7 @@ names(which(suppressMessages(compute_posterior(y = ys_mismatch[["OON"]], fs))$jo
 
 # Interpreting uncertainty {#uncertainty}
 
-Uncertain posterior estimates can be uncertain for two reasons that are not
+Uncertain posterior probabilities can be uncertain for two reasons that are not
 mutually exclusive:
 
 1) more data are needed 

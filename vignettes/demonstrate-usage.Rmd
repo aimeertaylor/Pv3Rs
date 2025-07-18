@@ -36,7 +36,7 @@ more elaborate study-level `Pv3Rs` tutorial is planned, covering
 - Sensitivity analysis for genotyping errors
 - Sensitivity analysis for sibling misspecification
 - Alternative approach using genetic distance and whole-genome sequence data
-- Using posterior probabilities (rather than categorical classifications) to estimate treatment efficacy
+- Using posterior probabilities (rather than categorical classifications) in downstream analyses
 - Estimating false negative rates
 
 ## Basic workflow
@@ -95,7 +95,7 @@ post <- compute_posterior(y, fs)
 **Aside** We do not recommend running `compute_posterior()` for data whose total 
 genotype count (sum over MOIs) exceeds eight. That said, we have not encoded a
 hard limit. In our experience, it is possible, but very long, to generate
-estimates using data with a total genotype count up to 10; above 10,
+posterior probabilities using data with a total genotype count up to 10; above 10,
 calls to `compute_posterior()` are liable cause memory-use problems and fail.
 
 In the call to `compute_posterior()` above we did not specify a prior, and so by

@@ -24,7 +24,7 @@ labelled.}
 \item{v.cutoff}{Number between 0.5 and 1 that separates lower vs higher
 probability regions. Use with caution for recrudescence and reinfection
 classification; see
-\href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior estimates"}.}
+\href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{"Understand posterior probabilities"}.}
 
 \item{v.colours}{Vertex colours anticlockwise from top.}
 

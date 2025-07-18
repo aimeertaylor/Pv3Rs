@@ -8,8 +8,8 @@
 #' `vignette("demonstrate-usage")` — clickable online
 #' [(offline link)](../doc/demonstrate-usage.html).
 #' For a more
-#' complete understanding of the posterior output, see ["Understand posterior
-#' estimates"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
+#' complete understanding of the posterior output, see
+#' ["Understand posterior probabilities"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
 #'
 #' Note: The progress bar may increment non-uniformly (see
 #' **Details**); it may appear stuck when computations are ongoing.
