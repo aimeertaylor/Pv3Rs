@@ -30,7 +30,7 @@ extracted from study participants enrolled in the Best Primaquine Dose (BPD) and
 History (VHX) trials; see
 \href{https://www.nature.com/articles/s41467-019-13412-x}{Taylor & Watson et al. 2019}
 for more details of the genetic data; for more details of the VHX and BPD trials, see
-\href{https://doi.org/10.1093/cid/ciy319}{Chu et al. 2018a} and
-\href{https://doi.org/10.1093/cid/ciy735}{Chu et al. 2018b}, respectively.
+\link{Chu et al. 2018a}(\doi{10.1093/cid/ciy319} and
+\link{Chu et al. 2018b}(\doi{10.1093/cid/ciy735}, respectively.
 }
 \keyword{datasets}
