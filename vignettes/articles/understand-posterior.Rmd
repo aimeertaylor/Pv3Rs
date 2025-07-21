@@ -1,5 +1,6 @@
 ---
 title: "Understand posterior probabilities"
+desc: A detailed sequal to "Demonstrate Pv3Rs usage"
 ---
   
 ```{r, include = FALSE}
