@@ -1,8 +1,7 @@
 ---
 title: "Benchmarking Pv3Rs"
-name: benchmarking
-extension: pdf
+description: blabla
 ---
 
-
+- [My PDF Vignette](articles/benchmarking.pdf)
 
