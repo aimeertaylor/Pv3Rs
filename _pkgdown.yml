@@ -4,7 +4,7 @@ template:
   light-switch: true
 
 articles:
-- title: Main
+- title:
   navbar: ~
   contents:
   - demonstrate-usage

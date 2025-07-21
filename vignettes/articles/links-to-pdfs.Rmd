@@ -1,10 +1,12 @@
 ---
 title: "Advanced documentation"
-description: Links to pdfs aimed at package and model developers
+description: Links to pdfs aimed at statistical model and package developers
 ---
 
 - [Benchmarking](benchmarking.pdf)
-- [Understand enumeration of graphs and partitions](enumerate.pdf)
-- [Understand half sibling misspecification](understand-half-sibs.pdf)
 - [Understand graph prior ramifications](understand-graph-prior.pdf)
+- [Understand half sibling misspecification](understand-half-sibs.pdf)
+- [Understand graphs and partition enumeration](enumerate.pdf)
+
+
 

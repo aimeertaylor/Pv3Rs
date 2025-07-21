@@ -1,6 +1,7 @@
 ---
 title: "Understand posterior probabilities"
-description: "A detailed sequal to **Demonstrate Pv3Rs usage**"
+description: "Documents `compute_posterior()` output when the statistical
+model underpinning it is well and misspecified"
 ---
   
 ```{r, include = FALSE}

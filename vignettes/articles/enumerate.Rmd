@@ -1,7 +1,0 @@
----
-title: "Understand enumeration of graphs and partitions"
----
-
-This is a stub file. The actual vignette is a pre-rendered PDF: 
-[Enumerating graphs and partitions](enumerate.pdf). 
-
