@@ -1,9 +1,0 @@
----
-title: "Enumerating graphs and partitions"
-as_is: true
-
-pkgdown:
-  as_is: true
-  extension: pdf
----
-
