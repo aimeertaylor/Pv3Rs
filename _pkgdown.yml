@@ -13,4 +13,6 @@ articles:
 - title: Advanced documentation
   contents:
   - articles/links-to-pdfs
-  - articles/enumerate
+    - text: "My Vignette"
+        href: ./../doc/articles/enumerate.pdf
+
