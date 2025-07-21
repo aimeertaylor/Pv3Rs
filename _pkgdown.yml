@@ -2,3 +2,17 @@ url: https://aimeertaylor.github.io/Pv3Rs/
 template:
   bootstrap: 5
   light-switch: true
+
+articles:
+- title: Main verbs
+  navbar: lala
+  contents:
+  - demonstrate-usage
+  - intra-episode-siblings
+
+- title: Developer
+  navebar: dodo
+  desc: Vignettes aimed at package developers
+  contents:
+  - understand-posterior
+  - links-to-pdfs
