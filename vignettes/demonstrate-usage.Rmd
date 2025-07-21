@@ -29,10 +29,9 @@ participant:
 2) Compute recurrence state posterior probabilities 
 3) Plot per-recurrence probabilities 
 
-We also show how to explore relationship graphs and their log likelihoods. 
-For a general understanding of the posterior probabilities see XXX. 
-For a demonstration of the `Pv3Rs` workflow at the study-level, we are working 
-on a tutorial covering
+We also show how to explore relationship graphs and their log likelihoods. For a
+general understanding of the posterior probabilities see XXX. A tutorial
+demonstrating the `Pv3Rs` workflow at the study-level is planned; we aim to cover
 
 - Generating pairwise probabilities when the total genotype count over multiple recurrences exceeds eight
 - Computing false discovery rates 

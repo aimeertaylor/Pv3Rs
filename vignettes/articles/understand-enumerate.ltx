@@ -1,0 +1,126 @@
+\documentclass{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath} % For math formatting
+\usepackage{mathtools} % For smashoperator
+\usepackage{bm} % For \bm in mypackage notation
+\usepackage{amsfonts} % For \mathbb etc.
+\usepackage{pv3rs} % For notation
+\usepackage{enumitem} % For roman numerals
+
+\title{Enumerate graphs and partitions}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+
+\section*{Enumerating relationship graphs}
+
+\subsection*{Relationship graphs as nested partitions}
+
+The function \texttt{enumerate\_RGs} enumerates all relationship graphs (RGs). A relationship graph can be interpreted as a nested partition. Label the $n$ genotypes (one per vertex) as $\geno_1,\ldots,\geno_n$. A clonal partition $\clp = \{\clc_1, \ldots, \clc_{\cln}\}$ is a partition of $\{\geno_1,\ldots,\geno_n\}$ where two genotypes are in the same cell if they have a clonal relationship, and where $\cln$ is the number of cells of the clonal partition (number of clonal cells). A relationship graph is then a partition of $\{\clc_1, \ldots, \clc_{\cln}\}$, where two clonal cells are in the same subset if they have a sibling relationship. So to enumerate all relationship graphs, we can first enumerate all clonal partitions, and then enumerate the sibling partitions over each clonal partition.
+
+As an example, suppose that we have $n=4$ genotypes with the following relationships: $\geno_1$ and $\geno_3$ are clones, $\geno_1$ and $\geno_2$ are siblings, $\geno_2$ and $\geno_3$ are siblings, while $\geno_4$ is a stranger to all other genotypes. The corresponding clonal partition can be written as
+\begin{equation*}
+    \clc_1 = \{\geno_1,\geno_3\}, \qquad
+    \clc_2 = \{\geno_2\}, \qquad
+    \clc_3 = \{\geno_4\},
+\end{equation*}
+and the sibling partition is $\{\{\clc_1,\clc_2\}, \{\clc_3\}\}$.
+
+\subsection*{Enumerating clonal partitions}
+
+The function \texttt{enumerate\_CPs} enumerates all clonal partitions (CPs). Each clonal partition can be written as a membership vector $\clv=(q_1,\ldots,q_n)\in \{1,\ldots,n^{cl}\}^n$, which indicates that for each $i=1,\ldots,n$, the genotype $\geno_i$ belongs to $\clc_{q_i}$, the $q_i$-th clonal cell. In order to have a one-to-one correspondence between the membership vectors and the clonal partitions, we require that the first appearance of any positive integer $r$ in $\clv$ must come after the first appearances of $1, \ldots, r-1$. For the previous example, we have the membership vector $(1, 2, 1, 3)$. A complication about clonal partitions is the fact that genotypes from the same infection cannot belong to the same clonal cell. Let us denote the MOIs as $\moi_0, \ldots, \moi_k$.
+This restriction can can be expressed as
+\begin{align*}
+    q_d &\neq q_{d'} &&\text{ for any } 1\le d < d'\le \moi_{0} \text{ and}\\
+    q_{\moi_0+d} &\neq q_{\moi_0+d'} &&\text{ for any } 1\le d < d'\le \moi_{1}
+    \text{ and if } k>1 \\
+    q_{\moi_0+\ldots+\moi_{t-1}+d} &\neq q_{\moi_0+\ldots+\moi_{t-1}+d'}
+    &&\text{ for any } 1\le d < d'\le \moi_{t} \text{ when } t \geq 2.
+\end{align*}
+A strategy to enumerate all clonal partitions is to generate all valid membership vectors in lexicographical order. We first initialise $\clv$ according to
+\begin{align*}
+    q_d &= d &&\text{ for } d = 1, \ldots, \moi_0 \text{ and } \\
+    q_{\moi_0+d} &= d && \text{ for } d = 1, \ldots, \moi_1 \text{ and if } k > 1 \\
+    q_{\moi_0+\ldots+\moi_{t-1}+d} &= d
+     &&\text{ for } d = 1,\ldots,\moi_{t}
+    \text{ when } t \geq 2,
+\end{align*}
+which is lexicographically the smallest membership vector. Note that the first $\moi_0$ entries of $\clv$ are fixed due to the restrictions involved. Generating the next membership vector can be broken down into three steps: (i) identifying the shortest suffix that can be changed, (ii) changing the entries of the episode from which the suffix starts from, (iii) replace the remaining part of the suffix with the initial membership vector.
+
+We illustrate these steps with an example where $k=2$ recurrent episodes, $M_0=1$, $M_1=2$, and $M_2=1$. The initial membership vector is $\clv=(1,1,2,1)$. The shortest suffix that can be changed is to change the final $1$ to a $2$. In this iteration, steps (ii) and (iii) do not apply, and we get $\clv=(1,1,2,2)$. The following iteration follows the same logic, which gives $\clv=(1,1,2,3)$. In the next iteration, we cannot increase the $2$ nor the $3$, as there are no earlier appearances of those numbers. Step (i) identifies that we have to change the suffix $(1,2,3)$. Step (ii) changes the entries of the first recurrent episode to (2,1), whereas step (iii) replaces the remaining part of the suffix with the initial membership vector, i.e. replace the last entry with $1$. This results in $\clv=(1,2,1,1)$. The full list of membership vectors is
+\begin{equation*}
+    (1,1,2,1),(1,1,2,2),(1,1,2,3),(1,2,1,1),(1,2,1,2),(1,2,1,3),(1,2,3,1),(1,2,3,2),(1,2,3,3),(1,2,3,4).
+\end{equation*}
+
+Here are the steps in detail:
+\begin{enumerate}[label=(\roman*)]
+    \item To identify the appropriate suffix, we have to find the rightmost entry of $\clv$ that has an earlier appearance. This is where the suffix should begin. To find this entry efficiently, it helps to have a prefix maximum vector $\clv^* = (q^*_1,\ldots,q^*_n)$ where $q^*_1=0$ and $q^*_i = \max \{q_1,\ldots,q_{i-1}\}$ for $i=2,\ldots,n$. An interpretation of $\clv^*$ is that the numbers $1,\ldots,q^*_i$ have all appeared within the first $i-1$ entries of $\clv$. Thus, the largest $i$ for which $q_i\le q^*_i$ is the index where the suffix begins, as $q_i$ must have already appeared prior to index $i$, and so the value at index $i$ can be increased. Such an index $i$ fails to exist only when we reach the final membership vector (1,\ldots,n).
+
+    \item Suppose that we selected index $i$ in step (i), and that genotype $\geno_i$ belongs to episode $t$. We now have to update the entries at indices $i, i+1, \ldots, M_0+\ldots+M_t$, which cannot coincide with any earlier entries within episode $t$. Denote the set of disallowed values as $D=\{q_{M_0+\ldots+M_{t-1}+1}, \ldots, q_{i-1}\}$. We introduce a candidate value $c$, which is initialised to $q_i+1$, as the next membership vector we generate must be lexicographically greater. We repeatedly check whether the candidate value $c$ is in $D$. If $c\in D$, then we increment $c$ by one. Otherwise, we update the entry at index $i$ to $c$, increment $i$ by one, and add $c$ to the set $D$. This process terminates when all entries at indices $i, i+1, \ldots, M_0+\ldots+M_t$ have all been updated. There is one exception to the process, which is that after $q_i$ is updated, we modify $c$ to $1$, as $q_{i+1}$ should take the smallest possible value.
+
+    \item The remaining values of the suffix should take the smallest possible values, which coincide with the initial membership vector. We then store the membership vector, and update the prefix maximum vector using the recurrence relation $q^*_{i'+1} = \max(q^*_{i'},q_{i'})$ for $i'=i,i+1,\ldots,n-1$.
+\end{enumerate}
+
+\subsection*{Putting it together}
+
+Enumerating sibling partitions can be done by the `partitions::setparts' as they are simply the usual set partitions. This can be pre-computed so that we do not need to call the function repeatedly. Note that `partitions::setparts' also returns the partitions in a membership vector format. The `split' function converts the vector format to a partition format (list).
+
+\section*{Enumerating identity-by-descent partitions}
+
+
+The function \texttt{enumerate\_IPs\_RG} enumerates all identity-by-descent partitions (IPs) given a relationship graph (RG). The language of clonal and sibling partitions allows the restrictions on identity-by-descent (IBD) partitions to be easily stated: an IBD partition of a relationship graph is a partition over the cells of the clonal partition that must be finer than the sibling partition, and each sibling cell may only contain at most two IBD cells (this is only true because we ignore half siblings; otherwise, each sibling cell could contain up to three IBD cells).
+
+One way to compute $\mathbb{P}(\ip |\rg)$ is to enumerate all $\ip$ compatible with $\rg$ and consider each equally likely. By definition, all genotypes from the same clonal cell inherit the same allele. For each sibling cell, its clonal cells inherit from one of two parents (two by assumption; a more realistic model would allow for two or three parents, thereby accounting for half-siblings). So the number of IBD partitions over a sibling cell is $2^{\text{\# clonal cells in sibling cell}-1}$, all of which are equally likely. The $-1$ term comes from the fact that we divide $2^{\text{\# clonal cells in sibling cell}}$ by 2 because swapping the two parents results in the same IBD partition. We can apply this argument to each sibling cell to enumerate the IBD partitions over all genotypes (i.e., $2^{\text{\# clonal cells in first sibling cell} - 1}$ $\times$ $2^{\text{\# clonal cells in second sibling cell} - 1} \times \ldots$. $= 2^{\text{\# clonal cells }-\text{ \# sibling cells}}$)
+each having equal probability of $0.5^{\text{\# clonal cells }-\text{ \# sibling cells}}$.
+
+The function \texttt{enumerate\_IPs\_RG} uses a helper function \texttt{split\_two} to split each sibling cell of clonal cells into two IBD cells, or to keep the whole sibling cell as an IBD cell. The set of IBD partitions is then the Cartesian product over the splits of each sibling cell. The uniform (log) probability $\mathbb{P}(\ip |\rg)$ is accounted for by the \texttt{-length(ms)*log(n.IPs)} term in \texttt{RG\_inference}.
+
+Equivalently, an obsolete function \texttt{compute\_pr\_IP\_RG}, which was superseded by \texttt{enumerate\_IPs\_RG}, computed the probability of an IBD partition given a relationship graph based on a partition model is detailed below. % Hand-written explanation
+Note that both approaches are viable only because we assume the parasite population is entirely outbred. That is to say, we assume parasites have an infinitely large pool of parasite lineages to draw from, such that the probability of drawing the same lineage twice or more from the pool is zero. Strangers draw directly from the pool, thus have zero probability of being IBD; siblings draw from two parental lineages drawn from the pool, thus are IBD with probability 0.5; clones are copies of a single parental lineage drawn from the pool, thus are IBD with certainty.
+\begin{align}
+    \mathbb{P}(\ip|\rg)
+    &= \begin{cases}
+    \text{intra-cell probability if } |\ip| = 1,\\
+    \text{intra- and inter-cell probabilities multiplied if } 1 < |\ip| < \ngen,\\
+    \text{inter-cell probabilities multiplied if } |\ip| = \ngen,\\
+    \end{cases}
+\end{align}
+%
+where
+%
+\begin{align}
+    \text{inter-cell probability}
+    &= \begin{cases}
+    0 \text{ if there are any clonal edges in $\rg$ that connect cells of $\ip$}, \\
+    0 \text{ if three or more cells of $\ip$ are interconnected by sibling edges in $\rg$}, \\
+    0.5^{n_\text{pairs}} \text{ otherwise, where $n_\text{pairs}$ is the number of pairs of cells in $\ip$} \\
+    \text{that are connected by siblings in $\rg$},
+    \end{cases}
+    \\
+    \text{intra-cell probability}
+    &= \begin{cases}
+    0 \text{ if there are any strangers within the cell}, \\
+    1 \text{ if there are only clones within the cells}, \\
+    0.5^{n_\text{sibs}-1} \text{ otherwise, where $n_\text{sibs}$ is the number of siblings within the cell.}
+    \end{cases}
+\end{align}
+
+To see the equivalence between the two approaches, note that $n_\text{pairs}$ is the number of sibling cells that have been split into two IBD cells, which is equal to
+\begin{equation*}
+    n_\text{pairs} = \text{\# IBD cells}-\text{\# sibling cells}.
+\end{equation*}
+On the other hand, we have
+\begin{equation*}
+    n_\text{sibs} = \text{\# clonal cells in IBD cell}.
+\end{equation*}
+Assuming that the IBD partition is consistent with the relationship graph, multiplying the inter-cell probability with all intra-cell probabilities is equivalent to exponentiating $0.5$ with
+\begin{align*}
+n_\text{pairs} + \smashoperator{\sum_{\text{IBD cells}}} (n_\text{sibs} - 1)
+&=  \text{\# IBD cells}-\text{\# sibling cells} + \smashoperator{\sum_{\text{IBD cells}}} (\text{\# clonal cells in IBD cell}-1)\\
+&= \text{\# IBD cells}-\text{\# sibling cells} + \text{\# clonal cells}-\text{\# IBD cells}\\
+&= \text{\# clonal cells}-\text{\# sibling cells},
+\end{align*}
+which matches the expression $0.5^{\text{\# clonal cells} - \text{\# sibling cells}}$ from above.
+
+\end{document}
