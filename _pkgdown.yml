@@ -4,14 +4,12 @@ template:
   light-switch: true
 
 articles:
-- title: User documentation
+- title: Main
+  navbar: ~
   contents:
   - demonstrate-usage
   - articles/understand-posterior
   - intra-episode-siblings
-
-- title: Advanced documentation
-  contents:
   - articles/links-to-pdfs
   - articles/enumerate
 

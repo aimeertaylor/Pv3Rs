@@ -1,6 +1,6 @@
 ---
 title: "Understand posterior probabilities"
-description: "A detailed sequal to 'Demonstrate Pv3Rs usage'"
+description: "A detailed sequal to **Demonstrate Pv3Rs usage**"
 ---
   
 ```{r, include = FALSE}
