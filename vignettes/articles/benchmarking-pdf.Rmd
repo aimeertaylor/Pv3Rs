@@ -3,5 +3,5 @@ title: "Benchmarking Pv3Rs"
 description: blabla
 ---
 
-- [My PDF Vignette](articles/benchmarking.pdf)
+- [My PDF Vignette](benchmarking.pdf)
 
