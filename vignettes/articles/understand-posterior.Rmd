@@ -1,0 +1,1422 @@
+---
+title: "Understand posterior probabilities"
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%", # Line width taken up by plot
+  fig.dpi = 300, # For quality 
+  fig.width = 7, # Increase to zoom out
+  fig.height = 4, 
+  cache = FALSE
+  )
+```
+  
+```{r setup, include = FALSE} 
+library(Pv3Rs)
+options(warn = -1) # Suppress warnings about missing and limited data
+```
+
+```{r echo = FALSE}
+# Load data that are not exported with Pv3Rs: 
+load("../../DevFiles/RelationshipStudy/output_Cln.Str.Sib.rda") 
+load("../../DevFiles/RelationshipStudy/output_HalfSib.PCLikeSib.rda")
+```
+
+# Summary of contents
+
+This vignette is a detailed sequel to `vignette("demonstrate-usage", "Pv3Rs")`. 
+
+We start by documenting the output of `compute_posterior()` when the statistical
+model underpinning it is well specified but
+
+- [Data are missing](#missing)
+- [Data are uninformative](#uniformative)
+- [Data are limited to only one episode](#one-episode)
+- [Data are incomparable across episodes](#incomparable)
+- Data are limited to only [one marker](#one-marker) or [two markers](#two-markers)
+
+Given [data on many markers](#many-markers), 
+we then show under the well specified model how maximum probabilities of
+recrudescence and reinfection depend on
+
+- [Per-episode multiplicities of infections (MOIs)](#mois)
+- [Episode count](#epi-count) 
+- [Position of a recurrence in a sequence of episodes](#position)
+
+and thus comment on how the above dependencies impact the 
+[interpretation of uncertainty](#uncertainty) given probable but uncertain
+recrudescence and reinfection.
+
+Finally, we summarise results on the output of `compute_posterior()` when the
+model is misspecified because of
+
+- [Meiotic siblings](#meiotic)
+- [Half siblings](#half)
+- [Parent-child-like siblings](#parent-child-like)
+
+More detailed results on sibling misspecification can be found in the 
+[development files of the Pv3Rs source package](https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy). 
+
+We have not yet characterised model misspecification due to genotyping errors
+nor stranger parasites with elevated relatedness: 
+- Genotyping errors will likely cause misspecification of recrudescence as relapse
+and misspecification of relapse as reinfection.
+- Stranger parasites that are related insofar as the population is related on
+average are largely accounted for: Allele frequency estimates encode
+population-level average relatedness locus-by-locus
+([Mehra et al. 2025](https://doi.org/10.1093/g3journal/jkaf018)). 
+Allele frequency estimates are plugged into the statistical model underpinning
+Pv3Rs. Providing they are computed from a sample drawn from the parasite
+population from which trial participants also draw, there is no need to
+compensate further for population-level average relatedness locus-by-locus.
+However, strong inter-locus dependence (linkage disequilibrium) could generate
+overconfident posterior probabilities.
+- Stranger parasites that related due to population structure (e.g., proximity in
+space and time) will likely lead to the misclassification of
+reinfection as relapse / recrudescence. In our view, recurrence classification
+in the presence of population structure is best understood using complementary
+population-genetic and sensitivity analyses (e.g., identity-by-descent
+networks).
+
+```{r echo = FALSE}
+# get RG vertex labels, RGs, recurrence state sequences RGs are compatible with
+get_graph_dist <- function(x) { 
+  gs <- paste0("g", 1:sum(x)) # genotype names (graph vertices)
+  ts <- 1:length(x) # episode indices
+  ts_per_gs <- rep(ts, x) # episode index of each genotype
+  gs_per_ts <- split(gs, ts_per_gs) # genotypes grouped by episode
+  RGs <- suppressMessages(enumerate_RGs(x)) # all relationship graphs
+  CIL_gvn_RGs <- sapply(RGs, Pv3Rs:::compatible_rstrs, gs_per_ts) # compatible states
+  return(list(gs = gs, RGs = RGs, CIL_gvn_RGs = CIL_gvn_RGs))
+}
+```
+
+
+# Missing data {#missing}
+
+When data are entirely missing, `compute_posterior()` returns the prior. 
+
+```{r}
+fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
+y = list(enrol = list(m1 = NA), recur = list(m1 = NA)) # Missing data
+suppressMessages(compute_posterior(y, fs))$marg # Posterior
+```
+
+When data are missing but the user provides MOIs that are incompatible with
+recrudescence, `compute_posterior()` returns the prior re-weighted to the
+exclusion of recrudescence.
+
+```{r}
+suppressMessages(compute_posterior(y, fs, MOIs = c(1,2)))$marg 
+```
+
+# Uniformative data {#uniformative}
+
+When data are uninformative because there is no genetic diversity,
+`compute_posterior()` returns the prior.
+
+```{r}
+fs = list(m1 = c("A" = 1)) # Unit allele frequency: no genetic diversity
+y = list(list(m1 = "A"), recur = list(m1 = "A")) # Data the only viable allele
+suppressMessages(compute_posterior(y, fs))$marg # Posterior
+```
+
+# Data on only one episode {#one-episode}
+
+## Homoallelic data without user-specified MOIs: prior return
+
+When only one episode has homoallelic data and the user does not specify an MOI
+> 1, `compute_posterior()` returns the prior.
+
+```{r}
+fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
+y <- list(enrol = list(m1 = NA), recur1 = list(m1 = "A")) # No enrolment data
+suppressMessages(compute_posterior(y, fs))$marg # Posterior
+```
+
+## Heteroallelic data: prior proximity
+
+When only one episode has heteroallelic data, the MOI under the model
+necessarily exceeds one because the model assumes there are no false alleles.
+The posterior is close to the prior but not equal to it because the data are
+slightly informative: for relationship graphs with intra-episode siblings,
+heteroallelic data limit summation over identity-by-descent partitions to
+partitions with at least two cells for the episode with data. The lower bound on
+the cell count increases with the number of distinct alleles observed.
+
+```{r}
+# Allele frequencies 
+fs = list(m1 = c('A' = 0.25, 'B' = 0.25, 'C' = 0.25, 'D' = 0.25)) 
+
+# MOI at enrolment increases with number of observed alleles:  
+yMOI2 <- list(enrol = list(m1 = c('A','B')), recur = list(m1 = NA))
+yMOI3 <- list(enrol = list(m1 = c('A','B','C')), recur = list(m1 = NA))
+yMOI4 <- list(enrol = list(m1 = c('A','B','C','D')), recur = list(m1 = NA))
+ys <- list(yMOI2, yMOI3, yMOI4)
+do.call(rbind, lapply(ys, function(y) {
+  suppressMessages(compute_posterior(y, fs))$marg
+})) 
+
+# MOI increases with external input:
+MOIs <- list(c(2,1), c(2,2), c(3,2)) # user-specified MOIs
+y <- list(enrol = list(m1 = c('A','B')), recur = list(m1 = NA)) # Data 
+do.call(rbind, lapply(MOIs, function(x) {
+  suppressMessages(compute_posterior(y, fs, MOIs = x))$marg
+})) 
+```
+
+## Rare homoallelic data with user-specified MOIs exceeding 1: prior departure 
+
+If the data are homoallelic, but the user specifies MOIs greater than one, and
+the observed allele is rare, the posterior departs from the prior because rare
+intra-episode allelic repeats are more probable given relationship graphs with
+intra-episode relatedness.
+
+```{r}
+y <- list(enrol = list(m1 = 'A'), list(m1 = NA)) # Homoallelic data
+MOIs <- list(c(2,1), c(3,2), c(5,1)) # Different MOIs with first MOI > 1
+fs = list(m1 = c("A" = 0.01, "B" = 0.99)) # Rare observed allele
+```
+
+```{r echo = FALSE}
+# ------------------------------------------------------------------------------
+# Compute posterior 
+# ------------------------------------------------------------------------------
+posterior <- do.call(rbind, lapply(MOIs, function(x) # Posterior 
+  suppressMessages(compute_posterior(y, fs, MOIs = x))$marg))
+
+# ------------------------------------------------------------------------------
+# Approximate posterior using graphs only
+# ------------------------------------------------------------------------------
+approximation <- sapply(1:length(MOIs), FUN = function(i) {
+  
+  gd <- get_graph_dist(MOIs[[i]])
+  RGs_C <- sapply(gd$CIL_gvn_RGs, function(RG) "C" %in% RG)
+  RGs_I <- sapply(gd$CIL_gvn_RGs, function(RG) "I" %in% RG)
+  
+  # Identify RGs with intra-episode relatedness for the initial episode
+  if(identical(MOIs[[i]], c(1,1))) { # Monoclonal case is trivial
+    RGs_edges_first <- rep(TRUE, length(gd$RGs)) 
+  } else { # Make adjacency matrix for the first episode
+    MOI1 <- MOIs[[i]][1]; gs1 <- gd$gs[1:MOI1]
+    mat <- array(1, dim = c(MOI1, MOI1), dimnames = list(gs1, gs1))
+    graph <- igraph::graph_from_adjacency_matrix(mat, diag=F, mode="undirected")
+    edges_first <- igraph::as_ids(igraph::E(graph)) # Edges of first episode
+    RGs_edges <- lapply(gd$RGs, function(RG) igraph::as_ids(igraph::E(RG))) 
+    RGs_edges_first <- sapply(RGs_edges, function(x) all(edges_first %in% x))
+  }
+  
+  approx_unnormalised <- c(C = sum(RGs_edges_first*RGs_C)/sum(RGs_C),
+                           L = sum(RGs_edges_first)/length(gd$RGs),
+                           I = sum(RGs_edges_first*RGs_I)/sum(RGs_I))
+  approx <- approx_unnormalised/sum(approx_unnormalised)
+})
+
+#-------------------------------------------------------------------------------
+# Plot probabilities
+#-------------------------------------------------------------------------------
+par(mar = c(0,0,0,0))
+plot_simplex(p.coords = posterior, pch = 20, cex = 1, col = 1:length(MOIs))
+xy <- apply(approximation, 2, project2D) # Project probabilities and plot:
+points(x = xy["x", ], y = xy["y", ], col = 1:length(MOIs), cex = 2)
+legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
+       legend = c(
+         "Posterior approximation 
+based on summation over 
+prior probabilities of
+graphs with only 
+siblings in the 
+first episode",
+"Posterior probability"))
+legend("right", col = 1:length(MOIs), pch = 20, bty = "n", inset = 0.2,
+       legend = sapply(MOIs, paste, collapse = " & "), title = "MOIs")
+```
+
+The per-graph likelihood is only appreciable for relationship graphs where all
+distinct parasite genotypes in the first episode are siblings
+
+```{r echo = FALSE}
+# ------------------------------------------------------------------------------
+# Maximum likelihood graphs for illustrative case with MOIs 3 & 2
+# ------------------------------------------------------------------------------
+# Classify graphs
+gd <- get_graph_dist(c(3,2))
+gs <- gd$gs[1:3] # genotypes in the 1st episode
+mat <- array(1, dim = c(3,3), dimnames = list(gs, gs)) # matrix for the 1st
+graph <- igraph::graph_from_adjacency_matrix(mat, diag = F, mode = "undirected")
+edges_1st <- igraph::as_ids(igraph::E(graph)) # Edges of the first episode 
+RGs_edges <- lapply(gd$RGs, function(RG) igraph::as_ids(igraph::E(RG)))
+RGs_edges_1st <- sapply(RGs_edges, function(RG_E) all(edges_1st %in% RG_E))
+RGs_no_edges_1st <- sapply(RGs_edges, function(RG_E) all(!edges_1st %in% RG_E))
+
+# Get graph log likelihoods
+post <- suppressMessages(compute_posterior(y, fs, MOIs = c(3,2), return.logp=T))
+llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
+llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
+
+# Plot log likelihoods by graph classification
+plot(llikes_sorted$x, pch = 20, cex = 0.5, col = "hotpink", bty = "n",
+     ylab = "Log-likelihood", xlab = "Relationship Graphs for MOIs 3 & 2")
+points(y = llikes_sorted$x[RGs_edges_1st[llikes_sorted$ix]], col = "black",
+       x = which(RGs_edges_1st[llikes_sorted$ix]), pch = 20, cex  = 0.5)
+points(y = llikes_sorted$x[RGs_no_edges_1st[llikes_sorted$ix]], col="lightgray",
+       x = which(RGs_no_edges_1st[llikes_sorted$ix]), pch = 20, cex  = 0.5)
+legend("topleft", pch = 20, bty= "n", col = c("black", "hotpink", "lightgray"), 
+       legend = c("Graphs with only siblings within the first episode",
+                  "Graphs with some siblings in the first episode",
+                  "Graphs with no siblings in the first episode"))
+```
+
+# Data are incomparable across episodes {#incomparable}
+
+When there are data on multiple episodes but no common markers across episodes,
+`compute_posterior()` behaves similarly to when data are limited to one episode:
+
+- it returns the prior when data are homoallelic without user-specified MOIs > 1, 
+- its output remains close to the prior when data are heteroallelic,
+- its output departs from the prior when data are homoallelic and rare with user-specified MOIs > 1.
+
+```{r}
+# Allele frequencies
+fs = list(m1 = c("A" = 0.01, "B" = 0.99), 
+          m2 = c("A" = 0.01, "B" = 0.99)) 
+
+# Data with an incomparable homoallelic call
+y_hom <- list(enrol = list(m1 = "A", m2 = NA), 
+              recur = list(m1 = NA, m2 = "A"))
+
+# Data with an incomparable heteroallelic call
+y_het <- list(enrol = list(m1 = c("A", "B"), m2 = NA), 
+              recur = list(m1 = NA, m2 = c("A", "B")))
+
+suppressMessages(compute_posterior(y_hom,fs))$marg # Prior return 
+suppressMessages(compute_posterior(y_het,fs))$marg # Prior proximity
+suppressMessages(compute_posterior(y_hom,fs,MOIs=c(2,2)))$marg # Prior departure
+```
+
+# Data on only one marker {#one-marker}
+
+Given data on only one marker, the output of `compute_posterior()` depends on
+the observation type and the frequencies of the observed alleles:
+
+- A rare match is informative: it quashes the posterior probability of 
+reinfection.
+- A partial rare match is informative: it quashes the posterior probability of 
+reinfection.
+- A match with a common allele is not very informative: all states are possible 
+*a posteriori*.
+- A partial match with a common allele is not very informative: all states are 
+possible *a posteriori*.
+- A mismatch is informative: it quashes the posterior probability of recrudescence. 
+
+The latter demonstrates the sensitivity of recrudescence inference to the
+assumption under the model that there are no genotyping errors: if a genotyping
+error generates a single  mismatch, the posterior probability of recrudescence
+is quashed.
+
+```{r echo=FALSE}
+# Allele frequencies
+fs_rare <- list(m1 = c("A" = 0.01, "B" = 0.99)) # rare A
+fs_comn <- list(m1 = c("A" = 0.6, "B" = 0.4)) # common A
+
+# Data 
+match <- list(enrol = list(m1 = "A"), list(m1 = "A"))
+mismatch <- list(enrol = list(m1 = c("A")), list(m1 = "B"))
+parmatch <- list(enrol = list(m1 = c("A", "B")), list(m1 = "A"))
+
+# Compute posterior probabilities, extract marginal probabilities, and name
+posteriors <- rbind(suppressMessages(compute_posterior(match, fs_rare))$marg, 
+                    suppressMessages(compute_posterior(match, fs_comn))$marg, 
+                    suppressMessages(compute_posterior(mismatch, fs_comn))$marg,
+                    suppressMessages(compute_posterior(parmatch, fs_comn))$marg,
+                    suppressMessages(compute_posterior(parmatch, fs_rare))$marg)
+
+# Plot per-recurrence probabilities on the simplex
+par(mar = c(0,0,0,0))
+plot_simplex(p.coords = posteriors, pch = 20, p.labels.cex = 0.75, 
+             p.labels = c("rare match", "common match", "mismatch", 
+                          "partial common match", "partial rare match")) 
+```
+
+# Data on only two markers {#two-markers}
+
+Adding a second consistent observation generally strengthens inference  (see
+arrows in or entering regions of probability > 0.5). An exception is adding a
+common match to a common partial match, which adds little information (central
+arrow). When a mismatch is added to a rare match (diamond), relapse becomes the
+most probable state. This illustrates the multiple-marker requirement of relapse
+inference. 
+
+
+```{r echo=FALSE}
+# Allele frequencies
+fs_rare <- list(m1 = c("A" = 0.01, "B" = 0.99), m2 = c("A" = 0.01, "B" = 0.99))
+fs_comn <- list(m1 = c("A" = 0.6, "B" = 0.4), m2 = c("A" = 0.6, "B" = 0.4)) 
+
+A_A <- list(m1 = "A", m2 = "A")
+B_B <- list(m1 = "B", m2 = "B")
+A_B <- list(m1 = "A", m2 = "B")
+AB_A <- list(m1 = c("A", "B"), m2 = "A")
+
+# Data 
+match <- list(enrol = A_A, A_A)
+mismatch <- list(enrol = A_A, B_B)
+parmatch <- list(enrol = AB_A, A_A)
+match_mismatch <- list(enrol = A_A, A_B)
+
+# Compute match + mismatch and plot
+par(mar = c(0,0,0,0))
+plot_simplex(p.coords = suppressMessages(compute_posterior(match_mismatch, fs_rare))$mar, 
+             p.labels = "rare match + mismatch", p.labels.cex = 0.75, pch = 18)
+
+# Update probabilities, extract marginal probabilities, and plot as arrows 
+posteriors_upd <- rbind(suppressMessages(compute_posterior(match, fs_rare))$marg, 
+                        suppressMessages(compute_posterior(match, fs_comn))$marg, 
+                        suppressMessages(compute_posterior(mismatch, fs_comn))$marg,
+                        suppressMessages(compute_posterior(parmatch, fs_comn))$marg,
+                        suppressMessages(compute_posterior(parmatch, fs_rare))$marg)
+
+# Plot reinforced probabilities as arrows
+xy_old <- apply(posteriors, 1, project2D) # Project probabilities
+xy_upd <- apply(posteriors_upd, 1, project2D) # Project probabilities
+arrows(x0 = xy_old["x", ], y0 = xy_old["y", ], 
+       x1 = xy_upd["x", ], y1 = xy_upd["y", ], length = 0.08, lwd = 2)
+
+# Annotate 
+labels <- c("rare match + rare match", "common match + common match", 
+            "mismatch + mismatch", "partial common match + common match", 
+            "partial rare match + rare match")
+text(x = xy_upd["x", ], y = xy_upd["y", ], pos = c(4,4,3,4,4), cex = 0.75, labels) 
+```
+
+# Data on many markers {#many-markers}
+
+Given non-zero prior probabilities, as the data increase with the number of
+markers, posterior probabilities for a given recurrence under the well specified
+model converge to either
+
+1) Relapse with posterior probability one when the data suggest the episode of
+interest is linked to previous episodes by regular sibling relationships
+
+2) Recrudescence with posterior probability less than one when the data suggest
+the episode of interest is linked to the directly preceding episode by clonal
+relationships
+
+3) Reinfection with posterior probability less than one when the data suggest
+the episode or interest is not linked to previous episodes by regular sibling or
+clonal relationships
+
+Recrudescence / reinfection probabilities necessarily converge to uncertain
+values because genetic data compatible with recrudescence / reinfection are also
+compatible with relapse. 
+
+## Posterior bounds 
+
+Because we assume *a priori* that relationship graphs compatible with a given
+recurrence state sequence are uniformly distributed, and because relationship
+graphs compatible with sequences of recrudescence / reinfection are a subset of
+those compatible with sequences of relapse, prior-induced bounds on
+non-marginal posterior probabilities can be computed *a priori* as a function of
+the prior on the recurrence state sequences and the prior on the relationship
+graphs; see 
+[Understand graph prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html).
+
+Because the probability mass function of a uniformly distributed discrete random
+variable depends on the size of its support, the prior on uniformly distributed
+graphs (and resulting prior-induced posterior bounds) depends on the size of the
+graph space. The size of this space is determined by the size of the graphs it
+contains, which have as many vertices as there are parasite genotypes within and
+across episodes. As such, graph size depends on the number of episodes and the
+per-episode MOIs, which vary across trial participants.
+
+Using rare matched and mismatched data on 100 markers, we illustrate how
+prior-induced posterior bounds for a single recurrence depend on per-episode
+MOIs. We also demonstrate how maximum marginal probabilities of recrudescence /
+relapse depend on episode counts by adding recurrences with no recurrent data.
+However, these maxima rely on knowing that recurrent data are absent for all but
+the first recurrence and thus are not computable *a priori*.
+
+We start by defining some variables that will be used repeatedly in the
+following code chunks.
+
+```{r}
+marker_count <- 100 # Number of markers
+ms <- paste0("m", 1:marker_count) # Marker names 
+all_As <- sapply(ms, function(t) "A", simplify = F) # As for all markers
+all_Bs <- sapply(ms, function(t) "B", simplify = F) # Bs for all markers
+no_data <- sapply(ms, function(t) NA, simplify = F) # NAs for all markers
+fA <- 0.01 # Frequency of rare allele
+fB <- 1 - fA # Frequency of common allele
+fs <- sapply(ms, function(m) c("A"=fA, "B"=fB), simplify = FALSE) # Frequencies
+```
+
+## Increasing per-episode MOIs {#mois}
+
+```{r}
+MOIs <- list(c(1,1), c(2,1), c(2,2)) 
+y_match <- list(enrol = all_As, recur = all_As)
+y_mismatch <- list(enrol = all_As, recur = all_Bs)
+```
+
+```{r echo = FALSE}
+# Assuming recurrence state sequences are equally likely a priori
+results_match <- sapply(MOIs, function(x) 
+  suppressMessages(compute_posterior(y = y_match, fs, MOIs = x)$marg))
+results_mismatch <- sapply(MOIs, function(x) 
+  suppressMessages(compute_posterior(y = y_mismatch, fs, MOIs = x)$marg))
+```
+
+```{r echo = FALSE}
+#------------------------------------------------------------------------------
+# Upper posterior bounds
+#------------------------------------------------------------------------------
+maxima <- lapply(1:length(MOIs), FUN = function(i) {
+  gd <- get_graph_dist(MOIs[[i]])
+  RGs_I <- sapply(gd$CIL_gvn_RGs, function(RG) "I" %in% RG)
+  RGs_C <- sapply(gd$CIL_gvn_RGs, function(RG) "C" %in% RG)
+  num_RGs_C <- sum(RGs_C)
+  num_RGs_I <- sum(RGs_I)
+  num_RGs_L <- length(gd$RGs)
+  x_match <- c(C = 1, L = num_RGs_C/num_RGs_L, I = 0)
+  x_mismatch <- c(C = 0, L = 1/num_RGs_L, I = 1/num_RGs_I)
+  approx <- rbind(x_match/sum(x_match), x_mismatch/sum(x_mismatch))
+})
+
+#------------------------------------------------------------------------------
+# Plot probabilities
+#------------------------------------------------------------------------------
+par(mar = c(0,0,0,0)) # Visualise the change 
+plot_simplex() # Plot simplex
+
+# Match probabilities
+xy <- apply(results_match, 2, project2D) # Project 
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(MOIs)) # Plot 
+text(x = median(xy["x", ]), y = mean(xy["y", ]), 
+     labels = "match data", pos = 2, offset = 1) # Annotate
+
+# Mismatch probabilities
+xy <- apply(results_mismatch, 2, project2D) # Project 
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(MOIs)) # Plot 
+text(x = sum(range(xy["x", ]))/2, y = mean(xy["y", ]), 
+     labels = "mismatch data", pos = 3, offset = 1) # Annotate
+
+# Maxima
+xys <- lapply(maxima, function(x) apply(x, 1, project2D)) # Project
+for(i in 1:length(xys)) {
+  xy <- xys[[i]]
+  points(x = xy["x", ], y = xy["y", ], col = i, cex = 2) # Plot
+}
+
+# Add legends
+legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0,
+       legend = c("Bound induced by prior", "Posterior probability"))
+legend("right", pch = 20, pt.cex = 2, bty = "n", inset = 0.2,col=1:length(MOIs), 
+       legend = gsub("c", "", as.character(MOIs)), title = "MOIs") # legend
+```
+
+The posterior probabilities increase with increasing graph size, but only if the
+MOIs are balanced in the case of recrudescence.
+
+
+### Digression: counts of intra-episode siblings 
+
+To increase per-episode MOIs, we can do as above and increase user-specified
+MOIs without changing the data, or we can increase the allelic diversity of the
+data, s.t. MOIs modelled under Pv3Rs increase without user-specified MOIs.
+Either way, we get the same maximum probabilitie, but the graph likelihoods
+change:
+
+```{r, echo = FALSE, include = FALSE}
+all_ACs <- sapply(ms, function(t) c("A", "C"), simplify = F) 
+all_BEs <- sapply(ms, function(t) c("B", "E"), simplify = F) 
+all_ACDs <- sapply(ms, function(t) c("A", "C", "D"), simplify = F)  
+fs <- sapply(ms, function(m) c("A" = 0.01, "B" = 0.01, "C" = 0.01, 
+                               "D" = 0.01, "E" = 0.96), simplify = FALSE)
+
+hom_match_data <- list(enrol = all_As, hom_match_data = all_As)
+het_match_data <- list(enrol = all_ACDs, het_match_data = all_ACs)
+hom_mismatch_data <- list(enrol = all_As, hom_mismatch_data = all_Bs)
+het_mismatch_data <- list(enrol = all_ACDs, het_mismatch_data = all_BEs)
+
+rbind(suppressMessages(compute_posterior(hom_match_data, fs, MOIs = c(3,2))$marg), 
+      suppressMessages(compute_posterior(het_match_data, fs)$marg), 
+      suppressMessages(compute_posterior(hom_mismatch_data, fs, MOIs = c(3,2))$marg),
+      suppressMessages(compute_posterior(het_mismatch_data, fs)$marg))
+```
+
+
+```{r echo = FALSE}
+# Classify graphs by state
+MOIs <- c(3,2)
+gd <- get_graph_dist(MOIs)
+RGs_not_I <- sapply(gd$CIL_gvn_RGs, function(CIL_gvn_RG) !("I" %in% CIL_gvn_RG))
+RGs_C <- sapply(gd$CIL_gvn_RGs, function(CIL_gvn_RG) "C" %in% CIL_gvn_RG)
+RGs_edges <- lapply(gd$RGs, function(RG) igraph::as_ids(igraph::E(RG)))
+
+# Make a vector of intra-infection edges by first creating a block diag. matrix
+mat <- Matrix::bdiag(lapply(MOIs, function(x) matrix(1, ncol=x, nrow=x)))
+colnames(mat) <- gd$gs; rownames(mat) <- gd$gs
+graph <- igraph::graph_from_adjacency_matrix(mat, diag = F, mode = "undirected")
+edges_within <- igraph::as_ids(igraph::E(graph))
+allRGs_edges_within <- sapply(RGs_edges, function(x) all(edges_within %in% x))
+noRGs_edges_within <- sapply(RGs_edges, function(x) !any(edges_within %in% x))
+
+# Get graph log likelihoods for monoclonal data with user-specified MOIs
+y <- hom_match_data
+post <- suppressMessages(compute_posterior(y, fs, MOIs = MOIs, return.logp = T))
+llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
+llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
+
+# Plot log likelihoods by graph classification
+plot(llikes_sorted$x, pch = 20, col = "lightgray", bty = "n", ylim = c(-2500, -500), 
+     ylab = "Log-likelihood", xlab = "Relationship Graphs")
+points(y = llikes_sorted$x[(RGs_C & allRGs_edges_within)[llikes_sorted$ix]], 
+       x = which((RGs_C & allRGs_edges_within)[llikes_sorted$ix]), 
+       col = "black", pch = 20)
+legend("topleft", pch = 20, bty= "n", cex = 0.75, col = c("black", "lightgray"), 
+       legend = c("Graphs with intra-episode siblings and inter-episode clones",
+                  "All other graphs"))
+title(main = sprintf("Homoallelic data with user-specified MOIs 3 and 2: \n recrudescence with probability %s", 
+                     round(post$marg[,"C"],4)))
+
+# Get graph log likelihoods for polyclonal data without user-specified MOIs
+y <- het_match_data
+post <- suppressMessages(compute_posterior(y, fs, return.logp=T))
+llikes <- sapply(post$RGs, function(RG) RG$logp) # Extract log likelihoods
+llikes_sorted <- sort.int(llikes, index.return = T) # Sort log likelihoods
+
+# Plot log likelihoods by graph classification
+plot(llikes_sorted$x, pch = 20, col = "lightgray", bty = "n", ylim = c(-2500, -500), 
+     ylab = "Log-likelihood", xlab = "Relationship Graphs")
+points(y = llikes_sorted$x[(RGs_C & noRGs_edges_within)[llikes_sorted$ix]], 
+       x = which((RGs_C & noRGs_edges_within)[llikes_sorted$ix]), 
+       col = "black", pch = 20)
+legend("topleft", pch = 20, bty= "n", cex = 0.75, col = c("black", "lightgray"), 
+       legend = c("Graphs with intra-episode strangers and inter-episode clones",
+                  "All other graphs"))
+title(main = sprintf("Heteroallelic data with max. marker diversity 3 and 2: \n recrudescence with probability %s", 
+                     round(post$marg[,"C"],4)))
+```
+
+For the homoallelic data with elevated user-specified MOIs, all intra-episode
+parasites in maximum likelihood graphs are siblings. For the heteroallelic data,
+all intra-episode parasites in maximum likelihood graphs are strangers. 
+
+One upshot of this is that maximum probabilities could be arbitrarily increased
+by increasing counts of intra-episode siblings. Since siblings are not
+independent, these maxima arguably should not increase beyond two siblings per
+episode. Under the Pv3Rs model with realistic MOI estimates, groups of three or
+more siblings are effectively treated as pairs; see
+`vignette("intra-episode-siblings", "Pv3Rs")`.
+
+END OF DIGRESSION
+
+## Increasing episode counts {#epi-count}
+
+Recurrences can be added without adding data
+
+```{r}
+ys_match <- list("1_recurrence" = list(enrol = all_As, 
+                                       recur1 = all_As),
+                 "2_recurrence" = list(enrol = all_As, 
+                                       recur1 = all_As,
+                                       recur2 = no_data),
+                 "3_recurrence" = list(enrol = all_As, 
+                                       recur1 = all_As,
+                                       recur2 = no_data,
+                                       recur3 = no_data))
+
+ys_mismatch <- list("1_recurrence" = list(enrol = all_As, 
+                                          recur1 = all_Bs),
+                    "2_recurrence" = list(enrol = all_As, 
+                                          recur1 = all_Bs,
+                                          recur2 = no_data),
+                    "3_recurrence" = list(enrol = all_As, 
+                                          recur1 = all_Bs,
+                                          recur2 = no_data,
+                                          recur3 = no_data))
+```
+
+```{r echo = FALSE}
+# ------------------------------------------------------------------------------
+# Posterior based on model
+# ------------------------------------------------------------------------------
+results_match <- lapply(ys_match, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+results_mismatch <- lapply(ys_mismatch, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+```
+
+```{r echo = FALSE}
+# Extract results for the first recurrence
+results_match_recur1 <- sapply(results_match, function(x) x["recur1",])
+results_mismatch_recur1 <- sapply(results_mismatch, function(x) x["recur1",])
+
+# ------------------------------------------------------------------------------
+# Posterior maximum based on prior plus knowledge that all but the first
+# recurrence has data
+# ------------------------------------------------------------------------------
+MOIs <- lapply(ys_mismatch, determine_MOIs) # MOIs, same for match and mismatch 
+maxima <- lapply(1:length(MOIs), FUN = function(i) {
+  
+  # Get graphs and the state sequence compatibilities
+  gd <- get_graph_dist(MOIs[[i]])
+  
+  # Recurrent state sequence strings 
+  sqstr <- unique(unlist(gd$CIL_gvn_RGs)) 
+  sqchr <- do.call(cbind, sapply(sqstr, function(x) strsplit(x, split = "")))
+  sqstr_C_1st <- sqstr[which(sqchr[1,] == "C")] 
+  sqstr_I_1st <- sqstr[which(sqchr[1,] == "I")] 
+  
+  # Graphs compatible with first episode recrudescence / reinfection 
+  RGs_C_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_C_1st %in% x))
+  RGs_I_1st <- sapply(gd$CIL_gvn_RGs, function(x) any(sqstr_I_1st %in% x))
+  
+  # Numbers of graphs compatible with each recurrence state sequence
+  num_comp <- sapply(sqstr, function(seq) { # All graphs
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x))})
+  num_comp_RGs_I_1st <- sapply(sqstr, function(seq) { # With reinfection 1st
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_I_1st)})
+  num_comp_RGs_C_1st <- sapply(sqstr, function(seq) { # With recrudesc. 1st 
+    sum(sapply(gd$CIL_gvn_RGs, function(x) seq %in% x)*RGs_C_1st)})
+  
+  # Joint probabilities unnormalised and normalised
+  joint_match_un <- num_comp_RGs_C_1st / num_comp # Odds 
+  joint_mismatch_un <- num_comp_RGs_I_1st / num_comp
+  joint_match <- joint_match_un/sum(joint_match_un)
+  joint_mismatch <- joint_mismatch_un/sum(joint_mismatch_un)
+  
+  # Marginal probabilities
+  C_match <- sum(joint_match[sqstr_C_1st])
+  I_mismatch <- sum(joint_mismatch[sqstr_I_1st])
+  approx <- rbind(c(C = C_match, L = 1 - C_match, I = 0), 
+                  c(C = 0, L = 1 - I_mismatch, I = I_mismatch))
+})
+```
+
+The marginal probability that the first recurrence is a recrudescence /
+reinfection depends on the total number of recurrences: 
+
+```{r echo = FALSE}
+# ------------------------------------------------------------------------------
+# Plot probabilities
+# ------------------------------------------------------------------------------
+par(mar = c(0,0,0,0))
+plot_simplex() # Plot simplex
+
+# Match probabilities
+xy <- apply(results_match_recur1, 2, project2D) 
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(ys_match)) 
+text(mean(xy["x", ]), mean(xy["y", ]), "match data", pos = 3, offset = 1) 
+
+# Mismatch probabilities
+xy <- apply(results_mismatch_recur1, 2, project2D) 
+points(x = xy["x", ], y = xy["y", ], pch = 20, col = 1:length(ys_mismatch)) 
+text(mean(xy["x", ]), mean(xy["y", ]), "mismatch data", pos = 3, offset = 1) 
+
+# Maxima
+xys <- lapply(maxima, function(x) apply(x, 1, project2D)) 
+for(i in 1:length(xys)) {
+  xy <- xys[[i]]
+  points(x = xy["x", ], y = xy["y", ], col = i, cex = 2) 
+}
+
+legend("left", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
+       legend = c(
+         "Maximum probability based on
+knowledge that all but the 
+first recurrence has data 
+and that all episodes 
+are monoclonal", 
+         "Posterior probability"))
+legend("right", col = c(1:length(xys)), pch = "-", pt.cex = 2, bty = "n", inset = 0.2, 
+       legend = c(1,2,3), title = "Recurrence\ncount") 
+```
+
+An example of how recrudescence probabilities converge to their maxima over 1,
+2, 5 and 100 markers:
+
+```{r, echo = F}
+ms <- paste0("m", 1:100)
+fm <- c("A" = 0.6, "B" = 0.4)
+fs <- sapply(ms, function(m) fm, simplify = F)
+A100 <- sapply(ms, function(m) "A", simplify = F)
+NA100 <- sapply(ms, function(m) NA, simplify = F)
+
+# Data on all 100 markers
+ys100 <- list("1_recurrence" = list(enrol = A100,
+                                    recur1 = A100),
+              "2_recurrence" = list(enrol = A100,
+                                    recur1 = A100,
+                                    recur2 = NA100),
+              "3_recurrence" = list(enrol = A100,
+                                    recur1 = A100,
+                                    recur2 = NA100,
+                                    recur3 = NA100))
+
+# Down-sampled data on only first 5, 2 and 1 markers
+ys5 <- sapply(ys100, function(y) sapply(y, function(x) x[1:5], simplify = F))
+ys2 <- sapply(ys100, function(y) sapply(y, function(x) x[1:2], simplify = F))
+ys1 <- sapply(ys100, function(y) sapply(y, function(x) x[1], simplify = F))
+
+# Compute posterior
+p1 <- sapply(ys1, function(y) suppressMessages(compute_posterior(y = y, fs))$marg["recur1",])
+p2 <- sapply(ys2, function(y) suppressMessages(compute_posterior(y = y, fs))$marg["recur1",])
+p5 <- sapply(ys5, function(y) suppressMessages(compute_posterior(y = y, fs))$marg["recur1",])
+p100 <- sapply(ys100, function(y) suppressMessages(compute_posterior(y = y, fs))$marg["recur1",])
+
+# Visualise the change in the marginal probability of the first recurrence
+par(mar = c(0,0,0,0))
+plot_simplex() # Plot simplex
+xy1 <- apply(p1, 2, project2D) # Project probabilities
+xy2 <- apply(p2, 2, project2D) # Project probabilities
+xy5 <- apply(p5, 2, project2D) # Project probabilities
+xy100 <- apply(p100, 2, project2D) # Project probabilities
+points(x = xy1["x", ], y = xy1["y", ], pch = 20, cex = 1, col = 1:3) # Plot
+points(x = xy2["x", ], y = xy2["y", ], pch = 20, cex = 1, col = 1:3) # Plot
+points(x = xy5["x", ], y = xy5["y", ], pch = 20, cex = 1, col = 1:3) # Plot
+points(x = xy100["x", ], y = xy100["y", ], pch = 20, cex = 1, col = 1:6) # Plot
+legend("left", legend = 1:3, title = "Number of recurrences", fill = 1:3,
+       bty = "n")
+```
+
+Recall that the above maxima are not bounds imposed by the prior: they are based
+on knowledge that there are no recurrent data on all but the first recurrence; 
+see 
+[Understand graph prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html).
+
+## Position in a sequence {#position}
+
+Because the distribution over relationship graphs is not invariant to different
+orderings of states in a sequence (more graphs are compatible with a reinfection
+at the beginning versus the end of a sequence of three episodes, for example),
+the position of a recurrence in a sequence affects its per-recurrence posterior
+probability. These examples also highlight why, under a well-specified model,
+jointly modelling data across more than two episodes is preferable to analysing
+episodes pairwise.
+
+The effect of position is negligible when all episodes have the same data on
+many markers:
+
+```{r}
+y <- list(enrol = all_As, 
+          recur1 = all_As, 
+          recur2 = all_As, 
+          recur3 = all_As)
+suppressMessages(compute_posterior(y, fs))$marg
+```
+
+Instead, consider sequences of episodes with observations (Os) and episodes with
+no data (Ns):
+
+```{r}
+ys_match <- list("NOO" = list(enrol = no_data, 
+                              recur1 = all_As,
+                              recur2 = all_As),
+                 "ONO" = list(enrol = all_As, 
+                              recur1 = no_data,
+                              recur2 = all_As),
+                 "OON" = list(enrol = all_As, 
+                              recur1 = all_As,
+                              recur2 = no_data))
+
+ys_mismatch <- list("NOO" = list(enrol = no_data, 
+                                 recur1 = all_As,
+                                 recur2 = all_Bs),
+                    "ONO" = list(enrol = all_As, 
+                                 recur1 = no_data,
+                                 recur2 = all_Bs), 
+                    "OON" = list(enrol = all_As, 
+                                 recur1 = all_Bs,
+                                 recur2 = no_data))
+``` 
+
+```{r echo = FALSE}
+# ------------------------------------------------------------------------------
+# Posterior based on model
+# ------------------------------------------------------------------------------
+results_match <- lapply(ys_match, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+results_mismatch <- lapply(ys_mismatch, function(y) {
+  suppressMessages(compute_posterior(y, fs)$marg)})
+
+# Extract results for the first recurrence
+results_match_recur1 <- sapply(results_match, function(x) x["recur1",])
+results_mismatch_recur1 <- sapply(results_mismatch, function(x) x["recur1",])
+results_match_recur2 <- sapply(results_match, function(x) x["recur2",])
+results_mismatch_recur2 <- sapply(results_mismatch, function(x) x["recur2",])
+
+# ------------------------------------------------------------------------------
+# Plot probabilities
+# ------------------------------------------------------------------------------
+par(mar = c(0,0,0,0))
+cols <- RColorBrewer::brewer.pal(3, "Dark2")
+plot_simplex() # Plot simplex
+
+n_points <- length(ys_match)
+xy <- apply(results_match_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 24, bg = cols, col = cols) 
+points(x = xy["x", ], y = xy["y", ], pch = "1", cex = 0.4) 
+xy <- apply(results_match_recur2, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 24, bg = cols, col = cols) # Plot 
+points(x = xy["x", ], y = xy["y", ], pch = "2", cex = 0.4) 
+
+n_points <- length(ys_mismatch)
+xy <- apply(results_mismatch_recur1, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 25, bg = cols, col = cols) 
+points(x = xy["x", ], y = xy["y", ], pch = "1", cex = 0.4) 
+xy <- apply(results_mismatch_recur2, 2, project2D) # Project probabilities
+points(x = xy["x", ], y = xy["y", ], pch = 25, bg = cols, col = cols) # Plot 
+points(x = xy["x", ], y = xy["y", ], pch = "2", cex = 0.4) # Plot 
+
+legend("topleft", pch = c("1", "2"), bty = "n", inset = 0.1,
+       legend = c(": 1st recurrence", ": 2nd recurrence"))
+legend("left", pch = c(24, 25), bty = "n", inset = 0.1, pt.bg = "black", 
+       legend = c("Match", "Mismatch"), title = "Observation type")
+legend("right", col = cols, pch = 20, bty = "n", legend = names(ys_mismatch), 
+       title = "Position of no observation (N) \namong observations (Os)") 
+```
+
+### Highly informed recurrences  
+
+The first recurrence in the sequence <span style="color: purple;">O**O**N</span>
+(upward purple 1 triangle) has a slightly lower probability of recrudescence than second
+recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
+(upward green 2 triangle) despite both recurrences having the same rare
+observations that match the directly preceding episode.
+
+The first recurrence in the sequence <span style="color: purple;">O**O**N</span>
+(downward purple 1 triangle) has a slightly higher probability of reinfection than the
+second recurrence in the sequence <span style="color: darkgreen;">NO**O**</span>
+(downward green 2 triangle) despite both recurrences having the same
+observations that mismatch the directly preceding episode.
+
+### Weakly and uninformed recurrences  
+
+Unsurprisingly, the posterior of the first recurrence in the sequence <span
+style="color: darkgreen;">N**O**O</span> is close to the prior (it has no
+preceding data), likewise for the second recurrence in the sequence of <span
+style="color: purple;">OO**N**</span> (it has no data). More surprisingly, the
+posterior of the first recurrence of the sequence <span style="color:
+darkorange;">O**N**O</span> is not close to the prior, despite having no data.
+On closer inspection, this is not so surprising for reasons explained below.
+
+For match data (upward triangles), strong evidence for a clonal edge between
+episodes one and three in <span style="color: darkorange;">**O**N**O**</span> is
+incompatible with all recurrence sequences ending with reinfection *and*
+reinfection followed by recrudescence, informing strongly the second recurrence and weakly the
+first recurrence. By comparison, strong evidence for a clonal edge
+between episodes two and three in <span style="color: darkgreen;">N**O****O**</span>
+is incompatible with all sequences of recurrences ending with reinfection,
+informing the second recurrence only; likewise, strong evidence for a clonal
+edge between episodes one and two in <span style="color: purple;">**O****O**N</span> is
+incompatible with all sequences of recurrences starting with reinfection,
+informing the first recurrence only.
+
+```{r}
+epsilon <- .Machine$double.eps # Very small probability
+names(which(suppressMessages(compute_posterior(y = ys_match[["ONO"]], fs))$joint < epsilon))
+names(which(suppressMessages(compute_posterior(y = ys_match[["NOO"]], fs))$joint < epsilon))
+names(which(suppressMessages(compute_posterior(y = ys_match[["OON"]], fs))$joint < epsilon))
+```
+
+On close inspection the upward orange 1 triangle makes intuitive sense: if you
+know a first recurrence is followed by a second MOI = 1 recurrence that is a
+clone of the MOI = 1 enrolment episode, it is very unlikely the second
+recurrence is a clone drawn from a new mosquito as it would be if it were a
+recrudescence of a reinfection. Thus, the enrolment and second recurrence data
+inform the first recurrence, causing its posterior to deviate from the
+prior even though it has no data.
+
+The explanation for mismatch data (downward triangles) in the sequence <span style="color:
+darkorange;">ONO</span> is similar to that for match data: strong evidence for
+a stranger edge between episodes one and three is incompatible with a double
+recrudescence, so the posterior of the first recurrence (downward orange 1
+triangle) deviates from the prior despite the first recurrence having no data.
+
+```{r}
+epsilon <- .Machine$double.eps # Very small probability
+names(which(suppressMessages(compute_posterior(y = ys_mismatch[["ONO"]], fs))$joint < epsilon))
+names(which(suppressMessages(compute_posterior(y = ys_mismatch[["NOO"]], fs))$joint < epsilon))
+names(which(suppressMessages(compute_posterior(y = ys_mismatch[["OON"]], fs))$joint < epsilon))
+```
+
+# Interpreting uncertainty {#uncertainty}
+
+Uncertain posterior probabilities can be uncertain for two reasons that are not
+mutually exclusive:
+
+1) more data are needed 
+2) the states are not fully identifiable
+
+It is also important to bear in mind the above-illustrated facts that, under the Pv3Rs model, trial
+participants with different [per-episode MOIs](#mois) and 
+[episode counts](#epi-count) have different maximum probabilities of
+recrudescence / reinfection. For example, if we use a common threshold of 0.8 to
+classify probable reinfection assuming recurrence states are equally likely *a
+priori*, we can discount *a priori* all trail participants with a single
+monoclonal recurrence following a monoclonal enrolment episode because their
+posterior reinfection probabilities will never exceed 0.75, even if their data
+are highly informative of reinfection:
+
+```{r}
+y <- list(enrol = all_As, recur = all_Bs)
+fs <- sapply(ms, FUN = function(m) c("A" = 0.5, "B" = 0.5), simplify = FALSE)
+
+# Using the default uniform prior on recurrence states
+suppressMessages(compute_posterior(y, fs))$marg
+
+# Using a non-uniform prior on recurrence states
+prior <- as.matrix(data.frame("C" = 0.25, "L" = 0.25, "I" = 0.5))
+suppressMessages(compute_posterior(y, fs, prior))$marg
+```
+
+And that, for a given trial participant, the probability of recrudescence /
+reinfection depends on its [position within a sequence](#position), especially 
+if one or more episodes has no data.
+
+# Meiotic siblings {#meiotic}
+
+## Methods 
+
+We simulated data and generated results for an initial infection containing two
+or three meiotic siblings and a recurrent
+
+- stranger 
+- clone
+- regular sibling 
+- meiotic sibling
+
+Posterior probabilities are computed assuming recurrence states are equally
+likely *a priori*.
+
+## Results
+
+When the initial infection contains two meiotic siblings `compute_posterior()` is
+well behaved with maximum likelihood on the true relationship graph (not shown). 
+Posterior probabilities converge to
+
+- probable reinfection when the recurrent parasite is a stranger, 
+- probable recrudescence when the recurrent parasite is a clone,
+- certain relapse when the recurrent parasite is a regular sibling,
+- certain relapse when the recurrent parasite is a meiotic sibling. 
+
+```{r echo = FALSE}
+MOIs <- "2_1"
+cases <- c("Stranger", "Clone", "Regular_sibling", "Meiotic_sibling")
+
+for(case in cases){
+  
+  if( case == "Stranger") {
+    exp_state <- "reinfection"    
+  } else if (case == "Clone") {
+    exp_state <- "recrudescence"
+  } else {
+    exp_state <- "relapse"
+  }
+  
+  output <- output_Cln.Str.Sib[[case]]
+  cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Repeats
+  
+  # Compute effective cardinality cumulatively
+  cum_card_eff <- sapply(output$fs_store, function(fs) {
+    cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  
+  # Determine which fs in cum_card_eff are equifrequent
+  equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
+  
+  # Plot trajectories
+  plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+       xaxt = "n", xlab = "", ylab = sprintf("Posterior %s probability", exp_state))
+  
+  if(case == "Stranger") {
+    # Add expected probability based on normalised odds from on theoretical results
+    abline(h = 9/11, lty = "dashed") 
+    text(x = 10, y = 9/11, labels = "9/11", pos = 3)
+  }
+  
+  if(case == "Clone") {
+    # Add expected probability based on normalised odds from on theoretical results
+    abline(h = 9/13, lty = "dashed") 
+    text(x = 10, y = 9/13, labels = "9/13", pos = 3)
+  }
+  
+  # Horizontal axis
+  axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
+  axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+  axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+       tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+  
+  title(main = gsub("_", " ", case))
+  title(xlab = "Marker count (cumulative effective cardinality)", line = 3.5)
+  
+  # Add trajectories
+  for(i in 1:output$n_repeats){
+    lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
+          y = sapply(output$ps_store_all_ms_uniform[[MOIs]][[as.character(i)]],
+                     function(x) x[,output$exp_state]))
+  }
+  
+  legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
+         legend = 1:output$n_repeats)
+}
+```
+
+When the initial infection contains three meiotic siblings and the recurrent
+parasite is either a stranger or a clone, posterior probabilities converge
+correctly to probable reinfection and probable recrudescence, respectively, but
+with maximal values given by graphs over relationships between two, not three,
+parasites in the initial infection.
+
+```{r echo = FALSE}
+MOIs <- "3_1"
+cases <- c("Stranger", "Clone")
+
+for(case in cases){
+  
+  if( case == "Stranger") {
+    exp_state <- "reinfection"    
+  } else if (case == "Clone") {
+    exp_state <- "recrudescence"
+  } else {
+    exp_state <- "relapse"
+  }
+  
+  rm(list = "output")
+  output <- output_Cln.Str.Sib[[case]]
+  cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Repeats
+  
+  # Compute effective cardinality cumulatively
+  cum_card_eff <- sapply(output$fs_store, function(fs) {
+    cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  
+  # Determine which fs in cum_card_eff are equifrequent
+  equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
+  
+  # Plot trajectories
+  plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", 
+       las = 1, xaxt = "n", xlab = "", 
+       ylab = sprintf("Posterior %s probability", exp_state))
+  
+  if(case == "Stranger") {
+    # Add expected probability based on graphs over n = 3 genotypes
+    abline(h = 9/11, lty = "dashed") 
+    text(x = 10, y = 9/11, labels = "9/11", pos = 3)
+  }
+  
+  if(case == "Clone") {
+    # Add expected probability based on graphs over n = 3 genotypes
+    abline(h = 9/13, lty = "dashed") 
+    text(x = 10, y = 9/13, labels = "9/13", pos = 3)
+  }
+  
+  # Horizontal axis
+  axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
+  axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+  axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+       tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+  
+  title(main = gsub("_", " ", case))
+  title(xlab = "Marker count (cumulative effective cardinality)", line = 3.5)
+  
+  # Add trajectories
+  for(i in 1:output$n_repeats){
+    lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
+          y = sapply(output$ps_store_all_ms_uniform[[MOIs]][[as.character(i)]],
+                     function(x) x[,output$exp_state]))
+  }
+  
+  legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
+         legend = 1:output$n_repeats)
+}
+```
+
+Relationship graphs (not shown) are wrong for two reasons:
+
+- all the relationship graphs have two, not three, parasites in the initial
+infection because there are at most two alleles per marker. Although technically
+incorrect, this behaviour is arguably desirable; see the digression in the above section 
+[Data on many markers](#many-markers).
+- the highest likelihood relationship graphs have stranger parasites in the
+initial episode because prevalence data from three or four meiotic siblings are
+identical to bulk data from the parents, who are strangers.
+
+We can force the graphs to have three distinct parasites in the initial episode
+by specifying external MOIs. Doing so recovers maximum likelihood on true
+relationship graphs. However, the correct MOIs are unknowable in practice: a
+collection of siblings from two parents can only ever be as diverse as the two
+parents. 
+
+When the initial infection contains three meiotic siblings and the recurrent
+parasite is a regular or meiotic sibling, posterior probabilities converge to
+probable recrudescence with maximum likelihood on graphs with a clonal edge to
+the sibling relapse, and either two stranger parasites in the initial episode
+when no external MOIs are specified, or three sibling parasites in the initial
+episode when the correct MOIs (unknowable in practice) are provided externally.
+
+```{r echo = FALSE}
+MOIs <- "3_1"
+cases <- c("Regular_sibling", "Meiotic_sibling")
+
+for(case in cases){
+  
+  rm(list = "output")
+  output <- output_Cln.Str.Sib[[case]]
+  cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # Colour repeats
+  
+  # Compute effective cardinality cumulatively
+  cum_card_eff <- sapply(output$fs_store, function(fs) {
+    cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+  
+  # Determine which fs in cum_card_eff are equifrequent
+  equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
+  
+  # Plot trajectories
+  plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+       xaxt = "n", xlab = "", ylab = "Posterior recrudescence probability")
+  
+  # Add expected probability based on graphs over n = 3 genotypes
+  abline(h = 9/13, lty = "dashed") 
+  text(x = 10, y = 9/13, labels = "9/13", pos = 3)
+  
+  # Horizontal axis
+  axis_at <- c(1, seq(0, max(output$n_markers), 10)[-1])
+  axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+  axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+       tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+  
+  title(main = gsub("_", " ", case))
+  title(xlab = "Marker count (cumulative effective cardinality)", line = 3.5)
+  
+  # Add trajectories
+  for(i in 1:output$n_repeats){
+    lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
+          y = sapply(output$ps_store_all_ms_uniform[[MOIs]][[as.character(i)]],
+                     function(x) x[,"C"]))
+  }
+  
+  legend("topright", col = cols, lwd = 3, title = "Repeats", box.col = "white",
+         legend = 1:output$n_repeats)
+}
+```
+
+# Half siblings {#half}
+
+## Methods 
+We simulated data for three half siblings: two in an initial episode, the third
+in a recurrence:
+
+- child of parents 1 and 2 in the initial episode
+- child of parents 1 and 3 in the initial episode
+- child of parents 2 and 3 in the recurrence
+
+We explored two scenarios: one where all parental parasites draw from the same
+allele distribution. Another with admixture where parent 1 draws alleles
+disproportionally to parents 2 and 3.  The admixture scenario is improbable. We
+explore it because it is a worse case scenario: it is contrived to maximally
+hamper relapse classification.
+
+## Results
+
+In general, when parental parasites draw from the same allele distribution, the
+frequency of certain relapse increases erratically with the number of markers
+genotyped. 
+
+For this particular case where there are three equifrequent alleles per marker,
+we can show theoretically that the system behaves erratically because a small
+perturbation to the ratio of observations (all alleles match across the three
+half siblings, all alleles are different, intra-episode alleles match,
+inter-episode alleles match) can lead to a large deviation in the odds of
+relapse versus reinfection; see 
+[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
+The purple, red,
+and green trajectories below have higher than the expected 0.5 intra-to-inter
+match ratios; moreover, the purple trajectory's intra-to-inter match ratio
+consistently exceeds $0.5\times \text{log}_2(\dfrac{2}{5})$, a condition found
+theoretically to concentrate posterior probability on reinfection under certain
+conditions; again, see 
+[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html).
+
+```{r echo = FALSE, fig.height = 4}
+rm(list = "output")
+output <- output_HalfSib.PCLikeSib[["Half"]]
+cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") # For repeats
+
+# Compute effective cardinality cumulatively in the order of markers genotyped
+cum_card_eff <- sapply(output$fs_store, function(fs) {
+  cumsum(sapply(fs[output$m_rorder], function(x) 1/sum(x^2)))})
+
+# Determine which fs in cum_card_eff are equifrequent
+equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff)
+
+# Plot the posterior relapse probability trajectories
+plot(NULL, bty = "n", las = 1, xaxt = "n", xlim = c(1,max(output$n_markers)), 
+     xlab = "Marker count (effective cardinality)", 
+     ylim = c(0,1), ylab = "Posterior relapse probability")
+legend("right", lwd = 2, col = cols, legend = 1:output$n_repeats, bty = "n", 
+       cex = 0.5, title = "Repeat")
+
+# Add expected probability based on normalised odds from on theoretical results
+abline(h = 2/11, lty = "dashed") 
+text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 1)
+
+# Add horizontal axis
+axis_at <- c(1, seq(0, max(output$n_markers), 50)[-1])
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+
+# Add trajectories
+for(i in 1:output$n_repeats){
+  lines(x = 1:max(output$n_markers),
+        y = sapply(output$ps_store_all_ms_uniform[[as.character(i)]], 
+                   function(x) x[,"L"]),
+        col = cols[i], lwd = 2)
+}
+```
+When intra-episode parasites systematically share rare alleles (admixture AND
+imbalanced allele frequencies), the frequency of probable reinfection increases
+erratically with the number of markers genotyped.
+
+```{r echo = FALSE}
+# Plot the posterior relapse probability trajectories
+plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+     xaxt = "n", xlab = "Marker count (effective cardinality)",
+     ylab = "Posterior reinfection probability")
+
+legend("right", col = cols, lwd = 2, inset = 0.1, legend = (1:output$n_repeats)-1, 
+       bty = "n", cex = 0.5, title = "Repeats")
+
+# Add expected probability based on normalised odds from on theoretical results
+abline(h = 9/11, lty = "dashed") 
+text(x = max(output$n_markers), y = 9/11, labels = "9/11", pos = 3)
+
+# Add horizontal axis
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", round(cum_card_eff[,"0.5"][axis_at])))
+
+# Add trajectories
+for(i in 1:output$n_repeats){
+  y <- sapply(output$ps_store_all_ms_admix_rare[[as.character(i)]],
+              function(x) x[,"I"])
+  lines(x = 1:max(output$n_markers), y = y, col = cols[i], lwd = 2)
+}
+```
+In both scenarios, the likelihood of the true graph with siblings within and
+across episodes is quashed as soon as distinct alleles from all three parents
+are observed at a given marker. In general, 
+
+- when all parasites draw from the same allele distribution, the maximum
+likelihood graphs are the two with one inter-episode sibling edge.
+- when intra-episode parasites systematically share rare alleles,
+the maximum likelihood graph is the one with one intra-episode sibling edge.
+
+# Parent-child-like siblings {#parent-child-like}
+
+## Methods 
+We simulated data for three parent-child-like siblings: 
+
+- child of selfed parent 1 in the initial episode
+- child of parents 1 and 2 in the initial episode
+- child of selfed parent 2 in the recurrence
+
+Aside: the alternative with both children of selfed parents in the initial
+episode is equivalent to the meiotic case above with three mieotic siblings in
+the initial episode because prevalence data from three meiotic siblings is
+equivalent to prevalence data from two stranger parents and leads to probable
+recrudescence rather than certain relapse with the number of markers genotyped.
+
+As for half-siblings, we explored two scenarios: one where all parental
+parasites draw from the same allele distribution. Another with admixture where
+parent 1 draws alleles disproportionally to parents 2 and 3. The admixture
+scenario is improbable. We explore it because it is a worse case
+scenario: it is contrived to maximally hamper relapse classification.
+
+## Results
+
+When parental parasites draw from the same allele distribution, the
+frequency of certain relapse increases erratically with the number of markers
+genotyped.
+
+```{r echo = FALSE}
+output <- output_HalfSib.PCLikeSib[["PCLike"]]
+
+# Colours for repeats
+cols <- RColorBrewer::brewer.pal(n = output$n_repeats, "Paired") 
+
+# Cumulative eff. cardinality 
+cum_card_eff <- sapply(output$fs_store, function(fs) { 
+  cumsum(sapply(fs, function(x) 1/sum(x^2)))})
+
+# Determine which fs in cum_card_eff are equifrequent
+equifs <- which(as.numeric(colnames(cum_card_eff)) > output$c_cutoff) 
+
+# Plot the posterior relapse probability trajectories
+plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1,
+     xaxt = "n", xlab = "Marker count (effective cardinality)", 
+     ylab = "Posterior relapse probability")
+abline(h = 2/11, lty = "dashed") # What is this ??? 
+text(x = max(output$n_markers), y = 2/11, labels = "2/11", pos = 1)
+legend("right", col = cols, lwd = 2, inset = 0.1, legend = 1:output$n_repeats,
+       bty = "n", title = "Repeats", cex = 0.5)
+
+# Add Horizontal axis
+axis_at <- c(1, seq(0, max(output$n_markers), 50)[-1])
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.7, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+
+# Add trajectories
+for(i in 1:output$n_repeats) {
+  lines(x = 1:max(output$n_markers), col = cols[i], lwd = 2, 
+        y = sapply(output$ps_store_all_ms_uniform[[as.character(i)]], 
+                   function(x) x[,"L"]))
+}
+```
+
+When intra-episode parasites systematically share rare alleles (admixture AND
+imbalanced allele frequencies), the frequency of probable reinfection increases
+erratically with the number of markers genotyped.
+
+```{r echo = FALSE}
+# Plot the posterior relapse probability trajectories
+plot(NULL, xlim = c(1,max(output$n_markers)), ylim = c(0,1), bty = "n", las = 1, 
+     xaxt = "n",  xlab = "Marker count (effective cardinality)", 
+     ylab = "Posterior reinfection probability")
+
+# Add expected probability based on normalised odds from on theoretical results
+abline(h = 9/11, lty = "dashed") 
+text(x = max(output$n_markers), y = 9/11, labels = "9/11", pos = 3)
+
+# Add horizontal axis 
+axis(side = 1, at = axis_at, cex.axis = 0.7) # Marker count
+axis(side = 1, line = 1, at = axis_at, cex.axis = 0.6, # Effective cardinality
+     tick = F, labels = sprintf("(%s)", cum_card_eff[,equifs][axis_at]))
+
+# Add trajectories
+for(i in 1:output$n_repeats){
+  y <- sapply(output$ps_store_all_ms_admix_rare[[as.character(i)]],
+              function(x) x[,"I"])
+  lines(x = 1:max(output$n_markers), y = y, col = cols[i], lwd = 2)
+}
+
+# Add legend
+legend("right", col = cols, lwd = 2, inset = 0.1, legend = 1:output$n_repeats,
+       bty = "n", title = "Repeats", cex = 0.5)
+```
+
+In general, when all parasites draw from the same allele distribution, the
+maximum likelihood graph is the true graph with siblings within and across
+episodes. Meanwhile, when intra-episode parasites systematically share rare
+alleles, the maximum likelihood graph is the one with one intra-episode sibling
+edge.
+
+
+
+
+
+
