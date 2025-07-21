@@ -1,6 +1,6 @@
 ---
 title: "Benchmarking Pv3Rs"
-name: benchmarking-pdf
+name: benchmarking
 description: "A short description of the article"
 extension: pdf
 ---
