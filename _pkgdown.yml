@@ -13,3 +13,4 @@ articles:
 - title: Advanced documentation
   contents:
   - articles/links-to-pdfs
+  - articles/enumerate
