@@ -4,7 +4,7 @@ template:
   light-switch: true
 
 articles:
-  - title: User documentation
+- title: User documentation
   contents:
   - demonstrate-usage
   - understand-posterior
