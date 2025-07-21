@@ -2,3 +2,14 @@ url: https://aimeertaylor.github.io/Pv3Rs/
 template:
   bootstrap: 5
   light-switch: true
+
+articles:
+- title: User documentation
+  contents:
+  - demonstrate-usage
+  - understand-posterior
+  - intra-episode-siblings
+
+- title: Advanced documentation
+  contents:
+  - links-to-pdfs
