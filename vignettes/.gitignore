@@ -1,3 +1,6 @@
 *.html
 *.R
 **/*_cache
+
+# Ensure figure source code is open source:
+!articles/figures/*.R
