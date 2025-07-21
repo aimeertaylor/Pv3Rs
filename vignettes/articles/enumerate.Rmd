@@ -1,11 +1,7 @@
 ---
 title: "Enumerate graphs and partitions"
-as_is: true
-pkgdown:
-  as_is: true
-  name: enumerate
-  extension: pdf
 ---
 
-This is a stub file. The actual vignette is provided as a pre-rendered PDF.
+This is a stub file. The actual vignette is provided as a pre-rendered PDF: 
+[Enumerating graphs and partitions](understand-enumerate.pdf). 
 
