@@ -1,7 +1,7 @@
 ---
 title: "Benchmarking Pv3Rs"
-name: benchmarking
 pkgdown:
+  name: benchmarking
   extension: pdf
 ---
 
