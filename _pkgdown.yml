@@ -5,7 +5,6 @@ template:
 
 articles:
 - title: Documentation for users and developers
-  navbar: ~
   contents:
   - demonstrate-usage
   - articles/understand-posterior
