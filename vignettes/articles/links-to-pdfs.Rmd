@@ -1,9 +1,9 @@
 ---
-title: "Links to pdf documentation"
+title: "Advanced documentation"
 ---
 
 - [Benchmarking](benchmarking.pdf)
-- [Enumerating graphs and partitions](understand-enumerate.pdf)
-- [Half sibling misspecification](understand-half-sibs.pdf)
-- [Graph prior ramifications](understand-graph-prior.pdf)
+- [Understand enumeration of graphs and partitions](enumerate.pdf)
+- [Understand half sibling misspecification](understand-half-sibs.pdf)
+- [Understand graph prior ramifications](understand-graph-prior.pdf)
 
