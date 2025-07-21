@@ -1,7 +1,0 @@
----
-title: "Benchmarking Pv3Rs"
-description: blabla
----
-
-- [My PDF Vignette](benchmarking.pdf)
-

@@ -4,7 +4,9 @@
 inst/doc
 docs
 
-DevFiles/Examples_tex/*.aux
-DevFiles/Examples_tex/*.log
-DevFiles/Examples_tex/*.out
-DevFiles/Examples_tex/*.synctex.gz
+# latex
+**/*.aux
+**/*.log
+**/*.out
+**/*.toc
+**/*.synctex.gz
