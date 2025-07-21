@@ -3,7 +3,6 @@ title: "Enumerate graphs and partitions"
 as_is: true
 pkgdown:
   as_is: true
-  name: articles/enumerate
   extension: pdf
 ---
 
