@@ -7,9 +7,9 @@ articles:
 - title: User documentation
   contents:
   - demonstrate-usage
-  - understand-posterior
+  - articles/understand-posterior
   - intra-episode-siblings
 
 - title: Advanced documentation
   contents:
-  - links-to-pdfs
+  - articles/links-to-pdfs
