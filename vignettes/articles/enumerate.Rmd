@@ -1,5 +1,7 @@
 ---
-title: "PDF"
+title: "Enumerate graphs and partitions"
 as_is: true
-extension: pdf
 ---
+
+This is a stub file. The actual vignette is provided as a pre-rendered PDF.
+
