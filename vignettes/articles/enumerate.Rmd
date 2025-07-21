@@ -1,5 +1,7 @@
 ---
 title: "Enumerating graphs and partitions"
+output: pdf_document
+
 pkgdown:
   as_is: true
   name: understand-enumerate
