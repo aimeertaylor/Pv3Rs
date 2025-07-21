@@ -27,9 +27,9 @@ load("../../DevFiles/RelationshipStudy/output_Cln.Str.Sib.rda")
 load("../../DevFiles/RelationshipStudy/output_HalfSib.PCLikeSib.rda")
 ```
 
-# Summary of contents
-
 This vignette is a detailed sequel to `vignette("demonstrate-usage", "Pv3Rs")`. 
+
+# Summary of contents
 
 We start by documenting the output of `compute_posterior()` when the statistical
 model underpinning it is well specified but
@@ -38,13 +38,15 @@ model underpinning it is well specified but
 - [Data are uninformative](#uniformative)
 - [Data are limited to only one episode](#one-episode)
 - [Data are incomparable across episodes](#incomparable)
-- Data are limited to only [one marker](#one-marker) or [two markers](#two-markers)
+- [Data are limited to only one marker](#one-marker) 
+- [Data are limited to only two markers](#two-markers)
 
-Given [data on many markers](#many-markers), 
+
+[Given data on many markers](#many-markers), 
 we then show under the well specified model how maximum probabilities of
 recrudescence and reinfection depend on
 
-- [Per-episode multiplicities of infections (MOIs)](#mois)
+- [Per-episode multiplicities of infections](#mois)
 - [Episode count](#epi-count) 
 - [Position of a recurrence in a sequence of episodes](#position)
 
