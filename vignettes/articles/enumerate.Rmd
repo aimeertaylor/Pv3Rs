@@ -1,0 +1,8 @@
+---
+title: "Enumerating graphs and partitions"
+pkgdown:
+  as_is: true
+  name: understand-enumerate
+  extension: pdf
+---
+
