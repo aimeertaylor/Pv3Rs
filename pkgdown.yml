@@ -2,14 +2,14 @@ pandoc: 3.1.11
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
-  articles/benchmarking-pdf: benchmarking-pdf.html
+  articles/benchmarking: benchmarking.html
   demonstrate-usage: demonstrate-usage.html
   articles/enumerate: enumerate.html
   intra-episode-siblings: intra-episode-siblings.html
   articles/understand-graph-prior: understand-graph-prior.html
   articles/understand-half-sibs: understand-half-sibs.html
   articles/understand-posterior: understand-posterior.html
-last_built: 2025-07-20T19:47Z
+last_built: 2025-07-21T08:15Z
 urls:
   reference: https://aimeertaylor.github.io/Pv3Rs/reference
   article: https://aimeertaylor.github.io/Pv3Rs/articles
