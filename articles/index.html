@@ -16,7 +16,14 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/demonstrate-usage.html">Demonstrate Pv3Rs usage</a></li>
+    <li><a class="dropdown-item" href="../articles/understand-posterior.html">Understand posterior probabilities</a></li>
+    <li><a class="dropdown-item" href="../articles/intra-episode-siblings.html">Understand treatment of intra-episode siblings</a></li>
+    <li><a class="dropdown-item" href="../articles/links-to-pdfs.html">Advanced documentation</a></li>
+    <li><a class="dropdown-item" href="../articles/enumerate.html">Understand enumeration of graphs and partitions</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/aimeertaylor/Pv3Rs/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -37,27 +44,21 @@
     </div>
 
     <div class="section ">
-      <h3>User documentation</h3>
+      <h3>Main</h3>
       <div class="section-desc"></div>
 
       <dl><dt><a href="demonstrate-usage.html">Demonstrate Pv3Rs usage</a></dt>
         <dd><p>Demonstrates basic Pv3Rs workflow for a single study participant</p>
         </dd><dt><a href="understand-posterior.html">Understand posterior probabilities</a></dt>
-        <dd><p>A detailed sequal to ‘Demonstrate Pv3Rs usage’</p>
-        </dd><dt><a href="intra-episode-siblings.html">Explore treatment of intra-episode siblings</a></dt>
-        <dd>
-      </dd></dl></div>
-    <div class="section ">
-      <h3>Advanced documentation</h3>
-      <div class="section-desc"></div>
-
-      <dl><dt><a href="links-to-pdfs.html">Advanced documentation</a></dt>
-        <dd>
+        <dd><p>A detailed sequal to <strong>Demonstrate Pv3Rs usage</strong></p>
+        </dd><dt><a href="intra-episode-siblings.html">Understand treatment of intra-episode siblings</a></dt>
+        <dd><p>Expands upon a digression in <strong>Understand posterior probabilities</strong></p>
+        </dd><dt><a href="links-to-pdfs.html">Advanced documentation</a></dt>
+        <dd><p>Links to pdfs aimed at package and model developers</p>
         </dd><dt><a href="enumerate.html">Understand enumeration of graphs and partitions</a></dt>
         <dd>
       </dd></dl></div>
-  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
-    </nav></aside></div>
+  </main></div>
 
 
     <footer><div class="pkgdown-footer-left">
