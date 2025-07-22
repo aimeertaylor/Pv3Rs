@@ -1,10 +1,6 @@
 ---
-title: "Explore treatment of intra-episode siblings"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Explore treatment of intra-episode siblings}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+title: Understand intra-episode siblings
+description: Expands upon a digression in Understand posterior probabilities
 ---
 
 ```{r, include = FALSE}
@@ -23,11 +19,11 @@ knitr::opts_chunk$set(
 library(Pv3Rs)
 # Access non-exported function
 recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs") 
-load("./vignette_data/maxima.rda")
+load("./data/maxima.rda")
 ```
 
-This vignette, which is rather niche, expands a digression in 
-[Understand posterior estimates](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html). 
+This vignette expands upon a digression in 
+[Understand posterior probabilities](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html). 
 
 `compute_posterior()` sums over graphs with cliques of three or more
 intra-episode siblings whenever the `MOIs` used contain values that exceed

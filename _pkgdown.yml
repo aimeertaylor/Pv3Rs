@@ -2,3 +2,11 @@ url: https://aimeertaylor.github.io/Pv3Rs/
 template:
   bootstrap: 5
   light-switch: true
+
+articles:
+- title: Documentation for both users and developers
+  contents:
+  - demonstrate-usage
+  - articles/posterior-probabilities
+  - articles/intra-episode-siblings
+  - articles/links-to-pdfs
