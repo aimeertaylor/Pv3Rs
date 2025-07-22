@@ -82,7 +82,7 @@ recrudescence, relapse, reinfection — using per-person genetic data on two
 or more episodes. For usage, see \strong{Examples} below and
 \HTMLVignette{demonstrate-usage}{}{vignette on Pv3Rs basic usage}.
 For a more complete understanding of \code{compute_posterior} output, see
-\HTMLVignette{understand-posterior}{}{Understanding posterior probabilities}.
+\HTMLVignette{posterior-probabilities}{}{Understanding posterior probabilities}.
 
 Note: The progress bar may increment non-uniformly (see
 \strong{Details}); it may appear stuck when computations are ongoing.
