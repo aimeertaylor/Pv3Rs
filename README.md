@@ -31,9 +31,8 @@ probability triplet summing to one.
 
 The Pv3Rs R package is not yet peer-reviewed and thus liable to modification.
 The model is described in the preprint 
-[Taylor, Foo & White, 2022](https://www.medrxiv.org/content/10.1101/2022.11.23.22282669v1), building on a prototype in 
-[Taylor & Watson et al. 2019](https://www.nature.com/articles/s41467-019-13412-x).
-
+Taylor, Foo & White, 2022 \doi{doi:10.1101/2022.11.23.22282669}, building on a prototype in 
+Taylor & Watson et al. 2019 \doi{doi:10.1038/s41467-019-13412-x}.
 ### Prior considerations: 
 
 - Genetic data are modelled using a Bayesian model, whose prior is ideally
