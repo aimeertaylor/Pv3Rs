@@ -32,5 +32,7 @@ History (VHX) trials; see
 for more details of the genetic data; for more details of the VHX and BPD trials, see
 \href{https://academic.oup.com/cid/article/67/10/1543/5034800}{Chu et al. 2018a} and
 \href{https://academic.oup.com/cid/article/68/8/1311/5079011}{Chu et al. 2018b},
+that is Chu et al. 2018b \doi{doi:10.1093/cid/ciy319}
+or \href{\doi{doi:10.1093/cid/ciy319}}{Chu et al. 2018b}
 }
 \keyword{datasets}

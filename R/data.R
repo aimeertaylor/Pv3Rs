@@ -7,6 +7,8 @@
 #' for more details of the genetic data; for more details of the VHX and BPD trials, see
 #' [Chu et al. 2018a](https://academic.oup.com/cid/article/67/10/1543/5034800) and
 #' [Chu et al. 2018b](https://academic.oup.com/cid/article/68/8/1311/5079011),
+#' that is Chu et al. 2018b \doi{doi:10.1093/cid/ciy319}
+#' or [Chu et al. 2018b](\doi{doi:10.1093/cid/ciy319})
 #'
 #' @format A list of 217 study participants; for each study participant, a list of one or more
 #' episodes; for each episode, a list of three or more microsatellite markers;

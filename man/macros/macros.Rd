@@ -3,7 +3,7 @@
 % In this version the vignette must be in the same package as the help page
 % arg 1 is the name of the vignette (without .html)
 % arg 2 is an optional anchor within the vignette (without the leading #)
-% arg 3 is the text to show on the link.
+% arg 3 is the text to show on the link (without quotes)
 % Use the RdVignettePath environment variable if vignettes aren't stored
 % in ../doc/, e.g. pkgdown puts them in ../articles/.
 \newcommand{\HTMLVignette}{\Sexpr[stage=build,results=rd]{
