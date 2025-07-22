@@ -3,10 +3,10 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   demonstrate-usage: demonstrate-usage.html
-  intra-episode-siblings: intra-episode-siblings.html
+  articles/intra-episode-siblings: intra-episode-siblings.html
   articles/links-to-pdfs: links-to-pdfs.html
   articles/understand-posterior: understand-posterior.html
-last_built: 2025-07-21T22:53Z
+last_built: 2025-07-22T07:13Z
 urls:
   reference: https://aimeertaylor.github.io/Pv3Rs/reference
   article: https://aimeertaylor.github.io/Pv3Rs/articles
