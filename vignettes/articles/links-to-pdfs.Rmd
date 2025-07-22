@@ -4,9 +4,9 @@ description: "Links to pdfs aimed at model and package developers"
 ---
 
 - [Benchmarking](benchmarking.pdf)
-- [Understand graph prior ramifications](understand-graph-prior.pdf)
-- [Understand half sibling misspecification](understand-half-sibs.pdf)
-- [Understand graphs and partition enumeration](enumerate.pdf)
+- [Understand graph prior ramifications](graph-prior.pdf)
+- [Understand half-sibling misspecification](half-siblings.pdf)
+- [Understand graph and partition enumeration](enumerate.pdf)
 
 
 

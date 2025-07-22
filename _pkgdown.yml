@@ -4,10 +4,10 @@ template:
   light-switch: true
 
 articles:
-- title: Documentation for users and developers
+- title: Documentation for both users and developers
   contents:
   - demonstrate-usage
-  - articles/understand-posterior
+  - articles/posterior-probabilities
   - articles/intra-episode-siblings
   - articles/links-to-pdfs
 
