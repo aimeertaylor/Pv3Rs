@@ -30,7 +30,7 @@ Authors:
 Other contributors:
 \itemize{
   \item Mans Magnusson [contributor]
-  \item l'INSTITUT PASTEUR [copyright holder]
+  \item Institut Pasteur [copyright holder]
   \item European Union, Project 101110393 [funder]
 }
 
