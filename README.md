@@ -15,7 +15,7 @@ using *P. vivax* genetic data on two or more episodes. To fully understand the
 core function, in addition to reading this README in its entirety and the
 pre-print cited below, we recommend reading the `vignette("demonstrate-usage",
 "Pv3Rs")` and 
-[Understand posterior probabilities](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
+[Understand posterior probabilities](https://aimeertaylor.github.io/Pv3Rs/articles/posterior-probabilities.html).
 
 Two other important features:
 
