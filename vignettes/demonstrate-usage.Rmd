@@ -147,7 +147,7 @@ probability greater than 0.5 (it falls in the bright yellow region); the point
 in the red region is most likely a reinfection with posterior probability
 greater than 0.5 (it falls in the bright red region).
 
-## Exploration of relationship graphs {#graphs}
+## Exploration of relationship graphs 
 
 To explore relationship graphs (RGs) and their log-likelihoods, set `return.RG`
 and `return.logp` to `TRUE`.
