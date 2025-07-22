@@ -74,8 +74,8 @@
 #'   graph (default `FALSE`). Setting `TRUE` disables permutation symmetry
 #'   optimisation and thus increases runtime, especially when MOIs are large.
 #'   Does not affect the output of the posterior probabilities; for an an
-#'   example of permutation symmetry, see
-#'   \HTMLVignette{demonstrate-usage}{}{vignette("demonstrate-usage")}.
+#'   example of permutation symmetry, see **Exploration of relationship graphs**
+#'   \HTMLVignette{demonstrate-usage}{'#exploration-of-relationship-graphs'}{'vignette("demonstrate-usage")'}.
 #' @param progress.bar Logical; show progress bars (default `TRUE`).
 #'   Note that the progress bar may update non-uniformly.
 #'
