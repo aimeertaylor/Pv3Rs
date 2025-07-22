@@ -1,25 +1,27 @@
-% Macro to create link to an HTML vignette from a help page.  In
-% this version the vignette must be in the same package as the help
-% page
-% arg 1 is the name of the vignette (without .html)
-% arg 2 is an optional anchor within the vignette (without the leading #)
-% arg 3 is the text to show on the link.
-% Use the RdVignettePath environment variable if vignettes aren't stored
-% in ../doc/, e.g. pkgdown puts them in ../articles/.
+% Macro to create link to an HTML vignette from a help page.
+% arg 1: name of vignette (without .html)
+% arg 2: (optional) anchor (without leading #)
+% arg 3: text to display on the link
+% arg 4: (optional) override path to vignette (e.g., "https://yourpkg.github.io/yourpkg/articles/")
+% If arg 4 is empty, defaults to Sys.getenv("RdVignettePath", unset = "../doc/")
 
-\newcommand{\HTMLVignette}{\Sexpr[stage=build,results=rd]{
-   local({anchor <- "#2"
-          if (nchar(anchor))
-            anchor <- paste0("#", anchor)
-          vigpath <- Sys.getenv("RdVignettePath", unset = "../doc/")
-          paste0("\\\\\\\\href{", vigpath, "#1.html",
-                 anchor, "}{#3}")
-          })}}
+\newcommand{\HTMLVignette}[4][]{\Sexpr[stage=build,results=rd]{
+  local({
+    anchor <- "#2"
+    if (nchar(anchor))
+      anchor <- paste0("#", anchor)
+    vigpath <- if (nchar("#1")) {
+      "#1"
+    } else {
+      Sys.getenv("RdVignettePath", unset = "../doc/")
+    }
+    paste0("\\\\href{", vigpath, "#2.html",
+           anchor, "}{#3}")
+  })
+}}
 
 
 % Macro to link PDF vignettes, the format is as above
-
-
 \newcommand{\PDFVignette}{\Sexpr[stage=build,results=rd]{
    local({anchor <- "#2"
           if (nchar(anchor))
