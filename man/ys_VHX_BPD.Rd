@@ -31,6 +31,6 @@ History (VHX) trials; see
 \href{https://doi.org/10.1038/s41467-019-13412-x}{Taylor & Watson et al. 2019}
 for more details of the genetic data; for more details of the VHX and BPD trials, see
 \href{https://doi.org/10.1093/cid/ciy319}{Chu et al. 2018a} and
-\href{https://doi.org10.1093/cid/ciy735}{Chu et al. 2018b}.
+\href{https://doi.org/10.1093/cid/ciy735}{Chu et al. 2018b}.
 }
 \keyword{datasets}

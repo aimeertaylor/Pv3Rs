@@ -6,7 +6,7 @@
 #' [Taylor & Watson et al. 2019](https://doi.org/10.1038/s41467-019-13412-x)
 #' for more details of the genetic data; for more details of the VHX and BPD trials, see
 #' [Chu et al. 2018a](https://doi.org/10.1093/cid/ciy319) and
-#' [Chu et al. 2018b](https://doi.org10.1093/cid/ciy735).
+#' [Chu et al. 2018b](https://doi.org/10.1093/cid/ciy735).
 #'
 #' @format A list of 217 study participants; for each study participant, a list of one or more
 #' episodes; for each episode, a list of three or more microsatellite markers;
