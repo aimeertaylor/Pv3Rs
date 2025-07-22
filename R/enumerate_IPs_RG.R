@@ -1,7 +1,7 @@
 #' Enumerate IBD partitions consistent with a given relationship graph
 #'
-#' Enumerate IBD partitions consistent with a given relationship graph; see
-#' [vignette("enumerate")](../doc/enumerate.pdf) for more details.
+#' Enumerate IBD partitions consistent with a given relationship graph; for more details, see
+#' [Understanding graph and partition enumeration](https://aimeertaylor.github.io/Pv3Rs/articles/enumerate.pdf)
 #'
 #' @details
 #' For a IBD partition to be consistent with the relationship graph given, it

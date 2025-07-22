@@ -12,7 +12,7 @@
 #' @param v.cutoff Number between 0.5 and 1 that separates lower vs higher
 #'   probability regions. Use with caution for recrudescence and reinfection
 #'   classification; see
-#'   ["Understand posterior probabilities"](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html).
+#'   [Understand posterior probabilities](https://aimeertaylor.github.io/Pv3Rs/articles/posterior-probabilities.html).
 #'
 #' @param v.colours Vertex colours anticlockwise from top.
 #'

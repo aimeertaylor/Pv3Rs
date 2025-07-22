@@ -3,8 +3,8 @@
 #' A clonal partition is a partition of genotypes where a pair of genotypes of
 #' the same partition cell have a clonal relationship. Genotypes from the same
 #' infection cannot be clones. This code enumerates all clonal partitions,
-#' accounting for this intra-infection restriction; see
-#' [vignette("enumerate")](../doc/enumerate.pdf) for more details.
+#' accounting for this intra-infection restriction; for more details, see
+#' [Understanding graph and partition enumeration](https://aimeertaylor.github.io/Pv3Rs/articles/enumerate.pdf).
 #'
 #' @param MOIs A numeric vector specifying, for each infection, the number of
 #'   distinct parasite genotypes, a.k.a. the multiplicity of infection (MOI).

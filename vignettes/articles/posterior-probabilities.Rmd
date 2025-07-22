@@ -425,7 +425,7 @@ those compatible with sequences of relapse, prior-induced bounds on
 non-marginal posterior probabilities can be computed *a priori* as a function of
 the prior on the recurrence state sequences and the prior on the relationship
 graphs; see 
-[Understand graph prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html).
+[Understand graph-prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/graph-prior.pdf).
 
 Because the probability mass function of a uniformly distributed discrete random
 variable depends on the size of its support, the prior on uniformly distributed
@@ -612,8 +612,8 @@ One upshot of this is that maximum probabilities could be arbitrarily increased
 by increasing counts of intra-episode siblings. Since siblings are not
 independent, these maxima arguably should not increase beyond two siblings per
 episode. Under the Pv3Rs model with realistic MOI estimates, groups of three or
-more siblings are effectively treated as pairs; see
-`vignette("intra-episode-siblings", "Pv3Rs")`.
+more siblings are effectively treated as pairs; see 
+[Understand intra-episode siblings](https://aimeertaylor.github.io/Pv3Rs/articles/intra-episode-siblings.html).
 
 END OF DIGRESSION
 
@@ -789,7 +789,7 @@ legend("left", legend = 1:3, title = "Number of recurrences", fill = 1:3,
 Recall that the above maxima are not bounds imposed by the prior: they are based
 on knowledge that there are no recurrent data on all but the first recurrence; 
 see 
-[Understand graph prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html).
+[Understand graph-prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/graph-prior.pdf).
 
 ## Position in a sequence {#position}
 
@@ -1234,14 +1234,14 @@ perturbation to the ratio of observations (all alleles match across the three
 half siblings, all alleles are different, intra-episode alleles match,
 inter-episode alleles match) can lead to a large deviation in the odds of
 relapse versus reinfection; see 
-[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
+[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/half-siblings.pdf). 
 The purple, red,
 and green trajectories below have higher than the expected 0.5 intra-to-inter
 match ratios; moreover, the purple trajectory's intra-to-inter match ratio
 consistently exceeds $0.5\times \text{log}_2(\dfrac{2}{5})$, a condition found
 theoretically to concentrate posterior probability on reinfection under certain
 conditions; again, see 
-[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html).
+[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/half-siblings.pdf).
 
 ```{r echo = FALSE, fig.height = 4}
 rm(list = "output")

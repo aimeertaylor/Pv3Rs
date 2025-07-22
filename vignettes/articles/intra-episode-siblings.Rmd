@@ -23,7 +23,7 @@ load("./data/maxima.rda")
 ```
 
 This vignette expands upon a digression in 
-[Understand posterior probabilities](https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html). 
+[Understand posterior probabilities](https://aimeertaylor.github.io/Pv3Rs/articles/posterior-probabilities.html). 
 
 `compute_posterior()` sums over graphs with cliques of three or more
 intra-episode siblings whenever the `MOIs` used contain values that exceed

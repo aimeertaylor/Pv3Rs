@@ -173,7 +173,7 @@ Bounds on marginal posteriors are harder to compute because computation involves
 \end{enumerate}
 
 \paragraph{Digression}
-In the online article \href{https://aimeertaylor.github.io/Pv3Rs/articles/understand-posterior.html}{``Understand posterior estimates''}
+In the online article \href{https://aimeertaylor.github.io/Pv3Rs/articles/posterior-probabilities.html}{``Understand posterior estimates''}
 we compute maximum marginal probabilities of recrudescence / reinfection at the first recurrence of two / three recurrences. These maxima are not bounds imposed by the prior: they are based on additional knowledge that there are no recurrent data on all but the first recurrence. The computation only holds because all episodes are monoclonal. When all episodes are monoclonal, the likelihood of equivalent sequences (e.g., CC, CI and CL in the case of two recurrences with strong evidence of recrudescence on the first and no data on the second) are equal (otherwise, they are unequal for reasons analogous to those that explain departure from the prior in the section ``Data on only one episode'') and graph likelihoods are equal for all graphs compatible with equivalent sequences (e.g., $\mathbb{P}(\bm{y} | \rg)$ is the same $\forall \rg \in \RG_{\recru\recru}$, $\forall \rg \in \RG_{\recru\reinf}$, and $\forall \rg \in \RG_{\recru\relap}$ in the case of two recurrences with strong evidence of recrudescence on the first and no data on the second). Given a uniform prior on recurrent states, three monoclonal episodes with strong evidence of recrudescence for the first recurrence and no data on the second recurrence, we thus have
 \begin{align}
 &\mathbb{P}(s_1 = \recru | \bm{y}  ) \\

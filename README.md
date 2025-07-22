@@ -89,7 +89,7 @@ parasites as regular siblings via the following assumptions:
 
 In our experience, half sibling misspecification leads to some misclassification
 of relapses as reinfections; see 
-[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/understand-half-sibs.html). 
+[Understand half-sibling misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/half-siblings.pdf). 
 A descriptive study to explore the extent of half-sibling misspecification is 
 recommended (an example will be provided in an upcoming manuscript).
 
@@ -102,10 +102,11 @@ analyses that explore the impact of errors and mutations on recurrence state
 probabilities are merited.
 
 #### Interpreting probable reinfection and recrudescence
-When data are not sufficiently informative to distinguish between recrudescence and 
-relapse (or reinfection and relapse), the posterior probabilities of recrudescence and 
-relapse (or reinfection and relapse) are heavily influenced by a model assumption over relationship
-graphs; see [Understand graph prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/understand-graph-prior.html). 
+When data are not sufficiently informative to distinguish between recrudescence
+and relapse (or reinfection and relapse), the posterior probabilities of
+recrudescence and relapse (or reinfection and relapse) are heavily influenced by
+a model assumption over relationship graphs; see
+[Understand graph-prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/enumerate.pdf). 
 The development of a more biologically-principled generative model on parasite 
 relationships is merited.
 
@@ -161,9 +162,6 @@ frequencies, assuming they are not biased by experimental artefacts.
 ```r
 # Install or update devtools from CRAN
 install.packages("devtools")
-
-# Install R.rsp, required for LaTeX vignette building
-install.packages("R.rsp")
 
 # Install Pv3Rs from GitHub 
 # We recommend doing this in RStudio: RStudio installs pandoc, required for
