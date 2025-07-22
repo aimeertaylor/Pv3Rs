@@ -1,6 +1,6 @@
 ---
-title: "Understand intra-episode siblings"
-description: "Expands upon a digression in **Understand posterior probabilities**"
+title: Understand intra-episode siblings
+description: Expands upon a digression in **Understand posterior probabilities**
 ---
 
 ```{r, include = FALSE}

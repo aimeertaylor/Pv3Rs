@@ -1,6 +1,6 @@
 ---
-title: "Understand posterior probabilities"
-description: "Documents `compute_posterior()` output under various conditions
+title: Understand posterior probabilities
+description: Documents `compute_posterior()` output under various conditions
 ---
   
 ```{r, include = FALSE}
