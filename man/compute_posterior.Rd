@@ -19,7 +19,7 @@ compute_posterior(
 episodes in chronological order. The inner list contains named
 markers per episode. Marker names must be consistent across episodes. \code{NA}
 indicates missing marker data; otherwise, specify a per-marker
-vector of distinct alleles detected (presently, \code{compute_posterior} does
+vector of distinct alleles detected (presently, \code{compute_posterior()} does
 not support data on the proportional abundance of detected alleles).
 Repeat alleles and \code{NA} entries within allelic vectors are ignored.
 Allele names are arbitrary, allowing for different data types, but must
@@ -50,7 +50,7 @@ graph (default \code{FALSE}). Setting \code{TRUE} disables permutation symmetry
 optimisation and thus increases runtime, especially when MOIs are large.
 Does not affect the output of the posterior probabilities; for an an
 example of permutation symmetry, see
-\HTMLVignette{demonstrate-usage}{graphs}{vignette("demonstrate-usage")}.}
+\HTMLVignette{demonstrate-usage}{"graphs"}{vignette("demonstrate-usage")}.}
 
 \item{progress.bar}{Logical; show progress bars (default \code{TRUE}).
 Note that the progress bar may update non-uniformly.}
