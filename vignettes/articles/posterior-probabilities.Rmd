@@ -22,8 +22,8 @@ options(warn = -1) # Suppress warnings about missing and limited data
 
 ```{r echo = FALSE}
 # Load data that are not exported with Pv3Rs: 
-load("../../DevFiles/RelationshipStudy/output_Cln.Str.Sib.rda") 
-load("../../DevFiles/RelationshipStudy/output_HalfSib.PCLikeSib.rda")
+load("./RelationshipStudy/output_Cln.Str.Sib.rda") 
+load("./RelationshipStudy/output_HalfSib.PCLikeSib.rda")
 ```
 
 This vignette is a detailed sequel to `vignette("demonstrate-usage", "Pv3Rs")`. 
@@ -60,8 +60,8 @@ model is misspecified because of
 - [Half siblings](#half)
 - [Parent-child-like siblings](#parent-child-like)
 
-More detailed results on sibling misspecification can be found in the 
-[development files of the Pv3Rs source package](https://github.com/aimeertaylor/Pv3Rs/tree/main/DevFiles/RelationshipStudy). 
+More detailed results on sibling misspecification can be found in  
+[RelationshipStudy](https://github.com/aimeertaylor/Pv3Rs/tree/main/vignettes/articles/RelationshipStudy). 
 
 We have not yet characterised model misspecification due to genotyping errors
 nor stranger parasites with elevated relatedness: 

@@ -1,6 +1,3 @@
 *.html
-*.R
+!*.R # To ensure source code is open source
 **/*_cache
-
-# Ensure figure source code is open source:
-!articles/figures/*.R
