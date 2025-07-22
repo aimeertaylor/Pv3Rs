@@ -1,7 +1,7 @@
 ---
 title: "Understand posterior probabilities"
-description: "Documents `compute_posterior()` output when the statistical
-model underpinning it is well and misspecified"
+description: "Documents `compute_posterior()` output when the underlying
+model is well and misspecified"
 ---
   
 ```{r, include = FALSE}

@@ -1,7 +1,7 @@
 ---
 title: "Demonstrate Pv3Rs usage"
 output: rmarkdown::html_vignette
-description: "Demonstrates basic Pv3Rs workflow for a single study participant"
+description: "Demonstrates Pv3Rs workflow for a single study participant"
 vignette: >
   %\VignetteIndexEntry{Demonstrate Pv3Rs usage}
   %\VignetteEngine{knitr::rmarkdown}

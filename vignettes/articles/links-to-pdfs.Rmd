@@ -1,6 +1,6 @@
 ---
 title: "Advanced documentation"
-description: Links to pdfs aimed at statistical model and package developers
+description: "Links to pdfs aimed at model and package developers"
 ---
 
 - [Benchmarking](benchmarking.pdf)

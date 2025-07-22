@@ -1,11 +1,6 @@
 ---
 title: "Understand intra-episode siblings"
-output: rmarkdown::html_vignette
 description: "Expands upon a digression in **Understand posterior probabilities**"
-vignette: >
-  %\VignetteIndexEntry{Explore treatment of intra-episode siblings}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
