@@ -4,7 +4,7 @@
 #' Computes per-person posterior probabilities of *P. vivax* recurrence states —
 #' recrudescence, relapse, reinfection — using per-person genetic data on two
 #' or more episodes. For usage, see **Examples** below and
-#' \HTMLVignette{demonstrate-usage}{}{'vignette("demonstrate-usage")'}.
+#' \HTMLVignette{demonstrate-usage}{}{Demonstrate Pv3Rs usage}.
 #' For a more complete understanding of `compute_posterior` output, see
 #' [Understand posterior probabilities](https://aimeertaylor.github.io/Pv3Rs/articles/posterior-probabilities.html).
 #'
@@ -74,8 +74,8 @@
 #'   graph (default `FALSE`). Setting `TRUE` disables permutation symmetry
 #'   optimisation and thus increases runtime, especially when MOIs are large.
 #'   Does not affect the output of the posterior probabilities; for an an
-#'   example of permutation symmetry, see **Exploration of relationship graphs**
-#'   \HTMLVignette{demonstrate-usage}{'#exploration-of-relationship-graphs'}{'vignette("demonstrate-usage")'}.
+#'   example of permutation symmetry, see **Exploration of relationship graphs** in
+#'   \HTMLVignette{demonstrate-usage}{exploration-of-relationship-graphs}{Demonstrate Pv3Rs usage}.
 #' @param progress.bar Logical; show progress bars (default `TRUE`).
 #'   Note that the progress bar may update non-uniformly.
 #'
