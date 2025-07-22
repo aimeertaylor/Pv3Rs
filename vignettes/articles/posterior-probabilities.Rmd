@@ -70,7 +70,7 @@ and misspecification of relapse as reinfection.
 - Stranger parasites that are related insofar as the population is related on
 average are largely accounted for: Allele frequency estimates encode
 population-level average relatedness locus-by-locus
-(Mehra et al. 2025, \doi{doi:10.1093/g3journal/jkaf018}). 
+[[Mehra et al. 2025]](https://doi.org/10.1093/g3journal/jkaf018). 
 Allele frequency estimates are plugged into the statistical model underpinning
 Pv3Rs. Providing they are computed from a sample drawn from the parasite
 population from which trial participants also draw, there is no need to
