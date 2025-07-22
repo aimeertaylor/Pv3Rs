@@ -1,12 +1,14 @@
 ---
 title: Advanced documentation
-description: Links to pdfs aimed at both model and package developers
+description: Links to pdfs aimed at both package and model developers
 ---
 
 - [Benchmarking](benchmarking.pdf)
+- [Examples encoded as unit tests in Pv3Rs](examples.pdf)
+- [Understand graph and partition enumeration](enumerate.pdf)
 - [Understand graph prior ramifications](graph-prior.pdf)
 - [Understand half-sibling misspecification](half-siblings.pdf)
-- [Understand graph and partition enumeration](enumerate.pdf)
+
 
 
 
