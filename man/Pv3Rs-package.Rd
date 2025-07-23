@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Compute per-person posterior probabilities that each recurrent Plasmodium vivax (Pv) recurrence is a recrudescence, relapse, or reinfection (3Rs) using per-person P. vivax genetic data on two or more episodes.
+Plot malaria parasite genetic data on two or more episodes. Compute per-person posterior probabilities that each Plasmodium vivax (Pv) recurrence is a recrudescence, relapse, or reinfection (3Rs) using per-person P. vivax genetic data on two or more episodes and a statistical model described in Taylor, Foo and White (2022, \doi{doi:10.1101/2022.11.23.22282669}). Plot per-recurrence posterior probabilities.
 }
 \seealso{
 Useful links:
@@ -24,7 +24,7 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Yong See Foo
+  \item Yong See Foo (\href{https://orcid.org/0000-0003-3010-9106}{ORCID})
 }
 
 Other contributors:
