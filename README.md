@@ -1,5 +1,9 @@
 # Pv3Rs <img src="man/figures/logo.png" align="right" alt="" width="120" />
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/aimeertaylor/Pv3Rs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aimeertaylor/Pv3Rs/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 An R package for *Plasmodium vivax* molecular correction via statistical genetic
 inference of 
 
