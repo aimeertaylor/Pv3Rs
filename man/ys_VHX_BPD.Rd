@@ -28,9 +28,9 @@ ys_VHX_BPD
 Previously-published microsatellite data on \emph{P. vivax} parasites
 extracted from study participants enrolled in the Best Primaquine Dose (BPD) and Vivax
 History (VHX) trials; see
-\href{https://doi.org/10.1038/s41467-019-13412-x}{Taylor & Watson et al. 2019}
+Taylor & Watson et al. 2019 (\doi{doi:10.1038/s41467-019-13412-x})
 for more details of the genetic data; for more details of the VHX and BPD trials, see
-\href{https://doi.org/10.1093/cid/ciy319}{Chu et al. 2018a} and
-\href{https://doi.org/10.1093/cid/ciy735}{Chu et al. 2018b}.
+Chu et al. 2018a (\doi{doi:10.1093/cid/ciy319}) and
+Chu et al. 2018b (\doi{doi:10.1093/cid/ciy735}).
 }
 \keyword{datasets}
