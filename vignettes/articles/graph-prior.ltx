@@ -37,7 +37,7 @@ For a given recurrent state, we assume relationship graphs are uniformly distrib
 When the prior probability on relapse is non-zero, posterior probabilities of reinfection and recrudescence never reach one because genetic data compatible with either recrudescence or reinfection are also compatible with relapse. In this section we discuss bounds on posterior probabilities of reinfection and recrudescence; they are induced by the uniformity of the prior over relationship graphs. Bounds define a feasible set of posterior probabilities without any information about the genetic data beyond that used to derive the multiplicities of infection (MOIs). For example, in the case of two genotypes in an enrolment episode followed by a monoclonal recurrence, when recurrent states are equally likely \textit{a priori}, the posterior probabilities of reinfection and recrudescence are upper bounded by $\sfrac{9}{11}$ and $\sfrac{9}{13}$, respectively. The feasible set of posterior probabilities is shown in Figure~\ref{fig:feasible}.
 
 \begin{SCfigure}
-\includegraphics[width=0.5\textwidth]{figures/feasible.png}
+\includegraphics[width=0.5\textwidth]{LatexFigures/feasible.png}
 \vspace{-2cm}
 \caption{Feasible set of posterior probabilities in the case of two genotypes in the initial episode and one genotype in the recurrent episode. Dashed lines intersect the left and bottom edges of the simplex at $\frac{4}{13}$ and $\frac{2}{11}$, respectively.}\label{fig:feasible}
 \end{SCfigure}
@@ -228,14 +228,13 @@ In this section we explore how maximum probabilities of recrudescence / reinfect
 \begin{figure}[h]
 \begin{subfigure}{.5\textwidth}
   \centering
-  \includegraphics[width=0.9\linewidth]
-  {figures/maxima1.png}
+  \includegraphics[width=0.9\linewidth]{LatexFigures/maxima1.png}
   \caption{}
   \label{fig:MOIDiff_reinfection}
 \end{subfigure}
 \begin{subfigure}{.5\textwidth}
   \centering
-  \includegraphics[width=0.9\linewidth]{figures/maxima2.png}
+  \includegraphics[width=0.9\linewidth]{LatexFigures/maxima2.png}
   \caption{}
   \label{fig:MOIDiff_recrudescence}
 \end{subfigure}
@@ -270,7 +269,7 @@ An explanation for the change in the probability distribution of the edge betwee
 
 \begin{SCfigure}
     \centering
-    \includegraphics[width=0.6\linewidth]{figures/maxima3.png}
+    \includegraphics[width=0.6\linewidth]{LatexFigures/maxima3.png}
     \caption{The probability that the first recurrence is a recrudescence / reinfection increases / decreases with additional recurrences devoid of data. The prior on recurrent states is uniform. The maximum probabilities are those based on knowledge that there are no recurrent data for all but the first recurrence and all episodes are monoclonal. For example, from equations \eqref{eq: 1st two C gvn L} and \eqref{eq: 1st two C gvn LL} we have $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3} > \sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$. Plugging $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3}$ into equation \eqref{eq:recru_prob_max}, and $\sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$ plus $\sfrac{|\RG_{\recru\recru}|}{|\RG_{\relap\recru}|} = \sfrac{1}{3}$ and $\sfrac{|\RG_{\recru\reinf}|}{|\RG_{\relap\reinf}|} = \sfrac{1}{3}$ into equation \eqref{eq:marginal_bound}, we see that the probability that the first recurrence is a recrudescence when recurrent states are equally likely \textit{a priori} increases slightly from $\sfrac{3}{4}$ to $\sfrac{3}{\left(3 + \sfrac{11}{12}\right)}$ with the addition of the second recurrence without data.}
     \label{fig:monoclonal_recurrences}
 \end{SCfigure}
