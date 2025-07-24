@@ -13,7 +13,7 @@
 \usepackage{xr}
 \usepackage{pv3rs} % For notation
 \usepackage{subcaption} % For subfigure
-\usepackage{sidecap} % For side captions
+\usepackage{caption}
 \usepackage{hyperref} % To link to Understand posterior estimates
 
 
@@ -34,13 +34,21 @@ For a given recurrent state, we assume relationship graphs are uniformly distrib
 
 \section{Posterior bounds that are induced by the graph prior}
 
-When the prior probability on relapse is non-zero, posterior probabilities of reinfection and recrudescence never reach one because genetic data compatible with either recrudescence or reinfection are also compatible with relapse. In this section we discuss bounds on posterior probabilities of reinfection and recrudescence; they are induced by the uniformity of the prior over relationship graphs. Bounds define a feasible set of posterior probabilities without any information about the genetic data beyond that used to derive the multiplicities of infection (MOIs). For example, in the case of two genotypes in an enrolment episode followed by a monoclonal recurrence, when recurrent states are equally likely \textit{a priori}, the posterior probabilities of reinfection and recrudescence are upper bounded by $\sfrac{9}{11}$ and $\sfrac{9}{13}$, respectively. The feasible set of posterior probabilities is shown in Figure~\ref{fig:feasible}.
+When the prior probability on relapse is non-zero, posterior probabilities of reinfection and recrudescence never reach one because all genetic data is always compatible with relapse. In this section, we discuss bounds on posterior probabilities of reinfection and recrudescence; they are induced by the uniformity of the prior over relationship graphs. Bounds define a feasible set of posterior probabilities without any information about the genetic data beyond that used to derive the multiplicities of infection (MOIs). For example, in the case of two genotypes in an enrolment episode followed by a monoclonal recurrence, when recurrent states are equally likely \textit{a priori}, the posterior probabilities of reinfection and recrudescence are upper bounded by $\sfrac{9}{11}$ and $\sfrac{9}{13}$, respectively. The feasible set of posterior probabilities is shown in Figure~\ref{fig:feasible}.
 
-\begin{SCfigure}
-\includegraphics[width=0.5\textwidth]{figures/feasible.png}
-\vspace{-2cm}
-\caption{Feasible set of posterior probabilities in the case of two genotypes in the initial episode and one genotype in the recurrent episode. Dashed lines intersect the left and bottom edges of the simplex at $\frac{4}{13}$ and $\frac{2}{11}$, respectively.}\label{fig:feasible}
-\end{SCfigure}
+\begin{figure}[h]
+  \centering
+  \begin{minipage}[c]{0.5\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/feasible.png}
+  \end{minipage}%
+  \begin{minipage}[c]{0.5\textwidth}
+    \vspace*{\fill}
+    \captionof{figure}{Feasible set of posterior probabilities in the case of two genotypes in the initial episode and one genotype in the recurrent episode. Dashed lines intersect the left and bottom edges of the simplex at $\frac{4}{13}$ and $\frac{2}{11}$, respectively.}
+    \label{fig:feasible}
+    \vspace*{\fill}
+  \end{minipage}
+\end{figure}
 
 \subsection{How bounds are derived}
 
@@ -48,7 +56,7 @@ We start by making some observations about the posterior odds of relapse to rein
 
 \subsubsection{Single recurrence}
 
-For clarity of exposition, we start with the case of a single recurrent episode. Let $\RG_\recru, \RG_\relap,$ and $\RG_\reinf$ denote subsets of the graph space $\RG$, containing the relationship graphs compatible with recrudescence, relapse, and reinfection respectively. The posterior odds of relapse to recrudescence is given by
+For clarity of exposition, we start with the case of a single recurrent episode. Let $\RG_\recru, \RG_\relap,$ and $\RG_\reinf$ denote subsets of the graph space $\RG$, containing the relationship graphs compatible with recrudescence, relapse, and reinfection respectively. (To be clear, $\RG_\relap$ is exactly $\RG$.) The posterior odds of relapse to recrudescence is given by
 
 
 \begin{equation*}
@@ -115,7 +123,7 @@ o_{\relap\relap:\recru\relap} \coloneqq
 \frac{\mathbb{P}(\relap\relap)}{\mathbb{P}(\recru\relap)}
 \frac{| \RG_{\recru\relap} |}{| \RG_{\relap\relap} |} \left(1 + \frac{\sum_{\rg\in\RG_{\relap\relap}\setminus\RG_{\recru\relap}}\mathbb{P}(\bm{y} | \rg)}{\sum_{\rg\in\RG_{\recru\relap}}\mathbb{P}(\bm{y} | \rg)}\right).
 \end{align*}
-However, unlike before, we cannot always derive maximum posterior probabilities from the odds because the probabilities of the remaining sequences are not necessarily zero (the exception being when the odds of a all-but-one-relapse to all-relapse sequence are maximised). Instead, we must compute maximum probabilities the long way; for example,
+However, unlike before, we cannot always derive maximum posterior probabilities from the odds because the probabilities of the remaining sequences are not necessarily zero (the exception being when the odds of an all-but-one-relapse to all-relapse sequence are maximised). Instead, we must compute maximum probabilities the long way; for example,
 \begin{align}
     \mathbb{P}(\recru\recru | \bm{y}) =
     &\left\{
@@ -154,7 +162,7 @@ However, unlike before, we cannot always derive maximum posterior probabilities 
     \sfrac{\mathbb{P}(\reinf\reinf)}{|\RG_{\reinf\reinf}|}
     \right\}^{-1} \label{eq:CC_prob_max}
 \end{align}
-converges to
+is approximately
 \begin{equation*}
 \dfrac{
 \mathbb{P}(\recru\recru)}{
@@ -165,7 +173,7 @@ converges to
 \end{equation*}
 when $\sum_{\rg\in\RG_{\recru\recru}} \mathbb{P}(\bm{y} | \rg)$ significantly exceeds the summation over all other subsets of graph space in equation \eqref{eq:CC_prob_max}.
 
-Bounds on marginal posteriors are harder to compute because computation involves summation over sequences whose probabilities are not necessarily zero. For example, the bound on recrudescence at the first recurrence of two recurrences, is a maximum of three upper bounds each involving non-zero probabilities:
+Bounds on marginal posteriors are harder to compute because computation involves summation over sequences whose probabilities are not necessarily zero. For example, the bound on recrudescence at the first recurrence of two recurrences, may be close to one of three upper bounds each involving non-zero probabilities:
 \begin{enumerate}
     \item bound given maximal CC probability (probabilities of CI \& CL are not necessarily both zero)
     \item bound given maximal CL probability (probabilities of CC \& CI are not necessarily both zero)
@@ -217,7 +225,7 @@ The same reasoning applies given strong evidence of reinfection.
 
 \section{Bounds as indicators of data informativeness}
 
-By comparing probability estimates to their respective bounds, we might like to answer the question: could the posterior probability of my most probable state sequence be higher if I added data on more markers? However, we cannot guarantee convergence onto bounds. In the case of a marginal probability, the bound is the maximum of multiple upper bounds (see example above), and thus convergence is not guaranteed; in the case of a non-marginal probability, we suspect convergence might depend on the relationship graph from which the data are generated.
+By comparing probability estimates to their respective bounds, we might like to answer the question: could the posterior probability of my most probable state sequence be higher if we had data on more markers? However, we cannot guarantee convergence onto bounds. In the case of a marginal probability, the bound is the maximum of multiple upper bounds (see example above), and thus convergence is not guaranteed; in the case of a non-marginal probability, we suspect convergence might depend on the relationship graph from which the data are generated.
 
 
 
@@ -268,11 +276,18 @@ There are now 12 relationship graphs, which are assumed to be equally likely und
 
 An explanation for the change in the probability distribution of the edge between the first two genotypes upon the addition of the second relapse is that a clonal edge between the first two genotypes imposes a constraint where the two remaining edges must exhibit the same relationship. Similarly, a sibling edge between the first two genotypes is incompatible with a single stranger edge among the two remaining edges. In general, the pattern that stranger edges are more likely \textit{a priori} and clonal edges are less likely \textit{a priori} becomes more prominent when more genotypes are present. For monoclonal episodes, this change in distribution over the edge between the first two genotypes results in an increase / decrease in the maximum probability that the first recurrence is a recrudescence / reinfection with the addition of monoclonal recurrences devoid of data (Figure \ref{fig:monoclonal_recurrences}), where the maximum probabilities are those assuming all episodes are monoclonal and there are no recurrent data on all but the first recurrence (e.g., as in equation \eqref{eq:marginal_bound}).
 
-\begin{SCfigure}
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[c]{0.5\textwidth}
     \centering
-    \includegraphics[width=0.6\linewidth]{figures/maxima3.png}
-    \caption{The probability that the first recurrence is a recrudescence / reinfection increases / decreases with additional recurrences devoid of data. The prior on recurrent states is uniform. The maximum probabilities are those based on knowledge that there are no recurrent data for all but the first recurrence and all episodes are monoclonal. For example, from equations \eqref{eq: 1st two C gvn L} and \eqref{eq: 1st two C gvn LL} we have $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3} > \sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$. Plugging $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3}$ into equation \eqref{eq:recru_prob_max}, and $\sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$ plus $\sfrac{|\RG_{\recru\recru}|}{|\RG_{\relap\recru}|} = \sfrac{1}{3}$ and $\sfrac{|\RG_{\recru\reinf}|}{|\RG_{\relap\reinf}|} = \sfrac{1}{3}$ into equation \eqref{eq:marginal_bound}, we see that the probability that the first recurrence is a recrudescence when recurrent states are equally likely \textit{a priori} increases slightly from $\sfrac{3}{4}$ to $\sfrac{3}{\left(3 + \sfrac{11}{12}\right)}$ with the addition of the second recurrence without data.}
+    \includegraphics[width=\textwidth]{figures/maxima3.png}
+  \end{minipage}%
+  \begin{minipage}[c]{0.5\textwidth}
+    \vspace*{\fill}
+    \captionof{figure}{The probability that the first recurrence is a recrudescence / reinfection increases / decreases with additional recurrences devoid of data. The prior on recurrent states is uniform. The maximum probabilities are those based on knowledge that there are no recurrent data for all but the first recurrence and all episodes are monoclonal. For example, from equations \eqref{eq: 1st two C gvn L} and \eqref{eq: 1st two C gvn LL} we have $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3} > \sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$. Plugging $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3}$ into equation \eqref{eq:recru_prob_max}, and $\sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$ plus $\sfrac{|\RG_{\recru\recru}|}{|\RG_{\relap\recru}|} = \sfrac{1}{3}$ and $\sfrac{|\RG_{\recru\reinf}|}{|\RG_{\relap\reinf}|} = \sfrac{1}{3}$ into equation \eqref{eq:marginal_bound}, we see that the probability that the first recurrence is a recrudescence when recurrent states are equally likely \textit{a priori} increases slightly from $\sfrac{3}{4}$ to $\sfrac{3}{\left(3 + \sfrac{11}{12}\right)}$ with the addition of the second recurrence without data.}
     \label{fig:monoclonal_recurrences}
-\end{SCfigure}
+    \vspace*{\fill}
+  \end{minipage}
+\end{figure}
 
 \end{document}

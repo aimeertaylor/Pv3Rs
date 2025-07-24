@@ -21,8 +21,7 @@
 \begin{document}
 \maketitle
 
-In this vignette, we investigate the theoretical behaviour of Pv3Rs
-when it is misspecified because data are from half-sibling parasites. For simplicity, we consider only the case of a single recurrent episode and we assume throughout that the prior distribution for recrudescence, relapse, and reinfection is uniform.
+In this vignette, we investigate the theoretical behaviour of Pv3Rs when it is misspecified because of data derived from half-sibling parasites. For simplicity, we consider only the case of a single recurrent episode and we assume throughout that the prior distribution for recrudescence, relapse, and reinfection is uniform.
 
 Before proceeding, we recall an observations about the posterior odds of relapse to reinfection, and relapse to recrudescence documented elsewhere. Let $\RG_\recru, \RG_\relap,$ and $\RG_\reinf$ denote subsets of the graph space $\RG$, containing the relationship graphs compatible with recrudescence, relapse, and reinfection respectively. Given the prior on the three recurrent states for the single recurrent infection is uniform, the posterior odds of relapse to reinfection is given by
 \begin{equation}\label{eq:relap_reinf_odds}
@@ -426,7 +425,7 @@ Now suppose that the parent alleles are sampled from
 \begin{equation}\label{eq:dirichlet_prior}
     (f_1,f_2,\ldots, f_d) \sim \textrm{Dir}(\lambda,\lambda,\ldots, \lambda)
 \end{equation}
-for some concentration parameter $\lambda > 0$. The equifrequent assumption corresponds to setting $\lambda\rightarrow\infty$. Under \eqref{eq:dirichlet_prior}, we can compute that
+for some concentration parameter $\lambda > 0$. The equifrequent assumption corresponds to setting $\lambda\rightarrow\infty$. Under \eqref{eq:dirichlet_prior}, we use moments of the Dirichlet distribution to derive that
 \begin{equation}\label{eq:case_probs_avg}
 % \begin{aligned}
 %     \mathbb{E}[\mathbb{P}(\text{observation case } 1)] &= \frac{\lambda^2}{2(3\lambda+1)(3\lambda+2)}, &
