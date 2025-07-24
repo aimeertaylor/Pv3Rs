@@ -164,6 +164,14 @@ frequencies, assuming they are not biased by experimental artefacts.
 ## Installation 
 
 ```r
+#===============================================================================
+# First try installing Pv3Rs from CRAN (available soon if not already):
+#===============================================================================
+install.packages("Pv3Rs")
+
+#===============================================================================
+# If Pv3Rs is not available on CRAN:
+#===============================================================================
 # Install or update devtools from CRAN
 install.packages("devtools")
 
@@ -173,6 +181,9 @@ install.packages("devtools")
 # path; otherwise set build_vignettes = FALSE
 devtools::install_github("aimeertaylor/Pv3Rs", build_vignettes = TRUE)
 
+#===============================================================================
+# Getting started after installation:
+#===============================================================================
 # Load and attach Pv3Rs
 library(Pv3Rs)
 
@@ -182,6 +193,6 @@ help(package = "Pv3Rs")
 # List links to vignettes
 vignette(package = "Pv3Rs")
 
-# View function documentation, e.g., 
+# View function documentation including examples, e.g., 
 ?compute_posterior
 ```

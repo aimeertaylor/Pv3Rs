@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 library(Pv3Rs)
 # Access non-exported function
 recombine_parent_ids <- utils::getFromNamespace("recombine_parent_ids", "Pv3Rs") 
-load("./data/maxima.rda")
+load("./MaximaStudy/maxima.rda")
 ```
 
 This vignette expands upon a digression in 
