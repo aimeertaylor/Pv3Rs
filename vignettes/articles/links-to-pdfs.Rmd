@@ -1,9 +1,9 @@
 ---
 title: Advanced documentation
-description: Links to PDFs with statistical and package-development content.
+description: Links to PDFs with theoretical and package-development content.
 ---
 
-Links to pdfs detailing model phenomena statistically:
+Links to pdfs detailing model behaviour theoretically:
 
 - [Understand graph-prior ramifications](graph-prior.pdf)
 - [Understand half-sibling misspecification](half-siblings.pdf)

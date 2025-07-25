@@ -17,7 +17,10 @@ knitr::opts_chunk$set(echo=TRUE)
 knitr::opts_chunk$set(dpi=300)
 ```
 
-In this document, we investigate the runtime scaling of the `Pv3Rs`' main function, `compute_posterior`, with respect to the number of markers, the MOIs, and the number of episodes. Each timing result is replicated 30 times to account for variability.
+In this document, we investigate the runtime scaling of the `Pv3Rs`' main
+function, `compute_posterior`, with respect to the number of markers, the MOIs,
+and the number of episodes. Each timing result is replicated 30 times to account
+for variability.
 
 ## Setup
 <!-- load results saved by benchmark.R, so that long-running code chunks in this document are not run when compiling -->
@@ -66,7 +69,12 @@ sim_data <- function(MOIs, n_m, n_a) {
 
 ## Runtime vs number of markers
 
-We expect the runtime of `compute_posterior` to scale linearly with the number of markers due to the likelihood decomposition ([1], Section 3.4). We simulate genetic data spanning across 2 episodes both with MOI 2, and vary the number of markers between $50, 100, \ldots, 400$. Each marker is assumed to have 8 possible alleles.
+We expect the runtime of `compute_posterior` to scale linearly with the number
+of markers due to the likelihood decomposition (Section 3.4 of 
+[Taylor, Foo & White, 2022](https://doi.org/10.1101/2022.11.23.22282669)). We
+simulate genetic data spanning across 2 episodes both with MOI 2, and vary the
+number of markers between $50, 100, \ldots, 400$. Each marker is assumed to have
+8 possible alleles.
 
 ```{r}
 set.seed(1)
@@ -182,11 +190,15 @@ for(i in 1:n) {
 }
 ```
 
-Empirically, the runtime (note the log scale) has roughly exponentially scaling with respect to the total MOI. It is difficult to conclude an exact growth rate due to the small range of the total MOI. Given a fixed total MOI, the runtime is slightly shorter (see printed output of total runtime) if the maximum MOI is larger. This can be explained by the following observations:
+Empirically, the runtime (note the log scale) has roughly exponentially scaling
+with respect to the total MOI. It is difficult to conclude an exact growth rate
+due to the small range of the total MOI. Given a fixed total MOI, the runtime is
+slightly shorter (see printed output of total runtime) if the maximum MOI is
+larger. This can be explained by the following observations:
 
-* A larger maximum MOI leads to more pairs of genotypes that cannot be clones. This leads to less valid relationship graphs to enumerate.
+* A larger maximum MOI leads to more pairs of genotypes that cannot be clones. This leads to fewer valid relationship graphs to enumerate.
 
-* Allele assignment for the largest MOI is always fixed. A smaller minimum MOI leads to less allele assignment possibilities to be considered.
+* Allele assignment for the largest MOI is always fixed. A smaller minimum MOI leads to fewer allele assignment possibilities to be considered.
 
 ## Runtime vs number of episodes
 
@@ -196,9 +208,10 @@ Here we investigate two separate cases:
 
 * increasing the number of episodes with a fixed total MOI.
 
-### 1 genotype per episode
+### One genotype per episode (episodes with MOI = 1)
 
-We simulate genetic data consisting of 1 marker (8 alleles), with 1 genotype per episode for various numbers of episodes.
+We simulate genetic data consisting of one marker (eight alleles), with one
+genotype per episode for various numbers of episodes.
 
 ```{r}
 set.seed(1)
@@ -251,13 +264,15 @@ for(epi in n_epis) {
 }
 ```
 
-With one genotype per episode, the runtime (note the log scale) scales super-exponentially with respect to the number of episodes (or equivalently, the total MOI). In fact, the number of relationship graphs with $n$ episodes with 1 genotype per episode is given by
+With one genotype per episode, the runtime (note the log scale) scales super-exponentially with respect to the number of episodes (or equivalently, the total MOI). In fact, the number of relationship graphs with $n$ episodes with one genotype per episode is given by
 $$R_n = \sum_{k=1}^n S(n,k)B_k,$$
 where $S(n_k)$ are Stirling numbers of the second kind and $B_k$ are Bell numbers. We provide the derivation in the [Appendix], where we also show that $\log R_n \sim n\log n$. 
 
 ### Fixed total MOI
 
-We simulate genetic data consisting of 1 marker (8 alleles), for various numbers of episodes with a fixed total MOI of 7. See printed output below for the sequence of MOIs considered.
+We simulate genetic data consisting of one marker (8 alleles), for various
+numbers of episodes with a fixed total MOI of seven. See printed output below
+for the sequence of MOIs considered.
 
 ```{r}
 set.seed(1)
@@ -317,11 +332,14 @@ for(epi in 2:maxepi) {
 }
 ```
 
-With the total MOI fixed, the runtime does not increase as drastically with the number of episodes (note linear scale, not log scale). However, more episodes still lead to more valid relationship graphs as there are less pairs of intra-episode genotypes which cannot be clones, explaining the increase in runtime.
+With the total MOI fixed, the runtime does not increase as drastically with the
+number of episodes (note linear scale, not log scale). However, more episodes
+still lead to more valid relationship graphs as there are more pairs that can be
+clones, explaining the increase in runtime.
 
 ## Appendix
 
-To derive a formula for $R_n$, the number of relationship graphs for $n$ episodes with 1 genotype per episode, we treat a relationship graph as a nested partition. The clonal relationships in a relationship graph induce a partition of all genotypes into subsets, where all genotypes within the same subset are clones of each other. We call such a subset a `clonal cell'. The sibling relationships in a relationship graph induce a partition of all clonal cells into subsets, such that any two genotypes from the same subset that are not clones of each other must be siblings. Recall that Stirling numbers of the second kind $S(n,k)$ count the number of ways to partition $n$ objects into $k$ subsets, whereas the Bell numbers $B_k$ count the number of ways to partition $k$ objects (into any number of subsets). Letting $k$ denote the number of clonal cells, we have
+To derive a formula for $R_n$, the number of relationship graphs for $n$ episodes with one genotype per episode, we treat a relationship graph as a nested partition. The clonal relationships in a relationship graph induce a partition of all genotypes into subsets, where all genotypes within the same subset are clones of each other. We call such a subset a `clonal cell'. The sibling relationships in a relationship graph induce a partition of all clonal cells into subsets, such that any two genotypes from the same subset that are not clones of each other must be siblings. Recall that Stirling numbers of the second kind $S(n,k)$ count the number of ways to partition $n$ objects into $k$ subsets, whereas the Bell numbers $B_k$ count the number of ways to partition $k$ objects (into any number of subsets). Letting $k$ denote the number of clonal cells, we have
 $$R_n = \sum_{k=1}^n S(n,k)B_k.$$
 
 To establish the asymptotics of $R_n$, we first note that $R_n \ge S(n,n)B_n = B_n$. It is well known that $\log B_n \sim n\log n$. If we additionally have that $R_n \le n^n$, it then follows that $\log R_n \sim n\log n$. The rest of this appendix is devoted to proving that $R_n \le n^n$ is indeed true. Let $\mathcal{H}_n$ be the set of all functions $h$ that map elements of $\{1,\ldots,n\}$ to $\{1,\ldots,n\}$. Since $|\mathcal{H}_n|=n^n$, it suffices to show that there is an injection from the set of all relationship graphs (with $n$ genotypes) to $\mathcal{H}_n$. 
@@ -336,6 +354,3 @@ It remains to show that this mapping is indeed an injection. Consider two differ
 
 This completes the proof that $\log R_n \sim n\log n$.
 
-## References 
-
-[1] Taylor AR, Foo YS, White MT. (2022). Plasmodium vivax relapse, reinfection and recrudescence estimation using genetic data. medRxiv preprint medRxiv:2022.11.23.22282669. <https://doi.org/10.1101/2022.11.23.22282669>
