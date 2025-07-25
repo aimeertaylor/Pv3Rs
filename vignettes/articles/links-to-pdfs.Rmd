@@ -10,7 +10,6 @@ Links to pdfs detailing model phenomena statistically:
 
 Links to pdfs aimed at package developers: 
 
-- [Benchmarking Pv3Rs](benchmark.pdf)
 - [Understand graph and partition enumeration](enumerate.pdf)
 - [Examples encoded as unit tests in Pv3Rs](examples.pdf)
 

@@ -1,7 +1,11 @@
 ---
-title: "Benchmarking Pv3Rs"
-output:
-  pdf_document: default
+title: Benchmarking Pv3Rs
+output: rmarkdown::html_vignette
+description: Investigates runtime scaling of posterior computation
+vignette: >
+  %\VignetteIndexEntry{Benchmarking Pv3Rs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
