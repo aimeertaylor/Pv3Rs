@@ -45,6 +45,7 @@ Suggests:
     R.rsp,
     rmarkdown,
     testthat (>= 3.0.0),
+    tictoc,
     utils
 VignetteBuilder: 
     knitr
