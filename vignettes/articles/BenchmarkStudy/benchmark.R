@@ -4,7 +4,7 @@
 ################################################################################
 
 library(Pv3Rs)
-library(MCMCpack)
+library(gtools)
 library(tictoc)
 
 # simulate allele frequencies for one marker

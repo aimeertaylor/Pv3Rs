@@ -18,7 +18,7 @@
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
-library(MCMCpack) # for rdirichlet
+library(gtools) # for rdirichlet
 set.seed(1) # for reproducibility
 source("enumerate_halfsib_alleles.R")
 source("locus_type_summary.R")

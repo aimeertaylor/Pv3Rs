@@ -5,7 +5,7 @@
 
 # Generate
 n <- 40
-lineage_probs <- as.vector(MCMCpack::rdirichlet(1, alpha = rep(0.1, n)))
+lineage_probs <- as.vector(gtools::rdirichlet(1, alpha = rep(0.1, n)))
 names(lineage_probs) <- generate_lineages(n)
 f_comp <- sum(lineage_probs^2)
 g_comp <- 0.5*(f_comp + 1)

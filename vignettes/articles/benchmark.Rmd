@@ -30,7 +30,7 @@ list2env(output_benchmark, envir = environment())
 ```{r message=FALSE}
 library(Pv3Rs)
 library(tictoc)
-library(MCMCpack)
+library(gtools)
 
 # simulate allele frequencies for one marker
 sim_fs_single <- function(n_a) {

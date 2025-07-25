@@ -9,7 +9,7 @@
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
-library(MCMCpack) # For rdirichlet
+library(gtools) # For rdirichlet
 
 #===============================================================================
 # Magic numbers / quantities
@@ -64,7 +64,7 @@ for(case in cases){
       if(c > c_cutoff) {
         fs_unnamed <- rep(1/n_alleles, n_alleles)
       } else {
-        fs_unnamed <- MCMCpack::rdirichlet(1, rep(c, n_alleles))
+        fs_unnamed <- gtools::rdirichlet(1, rep(c, n_alleles))
       }
       setNames(fs_unnamed, alleles)
     }, USE.NAMES = TRUE, simplify = FALSE)

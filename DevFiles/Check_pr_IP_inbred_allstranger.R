@@ -29,7 +29,7 @@ Equifrequent_lineages <- TRUE
 if(Equifrequent_lineages) {
   lineage_probs <- rep(1/n, n)
 } else {
-  lineage_probs <- as.vector(MCMCpack::rdirichlet(1, alpha = rep(0.1, n)))
+  lineage_probs <- as.vector(gtools::rdirichlet(1, alpha = rep(0.1, n)))
 }
 
 names(lineage_probs) <- generate_lineages(n)

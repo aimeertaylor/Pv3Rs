@@ -4,7 +4,7 @@
 # limit for 3 half siblings (with parents AB, BC, CA).
 ################################################################################
 
-library(MCMCpack)
+library(gtools)
 
 # eq:cond_dens in half_siblings.ltx
 myden <- function(x) (3*lambda+2)/(4*lambda+3) * (1+x) * dbeta(x, lambda+1,2*lambda+1)

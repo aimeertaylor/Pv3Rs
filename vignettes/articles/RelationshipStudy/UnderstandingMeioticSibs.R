@@ -9,7 +9,7 @@
 ################################################################################
 rm(list = ls())
 library(Pv3Rs)
-library(MCMCpack)
+library(gtools)
 max_n_markers <- 150
 all_markers <- paste0("m", 1:max_n_markers)
 n_alleles <- 5

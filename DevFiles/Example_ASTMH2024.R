@@ -3,7 +3,7 @@
 # ==============================================================================
 rm(list = ls())
 library(Pv3Rs)
-library(MCMCpack) # For rdirichlet
+library(gtools) # For rdirichlet
 library(tictoc) # For timing
 
 # Magic numbers / quantities
@@ -19,7 +19,7 @@ markers <- paste0("m", 1:n_markers) # Marker names
 
 # Sample allele frequencies
 fs <- sapply(markers, function(m) {
-  sort(setNames(MCMCpack::rdirichlet(1, rep(c_param, n_alleles)), alleles), decreasing = T)
+  sort(setNames(gtools::rdirichlet(1, rep(c_param, n_alleles)), alleles), decreasing = T)
   }, USE.NAMES = T, simplify = F)
 rm(alleles)
 
