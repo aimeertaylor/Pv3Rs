@@ -1,3 +1,3 @@
-# Pv3Rs (development version)
+# Pv3Rs 1.0.0
 
 * Initial CRAN submission.
