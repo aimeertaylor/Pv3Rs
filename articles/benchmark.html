@@ -125,7 +125,8 @@ variability.</p>
 </h2>
 <p>We expect the runtime of <code>compute_posterior</code> to scale
 linearly with the number of markers due to the likelihood decomposition
-([1], Section 3.4). We simulate genetic data spanning across 2 episodes
+(Section 3.4 of <a href="https://doi.org/10.1101/2022.11.23.22282669" class="external-link">Taylor, Foo &amp;
+White, 2022</a>). We simulate genetic data spanning across 2 episodes
 both with MOI 2, and vary the number of markers between
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>50</mn><mo>,</mo><mn>100</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>400</mn></mrow><annotation encoding="application/x-tex">50, 100, \ldots, 400</annotation></semantics></math>.
 Each marker is assumed to have 8 possible alleles.</p>
@@ -245,10 +246,10 @@ output of total runtime) if the maximum MOI is larger. This can be
 explained by the following observations:</p>
 <ul>
 <li><p>A larger maximum MOI leads to more pairs of genotypes that cannot
-be clones. This leads to less valid relationship graphs to
+be clones. This leads to fewer valid relationship graphs to
 enumerate.</p></li>
 <li><p>Allele assignment for the largest MOI is always fixed. A smaller
-minimum MOI leads to less allele assignment possibilities to be
+minimum MOI leads to fewer allele assignment possibilities to be
 considered.</p></li>
 </ul>
 </div>
@@ -263,10 +264,10 @@ and</p></li>
 MOI.</p></li>
 </ul>
 <div class="section level3">
-<h3 id="genotype-per-episode">1 genotype per episode<a class="anchor" aria-label="anchor" href="#genotype-per-episode"></a>
+<h3 id="one-genotype-per-episode-episodes-with-moi-1">One genotype per episode (episodes with MOI = 1)<a class="anchor" aria-label="anchor" href="#one-genotype-per-episode-episodes-with-moi-1"></a>
 </h3>
-<p>We simulate genetic data consisting of 1 marker (8 alleles), with 1
-genotype per episode for various numbers of episodes.</p>
+<p>We simulate genetic data consisting of one marker (eight alleles),
+with one genotype per episode for various numbers of episodes.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n_m</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
@@ -318,7 +319,7 @@ scales super-exponentially with respect to the number of episodes (or
 equivalently, the total MOI). In fact, the number of relationship graphs
 with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
-episodes with 1 genotype per episode is given by
+episodes with one genotype per episode is given by
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>B</mi><mi>k</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">R_n = \sum_{k=1}^n S(n,k)B_k,</annotation></semantics></math>
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>n</mi><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(n_k)</annotation></semantics></math>
@@ -330,8 +331,8 @@ are Bell numbers. We provide the derivation in the <a href="#appendix">Appendix<
 <div class="section level3">
 <h3 id="fixed-total-moi">Fixed total MOI<a class="anchor" aria-label="anchor" href="#fixed-total-moi"></a>
 </h3>
-<p>We simulate genetic data consisting of 1 marker (8 alleles), for
-various numbers of episodes with a fixed total MOI of 7. See printed
+<p>We simulate genetic data consisting of one marker (8 alleles), for
+various numbers of episodes with a fixed total MOI of seven. See printed
 output below for the sequence of MOIs considered.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
@@ -389,8 +390,8 @@ output below for the sequence of MOIs considered.</p>
 <p>With the total MOI fixed, the runtime does not increase as
 drastically with the number of episodes (note linear scale, not log
 scale). However, more episodes still lead to more valid relationship
-graphs as there are less pairs of intra-episode genotypes which cannot
-be clones, explaining the increase in runtime.</p>
+graphs as there are more pairs that can be clones, explaining the
+increase in runtime.</p>
 </div>
 </div>
 <div class="section level2">
@@ -400,8 +401,8 @@ be clones, explaining the increase in runtime.</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>n</mi></msub><annotation encoding="application/x-tex">R_n</annotation></semantics></math>,
 the number of relationship graphs for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
-episodes with 1 genotype per episode, we treat a relationship graph as a
-nested partition. The clonal relationships in a relationship graph
+episodes with one genotype per episode, we treat a relationship graph as
+a nested partition. The clonal relationships in a relationship graph
 induce a partition of all genotypes into subsets, where all genotypes
 within the same subset are clones of each other. We call such a subset a
 `clonal cell’. The sibling relationships in a relationship graph induce
@@ -573,13 +574,6 @@ which is irrelevant). Therefore, we must have
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>1</mn></msub><mo>≠</mo><msub><mi>h</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">h_1\neq h_2</annotation></semantics></math>.</p>
 <p>This completes the proof that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><msub><mi>R</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mo>log</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\log R_n \sim n\log n</annotation></semantics></math>.</p>
-</div>
-<div class="section level2">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h2>
-<p>[1] Taylor AR, Foo YS, White MT. (2022). Plasmodium vivax relapse,
-reinfection and recrudescence estimation using genetic data. medRxiv
-preprint medRxiv:2022.11.23.22282669. <a href="https://doi.org/10.1101/2022.11.23.22282669" class="external-link uri">https://doi.org/10.1101/2022.11.23.22282669</a></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
