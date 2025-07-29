@@ -29,6 +29,8 @@ Authors:
 
 Other contributors:
 \itemize{
+  \item Tymoteusz Kwiecinski [compiler]
+  \item Duncan Murdoch [contributor]
   \item Mans Magnusson [contributor]
   \item Institut Pasteur [copyright holder]
   \item European Union, Project 101110393 [funder]

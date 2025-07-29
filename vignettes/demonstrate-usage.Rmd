@@ -137,9 +137,7 @@ post$joint["LC"] + post$joint["LL"] + post$joint["LI"]
 Per-recurrence posterior probabilities are plotted on the simplex using `plot_simplex()`.
 
 ```{r}
-par(mar = rep(0.1,4))
-p.coords <- rbind(post$marg, Prior = rep(1/3, 3))
-plot_simplex(p.coords = p.coords, pch = 20)
+plot_simplex(p.coords = rbind(post$marg, Prior = rep(1/3, 3)), pch = 20)
 ```
 
 The point in the yellow region is most likely a recrudescence with posterior
@@ -180,6 +178,8 @@ two graphs with maximum likelihood; they are isomorphic up to within-episode
 genotype permutations.
 
 ```{r}
+
+
 # Extract all log likelihoods
 llikes <- sapply(post$RGs, function(RG) RG$logp)
 
@@ -190,7 +190,8 @@ mllikes <- max(llikes)
 RGs <- post$RGs[which(abs(llikes - mllikes) < .Machine$double.eps^0.5)]
 
 # Plot RGs with maximum log likelihoods
-par(mar = rep(0.1,4), mfrow = c(1,2))
+oldpar <- par(no.readonly = TRUE) # Store user's options
+par(mfrow = c(1,2))
 for(i in 1:length(RGs)) {
   plot_RG(RG_to_igraph(RGs[[i]], determine_MOIs(y)), vertex.size = 20)
   box()
@@ -200,6 +201,8 @@ for(i in 1:length(RGs)) {
 legend("bottomright", pch = 21, 
        pt.bg =  RColorBrewer::brewer.pal(n = 8, "Set2") [1:length(y)], 
        bty = "n", legend = names(y), title = "Episode")
+
+par(oldpar) # Restore user's options
 ```
 
 Using log likelihoods, we can also find the equivalence class for which the data are most
@@ -226,7 +229,8 @@ max_idx <- decr_idxs[max_class_p] # Index of last graph in ML EC
 max_size <- class_sizes[max_class_p] # Number of graphs in ML EC
 
 # Plot all graphs within the ML EC 
-par(mar = rep(0.1,4), mfrow = c(3,4))
+oldpar <- par(no.readonly = TRUE) # Store user's options
+par(mfrow = c(3,4))
 RG_order <- order(llikes, decreasing = T) # order RGs by logl
 for(i in (max_idx-max_size+1):max_idx) { # EC consists of the RGs with logl rank 21-32
   RG <- post$RGs[[RG_order[i]]]
@@ -234,6 +238,7 @@ for(i in (max_idx-max_size+1):max_idx) { # EC consists of the RGs with logl rank
   plot_RG(RG_igraph, vertex.size = 25, vertex.label = NA)
   box()
 }
+par(oldpar) # Restore user's options
 ```
 
 **Important considerations**

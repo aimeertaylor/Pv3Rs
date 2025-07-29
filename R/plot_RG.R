@@ -33,7 +33,7 @@
 #'
 #' @examples
 #' RGs <- enumerate_RGs(c(2, 1, 1), progress.bar = FALSE)
-#' cpar <- par(no.readonly = TRUE) # record current par before changing
+#' oldpar <- par(no.readonly = TRUE) # record user's options
 #' par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
 #' for (i in 12:23) {
 #'   plot_RG(RGs[[i]],
@@ -42,7 +42,7 @@
 #'   edge.curved = 0.1)
 #'   box()
 #' }
-#' par(cpar) # reset par
+#' par(oldpar) # restore user's options
 #' @export
 
 plot_RG <- function(RG,
@@ -52,6 +52,12 @@ plot_RG <- function(RG,
                     edge.col = c(sibling = "black", clone = "black"),
                     edge.width = 1.5,
                     ...) {
+
+  # Ensure users options are restored on exit
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
+
+  par(mar = rep(0.1,4)) # Reduce border
 
   # Convert relationship names to weights
   widths_by_relationship <- c(sibling = 0.5, clone = 1)

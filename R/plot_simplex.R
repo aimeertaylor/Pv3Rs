@@ -88,6 +88,12 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
                          p.labels.cex = 1,
                          ...) {
 
+  # Ensure users options are restored on exit
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
+
+  par(mar = rep(0.1,4)) # Reduce border
+
   # Define some constants:
   h <- sqrt(3)/2 # Height of equilateral triangle with unit sides
   r <- 1/sqrt(3) # Radius of circle encompassing triangle with unit sides
