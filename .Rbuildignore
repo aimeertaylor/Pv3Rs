@@ -28,3 +28,4 @@ DevFiles*
 ^pkgdown$
 ^\.github$
 ^cran-comments\.md$
+^CRAN-SUBMISSION$

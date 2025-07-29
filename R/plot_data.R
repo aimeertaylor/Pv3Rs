@@ -91,8 +91,8 @@ plot_data = function(ys,
 ){
 
   # Ensure users options are restored on exit
-  oldpar <- par(no.readonly = TRUE)
-  on.exit(par(oldpar))
+  oldpar <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(oldpar))
 
   # Function to create ramped colours based on "Paired" brewer.pal
   cols <- grDevices::colorRampPalette(palette)

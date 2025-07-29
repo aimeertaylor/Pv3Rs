@@ -5,6 +5,8 @@ This is a resubmission. In this version I have:
 
 * Made sure users' par options are restored in vignettes and examples
 
+* Made sure par is called as graphics::par within R functions
+
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
