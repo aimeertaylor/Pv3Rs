@@ -200,8 +200,12 @@ probabilities over <code>LC</code>, <code>LL</code> and
 <p>Per-recurrence posterior probabilities are plotted on the simplex
 using <code><a href="../reference/plot_simplex.html">plot_simplex()</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">marg</span>, Prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">oldpar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">marg</span>, Prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
 <p><img src="demonstrate-usage_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">oldpar</span><span class="op">)</span></span></code></pre></div>
 <p>The point in the yellow region is most likely a recrudescence with
 posterior probability greater than 0.5 (it falls in the bright yellow
 region); the point in the red region is most likely a reinfection with
@@ -215,7 +219,7 @@ region).</p>
 <p>To explore relationship graphs (RGs) and their log-likelihoods, set
 <code>return.RG</code> and <code>return.logp</code> to
 <code>TRUE</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">post</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">fs</span>, return.RG <span class="op">=</span> <span class="cn">TRUE</span>, return.logp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Number of valid relationship graphs (RGs) is 1315</span></span>
 <span><span class="co">#&gt; =============================================================================|</span></span>
@@ -224,7 +228,7 @@ region).</p>
 <span><span class="co">#&gt; Finding log-likelihood of each vector of recurrence states</span></span>
 <span><span class="co">#&gt; =============================================================================|</span></span></code></pre></div>
 <p>We recover the same posterior as before.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">joint</span>, decreasing <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         IC         LC         IL         LL         II         LI         CC </span></span>
 <span><span class="co">#&gt; 0.45682305 0.21338194 0.15385932 0.08501504 0.05986209 0.03105856 0.00000000 </span></span>
@@ -247,7 +251,7 @@ the representative-choosing scheme is too complicated.</p>
 the relationship graph(s) with the largest likelihood. In this example,
 there are two graphs with maximum likelihood; they are isomorphic up to
 within-episode genotype permutations.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="co"># Extract all log likelihoods</span></span>
@@ -272,13 +276,13 @@ within-episode genotype permutations.</p>
 <span>       pt.bg <span class="op">=</span>  <span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">8</span>, <span class="st">"Set2"</span><span class="op">)</span> <span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">]</span>, </span>
 <span>       bty <span class="op">=</span> <span class="st">"n"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, title <span class="op">=</span> <span class="st">"Episode"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="demonstrate-usage_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">oldpar</span><span class="op">)</span> <span class="co"># Restore user's options</span></span></code></pre></div>
 <p>Using log likelihoods, we can also find the equivalence class for
 which the data are most probable when all relationship graphs in that
 class are summed over.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># In the following code, we place two graphs in the same equivalence class if</span></span>
 <span><span class="co"># they share the same likelihood. This is not ideal (two graphs that are not</span></span>
 <span><span class="co"># isomorphic up to permutation could share the same likelihood), but it works</span></span>
@@ -309,7 +313,7 @@ class are summed over.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/box.html" class="external-link">box</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="demonstrate-usage_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">oldpar</span><span class="op">)</span> <span class="co"># Restore user's options</span></span></code></pre></div>
 <p><strong>Important considerations</strong></p>
 <ul>
