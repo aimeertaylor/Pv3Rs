@@ -53,12 +53,6 @@ plot_RG <- function(RG,
                     edge.width = 1.5,
                     ...) {
 
-  # Ensure users options are restored on exit
-  oldpar <- par(no.readonly = TRUE)
-  on.exit(par(oldpar))
-
-  par(mar = rep(0.1,4)) # Reduce border
-
   # Convert relationship names to weights
   widths_by_relationship <- c(sibling = 0.5, clone = 1)
   names(edge.lty) <- as.character(widths_by_relationship[names(edge.lty)])

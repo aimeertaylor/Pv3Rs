@@ -191,7 +191,7 @@ RGs <- post$RGs[which(abs(llikes - mllikes) < .Machine$double.eps^0.5)]
 
 # Plot RGs with maximum log likelihoods
 oldpar <- par(no.readonly = TRUE) # Store user's options
-par(mfrow = c(1,2))
+par(mar = rep(0.1,4), mfrow = c(1,2))
 for(i in 1:length(RGs)) {
   plot_RG(RG_to_igraph(RGs[[i]], determine_MOIs(y)), vertex.size = 20)
   box()
@@ -230,7 +230,7 @@ max_size <- class_sizes[max_class_p] # Number of graphs in ML EC
 
 # Plot all graphs within the ML EC 
 oldpar <- par(no.readonly = TRUE) # Store user's options
-par(mfrow = c(3,4))
+par(mar = rep(0.1,4), mfrow = c(3,4))
 RG_order <- order(llikes, decreasing = T) # order RGs by logl
 for(i in (max_idx-max_size+1):max_idx) { # EC consists of the RGs with logl rank 21-32
   RG <- post$RGs[[RG_order[i]]]
