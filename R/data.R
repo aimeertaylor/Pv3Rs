@@ -19,7 +19,7 @@
 #' }
 #'
 #' @source
-#' * <https://zenodo.org/records/3368828>
+#' * MS_data_PooledAnalysis.RData downloaded from <https://zenodo.org/records/3368828>
 #' * <https://github.com/aimeertaylor/Pv3Rs/blob/main/data-raw/ys_VHX_BPD.R>
 "ys_VHX_BPD"
 
@@ -39,6 +39,6 @@
 #' that sum to one.
 #'
 #' @source
-#' * <https://zenodo.org/records/3368828>
+#' * MS_data_PooledAnalysis.RData downloaded from <https://zenodo.org/records/3368828>
 #' * <https://github.com/aimeertaylor/Pv3Rs/blob/main/data-raw/fs_VHX_BPD.R>
 "fs_VHX_BPD"

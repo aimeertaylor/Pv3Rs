@@ -17,7 +17,7 @@ for each marker, a vector of observed alleles (repeat lengths). For example:
 }
 \source{
 \itemize{
-\item \url{https://zenodo.org/records/3368828}
+\item MS_data_PooledAnalysis.RData downloaded from \url{https://zenodo.org/records/3368828}
 \item \url{https://github.com/aimeertaylor/Pv3Rs/blob/main/data-raw/ys_VHX_BPD.R}
 }
 }
