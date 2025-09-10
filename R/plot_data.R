@@ -59,7 +59,9 @@
 #'
 #' @examples
 #'
-#' # Plot example Plasmodium vivax data set
+#' oldpar <- par(no.readonly = TRUE) # Store user's options before plotting
+#'
+#' # Plot example Plasmodium vivax data set:
 #' mar <- c(2, 3.5, 1.5, 1) # extra vertical margin for vertical person labels
 #' plot_data(ys = ys_VHX_BPD, person.vert = TRUE, mar = mar, legend.lab = NA)
 #' plot_data(ys = ys_VHX_BPD, person.vert = TRUE, mar = mar, legend.lab = NA,
@@ -72,7 +74,7 @@
 #' plot_data(ys, fs = fs_VHX_BPD, marker.annotate = FALSE) # Colours match above
 #' plot_data(ys) # Colours and the legend adapt to alleles detected in VHX_52
 #'
-#'
+#' par(oldpar) # Restore user's options
 #' @export
 plot_data = function(ys,
                      fs = NULL,
@@ -87,6 +89,11 @@ plot_data = function(ys,
                      cex.maj = 0.7, cex.min = 0.5, cex.text = 0.5,
                      x.line = 0.2, y.line = 2.5
 ){
+
+  # Ensure users options are restored on exit
+  oldpar <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(oldpar))
+
   # Function to create ramped colours based on "Paired" brewer.pal
   cols <- grDevices::colorRampPalette(palette)
 

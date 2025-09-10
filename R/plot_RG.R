@@ -33,7 +33,7 @@
 #'
 #' @examples
 #' RGs <- enumerate_RGs(c(2, 1, 1), progress.bar = FALSE)
-#' cpar <- par(no.readonly = TRUE) # record current par before changing
+#' oldpar <- par(no.readonly = TRUE) # record user's options
 #' par(mfrow = c(3, 4), mar = c(0.1, 0.1, 0.1, 0.1))
 #' for (i in 12:23) {
 #'   plot_RG(RGs[[i]],
@@ -42,7 +42,7 @@
 #'   edge.curved = 0.1)
 #'   box()
 #' }
-#' par(cpar) # reset par
+#' par(oldpar) # restore user's options
 #' @export
 
 plot_RG <- function(RG,
