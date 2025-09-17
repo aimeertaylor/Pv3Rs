@@ -40,7 +40,13 @@
 #' @return None
 #'
 #' @examples
-#' # Plot 2D simplex
+#' # Running example across plot_data - compute_posterior - plot_simplex
+#' # See further examples below for plotting the posterior together with the prior
+#' y <- ys_VHX_BPD[["VHX_52"]] # y is a list of length 2 (2 episodes)
+#' post <- compute_posterior(y, fs_VHX_BPD, progress.bar = FALSE)
+#' plot_simplex(p_coords = post$marg) # Plot posterior output
+#'
+#' # Basic example
 #' plot_simplex(p.coords = diag(3),
 #'              p.labels = c("(1,0,0)", "(0,1,0)", "(0,0,1)"),
 #'              p.labels.pos = c(1,3,3))
