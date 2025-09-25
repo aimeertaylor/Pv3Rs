@@ -1,0 +1,7 @@
+The Pv3Rs package is distributed under GPL-2 or later.
+It includes code written by other authors:
+
+* msg_progress_bar.R written and distributed by Mans Magnusson under MIT; Mans Magnusson is the copyright holder.
+
+* macros.Rd written by Duncan Murdoch and distributed within the R package rgl under GPL-2 | GPL-3 [expanded from: GPL]; rgl copy right holders are The R Core Team, The authors of Shiny, The authors of knitr, and Mapbox team.
+

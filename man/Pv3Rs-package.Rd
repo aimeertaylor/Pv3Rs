@@ -29,9 +29,9 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Tymoteusz Kwiecinski [compiler]
-  \item Duncan Murdoch [contributor]
-  \item Mans Magnusson [contributor]
+  \item Tymoteusz Kwiecinski (compiled included macros.Rd) [compiler]
+  \item Duncan Murdoch (author of included macros.Rd) [contributor]
+  \item Mans Magnusson (author of included msg_progress_bar.R) [contributor]
   \item Institut Pasteur [copyright holder]
   \item European Union, Project 101110393 [funder]
 }

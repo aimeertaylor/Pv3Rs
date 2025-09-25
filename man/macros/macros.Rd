@@ -1,5 +1,9 @@
-% Macro to create link to an HTML vignette (not article) from a help page.
-% Copied from: https://github.com/r-lib/roxygen2/issues/685#issuecomment-3009472263
+% Copied from macros.Rd of the rgl package, which has a GPL-2 | GPL-3 [expanded from: GPL] license.
+% Author of original code: Duncan Murdoch
+% Link to original code:
+% https://github.com/dmurdoch/rgl/blob/d81b3686e00f2571f5a0e44200cc1ea90e723387/man/macros/macros.Rd#L10-L17
+
+% Macro to create link to an HTML vignette (not an article) from a help page.
 % In this version the vignette must be in the same package as the help page
 % arg 1 is the name of the vignette (without .html)
 % arg 2 is an optional anchor within the vignette (without the leading #)
@@ -14,3 +18,4 @@
           paste0("\\\\\\\\href{", vigpath, "#1.html",
                  anchor, "}{#3}")
           })}}
+

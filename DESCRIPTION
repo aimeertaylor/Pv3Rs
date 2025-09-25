@@ -7,9 +7,9 @@ Authors@R: c(
     comment = c(ORCID = "0000-0002-2337-8992")),
     person("Yong See", "Foo", role = "aut", 
     comment = c(ORCID = "0000-0003-3010-9106")),
-    person("Tymoteusz", "Kwiecinski", role = "com"), 
-    person("Duncan", "Murdoch", role = "ctb"),
-    person("Mans", "Magnusson", role = "ctb"),
+    person("Tymoteusz", "Kwiecinski", role = "com", comment = "compiled included macros.Rd"), 
+    person("Duncan", "Murdoch", role = "ctb", comment = "author of included macros.Rd"),
+    person("Mans", "Magnusson", role = "ctb", comment = "author of included msg_progress_bar.R"),
     person("Institut Pasteur", role = "cph"),
     person("European Union, Project 101110393", role = "fnd")
   )
@@ -20,7 +20,7 @@ Description: Plot malaria parasite genetic data on two or more episodes.
     more episodes and a statistical model described in 
     Taylor, Foo and White (2022) <doi:10.1101/2022.11.23.22282669>. 
     Plot per-recurrence posterior probabilities. 
-License: MIT + file LICENSE
+License: GPL (>= 3)
 URL: https://aimeertaylor.github.io/Pv3Rs/,
      https://github.com/aimeertaylor/Pv3Rs
 BugReports: https://github.com/aimeertaylor/Pv3Rs/issues
