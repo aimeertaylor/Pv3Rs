@@ -97,10 +97,13 @@ different numbers of possible alleles. The names of the alleles are printed
 on top of their colours if \code{marker.annotate} is set to \code{TRUE}.
 }
 \examples{
-
 oldpar <- par(no.readonly = TRUE) # Store user's options before plotting
 
-# Plot example Plasmodium vivax data set:
+# Running example across plot_data - compute_posterior - plot_simplex
+ys <- ys_VHX_BPD["VHX_52"] # ys is a list of length 1 (1 participant)
+plot_data(ys, fs = fs_VHX_BPD, marker.annotate = FALSE)
+
+# Full data set:
 mar <- c(2, 3.5, 1.5, 1) # extra vertical margin for vertical person labels
 plot_data(ys = ys_VHX_BPD, person.vert = TRUE, mar = mar, legend.lab = NA)
 plot_data(ys = ys_VHX_BPD, person.vert = TRUE, mar = mar, legend.lab = NA,
@@ -109,9 +112,9 @@ plot_data(ys = ys_VHX_BPD, person.vert = TRUE, mar = mar, legend.lab = NA,
           fs = fs_VHX_BPD, marker.annotate = FALSE)
 
 # Demonstrating the adaptive nature of the colour scheme:
-ys <- ys_VHX_BPD["VHX_52"] # A single person
-plot_data(ys, fs = fs_VHX_BPD, marker.annotate = FALSE) # Colours match above
-plot_data(ys) # Colours and the legend adapt to alleles detected in VHX_52
+y <- ys_VHX_BPD["VHX_52"] # A single person
+# Compared to first example, colours now involve only the alleles detected in VHX_52
+plot_data(y)
 
 par(oldpar) # Restore user's options
 }

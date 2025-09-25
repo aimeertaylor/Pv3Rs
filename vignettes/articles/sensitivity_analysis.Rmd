@@ -1,0 +1,196 @@
+---
+title: Marker sensitivity analysis for model misspecification
+description: Address genotyping errors and *de novo* mutations using a sensitivity analysis on markers
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%", # Line width taken up by plot
+  fig.dpi = 300, # For quality 
+  fig.width = 7, # Increase to zoom out
+  fig.height = 4, 
+  cache = TRUE
+  )
+```
+  
+```{r setup, include = FALSE} 
+library(Pv3Rs)
+options(warn = -1) # Suppress warnings about missing and limited data
+```
+
+## Introduction
+
+The statistical model used by Pv3Rs does not perfectly capture the data-generating process in reality. In this article, we focus on marker sensitivity analysis can help address misspecifications due to genotyping errors and *de novo* mutations, which are not accounted for by the Pv3Rs model. 
+
+We distinguish three types of genetic misspecifications:
+
+- *False negatives.* The genotyping procedure may fail to detect parasites they are present at low densities in the blood. Such allele dropouts can incorrectly eliminate the possibility of recrudescence, as alleles from a recrudescence episode may not be able to matched to the preceding episode if the preceding episode suffers from false negatives. False negatives can also arise from genotyping errors.
+
+- *False positives.* This refers to additional alleles called by the genotyping procedure that are not truly present. Again, false positives may incorrectly eliminate the possibility of recrudescence if the recrudescnce episode suffers from false positives.
+
+- *Miscalls.* This refers to mistaking an allele for another allele, although one could view this as a false negative and false positive occuring together. *De novo* mutations can also be viewed similarly.
+
+Underestimating the probability recrudescence is most likely consequence of these misspecifications, although genetic errors can also incorrectly overestimate genetic relatedness, depending on how errors are introduced. For example, if a relapse episode consists of a clone and a sibling from a previous episode, but the sibling allele drops out due to low density, then we would overestimate the probability of recrudescence.
+
+## Data simulation
+
+Let us generate some data with the above error processes based on the following relationship graphs:
+```{r}
+par(mar = c(0, 0.5, 0, 0.5), mfrow = c(1, 3))
+suppressMessages(RGs <- enumerate_RGs(c(2, 2)))
+for(i in c(2, 6, 34)) {
+  plot_RG(RGs[[i]])
+}
+```
+
+Each relationship graph consists of two parasite genotypes during the enrolment episode and two parasite genotypes during the recurrence episode. We've chosen these relationship graphs such that only the first relationship graph is compatible with recrudescence, and only the last relationship graph is compatible with reinfection. Here is some code to simulate data based on these relationship graphs:
+
+```{r}
+library(gtools)
+
+# simulate allele frequencies for multiple markers
+# assumes each marker has the same number of alleles
+sim_fs <- function(n_m, n_a) {
+  markers <- paste0("m", 1:n_m) # marker names
+  n_a_vec <- setNames(rep(n_a, n_m), markers)
+  lapply(n_a_vec, function(n_a) {
+    alleles <- letters[1:n_a] # n_a <= 26
+    fs_unnamed <- as.vector(rdirichlet(1, alpha = rep(1, n_a)))
+    setNames(fs_unnamed, alleles)
+  })
+}
+
+
+sim_RG1 <- function(n_m, n_a) {
+  fs <- sim_fs(n_m, n_a)
+  init <- lapply(fs, function(f) unique(sample(names(f), 2, TRUE, f)))
+  return(list(y=list(init=init, recur=init), fs=fs))
+}
+
+sim_RG2 <- function(n_m, n_a) {
+  fs <- sim_fs(n_m, n_a)
+  parents <- lapply(fs, function(f) sample(names(f), 2, TRUE, f))
+  clone <- lapply(fs, function(f) sample(names(f), 1, TRUE, f))
+  init <- sapply(names(fs), function(m) unique(c(sample(parents[[m]], 1), clone[[m]])), 
+                 simplify = FALSE, USE.NAMES=TRUE)
+  recur <- sapply(names(fs), function(m) unique(c(sample(parents[[m]], 1), clone[[m]])), 
+                 simplify = FALSE, USE.NAMES=TRUE)
+  return(list(y=list(init=init, recur=recur), fs=fs))
+}
+
+sim_RG3 <- function(n_m, n_a) {
+  fs <- sim_fs(n_m, n_a)
+  parents <- lapply(fs, function(f) sample(names(f), 2, TRUE, f))
+  init <- sapply(names(fs), function(m) unique(sample(parents[[m]], 2, TRUE)), 
+                 simplify = FALSE, USE.NAMES=TRUE)
+  recur <- lapply(fs, function(f) unique(sample(names(f), 2, TRUE, f)))
+  return(list(y=list(init=init, recur=recur), fs=fs))
+}
+
+n_datasets <- 5 # 5 datasets per relationship graph
+n_m <- 50 # 50 markers
+n_a <- 5 # 5 possible alleles per marker
+set.seed(1)
+datasets_RG1 <- lapply(rep(n_m, n_datasets), sim_RG1, n_a)
+datasets_RG2 <- lapply(rep(n_m, n_datasets), sim_RG2, n_a)
+datasets_RG3 <- lapply(rep(n_m, n_datasets), sim_RG3, n_a)
+```
+
+## Pv3Rs on error-free data
+
+Before simulating errors, let us first check the output of Pv3Rs when run on error-free data.
+```{r}
+posts_RG1 <- lapply(datasets_RG1, 
+                    function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+posts_RG2 <- lapply(datasets_RG2, 
+                    function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+posts_RG3 <- lapply(datasets_RG3, 
+                    function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+par(mar = c(0, 0, 0, 0), mfrow = c(1, 3))
+for(posts in list(posts_RG1, posts_RG2, posts_RG3)) {
+  probs <- do.call(rbind, lapply(posts, function(post) post$marg))
+  plot_simplex(p.coords=probs, p.labels=NA, col=1:n_datasets)
+}
+```
+In the error-free case, the posterior probability concentrate around recrudescence, relapse, and reinfection for the three relationship graphs respectively.
+
+## Error simulation
+
+Now, we introduce errors into our data. For each marker and each episode, we modify the observed data with a $5\%$ probability, using either a false negative, false positive, or miscall. (In the code below, we do not ensure that for a given marker and episode, the modified observation is necessarily distinct from the original observation, e.g. a false positive might "introduce" an allele that was already observed.) We run Pv3Rs on the modified datasets.
+```{r}
+modify <- function(orig, n_a) {
+  r <- runif(1)
+  if(r < 1/3 && length(orig) > 1) { # false negative
+    return(sample(orig, length(orig)-1))
+  }
+  extra <- sample(letters[1:n_a], 1) # both false positive and miscall involve an "extra" allele
+  if(r < 2/3) { # false positive
+    return(unique(c(orig, extra)))
+  } else { # miscall
+    return(unique(c(sample(orig, length(orig)-1), extra)))
+  }
+}
+
+modified <- list(datasets_RG1, datasets_RG2, datasets_RG3)
+p.modify <- 0.05
+for(i in 1:3) {
+  for(j in 1:n_datasets) {
+    for(k in 1:2) { # episode
+      for(m in 1:n_m) {
+        if(runif(1) > p.modify) next
+        modified[[i]][[j]]$y[[k]][[m]] <- modify(modified[[i]][[j]]$y[[k]][[m]], n_a)
+      }
+    }
+  }
+}
+
+posts_RG1 <- lapply(modified[[1]], 
+                    function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+posts_RG2 <- lapply(modified[[2]], 
+                    function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+posts_RG3 <- lapply(modified[[3]], 
+                    function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+par(mar = c(0, 0, 0, 0), mfrow = c(1, 3))
+for(posts in list(posts_RG1, posts_RG2, posts_RG3)) {
+  probs <- do.call(rbind, lapply(posts, function(post) post$marg))
+  plot_simplex(p.coords=probs, p.labels=NA, col=1:5)
+}
+```
+As predicted, the presence of errors can cause probably recrudescence to be classified as near-certain relapse. Also, there are some datasets corresponding to the third relationship graph where the reinfection probability is overestimated.
+
+## Marker sensitivity analysis
+
+The reasoning behind our error simulation is that in reality, we may expect only a small subset of markers whose observed data suffer from model misspecification. This implies that we may be able to run Pv3Rs on a subset of markers that do not suffer from misspecification. In this article, we will investigate a rudimentary form of sensitivity analysis by running Pv3Rs with marker subsets. Suppose we partition our collection of $50$ markers into $10$ subsets of $5$ markers each (in practice, the subsets should be formed randomly), and run Pv3Rs $10$ times for each full dataset, each time using a different subset of $5$ markers.
+```{r}
+subset_data <- function(data, subsets) {
+  lapply(subsets, function(subset) {
+    list(y=lapply(data$y, `[`, subset), fs=data$fs[subset])
+  })
+}
+subsets <- split(1:n_m, rep(1:10, each = 5)) # list containing 1:5, 6:10, ..., 46:50
+data_subsets_RG1 <- lapply(modified[[1]], subset_data, subsets)
+data_subsets_RG2 <- lapply(modified[[2]], subset_data, subsets)
+data_subsets_RG3 <- lapply(modified[[3]], subset_data, subsets)
+
+subposts_RG1 <- lapply(data_subsets_RG1, lapply, 
+                       function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+subposts_RG2 <- lapply(data_subsets_RG2, lapply, 
+                       function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+subposts_RG3 <- lapply(data_subsets_RG3, lapply, 
+                       function(data) suppressMessages(compute_posterior(data$y, data$fs)))
+```
+
+Since the runtime of Pv3Rs scales linearly with the number of markers, we expect the total runtime of this sensitivity analysis to not take much longer than running Pv3Rs with all markers at once. Here is the output for each dataset:
+```{r, fig.height=8}
+par(mar = c(0, 0, 0, 0), mfrow = c(n_datasets, 3))
+for(i in 1:n_datasets) {
+  for(subposts in list(subposts_RG1, subposts_RG2, subposts_RG3)) {
+    probs <- do.call(rbind, lapply(subposts[[i]], function(post) post$marg))
+    plot_simplex(p.coords=probs, p.labels=NA)
+  }
+}
+```
+
+TODO: comment how to interpret this output

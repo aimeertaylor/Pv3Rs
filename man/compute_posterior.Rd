@@ -120,6 +120,11 @@ molecular correction are not modelled}
 }
 }
 \examples{
+# Running example across plot_data - compute_posterior - plot_simplex
+y <- ys_VHX_BPD[["VHX_52"]] # y is a list of length 2 (2 episodes)
+compute_posterior(y, fs_VHX_BPD, progress.bar = FALSE)
+
+
 # Numerically named alleles
 y <- list(enrol = list(m1 = c('3','2'), m2 = c('1','2')),
           recur1 = list(m1 = c('1','4'), m2 = c('1')),
