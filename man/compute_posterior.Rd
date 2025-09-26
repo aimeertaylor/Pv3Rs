@@ -120,8 +120,10 @@ molecular correction are not modelled}
 }
 }
 \examples{
-# Running example across plot_data - compute_posterior - plot_simplex
-y <- ys_VHX_BPD[["VHX_52"]] # y is a list of length 2 (2 episodes)
+# Running example (runs across compute_posterior, plot_data and plot_simplex)
+# based on real data from chloroquine-treated participant 52 of the Vivax
+# History Trial [(Chu et al. 2018a)](https://doi.org/10.1093/cid/ciy319)
+y <- ys_VHX_BPD[["VHX_52"]] # y is a list of length two (two episodes)
 compute_posterior(y, fs_VHX_BPD, progress.bar = FALSE)
 
 

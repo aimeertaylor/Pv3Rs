@@ -59,11 +59,12 @@ reinfection (or any other probability triplet summing to
 one) can be projected; see \code{\link[=project2D]{project2D()}} and \strong{Examples} below.
 }
 \examples{
-# Running example across plot_data - compute_posterior - plot_simplex
-# See further examples below for plotting the posterior together with the prior
-y <- ys_VHX_BPD[["VHX_52"]] # y is a list of length 2 (2 episodes)
+# Running example (runs across compute_posterior, plot_data and plot_simplex)
+# based on real data from chloroquine-treated participant 52 of the Vivax
+# History Trial [(Chu et al. 2018a)](https://doi.org/10.1093/cid/ciy319)
+y <- ys_VHX_BPD[["VHX_52"]] # y is a list of length two (two episodes)
 post <- compute_posterior(y, fs_VHX_BPD, progress.bar = FALSE)
-plot_simplex(p_coords = post$marg) # Plot posterior output
+plot_simplex(p.coords = post$marg, p.labels = "", pch = 20, cex = 2)
 
 # Basic example
 plot_simplex(p.coords = diag(3),
