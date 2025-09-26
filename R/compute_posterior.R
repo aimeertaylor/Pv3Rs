@@ -100,7 +100,10 @@
 #'   }
 #'
 #' @examples
-#' # Running example across plot_data - compute_posterior - plot_simplex
+#' # Running example (runs across plot_data, compute_posterior and plot_simplex)
+#' # based on real data from participant 52 of the Vivax History (VHX) Trial; see
+#' # Chu et al. 2018a (\doi{doi:10.1093/cid/ciy319}). Participant 52 of the VHX
+#' # trail was treated with chloroquine.
 #' y <- ys_VHX_BPD[["VHX_52"]] # y is a list of length 2 (2 episodes)
 #' compute_posterior(y, fs_VHX_BPD, progress.bar = FALSE)
 #'
