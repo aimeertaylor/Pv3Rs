@@ -101,7 +101,7 @@ oldpar <- par(no.readonly = TRUE) # Store user's options before plotting
 
 # Running example (runs across compute_posterior, plot_data and plot_simplex)
 # based on real data from chloroquine-treated participant 52 of the Vivax
-# History Trial [(Chu et al. 2018a)](https://doi.org/10.1093/cid/ciy319)
+# History Trial (Chu et al. 2018a, https://doi.org/10.1093/cid/ciy319)
 ys <- ys_VHX_BPD["VHX_52"] # ys is a list of length one (one participant)
 plot_data(ys, fs = fs_VHX_BPD, marker.annotate = FALSE)
 
