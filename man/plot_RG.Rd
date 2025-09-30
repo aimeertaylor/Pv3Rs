@@ -50,6 +50,11 @@ distributed with some horizontal jitter when \code{layout.by.group = TRUE}
 (default), and equicolored), and to ensure clone and sibling edges
 are plotted using different line types.
 }
+\details{
+To see how to plot relationship graphs outputted by
+\code{\link{compute_posterior}}, please refer to \strong{Exploration of relationship graphs} in
+\HTMLVignette{demonstrate-usage}{exploration-of-relationship-graphs}{Demonstrate Pv3Rs usage}.
+}
 \section{Provenance}{
  This function was adapted from \code{plot_Vivax_model} at
 \url{https://github.com/jwatowatson/RecurrentVivax/blob/master/Genetic_Model/iGraph_functions.R}.

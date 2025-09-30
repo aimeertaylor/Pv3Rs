@@ -963,7 +963,7 @@ participants with different [per-episode MOIs](#mois) and
 [episode counts](#epi-count) have different maximum probabilities of
 recrudescence / reinfection. For example, if we use a common threshold of 0.8 to
 classify probable reinfection assuming recurrence states are equally likely *a
-priori*, we can discount *a priori* all trail participants with a single
+priori*, we can discount *a priori* all trial participants with a single
 monoclonal recurrence following a monoclonal enrolment episode because their
 posterior reinfection probabilities will never exceed 0.75, even if their data
 are highly informative of reinfection:

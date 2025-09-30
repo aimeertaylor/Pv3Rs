@@ -7,6 +7,10 @@
 #' (default), and equicolored), and to ensure clone and sibling edges
 #' are plotted using different line types.
 #'
+#' To see how to plot relationship graphs outputted by
+#' \code{\link{compute_posterior}}, please refer to **Exploration of relationship graphs** in
+#' \HTMLVignette{demonstrate-usage}{exploration-of-relationship-graphs}{Demonstrate Pv3Rs usage}.
+#'
 #' @param RG \code{igraph} object encoding an RG; see
 #'   \code{\link{RG_to_igraph}}.
 #' @param edge.col Named vector of edge colours corresponding to different

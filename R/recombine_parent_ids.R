@@ -16,7 +16,7 @@
 #' @examples
 #' n_chrs <- 14 # P. vivax has 14 chromosomes
 #' n_markers <- 100 # For 100 markers
-#' chrs_per_marker <- round(seq(0.51, n_chrs + 0.5, length.out = n_markers))
+#' chrs_per_marker <- ceiling((1:n_markers)/(n_markers+1)*n_chrs)
 #' recombine_parent_ids(chrs_per_marker)
 #'
 #' @noRd
