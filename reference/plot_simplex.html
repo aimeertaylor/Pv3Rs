@@ -128,11 +128,23 @@ value or a vector.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Plot 2D simplex</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Running example (runs across compute_posterior, plot_data and plot_simplex)</span></span></span>
+<span class="r-in"><span><span class="co"># based on real data from chloroquine-treated participant 52 of the Vivax</span></span></span>
+<span class="r-in"><span><span class="co"># History Trial (Chu et al. 2018a, https://doi.org/10.1093/cid/ciy319)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">ys_VHX_BPD</span><span class="op">[[</span><span class="st">"VHX_52"</span><span class="op">]</span><span class="op">]</span> <span class="co"># y is a list of length two (two episodes)</span></span></span>
+<span class="r-in"><span><span class="va">post</span> <span class="op">&lt;-</span> <span class="fu"><a href="compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">fs_VHX_BPD</span>, progress.bar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of valid relationship graphs (RGs) is 971</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Computing log p(Y|RG) for 971 RGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding log-likelihood of each vector of recurrence states</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu">plot_simplex</span><span class="op">(</span>p.coords <span class="op">=</span> <span class="va">post</span><span class="op">$</span><span class="va">marg</span>, p.labels <span class="op">=</span> <span class="st">""</span>, pch <span class="op">=</span> <span class="fl">20</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_simplex-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Basic example</span></span></span>
 <span class="r-in"><span><span class="fu">plot_simplex</span><span class="op">(</span>p.coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>             p.labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(1,0,0)"</span>, <span class="st">"(0,1,0)"</span>, <span class="st">"(0,0,1)"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>             p.labels.pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot_simplex-1.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="plot_simplex-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># ==============================================================================</span></span></span>
 <span class="r-in"><span><span class="co"># Given data on an enrollment episode and a recurrence,</span></span></span>
@@ -170,7 +182,7 @@ value or a vector.</p></dd>
 <span class="r-in"><span><span class="va">xy_post</span> <span class="op">&lt;-</span> <span class="fu"><a href="project2D.html">project2D</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">post</span><span class="op">$</span><span class="va">marg</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/arrows.html" class="external-link">arrows</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">xy_prior</span><span class="op">[</span><span class="st">"x"</span><span class="op">]</span>, x1 <span class="op">=</span> <span class="va">xy_post</span><span class="op">[</span><span class="st">"x"</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>       y0 <span class="op">=</span> <span class="va">xy_prior</span><span class="op">[</span><span class="st">"y"</span><span class="op">]</span>, y1 <span class="op">=</span> <span class="va">xy_post</span><span class="op">[</span><span class="st">"y"</span><span class="op">]</span>, length <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot_simplex-2.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="plot_simplex-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
