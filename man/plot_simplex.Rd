@@ -9,6 +9,7 @@ plot_simplex(
   v.cutoff = 0.5,
   v.colours = c("yellow", "purple", "red"),
   plot.tri = TRUE,
+  lim.mar = 0.1,
   p.coords = NULL,
   p.labels = rownames(p.coords),
   p.labels.pos = 3,
@@ -29,6 +30,8 @@ classification; see
 \item{v.colours}{Vertex colours anticlockwise from top.}
 
 \item{plot.tri}{Logical; draws the triangular boundary if \code{TRUE} (default).}
+
+\item{lim.mar}{Margin away from simplex for axes limits; defaults to 0.1.}
 
 \item{p.coords}{Matrix of 3D simplex coordinates (e.g., per-recurrence
 probabilities of recrudescence, relapse and reinfection), one vector of 3D

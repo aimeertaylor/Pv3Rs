@@ -38,10 +38,10 @@ Underestimating the probability of recrudescence is the most likely consequence 
 
 Let us generate some data based on the following relationship graphs:
 ```{r}
-par(mar = c(0, 0.5, 0, 0.5), mfrow = c(1, 3))
+par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 suppressMessages(RGs <- enumerate_RGs(c(2, 2)))
 for(i in c(2, 6, 34)) {
-  plot_RG(RGs[[i]])
+  plot_RG(RGs[[i]], vertex.size = 20)
 }
 ```
 
@@ -118,10 +118,10 @@ posts_RG3 <- lapply(datasets_RG3,
 posts_list <- list(posts_RG1, posts_RG2, posts_RG3)
 ```
 ```{r, fig.height=3, fig.width=7}
-par(mar = c(0, 0, 0, 0.1), mfrow = c(1, 3))
+par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 for(i in 1:3) {
   probs <- do.call(rbind, lapply(posts_list[[i]], function(post) post$marg))
-  plot_simplex(p.coords = probs, p.labels = NA, cex = 2)
+  plot_simplex(p.coords = probs, lim.mar = 0.15, p.labels = NA, cex = 2)
   if(i == 2) legend("top", pch = 1, pt.cex = 2, bty = "n", inset = 0, 
                     legend = "Error-free (all markers)")
 }
@@ -168,11 +168,11 @@ mposts_RG3 <- lapply(modified[[3]],
 mposts_list <- list(mposts_RG1, mposts_RG2, mposts_RG3)
 ```
 ```{r, fig.height=3, fig.width=7}
-par(mar = c(0, 0, 0, 0.1), mfrow = c(1, 3))
+par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 for(i in 1:3) {
   probs <- do.call(rbind, lapply(posts_list[[i]], function(post) post$marg))
   mprobs <- do.call(rbind, lapply(mposts_list[[i]], function(mpost) mpost$marg))
-  plot_simplex(p.coords = rbind(probs, mprobs), p.labels = NA, 
+  plot_simplex(p.coords = rbind(probs, mprobs), lim.mar = 0.15, p.labels = NA, 
                col = rgb(0, 0, 0, alpha = rep(c(1, 0.3), each = n_datasets)),
                cex = rep(c(2, 1), each = n_datasets), pch = rep(c(1, 20), each = n_datasets))
   if(i == 2) legend("top", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
@@ -214,7 +214,7 @@ layout_matrix <- rbind(
   matrix(2:16, nrow = n_datasets, byrow = TRUE) # simplex plots
 )
 layout(layout_matrix, heights = c(0.25, rep(1, n_datasets)))
-par(mar = c(0, 0, 0, 0.1))
+par(mar = c(0, 0.1, 0, 0.1))
 plot.new()
 legend("top", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
        col = rgb(0, 0, 0, alpha = c(1, 0.3)), 
@@ -295,7 +295,7 @@ layout_matrix <- rbind(
   matrix(2:16, nrow = n_datasets, byrow = TRUE) # simplex plots
 )
 layout(layout_matrix, heights = c(1, rep(5, n_datasets)))
-par(mar = c(0, 0, 0, 0.1))
+par(mar = c(0, 0.1, 0, 0.1))
 plot.new()
 legend("top", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
        col = rgb(0, 0, 0, alpha = c(1, 0.3)), 

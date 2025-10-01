@@ -18,6 +18,8 @@
 #'
 #' @param plot.tri Logical; draws the triangular boundary if `TRUE` (default).
 #'
+#' @param lim.mar Margin away from simplex for axes limits; defaults to 0.1.
+#'
 #' @param p.coords Matrix of 3D simplex coordinates (e.g., per-recurrence
 #'   probabilities of recrudescence, relapse and reinfection), one vector of 3D
 #'   coordinates per row, each row is projected onto 2D coordinates using
@@ -89,6 +91,7 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
                          v.cutoff = 0.5,
                          v.colours = c("yellow","purple","red"),
                          plot.tri = TRUE,
+                         lim.mar = 0.1,
                          p.coords = NULL,
                          p.labels = rownames(p.coords),
                          p.labels.pos = 3,
@@ -104,9 +107,8 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
   k <- h-r # Distance from (0,0) to bottom of triangle with unit sides
 
   # Null plot
-  plot(NULL, xlim = c(-0.6, 0.6), ylim = c(-(k + 0.1), r + 0.1), asp = 1,
-       xaxt = "n", yaxt = "n", bty = "n",
-       ylab = "", xlab = "")
+  plot(NULL, xlim = c(-0.5-lim.mar, 0.5+lim.mar), ylim = c(-(k+lim.mar), r+lim.mar),
+       asp = 1, xaxt = "n", yaxt = "n", bty = "n", xlab = "", ylab = "")
 
   # Plot equilateral triangle:
   if(plot.tri) graphics::polygon(x = c(-0.5, 0.5, 0), y = c(-k, -k, r))
