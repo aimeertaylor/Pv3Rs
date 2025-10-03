@@ -22,21 +22,22 @@ options(warn = -1) # Suppress warnings about missing and limited data
 
 ## Introduction
 
-The statistical model used by Pv3Rs does not perfectly capture the data-generating process in reality. In this article, we demonstrate how marker sensitivity analysis can help address misspecifications arising from genotyping errors and *de novo* mutations, which are not accounted for by the Pv3Rs model. 
+In this article, we demonstrate how marker sensitivity analysis can help identify and address misspecifications arising from genotyping errors and *de novo* mutations, which are not accounted for by the Pv3Rs model. 
 
 We distinguish three types of misspecifications:
 
-- *False negatives.* The genotyping procedure may fail to detect parasites that are present at low densities in the blood. Such allele dropouts can incorrectly eliminate the possibility of recrudescence, as alleles from a recrudescence episode may not be able to be matched to the preceding episode if the preceding episode suffers from false negatives. False negatives can also arise from genotyping errors.
+- *False negatives.* The genotyping procedure may fail to detect alleles, e.g., because they are carried by parasites that are present at low densities in the blood sample. Such allele dropouts can incorrectly eliminate the possibility of recrudescence: alleles from a recrudescence episode may not be able to be matched to the preceding episode if either episode suffers from false negatives. False negatives can also arise from micalls (see below). 
 
-- *False positives.* This refers to additional alleles called by the genotyping procedure that are not truly present. Again, false positives may incorrectly eliminate the possibility of recrudescence if the recrudescence episode suffers from false positives.
+- *False positives.* This refers to additional alleles called by the genotyping procedure that are not truly present. Again, false positives may incorrectly eliminate the possibility of recrudescence if either episode suffers from false positives.
 
-- *Miscalls.* This refers to mistaking an allele for another allele, although one could view this as a false negative and false positive occurring together. *De novo* mutations can be viewed similarly.
+- *Miscalls.* This refers to mistaking an allele for another allele. One can view this as a false negative and false positive occurring together. *De novo* mutations can be viewed similarly.
 
-Underestimating the probability of recrudescence is the most likely consequence of these misspecifications, although genetic errors can also incorrectly overestimate genetic relatedness, depending on how errors are introduced. For example, if a relapse episode consists of a clone and a sibling from a previous episode, but the sibling allele drops out due to low density, then we would overestimate the probability of recrudescence.
+Underestimating the probability of recrudescence is the most likely consequence of these misspecifications, although genetic errors can also incorrectly overestimate genetic relatedness. For example, if a relapse episode consists of a clone and a sibling from a previous episode, but the sibling allele drops out due to low density, then we would overestimate the probability of recrudescence.
 
 ## Data simulation
 
-Let us generate some data based on the following relationship graphs:
+Let us generate some data based on the following three relationship graphs, 
+each with four genotypes g1, g2, g3 and g4:
 ```{r}
 par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 suppressMessages(RGs <- enumerate_RGs(c(2, 2)))
@@ -45,7 +46,7 @@ for(i in c(2, 6, 34)) {
 }
 ```
 
-Each relationship graph consists of two parasite genotypes during the enrolment episode and two parasite genotypes during the recurrence episode. We've chosen these relationship graphs such that only the first relationship graph is compatible with recrudescence, and only the last relationship graph is compatible with reinfection. Here is some code to simulate data based on these relationship graphs:
+Each relationship graph consists of two parasite genotypes during the enrolment episode and two parasite genotypes during the recurrence episode. We've chosen these relationship graphs such that only the first relationship graph is compatible with recrudescence, and only the last relationship graph is compatible with reinfection. Below is some code to simulate data based on these relationship graphs. For each relationship graph, five data sets are simulated. For each data set, data on 50 octo-allelic markers are simulated per genotype. An internal function (`Pv3Rs:::recombine_parent_ids`) ensures the finite nature of the parasite genome (not accounted for by the Pv3Rs model) is accounted for in the simulated data. 
 
 ```{r}
 library(gtools) # for `rdirichlet`
@@ -107,7 +108,8 @@ datasets_RG3 <- lapply(rep(n_m, n_datasets), sim_RG3, n_a)
 
 ## Pv3Rs on error-free data
 
-Before simulating errors, let us first check the output of Pv3Rs when run on error-free data.
+Before simulating errors, we show the output of Pv3Rs meets our expectations 
+when the model is fit to error-free data.
 ```{r}
 posts_RG1 <- lapply(datasets_RG1, 
                     function(data) suppressMessages(compute_posterior(data$y, data$fs)))
@@ -117,20 +119,32 @@ posts_RG3 <- lapply(datasets_RG3,
                     function(data) suppressMessages(compute_posterior(data$y, data$fs)))
 posts_list <- list(posts_RG1, posts_RG2, posts_RG3)
 ```
+
 ```{r, fig.height=3, fig.width=7}
 par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 for(i in 1:3) {
   probs <- do.call(rbind, lapply(posts_list[[i]], function(post) post$marg))
   plot_simplex(p.coords = probs, lim.mar = 0.15, p.labels = NA, cex = 2)
   if(i == 2) legend("top", pch = 1, pt.cex = 2, bty = "n", inset = 0, 
-                    legend = "Error-free (all markers)")
+                    legend = "Error-free")
+  print(probs)
 }
 ```
-In the error-free case, the posterior probabilities concentrate around recrudescence, relapse, and reinfection for the three relationship graphs respectively.
+In the error-free case, the posterior probabilities (five per simplex: one per
+data set, five data sets per relationship graph; all the probabilities per
+simplex are almost identical and thus the points are overlaid.) concentrate on
+recrudescence, relapse, and reinfection for the three relationship graphs
+respectively.
 
 ## Error simulation
 
-Now, we introduce errors into our data. For each marker and each episode, we independently modify the observed data with a $2\%$ probability, using either a false negative, false positive, or miscall. If more than one allele is observed, then we have equal probabilities for the three misspecifications. Otherwise, a false positive or miscall is simulated with equal probability. We then run Pv3Rs on the modified datasets.
+Now, we introduce errors into our data. For each marker and each episode, we 
+independently modify the observed data with a $2\%$ probability, using either a 
+false negative, false positive, or miscall. If more than one allele is observed, 
+all three misspecifications have equal probabilities. Otherwise, to avoid 
+missing alleles, a false positive or miscall is simulated with equal probability. 
+(Pv3Rs deals well with missing alleles: including them as errors here would be 
+an eschewal.) We then run Pv3Rs on the modified datasets.
 ```{r}
 modify <- function(orig, n_a) {
   if(runif(1) < 1/3 && length(orig) > 1) { # false negative
@@ -167,6 +181,7 @@ mposts_RG3 <- lapply(modified[[3]],
                      function(data) suppressMessages(compute_posterior(data$y, data$fs)))
 mposts_list <- list(mposts_RG1, mposts_RG2, mposts_RG3)
 ```
+
 ```{r, fig.height=3, fig.width=7}
 par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 for(i in 1:3) {
@@ -177,14 +192,26 @@ for(i in 1:3) {
                cex = rep(c(2, 1), each = n_datasets), pch = rep(c(1, 20), each = n_datasets))
   if(i == 2) legend("top", pch = c(1, 20), pt.cex = c(2, 1), bty = "n", inset = 0, 
                     col = rgb(0, 0, 0, alpha = c(1, 0.3)),
-                    legend = c("Error-free (all markers)", "With errors (all markers)"))
+                    legend = c("Error-free", "With errors"))
 }
 ```
-As predicted, the presence of errors causes probable recrudescence to be classified as near-certain relapse. Also, there are some datasets corresponding to the third relationship graph where the reinfection probability is overestimated.
+As predicted, the presence of errors causes probable recrudescence to be
+classified as near-certain relapse. (Remember that there are five probabilities
+per simplex: one per data set, five data sets per relationship graph; almost all
+the probabilities per simplex are the same and thus the points are overlaid.)
+Also, there are some datasets corresponding to the third relationship graph
+where the reinfection probability is overestimated.
 
 ## Marker sensitivity analysis
 
-The reasoning behind our error simulation is that in reality, we may expect only a small subset of markers whose observed data to be affected by model misspecification. This implies that we may be able to run Pv3Rs on a subset of markers that are not affected by misspecification. In this article, we will investigate a rudimentary form of sensitivity analysis by running Pv3Rs with marker subsets. Suppose we partition our collection of $50$ markers into $10$ subsets of $5$ markers each (in practice, the subsets should be formed randomly), and run Pv3Rs $10$ times for each full dataset, each time using a different subset of $5$ markers.
+Because genotyping errors are generally infrequent, we expect only a small
+subset of markers affected by model misspecification in practice. This implies
+that we may be able to subset markers so that some subsets are not affected by
+misspecification. In this article, we present a rudimentary form of sensitivity
+analysis based on running Pv3Rs on marker subsets. Suppose we partition our
+collection of $50$ markers into $10$ subsets of $5$ markers each (in practice,
+the subsets should be formed randomly), and run Pv3Rs $10$ times for each full
+marker dataset, each time using a different subset of $5$ markers.
 ```{r}
 subset_data <- function(data, subsets) {
   lapply(subsets, function(subset) {
@@ -207,7 +234,9 @@ subposts_RG3 <- lapply(data_subsets_RG3, lapply,
 subposts_list <- list(subposts_RG1, subposts_RG2, subposts_RG3)
 ```
 
-Since the runtime of Pv3Rs scales linearly with the number of markers, we expect the total runtime of this sensitivity analysis to not take much longer than running Pv3Rs with all markers at once. Here is the output for each dataset:
+Since the runtime of Pv3Rs scales linearly with the number of markers, we expect
+the total runtime of this sensitivity analysis to not take much longer than
+running Pv3Rs with all markers at once. Here is the output for each dataset:
 ```{r, fig.height=9, fig.width=7}
 layout_matrix <- rbind(
   c(1, 1, 1), # legend                   
@@ -230,9 +259,20 @@ for(i in 1:n_datasets) {
 }
 ```
 
-Some marker subsets result in posterior probabilities that are very similar to those obtained using error-free data on all markers. These are likely to correspond to marker subsets that do not involve any simulated errors. Some marker subsets result in posterior probabilities that are similar to those obtained using all markers on the same data (see first column). These are likely to correspond to marker subsets that do involve simulated errors. Intriguingly, we occasionally get a misclassification due to marker subsetting (see second column). 
+Some marker subsets result in posterior probabilities that are very similar to
+those obtained using error-free data on all markers. These are likely to
+correspond to marker subsets that do not involve any simulated errors. Some
+marker subsets result in posterior probabilities that are similar to those
+obtained using error-prone data on all markers (see first column). These are
+likely to correspond to marker subsets that do involve simulated errors. In
+addition, we occasionally get a misclassification due to marker subsetting (see
+second column: when picking only five of 50 markers, there is a non-negligible
+chance that all sibling alleles match).
 
-We provide two ways to evaluate our sensitivity analysis results against the output based on error-free data. First, we construct a confusion matrix based on a hard classification rule, i.e. each instance is classified as recrudescence, relapse, or reinfection according to the highest posterior probability.
+We provide two ways to evaluate our sensitivity analysis results against the
+output based on error-free data. First, we construct a confusion matrix based on
+a hard classification rule, i.e., each instance is classified as recrudescence,
+relapse, or reinfection according to the highest posterior probability.
 ```{r}
 pred.mat <- sapply(subposts_list, function(subposts) {
   sapply(subposts, function(sposts) {
@@ -245,9 +285,13 @@ true.vec <- rep(c("C", "L", "I"), each = nrow(pred.mat))
 table("Error-free" = true.vec, "With errors" = as.vector(pred.mat))
 ```
 
-In each row (corresponding to a relationship graph), we see that marker subsets result in the correct classification at least 80\% of the time. Note that each row sums to 50 because we aggregate over 10 marker subsets of each of the 5 datasets simulated based on a given relationship graph.
+In each row (corresponding to a relationship graph), we see that marker subsets
+result in the correct classification at least 80\% of the time. Note that each
+row sums to 50 because we aggregate over 10 marker subsets of each of the 5
+datasets simulated based on a given relationship graph.
 
-Second, we report the [total variation distance](https://en.wikipedia.org/wiki/Total_variation_distance_of_probability_measures) between the posterior probabilities obtained using marker subsets (with error) and those obtained using error-free data.
+Second, we report the [total variation distance](https://en.wikipedia.org/wiki/Total_variation_distance_of_probability_measures) 
+between the posterior probabilities obtained using marker subsets (with error) and those obtained using error-free data.
 
 ```{r, fig.height=3, fig.width=7}
 par(mfrow = c(1, 3))
@@ -264,7 +308,16 @@ for(i in 1:3) {
 }
 ```
 
-Each histogram corresponds to one of the relationship graphs. Since only a subset of markers are used to obtain each set of posterior probabilities, using marker subsets result in some discrepancies compared to results obtained using all markers. There is a tradeoff concerning the number of markers per subset: using more markers leads to less information lost when subsetting, however it also lowers the probability of choosing a subset that is error-free. As a comparison, we repeat the above sensitivity analysis, but use 10 marker subsets of 10 markers each, which are independently sampled at uniform without replacement.
+Each histogram corresponds to one of the relationship graphs and represents 50
+distances, one for each of the 10 marker subsets of each of the 5 datasets per
+relationship graph. Since only a subset of markers are used to obtain each set
+of posterior probabilities, using marker subsets result in some discrepancies
+compared to results obtained using all markers. There is a trade-off concerning
+the number of markers per subset: using more markers leads to less information
+lost when subsetting, however it also lowers the probability of choosing a
+subset that is error-free. As a comparison, we repeat the above sensitivity
+analysis, but use 10 marker subsets of 10 markers each, which are independently
+sampled at uniform without replacement.
 
 ```{r}
 rand_subset_data <- function(data, n_subsets, subset_size) {
@@ -311,7 +364,9 @@ for(i in 1:n_datasets) {
 }
 ```
 
-As we double the number of markers per subset, the proportion of marker subsets that correctly classify recrudescence as so decreases to about half. However, reinfection is now more reliably classified.
+As we double the number of markers per subset, the proportion of marker subsets
+that correctly classify recrudescence as so decreases to about half. However,
+reinfection is now more reliably classified.
 
 ```{r}
 pred.mat <- sapply(subposts_list, function(subposts) {
@@ -325,7 +380,10 @@ true.vec <- rep(c("C", "L", "I"), each = nrow(pred.mat))
 table("Error-free" = true.vec, "With errors" = as.vector(pred.mat))
 ```
 
-In the case of relapse and reinfection, the total variation distance between the output based on marker subsets and output based on error-free data decreases. Again, this comes at the cost of increasing the total variation distance in the case of recrudescence.
+In the case of relapse and reinfection, the total variation distance between the
+output based on marker subsets and output based on error-free data decreases.
+Again, this comes at the cost of increasing the total variation distance in the
+case of recrudescence.
 
 ```{r, fig.height=3, fig.width=7}
 par(mfrow = c(1, 3))
@@ -342,4 +400,13 @@ for(i in 1:3) {
 }
 ```
 
-In practice, we recommend using small marker subsets in favour of ensuring a low probability of being affected by errors, such that the majority cluster (in the simplex) is likely to correspond to the ground truth. If a single probabilistic estimate is desired, we advise averaging the probabilities within the majority cluster.
+In practice, there is no way of knowing the output based on error-free data. 
+We recommend using small marker subsets in favour of ensuring a low probability of
+being affected by errors, such that the majority cluster (in the simplex) is
+likely to correspond to the ground truth. If a single probabilistic estimate is
+desired, we advise averaging the probabilities within the majority cluster. 
+
+In summary, marker subsetting is a promising approach to identify and adjust for
+the misclassification of recrudescence due to genotyping errors and mutations.
+The use of subsetting for relapse and reinfection misclassification is less
+straight forward, but relapse and reinfection are less impacted errors.
