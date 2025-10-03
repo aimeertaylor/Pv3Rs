@@ -127,7 +127,6 @@ for(i in 1:3) {
   plot_simplex(p.coords = probs, lim.mar = 0.15, p.labels = NA, cex = 2)
   if(i == 2) legend("top", pch = 1, pt.cex = 2, bty = "n", inset = 0, 
                     legend = "Error-free")
-  print(probs)
 }
 ```
 In the error-free case, the posterior probabilities (five per simplex: one per
@@ -406,7 +405,8 @@ being affected by errors, such that the majority cluster (in the simplex) is
 likely to correspond to the ground truth. If a single probabilistic estimate is
 desired, we advise averaging the probabilities within the majority cluster. 
 
-In summary, marker subsetting is a promising approach to identify and adjust for
-the misclassification of recrudescence due to genotyping errors and mutations.
-The use of subsetting for relapse and reinfection misclassification is less
-straight forward, but relapse and reinfection are less impacted errors.
+In summary, marker subsetting with small subset size shows promise for
+identifying and correcting the misclassification of recrudescence due to
+genotyping errors and mutations. The use of subsetting for relapse and
+reinfection misclassification is less straight forward, but relapse and
+reinfection are less impacted errors.
