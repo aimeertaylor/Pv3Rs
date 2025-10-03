@@ -78,43 +78,40 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The statistical model used by Pv3Rs does not perfectly capture the
-data-generating process in reality. In this article, we demonstrate how
-marker sensitivity analysis can help address misspecifications arising
-from genotyping errors and <em>de novo</em> mutations, which are not
-accounted for by the Pv3Rs model.</p>
+<p>In this article, we demonstrate how marker sensitivity analysis can
+help identify and address misspecifications arising from genotyping
+errors and <em>de novo</em> mutations, which are not accounted for by
+the Pv3Rs model.</p>
 <p>We distinguish three types of misspecifications:</p>
 <ul>
 <li><p><em>False negatives.</em> The genotyping procedure may fail to
-detect parasites that are present at low densities in the blood. Such
-allele dropouts can incorrectly eliminate the possibility of
-recrudescence, as alleles from a recrudescence episode may not be able
-to be matched to the preceding episode if the preceding episode suffers
-from false negatives. False negatives can also arise from genotyping
-errors.</p></li>
+detect alleles, e.g., because they are carried by parasites that are
+present at low densities in the blood sample. Such allele dropouts can
+incorrectly eliminate the possibility of recrudescence: alleles from a
+recrudescence episode may not be able to be matched to the preceding
+episode if either episode suffers from false negatives. False negatives
+can also arise from micalls (see below).</p></li>
 <li><p><em>False positives.</em> This refers to additional alleles
 called by the genotyping procedure that are not truly present. Again,
 false positives may incorrectly eliminate the possibility of
-recrudescence if the recrudescence episode suffers from false
-positives.</p></li>
+recrudescence if either episode suffers from false positives.</p></li>
 <li><p><em>Miscalls.</em> This refers to mistaking an allele for another
-allele, although one could view this as a false negative and false
-positive occurring together. <em>De novo</em> mutations can be viewed
+allele. One can view this as a false negative and false positive
+occurring together. <em>De novo</em> mutations can be viewed
 similarly.</p></li>
 </ul>
 <p>Underestimating the probability of recrudescence is the most likely
 consequence of these misspecifications, although genetic errors can also
-incorrectly overestimate genetic relatedness, depending on how errors
-are introduced. For example, if a relapse episode consists of a clone
-and a sibling from a previous episode, but the sibling allele drops out
-due to low density, then we would overestimate the probability of
-recrudescence.</p>
+incorrectly overestimate genetic relatedness. For example, if a relapse
+episode consists of a clone and a sibling from a previous episode, but
+the sibling allele drops out due to low density, then we would
+overestimate the probability of recrudescence.</p>
 </div>
 <div class="section level2">
 <h2 id="data-simulation">Data simulation<a class="anchor" aria-label="anchor" href="#data-simulation"></a>
 </h2>
-<p>Let us generate some data based on the following relationship
-graphs:</p>
+<p>Let us generate some data based on the following three relationship
+graphs, each with four genotypes g1, g2, g3 and g4:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span>, mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="va">RGs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/enumerate_RGs.html">enumerate_RGs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -126,8 +123,13 @@ graphs:</p>
 enrolment episode and two parasite genotypes during the recurrence
 episode. We’ve chosen these relationship graphs such that only the first
 relationship graph is compatible with recrudescence, and only the last
-relationship graph is compatible with reinfection. Here is some code to
-simulate data based on these relationship graphs:</p>
+relationship graph is compatible with reinfection. Below is some code to
+simulate data based on these relationship graphs. For each relationship
+graph, five data sets are simulated. For each data set, data on 50
+octo-allelic markers are simulated per genotype. An internal function
+(<code>Pv3Rs:::recombine_parent_ids</code>) ensures the finite nature of
+the parasite genome (not accounted for by the Pv3Rs model) is accounted
+for in the simulated data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-gregmisc/gtools" class="external-link">gtools</a></span><span class="op">)</span> <span class="co"># for `rdirichlet`</span></span>
 <span></span>
@@ -188,8 +190,8 @@ simulate data based on these relationship graphs:</p>
 <div class="section level2">
 <h2 id="pv3rs-on-error-free-data">Pv3Rs on error-free data<a class="anchor" aria-label="anchor" href="#pv3rs-on-error-free-data"></a>
 </h2>
-<p>Before simulating errors, let us first check the output of Pv3Rs when
-run on error-free data.</p>
+<p>Before simulating errors, we show the output of Pv3Rs meets our
+expectations when the model is fit to error-free data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">posts_RG1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">datasets_RG1</span>, </span>
 <span>                    <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="va">data</span><span class="op">$</span><span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -204,12 +206,33 @@ run on error-free data.</p>
 <span>  <span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">posts_list</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, <span class="kw">function</span><span class="op">(</span><span class="va">post</span><span class="op">)</span> <span class="va">post</span><span class="op">$</span><span class="va">marg</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="../reference/plot_simplex.html">plot_simplex</a></span><span class="op">(</span>p.coords <span class="op">=</span> <span class="va">probs</span>, lim.mar <span class="op">=</span> <span class="fl">0.15</span>, p.labels <span class="op">=</span> <span class="cn">NA</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span>  <span class="kw">if</span><span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"top"</span>, pch <span class="op">=</span> <span class="fl">1</span>, pt.cex <span class="op">=</span> <span class="fl">2</span>, bty <span class="op">=</span> <span class="st">"n"</span>, inset <span class="op">=</span> <span class="fl">0</span>, </span>
-<span>                    legend <span class="op">=</span> <span class="st">"Error-free (all markers)"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p><img src="sensitivity-analysis_files/figure-html/unnamed-chunk-5-1.png" width="100%">
-In the error-free case, the posterior probabilities concentrate around
-recrudescence, relapse, and reinfection for the three relationship
-graphs respectively.</p>
+<span>                    legend <span class="op">=</span> <span class="st">"Error-free"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt;               C          L            I</span></span>
+<span><span class="co">#&gt; recur 0.9069767 0.09302326 1.120762e-58</span></span>
+<span><span class="co">#&gt; recur 0.9069767 0.09302326 9.747680e-59</span></span>
+<span><span class="co">#&gt; recur 0.9069767 0.09302326 2.374274e-65</span></span>
+<span><span class="co">#&gt; recur 0.9069767 0.09302326 2.402830e-70</span></span>
+<span><span class="co">#&gt; recur 0.9069767 0.09302326 1.523084e-67</span></span>
+<span><span class="co">#&gt;       C L            I</span></span>
+<span><span class="co">#&gt; recur 0 1 8.893381e-29</span></span>
+<span><span class="co">#&gt; recur 0 1 1.392634e-31</span></span>
+<span><span class="co">#&gt; recur 0 1 4.365226e-25</span></span>
+<span><span class="co">#&gt; recur 0 1 5.957762e-41</span></span>
+<span><span class="co">#&gt; recur 0 1 5.815766e-32</span></span></code></pre></div>
+<p><img src="sensitivity-analysis_files/figure-html/unnamed-chunk-5-1.png" width="100%"></p>
+<pre><code><span><span class="co">#&gt;       C          L         I</span></span>
+<span><span class="co">#&gt; recur 0 0.09302326 0.9069767</span></span>
+<span><span class="co">#&gt; recur 0 0.09302326 0.9069767</span></span>
+<span><span class="co">#&gt; recur 0 0.09302326 0.9069767</span></span>
+<span><span class="co">#&gt; recur 0 0.09302326 0.9069767</span></span>
+<span><span class="co">#&gt; recur 0 0.09302326 0.9069767</span></span></code></pre>
+<p>In the error-free case, the posterior probabilities (five per
+simplex: one per data set, five data sets per relationship graph; all
+the probabilities per simplex are almost identical and thus the points
+are overlaid.) concentrate on recrudescence, relapse, and reinfection
+for the three relationship graphs respectively.</p>
 </div>
 <div class="section level2">
 <h2 id="error-simulation">Error simulation<a class="anchor" aria-label="anchor" href="#error-simulation"></a>
@@ -218,11 +241,12 @@ graphs respectively.</p>
 episode, we independently modify the observed data with a
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">2\%</annotation></semantics></math>
 probability, using either a false negative, false positive, or miscall.
-If more than one allele is observed, then we have equal probabilities
-for the three misspecifications. Otherwise, a false positive or miscall
-is simulated with equal probability. We then run Pv3Rs on the modified
-datasets.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+If more than one allele is observed, all three misspecifications have
+equal probabilities. Otherwise, to avoid missing alleles, a false
+positive or miscall is simulated with equal probability. (Pv3Rs deals
+well with missing alleles: including them as errors here would be an
+eschewal.) We then run Pv3Rs on the modified datasets.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modify</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">orig</span>, <span class="va">n_a</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">/</span><span class="fl">3</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">orig</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span> <span class="co"># false negative</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">orig</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">orig</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
@@ -257,7 +281,7 @@ datasets.</p>
 <span><span class="va">mposts_RG3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">modified</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span>, </span>
 <span>                     <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="va">data</span><span class="op">$</span><span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mposts_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">mposts_RG1</span>, <span class="va">mposts_RG2</span>, <span class="va">mposts_RG3</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span>, mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">posts_list</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, <span class="kw">function</span><span class="op">(</span><span class="va">post</span><span class="op">)</span> <span class="va">post</span><span class="op">$</span><span class="va">marg</span><span class="op">)</span><span class="op">)</span></span>
@@ -267,24 +291,26 @@ datasets.</p>
 <span>               cex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, each <span class="op">=</span> <span class="va">n_datasets</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">20</span><span class="op">)</span>, each <span class="op">=</span> <span class="va">n_datasets</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="kw">if</span><span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"top"</span>, pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">20</span><span class="op">)</span>, pt.cex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span>, inset <span class="op">=</span> <span class="fl">0</span>, </span>
 <span>                    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/rgb.html" class="external-link">rgb</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                    legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Error-free (all markers)"</span>, <span class="st">"With errors (all markers)"</span><span class="op">)</span><span class="op">)</span></span>
+<span>                    legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Error-free"</span>, <span class="st">"With errors"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="sensitivity-analysis_files/figure-html/unnamed-chunk-7-1.png" width="100%">
 As predicted, the presence of errors causes probable recrudescence to be
-classified as near-certain relapse. Also, there are some datasets
+classified as near-certain relapse. (Remember that there are five
+probabilities per simplex: one per data set, five data sets per
+relationship graph; almost all the probabilities per simplex are the
+same and thus the points are overlaid.) Also, there are some datasets
 corresponding to the third relationship graph where the reinfection
 probability is overestimated.</p>
 </div>
 <div class="section level2">
 <h2 id="marker-sensitivity-analysis">Marker sensitivity analysis<a class="anchor" aria-label="anchor" href="#marker-sensitivity-analysis"></a>
 </h2>
-<p>The reasoning behind our error simulation is that in reality, we may
-expect only a small subset of markers whose observed data to be affected
-by model misspecification. This implies that we may be able to run Pv3Rs
-on a subset of markers that are not affected by misspecification. In
-this article, we will investigate a rudimentary form of sensitivity
-analysis by running Pv3Rs with marker subsets. Suppose we partition our
-collection of
+<p>Because genotyping errors are generally infrequent, we expect only a
+small subset of markers affected by model misspecification in practice.
+This implies that we may be able to subset markers so that some subsets
+are not affected by misspecification. In this article, we present a
+rudimentary form of sensitivity analysis based on running Pv3Rs on
+marker subsets. Suppose we partition our collection of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>50</mn><annotation encoding="application/x-tex">50</annotation></semantics></math>
 markers into
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>
@@ -293,10 +319,11 @@ subsets of
 markers each (in practice, the subsets should be formed randomly), and
 run Pv3Rs
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>
-times for each full dataset, each time using a different subset of
+times for each full marker dataset, each time using a different subset
+of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>
 markers.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">subset_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">subsets</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">subsets</span>, <span class="kw">function</span><span class="op">(</span><span class="va">subset</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="va">`[`</span>, <span class="va">subset</span><span class="op">)</span>, fs <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">fs</span><span class="op">[</span><span class="va">subset</span><span class="op">]</span><span class="op">)</span></span>
@@ -320,7 +347,7 @@ markers.</p>
 markers, we expect the total runtime of this sensitivity analysis to not
 take much longer than running Pv3Rs with all markers at once. Here is
 the output for each dataset:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">layout_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="co"># legend                   </span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">16</span>, nrow <span class="op">=</span> <span class="va">n_datasets</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># simplex plots</span></span>
@@ -345,16 +372,18 @@ the output for each dataset:</p>
 similar to those obtained using error-free data on all markers. These
 are likely to correspond to marker subsets that do not involve any
 simulated errors. Some marker subsets result in posterior probabilities
-that are similar to those obtained using all markers on the same data
+that are similar to those obtained using error-prone data on all markers
 (see first column). These are likely to correspond to marker subsets
-that do involve simulated errors. Intriguingly, we occasionally get a
-misclassification due to marker subsetting (see second column).</p>
+that do involve simulated errors. In addition, we occasionally get a
+misclassification due to marker subsetting (see second column: when
+picking only five of 50 markers, there is a non-negligible chance that
+all sibling alleles match).</p>
 <p>We provide two ways to evaluate our sensitivity analysis results
 against the output based on error-free data. First, we construct a
-confusion matrix based on a hard classification rule, i.e. each instance
-is classified as recrudescence, relapse, or reinfection according to the
-highest posterior probability.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+confusion matrix based on a hard classification rule, i.e., each
+instance is classified as recrudescence, relapse, or reinfection
+according to the highest posterior probability.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred.mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">subposts_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">subposts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">subposts</span>, <span class="kw">function</span><span class="op">(</span><span class="va">sposts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">sposts</span>, <span class="kw">function</span><span class="op">(</span><span class="va">spost</span><span class="op">)</span> <span class="op">{</span></span>
@@ -378,7 +407,7 @@ relationship graph.</p>
 variation distance</a> between the posterior probabilities obtained
 using marker subsets (with error) and those obtained using error-free
 data.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">dists</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_datasets</span>, <span class="kw">function</span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">{</span></span>
@@ -392,17 +421,18 @@ data.</p>
 <span>       breaks<span class="op">=</span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span><span class="op">/</span><span class="fl">100</span>, ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="sensitivity-analysis_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
-<p>Each histogram corresponds to one of the relationship graphs. Since
-only a subset of markers are used to obtain each set of posterior
-probabilities, using marker subsets result in some discrepancies
-compared to results obtained using all markers. There is a tradeoff
-concerning the number of markers per subset: using more markers leads to
-less information lost when subsetting, however it also lowers the
-probability of choosing a subset that is error-free. As a comparison, we
-repeat the above sensitivity analysis, but use 10 marker subsets of 10
-markers each, which are independently sampled at uniform without
-replacement.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<p>Each histogram corresponds to one of the relationship graphs and
+represents 50 distances, one for each of the 10 marker subsets of each
+of the 5 datasets per relationship graph. Since only a subset of markers
+are used to obtain each set of posterior probabilities, using marker
+subsets result in some discrepancies compared to results obtained using
+all markers. There is a trade-off concerning the number of markers per
+subset: using more markers leads to less information lost when
+subsetting, however it also lowers the probability of choosing a subset
+that is error-free. As a comparison, we repeat the above sensitivity
+analysis, but use 10 marker subsets of 10 markers each, which are
+independently sampled at uniform without replacement.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rand_subset_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">n_subsets</span>, <span class="va">subset_size</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">n_m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">fs</span><span class="op">)</span></span>
 <span>  <span class="va">subsets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="va">n_subsets</span>, <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_m</span>, <span class="va">subset_size</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -423,7 +453,7 @@ replacement.</p>
 <span><span class="va">subposts_RG3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">data_subsets_RG3</span>, <span class="va">lapply</span>, </span>
 <span>                       <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_posterior.html">compute_posterior</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="va">data</span><span class="op">$</span><span class="va">fs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">subposts_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">subposts_RG1</span>, <span class="va">subposts_RG2</span>, <span class="va">subposts_RG3</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">layout_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="co"># legend                   </span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">16</span>, nrow <span class="op">=</span> <span class="va">n_datasets</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># simplex plots</span></span>
@@ -447,7 +477,7 @@ replacement.</p>
 <p>As we double the number of markers per subset, the proportion of
 marker subsets that correctly classify recrudescence as so decreases to
 about half. However, reinfection is now more reliably classified.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred.mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">subposts_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">subposts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">subposts</span>, <span class="kw">function</span><span class="op">(</span><span class="va">sposts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">sposts</span>, <span class="kw">function</span><span class="op">(</span><span class="va">spost</span><span class="op">)</span> <span class="op">{</span></span>
@@ -466,7 +496,7 @@ about half. However, reinfection is now more reliably classified.</p>
 between the output based on marker subsets and output based on
 error-free data decreases. Again, this comes at the cost of increasing
 the total variation distance in the case of recrudescence.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">dists</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_datasets</span>, <span class="kw">function</span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">{</span></span>
@@ -480,11 +510,17 @@ the total variation distance in the case of recrudescence.</p>
 <span>       breaks<span class="op">=</span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span><span class="op">/</span><span class="fl">100</span>, ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="sensitivity-analysis_files/figure-html/unnamed-chunk-15-1.png" width="100%"></p>
-<p>In practice, we recommend using small marker subsets in favour of
+<p>In practice, there is no way of knowing the output based on
+error-free data. We recommend using small marker subsets in favour of
 ensuring a low probability of being affected by errors, such that the
 majority cluster (in the simplex) is likely to correspond to the ground
 truth. If a single probabilistic estimate is desired, we advise
 averaging the probabilities within the majority cluster.</p>
+<p>In summary, marker subsetting is a promising approach to identify and
+adjust for the misclassification of recrudescence due to genotyping
+errors and mutations. The use of subsetting for relapse and reinfection
+misclassification is less straight forward, but relapse and reinfection
+are less impacted errors.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
