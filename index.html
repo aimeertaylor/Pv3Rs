@@ -74,16 +74,16 @@
 <li>Recrudescence</li>
 <li>Reinfection</li>
 </ul>
-<p>The core function, <code><a href="reference/compute_posterior.html">compute_posterior()</a></code>, computes per-person posterior probabilities of relapse, recrudescence, and reinfection (recurrence states) using <em>P. vivax</em> genetic data on two or more episodes. To fully understand the core function, in addition to reading this README in its entirety and the pre-print cited below, we recommend reading the <code><a href="articles/demonstrate-usage.html">vignette("demonstrate-usage", "Pv3Rs")</a></code> and <a href="https://aimeertaylor.github.io/Pv3Rs/articles/posterior-probabilities.html">Understand posterior probabilities</a>.</p>
+<p>The core function, <code><a href="reference/compute_posterior.html">compute_posterior()</a></code>, computes per-person posterior probabilities of relapse, recrudescence, and reinfection (recurrence states) using <em>P. vivax</em> genetic data on two or more episodes. To better understand the core function, in addition to reading this README, the documentation accessed via <code><a href="reference/compute_posterior.html">compute_posterior()</a></code>, and the pre-print cited below, we recommend reading the <code><a href="articles/demonstrate-usage.html">vignette("demonstrate-usage", "Pv3Rs")</a></code> and <a href="https://aimeertaylor.github.io/Pv3Rs/articles/posterior-probabilities.html">Understand posterior probabilities</a>.</p>
 <p>Two other important features:</p>
 <ul>
 <li><p><code><a href="reference/plot_data.html">plot_data()</a></code> visualises genetic data for molecular correction, regardless of the analytical method (e.g., <em>Plasmodium falciparum</em> data intended for analysis using a WHO match-counting algorithm).</p></li>
-<li><p><code><a href="reference/plot_simplex.html">plot_simplex()</a></code> can be used to visualise per-recurrence probabilities of relapse, recrudescence, and reinfection, or any other probability triplet summing to one.</p></li>
+<li><p><code><a href="reference/plot_simplex.html">plot_simplex()</a></code> can be used to visualise per-recurrence probabilities of relapse, recrudescence, and reinfection (or any other probability triplet summing to one).</p></li>
 </ul>
 <div class="section level2">
 <h2 id="please-be-aware-of-the-following-points">Please be aware of the following points!<a class="anchor" aria-label="anchor" href="#please-be-aware-of-the-following-points"></a>
 </h2>
-<p>The Pv3Rs R package is not yet peer-reviewed and thus liable to modification. The model is described in the preprint <a href="https://doi.org/10.1101/2022.11.23.22282669" class="external-link">Taylor, Foo &amp; White, 2022</a>, building on a prototype in <a href="https://doi.org/10.1038/s41467-019-13412-x" class="external-link">Taylor &amp; Watson et al. 2019</a>.</p>
+<p>The Pv3Rs R package is currently under peer-review and thus liable to modification. The model is described in the preprint <a href="https://doi.org/10.1101/2022.11.23.22282669" class="external-link">Taylor, Foo &amp; White, 2022</a>, building on a prototype in <a href="https://doi.org/10.1038/s41467-019-13412-x" class="external-link">Taylor &amp; Watson et al. 2019</a>.</p>
 <div class="section level3">
 <h3 id="prior-considerations">Prior considerations:<a class="anchor" aria-label="anchor" href="#prior-considerations"></a>
 </h3>
@@ -99,12 +99,12 @@
 <div class="section level4">
 <h4 id="mutually-exclusive-recurrent-states">Mutually exclusive recurrent states<a class="anchor" aria-label="anchor" href="#mutually-exclusive-recurrent-states"></a>
 </h4>
-<p>Recurrence states are modelled as mutually exclusive, suitable for studies where participants are actively followed up frequently and where all detected infections are treated to the extent that parasitaemia drops below some detectable level before recurrence, if recurrence occurs. In studies with untreated or accumulated infections, outputs may not be meaningful.</p>
+<p>Recurrence states are modelled as mutually exclusive, suitable for studies where participants are actively followed up frequently and where all detected infections are treated to the extent that parasitaemia drops below some detectable level before recurrence if recurrence occurs. In studies with untreated or accumulated infections, outputs may not be meaningful.</p>
 </div>
 <div class="section level4">
 <h4 id="unmodelled-complexities">Unmodelled complexities<a class="anchor" aria-label="anchor" href="#unmodelled-complexities"></a>
 </h4>
-<p>We do not model all the complexities around molecular correction. For example, population structure, including household effects; failure to capture low-density clones in a blood sample of limited volume <a href="https://doi.org/10.1016/S0169-4758(98)01340-4" class="external-link">[Snounou &amp; Beck, 1998]</a>; and hidden biomass the spleen and bone marrow <a href="https://doi.org/10.1016/j.pt.2019.08.009" class="external-link">[Markus, 2019]</a>. Users must interpret outputs in context of the study and its methods. For example, we expect Pv3Rs to output probable relapse if a person is reinfected by a new mosquito but with parasites that are recently related to those that caused a previous infection, as might happen in household transmission chains.</p>
+<p>We do not model all the complexities around molecular correction. For example, population structure, including household effects; failure to capture low-density clones in a blood sample of limited volume <a href="https://doi.org/10.1016/S0169-4758(98)01340-4" class="external-link">[Snounou &amp; Beck, 1998]</a>; and hidden biomass the spleen and bone marrow <a href="https://doi.org/10.1016/j.pt.2019.08.009" class="external-link">[Markus, 2019]</a>. Users must interpret outputs in light of these limitations and in the context of the study and its methods. For example, we expect Pv3Rs to output probable relapse if a person is reinfected by a new mosquito but with parasites that are recently related to those that caused a previous infection, as might happen in household transmission chains.</p>
 </div>
 <div class="section level4">
 <h4 id="sibling-misspecification">Sibling misspecification<a class="anchor" aria-label="anchor" href="#sibling-misspecification"></a>
@@ -112,7 +112,7 @@
 <p>Relapsing parasites that are siblings of parasites in previous infections can be meiotic, parent-child-like, regular or half siblings, but we model all sibling parasites as regular siblings via the following assumptions:</p>
 <ul>
 <li>Allele inheritance is independent (not true of meiotic siblings)</li>
-<li>Aibling relationships are transitive (not true of parent-child-like trios or some half-sibling trios)</li>
+<li>Sibling relationships are transitive (not true of parent-child-like trios or some half-sibling trios)</li>
 <li>Alleles of a sibling cluster are drawn from at most two parental alleles (not true of half siblings)</li>
 </ul>
 <p>In our experience, half sibling misspecification leads to some misclassification of relapses as reinfections; see <a href="https://aimeertaylor.github.io/Pv3Rs/articles/half-siblings.pdf">Understand half-sibling misspecification</a>. A descriptive study to explore the extent of half-sibling misspecification is recommended (an example will be provided in an upcoming manuscript).</p>
@@ -120,12 +120,12 @@
 <div class="section level4">
 <h4 id="observation-errors-and-de-novo-mutations">Observation errors and <em>de novo</em> mutations<a class="anchor" aria-label="anchor" href="#observation-errors-and-de-novo-mutations"></a>
 </h4>
-<p>We do not model undetected alleles, genotyping errors, or <em>de novo</em> mutations. Recrudescent parasites are modelled as perfect clones under Pv3Rs. As such, the posterior probability of recrudescence is rendered zero by errors and mutations. This becomes more likely when there are data on more markers. Sensitivity analyses that explore the impact of errors and mutations on recurrence state probabilities are merited.</p>
+<p>We do not model undetected alleles, genotyping errors, or <em>de novo</em> mutations. Recrudescent parasites are modelled as perfect clones under Pv3Rs. As such, the posterior probability of recrudescence is rendered zero by errors and mutations. This becomes more likely when there are data on more markers. <a href="https://aimeertaylor.github.io/Pv3Rs/articles/sensitivity-analysis.html">Marker sensitivity analysis for model misspecification</a>. explores the impact of errors and mutations on recurrence state probabilities.</p>
 </div>
 <div class="section level4">
 <h4 id="interpreting-probable-reinfection-and-recrudescence">Interpreting probable reinfection and recrudescence<a class="anchor" aria-label="anchor" href="#interpreting-probable-reinfection-and-recrudescence"></a>
 </h4>
-<p>When data are not sufficiently informative to distinguish between recrudescence and relapse (or reinfection and relapse), the posterior probabilities of recrudescence and relapse (or reinfection and relapse) are heavily influenced by a model assumption over relationship graphs; see <a href="https://aimeertaylor.github.io/Pv3Rs/articles/enumerate.pdf">Understand graph-prior ramifications</a>. The development of a more biologically-principled generative model on parasite relationships is merited.</p>
+<p>When genetic data alone are insufficient to distinguish between recrudescence and relapse (or reinfection and relapse), the posterior probabilities of recrudescence and relapse (or reinfection and relapse) are heavily influenced by our <em>a priori</em> uniform assumption over relationship graphs; see <a href="https://aimeertaylor.github.io/Pv3Rs/articles/enumerate.pdf">Understand graph-prior ramifications</a>. The development of a more biologically-principled generative model on parasite relationships is merited.</p>
 <table class="table">
 <colgroup>
 <col width="64%">
@@ -145,11 +145,11 @@
 <td>Not modelling errors</td>
 </tr>
 <tr class="odd">
-<td>Possible misclassification of relapse</td>
-<td>Half-sibling misspecification and not modelling errors</td>
+<td>Possible misclassification of relapse as reinfection</td>
+<td>Half-sibling misspecification</td>
 </tr>
 <tr class="even">
-<td>Possible misclassification of recrudescence</td>
+<td>Possible misclassification of recrudescence as relapse</td>
 <td>Not modelling errors</td>
 </tr>
 <tr class="odd">
@@ -176,7 +176,7 @@
 <div class="section level3">
 <h3 id="population-level-allele-frequencies">Population-level allele frequencies:<a class="anchor" aria-label="anchor" href="#population-level-allele-frequencies"></a>
 </h3>
-<p>In addition to <em>P. vivax</em> allelic data on two or more episodes, <code><a href="reference/compute_posterior.html">compute_posterior()</a></code> requires as input population-level allele frequencies. To minimise bias due to within-host selection of recrudescent parasites, we recommend using only enrolment episodes to estimate population-level allele frequencies, and ideally enrolment episodes from study participants selected at random, not only study participants who experience recurrence. That said, if most recurrences are either reinfections or relapses, both of which are draws from the mosquito population (albeit a delayed draw in the case of a relapse), assuming there is no systematic within-patient selection (as might occur when infections encounter lingering drug pressure), estimates based on all episodes should be unbiased and more precise than those based on enrolment episodes only.</p>
+<p>In addition to <em>P. vivax</em> allelic data on two or more episodes, <code><a href="reference/compute_posterior.html">compute_posterior()</a></code> requires as input population-level allele frequencies. To minimise bias due to within-host selection of recrudescent parasites, we recommend using only enrolment episodes to estimate population-level allele frequencies, and ideally enrolment episodes from study participants selected at random, not only study participants who experience recurrence. That said, if there is strong prior reason to believe most recurrences are either reinfections or relapses, both of which are draws from the mosquito population (albeit a delayed draw in the case of a relapse), assuming there is no systematic within-patient selection (as might occur when infections encounter lingering drug pressure), estimates based on all episodes should be unbiased and more precise than those based on enrolment episodes only.</p>
 </div>
 <div class="section level3">
 <h3 id="read-count-data">Read-count data:<a class="anchor" aria-label="anchor" href="#read-count-data"></a>
@@ -188,26 +188,9 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#===============================================================================</span></span>
-<span><span class="co"># First try installing Pv3Rs from CRAN (available soon if not already):</span></span>
-<span><span class="co">#===============================================================================</span></span>
+<code class="sourceCode R"><span><span class="co"># Install Pv3Rs from CRAN:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"Pv3Rs"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#===============================================================================</span></span>
-<span><span class="co"># If Pv3Rs is not available on CRAN:</span></span>
-<span><span class="co">#===============================================================================</span></span>
-<span><span class="co"># Install or update devtools from CRAN</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Install Pv3Rs from GitHub </span></span>
-<span><span class="co"># We recommend doing this in RStudio: RStudio installs pandoc, required for</span></span>
-<span><span class="co"># vignette building. If not, you might need to install pandoc and check its</span></span>
-<span><span class="co"># path; otherwise set build_vignettes = FALSE</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"aimeertaylor/Pv3Rs"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#===============================================================================</span></span>
-<span><span class="co"># Getting started after installation:</span></span>
-<span><span class="co">#===============================================================================</span></span>
 <span><span class="co"># Load and attach Pv3Rs</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://aimeertaylor.github.io/Pv3Rs/">Pv3Rs</a></span><span class="op">)</span></span>
 <span></span>
@@ -218,7 +201,16 @@
 <span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"Pv3Rs"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View function documentation including examples, e.g., </span></span>
-<span><span class="op">?</span><span class="va">compute_posterior</span></span></code></pre></div>
+<span><span class="op">?</span><span class="va">compute_posterior</span></span>
+<span></span>
+<span><span class="co">#===============================================================================</span></span>
+<span><span class="co"># To install the development version of Pv3Rs:</span></span>
+<span><span class="co">#===============================================================================</span></span>
+<span><span class="co"># Doing this in RStudio ensures pandoc, required for vignette building, is</span></span>
+<span><span class="co"># installed. If you're not working in RStudio, you might need to install pandoc </span></span>
+<span><span class="co"># and check its path (or set build_vignettes = FALSE)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span> <span class="co"># Install or update devtools from CRAN</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"aimeertaylor/Pv3Rs"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
