@@ -399,14 +399,8 @@ for(i in 1:3) {
 }
 ```
 
-In practice, there is no way of knowing the output based on error-free data. 
-We recommend using small marker subsets in favour of ensuring a low probability of
+In practice, there is no way of knowing the output based on error-free data. We
+recommend using small marker subsets in favour of ensuring a low probability of
 being affected by errors, such that the majority cluster (in the simplex) is
 likely to correspond to the ground truth. If a single probabilistic estimate is
-desired, we advise averaging the probabilities within the majority cluster. 
-
-In summary, marker subsetting with small subset size shows promise for
-identifying and correcting the misclassification of recrudescence due to
-genotyping errors and mutations. The use of subsetting for relapse and
-reinfection misclassification is less straight forward, but relapse and
-reinfection are less impacted errors.
+desired, we advise averaging the probabilities within the majority cluster.
