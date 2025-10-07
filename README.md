@@ -49,12 +49,13 @@ infections, both reinfection and relapse are plausible; meanwhile, when the data
 are compatible with recurrent parasites that are clones of those in the
 preceding infection, both recrudescence and relapse are plausible.
 
-- The main Pv3Rs function, `compute_posterior()`, could be applied to *P. falciparum* by setting the prior
-probability of relapse to zero, but genotyping errors, which are not accounted
-for under the current Pv3Rs model, are liable to lead to the misclassification
-of recrudescence as reinfection when the prior probability of relapse is zero
-(and of recrudescence as relapse when the prior probability of relapse exceeds
-zero).
+- The main Pv3Rs function, `compute_posterior()`, could be applied to *P. falciparum* 
+by setting the prior probability of relapse to zero, but genotyping errors,
+which are not accounted for under the current Pv3Rs model, are liable to lead to
+the misclassification of recrudescence as reinfection when the prior probability
+of relapse is zero (and of recrudescence as relapse when the prior probability
+of relapse exceeds zero). A post hoc diagnostic to identify misclassified 
+recrudescence is presented in [Marker sensitivity analysis for model misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/sensitivity-analysis.html).
 
 ### Notable assumptions and limitations: 
 
@@ -98,12 +99,12 @@ of relapses as reinfections; see
 A descriptive study to explore the extent of half-sibling misspecification is 
 recommended (an example will be provided in an upcoming manuscript).
 
-#### Observation errors and *de novo* mutations
-We do not model undetected alleles, genotyping errors, or *de novo* mutations. 
+#### Genotyping errors and *de novo* mutations
+We do not model undetected alleles, other genotyping errors, or *de novo* mutations. 
 Recrudescent parasites are modelled as perfect clones under Pv3Rs. As 
 such, the posterior probability of recrudescence is rendered zero by errors and 
 mutations. This becomes more likely when there are data on more markers. 
-[Marker sensitivity analysis for model misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/sensitivity-analysis.html).
+[Marker sensitivity analysis for model misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/sensitivity-analysis.html)
 explores the impact of errors and mutations on recurrence state probabilities.
 
 #### Interpreting probable reinfection and recrudescence
