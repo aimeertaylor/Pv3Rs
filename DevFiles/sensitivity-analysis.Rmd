@@ -20,6 +20,8 @@ library(Pv3Rs)
 options(warn = -1) # Suppress warnings about missing and limited data
 ```
 
+**Note: ** This is the original version genotyping error investigation. It has been superseded by the article "Understand genotyping errors".
+
 ## Introduction
 
 In this article, we demonstrate how marker sensitivity analysis can help identify and address misspecifications arising from genotyping errors and *de novo* mutations, which are not accounted for by the Pv3Rs model. 
@@ -41,7 +43,7 @@ each with four genotypes g1, g2, g3 and g4:
 ```{r}
 par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 suppressMessages(RGs <- enumerate_RGs(c(2, 2)))
-for(i in c(2, 6, 34)) {
+for(i in c(2, 35, 34)) { # used to be 2, 6, 34
   plot_RG(RGs[[i]], vertex.size = 20)
 }
 ```
