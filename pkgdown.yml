@@ -4,11 +4,11 @@ pkgdown_sha: ~
 articles:
   articles/benchmark: benchmark.html
   demonstrate-usage: demonstrate-usage.html
+  articles/genotyping-errors: genotyping-errors.html
   articles/intra-episode-siblings: intra-episode-siblings.html
   articles/links-to-pdfs: links-to-pdfs.html
   articles/posterior-probabilities: posterior-probabilities.html
-  articles/sensitivity-analysis: sensitivity-analysis.html
-last_built: 2025-10-07T07:58Z
+last_built: 2025-10-10T04:21Z
 urls:
   reference: https://aimeertaylor.github.io/Pv3Rs/reference
   article: https://aimeertaylor.github.io/Pv3Rs/articles
