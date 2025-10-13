@@ -90,19 +90,29 @@ that lead to alleles that are not observed in the preceding episode,
 Pv3Rs will incorrectly eliminate the possibility of recrudescence. The
 same applies in the case of allele dropouts or genotyping false
 negatives in the preceding episode.</p>
-<p>Practically, care needs to be taken when interpreting a near-certain
-relapse output from Pv3Rs, as it may correspond to a genuine relapse, or
-a recrudescence that is obscured by genotyping errors and/or <em>de
-novo</em> mutations. Given a sufficient number of markers, these two
-cases can be distinguished by inspecting the proportion of markers that
-are incompatible with recrudescence, i.e. there is some allele observed
-in the recrudescence episode that is absent in the preceding episode. If
-the proportion matches the expected error rate, one can consider
-rerunning Pv3Rs without the markers incompatible with recrudescence.
-Otherwise, for a genuine relapse, the proportion of markers incompatible
-with recrudescence should be higher. We note that for applications that
-do not require distinguishing between recrudescence and relapse, this
-diagnosis can be skipped.</p>
+<p>Mistaking recrudescence as near-certain relapse is inconsequential
+when recrudescence and relapse probabilities are combined, e.g., in
+estimations of radical cure efficacy. Otherwise, care needs to be taken
+when interpreting a near-certain relapse output from Pv3Rs, as it may
+correspond to a genuine relapse, or a recrudescence that is obscured by
+genotyping errors and/or <em>de novo</em> mutations. Assuming a small
+error rate and given a sufficient marker count, these two cases can be
+distinguished by inspecting the proportion of mismatched markers —
+markers that are incompatible with recrudescence because there is some
+allele observed in the recurrence that is absent in the preceding
+episode. If the proportion of mismatched markers aligns the expected
+error rate, one can consider rerunning Pv3Rs without the mismatched
+markers. For a genuine relapse, the proportion of mismatched markers
+should be higher.</p>
+<p>Another consequence of genotyping error, specifically false
+positivity, is spuriously high multiplicity of infection. Because there
+is a computational limit on the total genotype count (we do not
+recommend running Pv3Rs on participant data where per-episode
+multiplicities of infection sum to nine or more), false positives might
+render some recurrences unanalysable. Among those that are analysable,
+false postives might impact probable recrudescence and probable
+reinfection probabilities because different parasite genotype counts
+induce different posterior bounds on these states.</p>
 </div>
 <div class="section level2">
 <h2 id="data-simulation">Data simulation<a class="anchor" aria-label="anchor" href="#data-simulation"></a>
@@ -125,8 +135,8 @@ simulate data based on these relationship graphs. For each relationship
 graph, ten data sets are simulated. For each data set, data on 50
 octo-allelic markers are simulated per genotype. An internal function
 (<code>Pv3Rs:::recombine_parent_ids</code>) ensures the finite nature of
-the parasite genome (not accounted for by the Pv3Rs model) is accounted
-for in the simulated data.</p>
+the parasite genome (not accounted for under the Pv3Rs model) is
+captured in the simulation.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-gregmisc/gtools" class="external-link">gtools</a></span><span class="op">)</span> <span class="co"># for `rdirichlet`</span></span>
 <span></span>
@@ -204,12 +214,12 @@ expectations when the model is fit to error-free data.</p>
 <p><img src="genotyping-errors_files/figure-html/unnamed-chunk-5-1.png" width="100%">
 In the error-free case, the posterior probabilities concentrate on
 recrudescence, relapse, and reinfection for the three relationship
-graphs respectively. (Note that there are ten points per simplex: one
-per data set, ten data sets per relationship graph; all the
-probabilities per simplex are almost identical and thus the points are
-overlaid. The physical size of the plotting marker is not quantitatively
-meaningful; its role is to visually distinguish other plotting markers
-in later plots.)</p>
+graphs respectively. Note that there are ten points per simplex: one per
+data set, ten data sets per relationship graph; all the probabilities
+per simplex are almost identical and thus the points overlap. The
+physical size of the plotting marker is not quantitatively meaningful;
+its role is to visually distinguish other plotting markers in later
+plots.</p>
 </div>
 <div class="section level2">
 <h2 id="error-simulation">Error simulation<a class="anchor" aria-label="anchor" href="#error-simulation"></a>
@@ -222,12 +232,12 @@ detect alleles, e.g., because they are carried by parasites that are
 present at low densities in the blood sample. Such allele dropouts can
 incorrectly eliminate the possibility of recrudescence: alleles from a
 recrudescence episode may not be able to be matched to the preceding
-episode if either episode suffers from false negatives. False negatives
-can also arise from micalls (see below).</p></li>
+episode if it suffers from false negatives. False negatives can also
+arise from micalls (see below).</p></li>
 <li><p><em>False positives.</em> This refers to additional alleles
 called by the genotyping procedure that are not truly present. Again,
 false positives may incorrectly eliminate the possibility of
-recrudescence if either episode suffers from false positives.</p></li>
+recrudescence if the recurrence suffers from false positives.</p></li>
 <li><p><em>Miscalls.</em> This refers to mistaking an allele for another
 allele. One can view this as a false negative and false positive
 occurring together. <em>De novo</em> mutations can be viewed
@@ -289,9 +299,10 @@ As predicted, the presence of errors causes probable recrudescence to be
 classified as near-certain relapse. (Remember that there are ten
 probabilities per simplex: one per data set, ten data sets per
 relationship graph; almost all the probabilities per simplex are the
-same and thus the points are overlaid.) Also, there are some datasets
+same and thus the points overlap.) Also, there are some datasets
 corresponding to the third relationship graph where the reinfection
-probability is overestimated.</p>
+probability is overestimated. This is likley due to a false positives
+changing the posterior bound.</p>
 </div>
 <div class="section level2">
 <h2 id="diagnosis">Diagnosis<a class="anchor" aria-label="anchor" href="#diagnosis"></a>
@@ -301,9 +312,7 @@ graph, and so cannot distinguish between the first two simplices from
 posterior probabilities (based on data with errors) alone, where Pv3Rs
 outputs near-certain relapse. As alluded to in the introduction, we
 propose that these two cases can be distinguished by a simple
-diagnostic, that is, the proportion of markers that are incompatible
-with recrudescence, i.e. there is some allele observed in the
-recrudescence episode that is absent in the preceding episode.</p>
+diagnostic, that is, the proportion of mismatched markers.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># count how many markers have some allele in epi1 but not in epi0</span></span>
 <span><span class="va">count_recru_incompat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">epi0</span>, <span class="va">epi1</span><span class="op">)</span> <span class="op">{</span></span>
@@ -321,31 +330,30 @@ recrudescence episode that is absent in the preceding episode.</p>
 <span>        col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"purple"</span><span class="op">)</span>,</span>
 <span>        space <span class="op">=</span> <span class="fl">0</span>,  width <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>        axes <span class="op">=</span> <span class="cn">FALSE</span>, offset <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>        xlab <span class="op">=</span> <span class="st">"Proportion of markers incompatible with recrudescence"</span>,</span>
+<span>        xlab <span class="op">=</span> <span class="st">"Proportion of mismatched markers"</span>,</span>
 <span>        ylab <span class="op">=</span> <span class="st">"Number of datasets (with errors)"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1st RG"</span>, <span class="st">"2nd RG"</span><span class="op">)</span>,</span>
-<span>       fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"purple"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="fl">0.04</span>, col <span class="op">=</span> <span class="st">"red"</span>, lwd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"First relationship graph"</span>, <span class="st">"Second relationship graph"</span>, <span class="st">"Expected error rate"</span><span class="op">)</span>,</span>
+<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"purple"</span>, <span class="st">"red"</span><span class="op">)</span>, pch <span class="op">=</span> <span class="st">"-"</span>, pt.cex <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <p><img src="genotyping-errors_files/figure-html/unnamed-chunk-8-1.png" width="100%">
 We see that datasets from the first relationship graph (corresponding to
 recrudescence with error-free data) have a much lower proportion of
-markers incompatible with recrudescence compared to datasets from the
-second relationship graph (corresponding to relapse with error-free
-data). This shows that our proposed diagnostic is promising for
-detecting misclassification of recrudescence as relapse. Since the per
-marker per episode error rate is
+mismatched markers compared to datasets from the second relationship
+graph (corresponding to relapse with error-free data). This shows that
+our proposed diagnostic is promising for detecting misclassification of
+recrudescence as relapse. Since the per marker per episode error rate is
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">2\%</annotation></semantics></math>,
 we expect a
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>4</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\approx 4\%</annotation></semantics></math>
-per marker error rate (across two episodes), which matches the empirical
-proportion of markers incompatible with recrudescence for the first
-relationship graph.</p>
-<p>In practice, the proportion of markers incompatible with
-recrudescence given genuine relapse may follow a different distribution
-depending on the allele frequencies and the underlying relationship
-graph. Further simulation studies may be useful for investigating how
-this diagnostic behaves beyond the scenarios we consider here.</p>
+per marker error rate over two episodes, which matches the empirical
+proportion of mismatched markers for the first relationship graph.</p>
+<p>In practice, the proportion of mismatched markers given genuine
+relapse may follow a different distribution depending on the allele
+frequencies and the underlying relationship graph. Further simulation
+studies may be useful for investigating how this diagnostic behaves
+beyond the scenarios we consider here.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
