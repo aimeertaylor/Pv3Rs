@@ -33,7 +33,6 @@ probability triplet summing to one).
 
 ## Please be aware of the following points!
 
-The Pv3Rs R package is currently under peer-review and thus liable to modification.
 The model is described in the preprint 
 [Taylor, Foo & White, 2022](https://doi.org/10.1101/2022.11.23.22282669), building on a prototype in 
 [Taylor & Watson et al. 2019](https://doi.org/10.1038/s41467-019-13412-x).
