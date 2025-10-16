@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 library(Pv3Rs)
 ```
 
-## Introduction
+## Introduction {#intro}
 
 Pv3Rs' statistical model does not account for genotyping errors and *de novo*
 mutations, which can lead to misclassification. In this article, we demonstrate
@@ -45,14 +45,16 @@ episode. If the proportion of mismatched markers aligns the expected error rate,
 one can consider rerunning Pv3Rs without the mismatched markers. For a genuine
 relapse, the proportion of mismatched markers should be higher.
 
-Another consequence of genotyping error, specifically false positivity, is
-spuriously high multiplicity of infection. Because there is a computational
+Another consequence of genotyping error, specifically false positives, is
+spuriously high multiplicities of infection. Because there is a computational
 limit on the total genotype count (we do not recommend running Pv3Rs on
 participant data where per-episode multiplicities of infection sum to nine or
-more), false positives might render some recurrences unanalysable. Among those
-that are analysable, false postives might impact probable recrudescence
-and probable reinfection probabilities because different parasite genotype
-counts induce different posterior bounds on these states. 
+more), false positives might render some recurrences computationally infeasible 
+to be analysed by Pv3Rs. Among those that are computationally feasible, false 
+postives might impact probable recrudescence and probable reinfection 
+probabilities because different parasite genotype counts induce different 
+posterior bounds on these states (see 
+[Understand graph-prior ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/graph-prior.pdf)). 
 
 ## Data simulation
 
@@ -223,8 +225,8 @@ classified as near-certain relapse. (Remember that there are ten probabilities
 per simplex: one per data set, ten data sets per relationship graph; almost all
 the probabilities per simplex are the same and thus the points overlap.)
 Also, there are some datasets corresponding to the third relationship graph
-where the reinfection probability is overestimated. This is likley due to a false
-positives changing the posterior bound.
+where the reinfection probability is overestimated. This is likely due to false
+positives affecting the posterior bounds (see end of [Introduction](#intro)).
 
 ## Diagnosis
 
@@ -254,6 +256,6 @@ abline(v = 0.04, col = "red", lwd = 3)
 legend("topright", legend = c("First relationship graph", "Second relationship graph", "Expected error rate"),
        col = c("yellow", "purple", "red"), pch = "-", pt.cex = 4)
 ```
-We see that datasets from the first relationship graph (corresponding to recrudescence with error-free data) have a much lower proportion of mismatched markers compared to datasets from the second relationship graph (corresponding to relapse with error-free data). This shows that our proposed diagnostic is promising for detecting misclassification of recrudescence as relapse. Since the per marker per episode error rate is $2\%$, we expect a $\approx 4\%$ per marker error rate over  two episodes, which matches the empirical proportion of mismatched markers for the first relationship graph. 
+We see that datasets from the first relationship graph (corresponding to recrudescence with error-free data) have a much lower proportion of mismatched markers compared to datasets from the second relationship graph (corresponding to relapse with error-free data). This shows that our proposed diagnostic is promising for detecting misclassification of recrudescence as relapse. Since the per marker per episode error rate is $2\%$, we expect a $\approx 4\%$ per marker error rate over two episodes, which matches the empirical proportion of mismatched markers for the first relationship graph. 
 
 In practice, the proportion of mismatched markers given genuine relapse may follow a different distribution depending on the allele frequencies and the underlying relationship graph. Further simulation studies may be useful for investigating how this diagnostic behaves beyond the scenarios we consider here.
