@@ -76,7 +76,7 @@
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="intro">Introduction<a class="anchor" aria-label="anchor" href="#intro"></a>
 </h2>
 <p>Pv3Rs’ statistical model does not account for genotyping errors and
 <em>de novo</em> mutations, which can lead to misclassification. In this
@@ -105,14 +105,16 @@ error rate, one can consider rerunning Pv3Rs without the mismatched
 markers. For a genuine relapse, the proportion of mismatched markers
 should be higher.</p>
 <p>Another consequence of genotyping error, specifically false
-positivity, is spuriously high multiplicity of infection. Because there
+positives, is spuriously high multiplicities of infection. Because there
 is a computational limit on the total genotype count (we do not
 recommend running Pv3Rs on participant data where per-episode
 multiplicities of infection sum to nine or more), false positives might
-render some recurrences unanalysable. Among those that are analysable,
-false postives might impact probable recrudescence and probable
-reinfection probabilities because different parasite genotype counts
-induce different posterior bounds on these states.</p>
+render some recurrences computationally infeasible to be analysed by
+Pv3Rs. Among those that are computationally feasible, false postives
+might impact probable recrudescence and probable reinfection
+probabilities because different parasite genotype counts induce
+different posterior bounds on these states (see <a href="https://aimeertaylor.github.io/Pv3Rs/articles/graph-prior.pdf">Understand
+graph-prior ramifications</a>).</p>
 </div>
 <div class="section level2">
 <h2 id="data-simulation">Data simulation<a class="anchor" aria-label="anchor" href="#data-simulation"></a>
@@ -301,8 +303,8 @@ probabilities per simplex: one per data set, ten data sets per
 relationship graph; almost all the probabilities per simplex are the
 same and thus the points overlap.) Also, there are some datasets
 corresponding to the third relationship graph where the reinfection
-probability is overestimated. This is likley due to a false positives
-changing the posterior bound.</p>
+probability is overestimated. This is likely due to false positives
+affecting the posterior bounds (see end of <a href="#intro">Introduction</a>).</p>
 </div>
 <div class="section level2">
 <h2 id="diagnosis">Diagnosis<a class="anchor" aria-label="anchor" href="#diagnosis"></a>
