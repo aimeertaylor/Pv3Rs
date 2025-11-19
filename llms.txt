@@ -114,10 +114,11 @@ assumptions:
 In our experience, half sibling misspecification leads to some
 misclassification of relapses as reinfections; see [Understand
 half-sibling
-misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/half-siblings.pdf),
+misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/half-siblings.pdf)
+and [Understand posterior
+probabilities](https://aimeertaylor.github.io/Pv3Rs/articles/posterior-probabilities.html#half)
 where half siblings lead to erratic probabilities based on increasing
-marker counts.  
-A descriptive study to explore the extent of half-sibling
+marker counts. A descriptive study to explore the extent of half-sibling
 misspecification is recommended.
 
 #### Genotyping errors and *de novo* mutations
