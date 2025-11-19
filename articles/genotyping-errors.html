@@ -127,7 +127,7 @@ graphs, each with four genotypes g1, g2, g3, and g4:</p>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">6</span>, <span class="fl">34</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/plot_RG.html">plot_RG</a></span><span class="op">(</span><span class="va">RGs</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, vertex.size <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="genotyping-errors_files/figure-html/unnamed-chunk-2-1.png" width="100%"></p>
+<p><img src="genotyping-errors_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="100%"></p>
 <p>Each relationship graph consists of two parasite genotypes during the
 enrolment episode and two parasite genotypes during the recurrence
 episode. We’ve chosen these relationship graphs such that only the first
@@ -213,7 +213,7 @@ expectations when the model is fit to error-free data.</p>
 <span>  <span class="kw">if</span><span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"top"</span>, pch <span class="op">=</span> <span class="fl">1</span>, pt.cex <span class="op">=</span> <span class="fl">2</span>, bty <span class="op">=</span> <span class="st">"n"</span>, inset <span class="op">=</span> <span class="fl">0</span>, </span>
 <span>                    legend <span class="op">=</span> <span class="st">"Error-free"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="genotyping-errors_files/figure-html/unnamed-chunk-5-1.png" width="100%">
+<p><img src="genotyping-errors_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" width="100%">
 In the error-free case, the posterior probabilities concentrate on
 recrudescence, relapse, and reinfection for the three relationship
 graphs respectively. Note that there are ten points per simplex: one per
@@ -296,7 +296,7 @@ eschewal.) We then run Pv3Rs on the modified datasets.</p>
 <span>                    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/rgb.html" class="external-link">rgb</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                    legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Error-free"</span>, <span class="st">"With errors"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="genotyping-errors_files/figure-html/unnamed-chunk-7-1.png" width="100%">
+<p><img src="genotyping-errors_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="100%">
 As predicted, the presence of errors causes probable recrudescence to be
 classified as near-certain relapse. (Remember that there are ten
 probabilities per simplex: one per data set, ten data sets per
@@ -339,7 +339,7 @@ diagnostic, that is, the proportion of mismatched markers.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="fl">0.04</span>, col <span class="op">=</span> <span class="st">"red"</span>, lwd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"First relationship graph"</span>, <span class="st">"Second relationship graph"</span>, <span class="st">"Expected error rate"</span><span class="op">)</span>,</span>
 <span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"purple"</span>, <span class="st">"red"</span><span class="op">)</span>, pch <span class="op">=</span> <span class="st">"-"</span>, pt.cex <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="genotyping-errors_files/figure-html/unnamed-chunk-8-1.png" width="100%">
+<p><img src="genotyping-errors_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="100%">
 We see that datasets from the first relationship graph (corresponding to
 recrudescence with error-free data) have a much lower proportion of
 mismatched markers compared to datasets from the second relationship
@@ -368,7 +368,7 @@ beyond the scenarios we consider here.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
