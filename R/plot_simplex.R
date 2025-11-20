@@ -99,7 +99,7 @@ plot_simplex <- function(v.labels = c("Recrudescence", "Relapse", "Reinfection")
                          ...) {
 
   params <- names(list(...))
-  if (!all(params %in% names(par()))) stop("... contains invalid parameters")
+  if (!all(params %in% names(graphics::par()))) stop("... contains invalid parameters")
 
   # Define some constants:
   h <- sqrt(3)/2 # Height of equilateral triangle with unit sides
