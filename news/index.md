@@ -2,6 +2,8 @@
 
 ## Pv3Rs 1.0.0
 
+CRAN release: 2025-11-20
+
 - CRAN submission post Bioinformatics peer review.
 
 - README now refers to Bioinformatics article “Pv3Rs: Plasmodium vivax
