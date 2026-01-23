@@ -25,14 +25,14 @@
 Source:
 [`DESCRIPTION`](https://github.com/aimeertaylor/Pv3Rs/blob/main/DESCRIPTION)
 
-Taylor A, Foo Y (2025). *Pv3Rs: Estimate the Cause of Recurrent Vivax
+Taylor A, Foo Y (2026). *Pv3Rs: Estimate the Cause of Recurrent Vivax
 Malaria using Genetic Data*. R package version 1.0.0.9000,
 <https://aimeertaylor.github.io/Pv3Rs/>.
 
     @Manual{,
       title = {Pv3Rs: Estimate the Cause of Recurrent Vivax Malaria using Genetic Data},
       author = {Aimee Taylor and Yong See Foo},
-      year = {2025},
+      year = {2026},
       note = {R package version 1.0.0.9000},
       url = {https://aimeertaylor.github.io/Pv3Rs/},
     }
