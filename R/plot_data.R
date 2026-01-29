@@ -29,7 +29,7 @@
 #'  legend with areas proportional to allele frequencies, so that common alleles
 #'  occupy larger areas than rarer alleles. Specify `fs` to fix the allele
 #'  colour scheme across plots of different `ys`.
-#'@param person.vert Logical. If `TRUE` (default), person IDs are printed
+#'@param person.vert Logical. If `TRUE`, person IDs are printed
 #'  vertically; otherwise, they are printed horizontally.
 #'@param mar Vector of numbers of lines of margin for the main
 #'  plot; see `mar` entry of \code{\link[graphics]{par}}.
