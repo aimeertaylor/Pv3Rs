@@ -71,6 +71,7 @@ When data are entirely missing,
 returns the prior.
 
 ``` r
+
 fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
 y = list(enrol = list(m1 = NA), recur = list(m1 = NA)) # Missing data
 suppressMessages(compute_posterior(y, fs))$marg # Posterior
@@ -84,6 +85,7 @@ with recrudescence,
 returns the prior re-weighted to the exclusion of recrudescence.
 
 ``` r
+
 suppressMessages(compute_posterior(y, fs, MOIs = c(1,2)))$marg 
 #>       C   L   I
 #> recur 0 0.5 0.5
@@ -96,6 +98,7 @@ When data are uninformative because there is no genetic diversity,
 returns the prior.
 
 ``` r
+
 fs = list(m1 = c("A" = 1)) # Unit allele frequency: no genetic diversity
 y = list(list(m1 = "A"), recur = list(m1 = "A")) # Data the only viable allele
 suppressMessages(compute_posterior(y, fs))$marg # Posterior
@@ -113,6 +116,7 @@ an MOI \> 1,
 returns the prior.
 
 ``` r
+
 fs = list(m1 = c("A" = 0.5, "B" = 0.5)) # Allele frequencies
 y <- list(enrol = list(m1 = NA), recur1 = list(m1 = "A")) # No enrolment data
 suppressMessages(compute_posterior(y, fs))$marg # Posterior
@@ -132,6 +136,7 @@ the episode with data. The lower bound on the cell count increases with
 the number of distinct alleles observed.
 
 ``` r
+
 # Allele frequencies 
 fs = list(m1 = c('A' = 0.25, 'B' = 0.25, 'C' = 0.25, 'D' = 0.25)) 
 
@@ -168,6 +173,7 @@ prior because rare intra-episode allelic repeats are more probable given
 relationship graphs with intra-episode relatedness.
 
 ``` r
+
 y <- list(enrol = list(m1 = 'A'), list(m1 = NA)) # Homoallelic data
 MOIs <- list(c(2,1), c(3,2), c(5,1)) # Different MOIs with first MOI > 1
 fs = list(m1 = c("A" = 0.01, "B" = 0.99)) # Rare observed allele
@@ -194,6 +200,7 @@ behaves similarly to when data are limited to one episode:
   with user-specified MOIs \> 1.
 
 ``` r
+
 # Allele frequencies
 fs = list(m1 = c("A" = 0.01, "B" = 0.99), 
           m2 = c("A" = 0.01, "B" = 0.99)) 
@@ -308,6 +315,7 @@ We start by defining some variables that will be used repeatedly in the
 following code chunks.
 
 ``` r
+
 marker_count <- 100 # Number of markers
 ms <- paste0("m", 1:marker_count) # Marker names 
 all_As <- sapply(ms, function(t) "A", simplify = F) # As for all markers
@@ -321,6 +329,7 @@ fs <- sapply(ms, function(m) c("A"=fA, "B"=fB), simplify = FALSE) # Frequencies
 ### Increasing per-episode MOIs
 
 ``` r
+
 MOIs <- list(c(1,1), c(2,1), c(2,2)) 
 y_match <- list(enrol = all_As, recur = all_As)
 y_mismatch <- list(enrol = all_As, recur = all_Bs)
@@ -361,6 +370,7 @@ END OF DIGRESSION
 Recurrences can be added without adding data
 
 ``` r
+
 ys_match <- list("1_recurrence" = list(enrol = all_As, 
                                        recur1 = all_As),
                  "2_recurrence" = list(enrol = all_As, 
@@ -412,6 +422,7 @@ The effect of position is negligible when all episodes have the same
 data on many markers:
 
 ``` r
+
 y <- list(enrol = all_As, 
           recur1 = all_As, 
           recur2 = all_As, 
@@ -427,6 +438,7 @@ Instead, consider sequences of episodes with observations (Os) and
 episodes with no data (Ns):
 
 ``` r
+
 ys_match <- list("NOO" = list(enrol = no_data, 
                               recur1 = all_As,
                               recur2 = all_As),
@@ -486,6 +498,7 @@ recurrences starting with reinfection, informing the first recurrence
 only.
 
 ``` r
+
 epsilon <- .Machine$double.eps # Very small probability
 names(which(suppressMessages(compute_posterior(y = ys_match[["ONO"]], fs))$joint < epsilon))
 #> [1] "IC" "CI" "LI" "II"
@@ -512,6 +525,7 @@ recrudescence, so the posterior of the first recurrence (downward orange
 no data.
 
 ``` r
+
 epsilon <- .Machine$double.eps # Very small probability
 names(which(suppressMessages(compute_posterior(y = ys_mismatch[["ONO"]], fs))$joint < epsilon))
 #> [1] "CC"
@@ -541,6 +555,7 @@ reinfection probabilities will never exceed 0.75, even if their data are
 highly informative of reinfection:
 
 ``` r
+
 y <- list(enrol = all_As, recur = all_Bs)
 fs <- sapply(ms, FUN = function(m) c("A" = 0.5, "B" = 0.5), simplify = FALSE)
 
@@ -660,7 +675,7 @@ misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/half-siblings.pd
 The purple, red, and green trajectories below have higher than the
 expected 0.5 intra-to-inter match ratios; moreover, the purple
 trajectory’s intra-to-inter match ratio consistently exceeds
-$0.5 \times \text{log}_{2}\left( \frac{2}{5} \right)$, a condition found
+$`0.5\times \text{log}_2(\dfrac{2}{5})`$, a condition found
 theoretically to concentrate posterior probability on reinfection under
 certain conditions; again, see [Understand half-sibling
 misspecification](https://aimeertaylor.github.io/Pv3Rs/articles/half-siblings.pdf).

@@ -37,6 +37,7 @@ enrolment episode contains five genetically distinct genotypes and thus
 has a MOI of five.
 
 ``` r
+
 simulate_data <- function(marker_cardinality){
   
   # Magic numbers / quantities
@@ -93,6 +94,7 @@ However, MOI estimates based on maximum per-marker allele counts are
 three and one when markers are polyallelic:
 
 ``` r
+
 polyallelic <- simulate_data(10) 
 determine_MOIs(polyallelic$data)
 #> [1] 3 1
@@ -101,6 +103,7 @@ determine_MOIs(polyallelic$data)
 And two and one when markers are biallelic:
 
 ``` r
+
 biallelic <- simulate_data(2) 
 determine_MOIs(biallelic$data)
 #> [1] 2 1
@@ -118,6 +121,7 @@ the
 - biallelic data with user-specified MOIs of three and one
 
 ``` r
+
 ppost <- suppressMessages(compute_posterior(y = polyallelic$data, 
                                             fs = polyallelic$fs, 
                                             return.logp = T))
@@ -142,6 +146,7 @@ Whereas, all relationships have non-zero likelihood given the biallelic
 data:
 
 ``` r
+
 llikes <- sapply(bpost$RGs, function(RG) RG$logp) # Extract log likelihoods
 any(is.infinite(llikes)) # Are there any minus infinity log likelihoods?
 #> [1] FALSE

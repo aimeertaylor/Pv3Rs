@@ -8,6 +8,7 @@ replicated 30 times to account for variability.
 ## Setup
 
 ``` r
+
 library(Pv3Rs)
 library(tictoc)
 library(gtools)
@@ -51,10 +52,11 @@ number of markers due to the likelihood decomposition (Section 3.4 of
 [Taylor, Foo & White,
 2022](https://doi.org/10.1101/2022.11.23.22282669)). We simulate genetic
 data spanning across 2 episodes both with MOI 2, and vary the number of
-markers between $50,100,\ldots,400$. Each marker is assumed to have 8
-possible alleles.
+markers between $`50, 100, \ldots, 400`$. Each marker is assumed to have
+8 possible alleles.
 
 ``` r
+
 set.seed(1)
 n_markers <- 50*(1:8)
 n_a <- 8
@@ -71,6 +73,7 @@ for (n_m in n_markers) {
 ```
 
 ``` r
+
 time_by_m <- list()
 for (n_m in n_markers) {
   time_by_m[[as.character(n_m)]] <- sapply(
@@ -86,6 +89,7 @@ for (n_m in n_markers) {
 ```
 
 ``` r
+
 max_time <- max(sapply(time_by_m, max))
 par(cex=1.0, mar=c(5, 4.5, 2, 1))
 plot(
@@ -110,6 +114,7 @@ We simulate genetic data consisting of 1 marker (8 alleles), spanning 2
 episodes of various MOI combinations.
 
 ``` r
+
 set.seed(1)
 n_m <- 1
 n_a <- 8
@@ -132,6 +137,7 @@ for (MOIs in MOIs_comb) {
 ```
 
 ``` r
+
 time_by_MOI <- list()
 for (MOIs in MOIs_comb) {
   MOIstr <- paste(MOIs, collapse=",")
@@ -148,6 +154,7 @@ for (MOIs in MOIs_comb) {
 ```
 
 ``` r
+
 min_time <- min(sapply(time_by_MOI, min))
 max_time <- max(sapply(time_by_MOI, max))
 n <- length(MOIs_comb)
@@ -201,6 +208,7 @@ We simulate genetic data consisting of one marker (eight alleles), with
 one genotype per episode for various numbers of episodes.
 
 ``` r
+
 set.seed(1)
 n_m <- 1
 n_a <- 8
@@ -217,6 +225,7 @@ for (epi in n_epis) {
 ```
 
 ``` r
+
 time_by_epi <- list()
 for (epi in n_epis) {
   time_by_epi[[as.character(epi)]] <- sapply(
@@ -232,6 +241,7 @@ for (epi in n_epis) {
 ```
 
 ``` r
+
 min_time <- min(sapply(time_by_epi, min))
 max_time <- max(sapply(time_by_epi, max))
 
@@ -255,12 +265,13 @@ for(epi in n_epis) {
 With one genotype per episode, the runtime (note the log scale) scales
 super-exponentially with respect to the number of episodes (or
 equivalently, the total MOI). In fact, the number of relationship graphs
-with $n$ episodes with one genotype per episode is given by
-$$R_{n} = \sum\limits_{k = 1}^{n}S(n,k)B_{k},$$ where
-$S\left( n_{k} \right)$ are Stirling numbers of the second kind and
-$B_{k}$ are Bell numbers. We provide the derivation in the
-[Appendix](#appendix), where we also show that
-$\log R_{n} \sim n\log n$.
+with $`n`$ episodes with one genotype per episode is given by
+``` math
+R_n = \sum_{k=1}^n S(n,k)B_k,
+```
+where $`S(n_k)`$ are Stirling numbers of the second kind and $`B_k`$ are
+Bell numbers. We provide the derivation in the [Appendix](#appendix),
+where we also show that $`\log R_n \sim n\log n`$.
 
 ### Fixed total MOI
 
@@ -269,6 +280,7 @@ various numbers of episodes with a fixed total MOI of seven. See printed
 output below for the sequence of MOIs considered.
 
 ``` r
+
 set.seed(1)
 n_m <- 1
 n_a <- 8
@@ -292,6 +304,7 @@ for (MOIs in MOI_fix_comb) {
 ```
 
 ``` r
+
 time_by_MOI_fix <- list()
 for (MOIs in MOI_fix_comb) {
   MOIstr <- paste(MOIs, collapse=",")
@@ -308,6 +321,7 @@ for (MOIs in MOI_fix_comb) {
 ```
 
 ``` r
+
 min_time <- min(sapply(time_by_MOI_fix, min))
 max_time <- max(sapply(time_by_MOI_fix, max))
 
@@ -334,8 +348,8 @@ more pairs that can be clones, explaining the increase in runtime.
 
 ## Appendix
 
-To derive a formula for $R_{n}$, the number of relationship graphs for
-$n$ episodes with one genotype per episode, we treat a relationship
+To derive a formula for $`R_n`$, the number of relationship graphs for
+$`n`$ episodes with one genotype per episode, we treat a relationship
 graph as a nested partition. The clonal relationships in a relationship
 graph induce a partition of all genotypes into subsets, where all
 genotypes within the same subset are clones of each other. We call such
@@ -343,70 +357,67 @@ a subset a \`clonal cell’. The sibling relationships in a relationship
 graph induce a partition of all clonal cells into subsets, such that any
 two genotypes from the same subset that are not clones of each other
 must be siblings. Recall that Stirling numbers of the second kind
-$S(n,k)$ count the number of ways to partition $n$ objects into $k$
-subsets, whereas the Bell numbers $B_{k}$ count the number of ways to
-partition $k$ objects (into any number of subsets). Letting $k$ denote
-the number of clonal cells, we have
-$$R_{n} = \sum\limits_{k = 1}^{n}S(n,k)B_{k}.$$
+$`S(n,k)`$ count the number of ways to partition $`n`$ objects into
+$`k`$ subsets, whereas the Bell numbers $`B_k`$ count the number of ways
+to partition $`k`$ objects (into any number of subsets). Letting $`k`$
+denote the number of clonal cells, we have
+``` math
+R_n = \sum_{k=1}^n S(n,k)B_k.
+```
 
-To establish the asymptotics of $R_{n}$, we first note that
-$R_{n} \geq S(n,n)B_{n} = B_{n}$. It is well known that
-$\log B_{n} \sim n\log n$. If we additionally have that
-$R_{n} \leq n^{n}$, it then follows that $\log R_{n} \sim n\log n$. The
-rest of this appendix is devoted to proving that $R_{n} \leq n^{n}$ is
-indeed true. Let $\mathcal{H}_{n}$ be the set of all functions $h$ that
-map elements of $\{ 1,\ldots,n\}$ to $\{ 1,\ldots,n\}$. Since
-$\left| \mathcal{H}_{n} \right| = n^{n}$, it suffices to show that there
-is an injection from the set of all relationship graphs (with $n$
-genotypes) to $\mathcal{H}_{n}$.
+To establish the asymptotics of $`R_n`$, we first note that
+$`R_n \ge S(n,n)B_n = B_n`$. It is well known that
+$`\log B_n \sim n\log n`$. If we additionally have that $`R_n \le n^n`$,
+it then follows that $`\log R_n \sim n\log n`$. The rest of this
+appendix is devoted to proving that $`R_n \le n^n`$ is indeed true. Let
+$`\mathcal{H}_n`$ be the set of all functions $`h`$ that map elements of
+$`\{1,\ldots,n\}`$ to $`\{1,\ldots,n\}`$. Since $`|\mathcal{H}_n|=n^n`$,
+it suffices to show that there is an injection from the set of all
+relationship graphs (with $`n`$ genotypes) to $`\mathcal{H}_n`$.
 
 Consider the following mapping of a relationship graph to a function
-$h$: Given a relationship graph, label the genotypes from $1$ to $n$,
-and label the clonal cells from $1$ to $k$. For each
-$k\prime = 1,\ldots,k$, let $c_{k\prime}$ denote the smallest genotype
-label in clonal cell $k\prime$. For each genotype $i$ in clonal cell
-$k\prime$ that is not $c_{k\prime}$, we define $h(i) = c_{k\prime}$. It
-remains to define the values of
-$h\left( c_{1} \right),\ldots,h\left( c_{k} \right)$. The sibling
-relationships induce a partition of $\{ 1,\ldots,k\}$ into subsets of
-clonal cells. Let $\{ x_{1},\ldots,x_{m}\}$ be such a subset, where
-$1 \leq x_{1} \leq \cdots \leq x_{m} \leq k$. For each
-$m\prime = 1,\ldots,m$, we define
-$h\left( c_{x_{m\prime}} \right) = c_{x_{m\prime + 1}}$, where
-subscripts of $x$ are taken modulo $m$. We repeat the same for all
-subsets of the partition induced by sibling relationships, which
-completes the definition of the mapping. Informally, we select one
-genotype from each clonal cell to be a representative. The function $h$
-maps non-representative genotypes to their corresponding
-representatives, and maps representative genotypes to representative
-genotypes, such that each subset induced by the sibling relationships
-corresponds to a cycle induced by $h$.
+$`h`$: Given a relationship graph, label the genotypes from $`1`$ to
+$`n`$, and label the clonal cells from $`1`$ to $`k`$. For each
+$`k'=1,\ldots,k`$, let $`c_{k'}`$ denote the smallest genotype label in
+clonal cell $`k'`$. For each genotype $`i`$ in clonal cell $`k'`$ that
+is not $`c_{k'}`$, we define $`h(i)=c_{k'}`$. It remains to define the
+values of $`h(c_1),\ldots,h(c_k)`$. The sibling relationships induce a
+partition of $`\{1,\ldots,k\}`$ into subsets of clonal cells. Let
+$`\{x_1,\ldots,x_m\}`$ be such a subset, where
+$`1\le x_1 \le \cdots \le x_m\le k`$. For each $`m'=1,\ldots,m`$, we
+define $`h(c_{x_{m'}})=c_{x_{m'+1}}`$, where subscripts of $`x`$ are
+taken modulo $`m`$. We repeat the same for all subsets of the partition
+induced by sibling relationships, which completes the definition of the
+mapping. Informally, we select one genotype from each clonal cell to be
+a representative. The function $`h`$ maps non-representative genotypes
+to their corresponding representatives, and maps representative
+genotypes to representative genotypes, such that each subset induced by
+the sibling relationships corresponds to a cycle induced by $`h`$.
 
 It remains to show that this mapping is indeed an injection. Consider
-two different relationship graphs $g_{1}$ and $g_{2}$, corresponding to
-the functions $h_{1}$ and $h_{2}$ under the mapping above. We seek to
-show that $h_{1} \neq h_{2}$. Suppose that the genotypes $i$ and
-$i\prime$ have a different relationship under $g_{1}$ and $g_{2}$. It
-suffices to consider the following two cases:
+two different relationship graphs $`g_1`$ and $`g_2`$, corresponding to
+the functions $`h_1`$ and $`h_2`$ under the mapping above. We seek to
+show that $`h_1\neq h_2`$. Suppose that the genotypes $`i`$ and $`i'`$
+have a different relationship under $`g_1`$ and $`g_2`$. It suffices to
+consider the following two cases:
 
-*Case 1: Genotypes $i$ and $i\prime$ are strangers under one of $g_{1}$
-and $g_{2}$, but not under the other graph.* Given a function $h$
-obtained from the mapping of a relationship graph and a genotype $j$,
-let $\text{sink}(j;h)$ denote the set of genotype labels that appear
-infinitely many times in the sequence
-$\left( j,h(j),h\left( h(j) \right),\ldots \right)$. It follows that
-$\text{sink}(i;h) \neq \text{sink}(i\prime;h)$ if and only if genotypes
-$i$ and $i\prime$ are strangers. Therefore, we must have
-$h_{1} \neq h_{2}$.
+*Case 1: Genotypes $`i`$ and $`i'`$ are strangers under one of $`g_1`$
+and $`g_2`$, but not under the other graph.* Given a function $`h`$
+obtained from the mapping of a relationship graph and a genotype $`j`$,
+let $`\textrm{sink}(j;h)`$ denote the set of genotype labels that appear
+infinitely many times in the sequence $`(j,h(j),h(h(j)),\ldots)`$. It
+follows that $`\textrm{sink}(i;h)\neq \textrm{sink}(i';h)`$ if and only
+if genotypes $`i`$ and $`i'`$ are strangers. Therefore, we must have
+$`h_1\neq h_2`$.
 
-*Case 2: Genotypes $i$ and $i\prime$ are siblings under one of $g_{1}$
-and $g_{2}$, but are clones under the other graph.* Given a function $h$
-obtained from the mapping of a relationship graph and a genotype $j$,
-let $\text{sink}_{1}(j;h)$ be the genotype label in $\text{sink}(j;h)$
-that occurs first in the sequence
-$\left( j,h(j),h\left( h(j) \right),\ldots \right)$. It follows that
-$\text{sink}_{1}(i;h) = \text{sink}_{1}(i\prime;h)$ if and only if
-genotypes $i$ and $i\prime$ are clones (or if $i = i\prime$, which is
-irrelevant). Therefore, we must have $h_{1} \neq h_{2}$.
+*Case 2: Genotypes $`i`$ and $`i'`$ are siblings under one of $`g_1`$
+and $`g_2`$, but are clones under the other graph.* Given a function
+$`h`$ obtained from the mapping of a relationship graph and a genotype
+$`j`$, let $`\textrm{sink}_1(j;h)`$ be the genotype label in
+$`\textrm{sink}(j;h)`$ that occurs first in the sequence
+$`(j,h(j),h(h(j)),\ldots)`$. It follows that
+$`\textrm{sink}_1(i;h)= \textrm{sink}_1(i';h)`$ if and only if genotypes
+$`i`$ and $`i'`$ are clones (or if $`i=i'`$, which is irrelevant).
+Therefore, we must have $`h_1\neq h_2`$.
 
-This completes the proof that $\log R_{n} \sim n\log n$.
+This completes the proof that $`\log R_n \sim n\log n`$.

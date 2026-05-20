@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Benchmarking Pv3Rs">
 <meta name="description" content="Investigates runtime scaling of posterior computation">
@@ -320,13 +320,13 @@ equivalently, the total MOI). In fact, the number of relationship graphs
 with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
 episodes with one genotype per episode is given by
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>B</mi><mi>k</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">R_n = \sum_{k=1}^n S(n,k)B_k,</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>S</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo><msub><mi>B</mi><mi>k</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">R_n = \sum_{k=1}^n S(n,k)B_k,</annotation></semantics></math>
 where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>n</mi><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(n_k)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>n</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">S(n_k)</annotation></semantics></math>
 are Stirling numbers of the second kind and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mi>k</mi></msub><annotation encoding="application/x-tex">B_k</annotation></semantics></math>
 are Bell numbers. We provide the derivation in the <a href="#appendix">Appendix</a>, where we also show that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><msub><mi>R</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mo>log</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\log R_n \sim n\log n</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><msub><mi>R</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">\log R_n \sim n\log n</annotation></semantics></math>.</p>
 </div>
 <div class="section level3">
 <h3 id="fixed-total-moi">Fixed total MOI<a class="anchor" aria-label="anchor" href="#fixed-total-moi"></a>
@@ -409,7 +409,7 @@ within the same subset are clones of each other. We call such a subset a
 a partition of all clonal cells into subsets, such that any two
 genotypes from the same subset that are not clones of each other must be
 siblings. Recall that Stirling numbers of the second kind
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(n,k)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">S(n,k)</annotation></semantics></math>
 count the number of ways to partition
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
 objects into
@@ -421,17 +421,17 @@ count the number of ways to partition
 objects (into any number of subsets). Letting
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
 denote the number of clonal cells, we have
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>B</mi><mi>k</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">R_n = \sum_{k=1}^n S(n,k)B_k.</annotation></semantics></math></p>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>S</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo><msub><mi>B</mi><mi>k</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">R_n = \sum_{k=1}^n S(n,k)B_k.</annotation></semantics></math></p>
 <p>To establish the asymptotics of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>n</mi></msub><annotation encoding="application/x-tex">R_n</annotation></semantics></math>,
 we first note that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>≥</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>B</mi><mi>n</mi></msub><mo>=</mo><msub><mi>B</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">R_n \ge S(n,n)B_n = B_n</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>≥</mo><mi>S</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>,</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo><msub><mi>B</mi><mi>n</mi></msub><mo>=</mo><msub><mi>B</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">R_n \ge S(n,n)B_n = B_n</annotation></semantics></math>.
 It is well known that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><msub><mi>B</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mo>log</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\log B_n \sim n\log n</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><msub><mi>B</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">\log B_n \sim n\log n</annotation></semantics></math>.
 If we additionally have that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>≤</mo><msup><mi>n</mi><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">R_n \le n^n</annotation></semantics></math>,
 it then follows that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><msub><mi>R</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mo>log</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\log R_n \sim n\log n</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><msub><mi>R</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">\log R_n \sim n\log n</annotation></semantics></math>.
 The rest of this appendix is devoted to proving that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>n</mi></msub><mo>≤</mo><msup><mi>n</mi><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">R_n \le n^n</annotation></semantics></math>
 is indeed true. Let
@@ -443,7 +443,7 @@ that map elements of
 to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>n</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{1,\ldots,n\}</annotation></semantics></math>.
 Since
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>ℋ</mi><mi>n</mi></msub><mo stretchy="true" form="postfix">|</mo></mrow><mo>=</mo><msup><mi>n</mi><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">|\mathcal{H}_n|=n^n</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><msub><mi>ℋ</mi><mi>n</mi></msub><mo stretchy="false" form="prefix">|</mo><mo>=</mo><msup><mi>n</mi><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">|\mathcal{H}_n|=n^n</annotation></semantics></math>,
 it suffices to show that there is an injection from the set of all
 relationship graphs (with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
@@ -460,21 +460,21 @@ and label the clonal cells from
 to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>.
 For each
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mi>′</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">k'=1,\ldots,k</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>k</mi><mo>′</mo></msup><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">k'=1,\ldots,k</annotation></semantics></math>,
 let
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mrow><mi>k</mi><mi>′</mi></mrow></msub><annotation encoding="application/x-tex">c_{k'}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><msup><mi>k</mi><mo>′</mo></msup></msub><annotation encoding="application/x-tex">c_{k'}</annotation></semantics></math>
 denote the smallest genotype label in clonal cell
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">k'</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>k</mi><mo>′</mo></msup><annotation encoding="application/x-tex">k'</annotation></semantics></math>.
 For each genotype
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 in clonal cell
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">k'</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>k</mi><mo>′</mo></msup><annotation encoding="application/x-tex">k'</annotation></semantics></math>
 that is not
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mrow><mi>k</mi><mi>′</mi></mrow></msub><annotation encoding="application/x-tex">c_{k'}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><msup><mi>k</mi><mo>′</mo></msup></msub><annotation encoding="application/x-tex">c_{k'}</annotation></semantics></math>,
 we define
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>c</mi><mrow><mi>k</mi><mi>′</mi></mrow></msub></mrow><annotation encoding="application/x-tex">h(i)=c_{k'}</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>c</mi><msup><mi>k</mi><mo>′</mo></msup></msub></mrow><annotation encoding="application/x-tex">h(i)=c_{k'}</annotation></semantics></math>.
 It remains to define the values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>c</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>c</mi><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">h(c_1),\ldots,h(c_k)</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>c</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>…</mi><mo>,</mo><mi>h</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>c</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">h(c_1),\ldots,h(c_k)</annotation></semantics></math>.
 The sibling relationships induce a partition of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>k</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{1,\ldots,k\}</annotation></semantics></math>
 into subsets of clonal cells. Let
@@ -482,9 +482,9 @@ into subsets of clonal cells. Let
 be such a subset, where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>≤</mo><msub><mi>x</mi><mn>1</mn></msub><mo>≤</mo><mi>⋯</mi><mo>≤</mo><msub><mi>x</mi><mi>m</mi></msub><mo>≤</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">1\le x_1 \le \cdots \le x_m\le k</annotation></semantics></math>.
 For each
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mi>′</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">m'=1,\ldots,m</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mo>′</mo></msup><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">m'=1,\ldots,m</annotation></semantics></math>,
 we define
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>c</mi><msub><mi>x</mi><mrow><mi>m</mi><mi>′</mi></mrow></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>c</mi><msub><mi>x</mi><mrow><mi>m</mi><mi>′</mi><mo>+</mo><mn>1</mn></mrow></msub></msub></mrow><annotation encoding="application/x-tex">h(c_{x_{m'}})=c_{x_{m'+1}}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>c</mi><msub><mi>x</mi><msup><mi>m</mi><mo>′</mo></msup></msub></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>c</mi><msub><mi>x</mi><mrow><msup><mi>m</mi><mo>′</mo></msup><mo>+</mo><mn>1</mn></mrow></msub></msub></mrow><annotation encoding="application/x-tex">h(c_{x_{m'}})=c_{x_{m'+1}}</annotation></semantics></math>,
 where subscripts of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
 are taken modulo
@@ -513,7 +513,7 @@ under the mapping above. We seek to show that
 Suppose that the genotypes
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">i'</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mo>′</mo></msup><annotation encoding="application/x-tex">i'</annotation></semantics></math>
 have a different relationship under
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>g</mi><mn>1</mn></msub><annotation encoding="application/x-tex">g_1</annotation></semantics></math>
 and
@@ -522,7 +522,7 @@ It suffices to consider the following two cases:</p>
 <p><em>Case 1: Genotypes
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">i'</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mo>′</mo></msup><annotation encoding="application/x-tex">i'</annotation></semantics></math>
 are strangers under one of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>g</mi><mn>1</mn></msub><annotation encoding="application/x-tex">g_1</annotation></semantics></math>
 and
@@ -532,22 +532,22 @@ but not under the other graph.</em> Given a function
 obtained from the mapping of a relationship graph and a genotype
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>,
 let
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">sink</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo>;</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{sink}(j;h)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">sink</mtext><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo>;</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\textrm{sink}(j;h)</annotation></semantics></math>
 denote the set of genotype labels that appear infinitely many times in
 the sequence
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo>,</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(j,h(j),h(h(j)),\ldots)</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo>,</mo><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>…</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(j,h(j),h(h(j)),\ldots)</annotation></semantics></math>.
 It follows that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">sink</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo>;</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≠</mo><mtext mathvariant="normal">sink</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mi>′</mi><mo>;</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{sink}(i;h)\neq \textrm{sink}(i';h)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">sink</mtext><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>;</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo><mo>≠</mo><mtext mathvariant="normal">sink</mtext><mo stretchy="false" form="prefix">(</mo><msup><mi>i</mi><mo>′</mo></msup><mo>;</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\textrm{sink}(i;h)\neq \textrm{sink}(i';h)</annotation></semantics></math>
 if and only if genotypes
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">i'</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mo>′</mo></msup><annotation encoding="application/x-tex">i'</annotation></semantics></math>
 are strangers. Therefore, we must have
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>1</mn></msub><mo>≠</mo><msub><mi>h</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">h_1\neq h_2</annotation></semantics></math>.</p>
 <p><em>Case 2: Genotypes
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">i'</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mo>′</mo></msup><annotation encoding="application/x-tex">i'</annotation></semantics></math>
 are siblings under one of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>g</mi><mn>1</mn></msub><annotation encoding="application/x-tex">g_1</annotation></semantics></math>
 and
@@ -557,23 +557,23 @@ but are clones under the other graph.</em> Given a function
 obtained from the mapping of a relationship graph and a genotype
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>,
 let
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">sink</mtext><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo>;</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{sink}_1(j;h)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">sink</mtext><mn>1</mn></msub><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo>;</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\textrm{sink}_1(j;h)</annotation></semantics></math>
 be the genotype label in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">sink</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo>;</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{sink}(j;h)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">sink</mtext><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo>;</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\textrm{sink}(j;h)</annotation></semantics></math>
 that occurs first in the sequence
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo>,</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(j,h(j),h(h(j)),\ldots)</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo>,</mo><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>…</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(j,h(j),h(h(j)),\ldots)</annotation></semantics></math>.
 It follows that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">sink</mtext><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo>;</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mtext mathvariant="normal">sink</mtext><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mi>′</mi><mo>;</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{sink}_1(i;h)= \textrm{sink}_1(i';h)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">sink</mtext><mn>1</mn></msub><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>;</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mtext mathvariant="normal">sink</mtext><mn>1</mn></msub><mo stretchy="false" form="prefix">(</mo><msup><mi>i</mi><mo>′</mo></msup><mo>;</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\textrm{sink}_1(i;h)= \textrm{sink}_1(i';h)</annotation></semantics></math>
 if and only if genotypes
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">i'</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mo>′</mo></msup><annotation encoding="application/x-tex">i'</annotation></semantics></math>
 are clones (or if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mi>i</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">i=i'</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><msup><mi>i</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">i=i'</annotation></semantics></math>,
 which is irrelevant). Therefore, we must have
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mn>1</mn></msub><mo>≠</mo><msub><mi>h</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">h_1\neq h_2</annotation></semantics></math>.</p>
 <p>This completes the proof that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><msub><mi>R</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mo>log</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\log R_n \sim n\log n</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><msub><mi>R</mi><mi>n</mi></msub><mo>∼</mo><mi>n</mi><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">\log R_n \sim n\log n</annotation></semantics></math>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

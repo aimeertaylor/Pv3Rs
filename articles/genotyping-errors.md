@@ -48,6 +48,7 @@ Let us generate some data based on the following three relationship
 graphs, each with four genotypes g1, g2, g3, and g4:
 
 ``` r
+
 par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 suppressMessages(RGs <- enumerate_RGs(c(2, 2)))
 for(i in c(2, 6, 34)) {
@@ -70,6 +71,7 @@ parasite genome (not accounted for under the Pv3Rs model) is captured in
 the simulation.
 
 ``` r
+
 library(gtools) # for `rdirichlet`
 
 N_CHRS <- 14 # P. vivax has 14 chromosomes
@@ -134,11 +136,13 @@ Before simulating errors, we show the output of Pv3Rs meets our
 expectations when the model is fit to error-free data.
 
 ``` r
+
 posts_list <- lapply(all_datasets, lapply,
                      function(data) suppressMessages(compute_posterior(data$y, data$fs)))
 ```
 
 ``` r
+
 par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 for(i in 1:3) {
   probs <- do.call(rbind, lapply(posts_list[[i]], function(post) post$marg))
@@ -181,7 +185,7 @@ misspecifications:
   together. *De novo* mutations can be viewed similarly.
 
 For each marker and each episode, we independently modify the observed
-data with a $2\%$ probability, using either a false negative, false
+data with a $`2\%`$ probability, using either a false negative, false
 positive, or miscall. If more than one allele is observed, all three
 misspecifications have equal probabilities. Otherwise, to avoid missing
 alleles, a false positive or miscall is simulated with equal
@@ -190,6 +194,7 @@ errors here would be an eschewal.) We then run Pv3Rs on the modified
 datasets.
 
 ``` r
+
 modify <- function(orig, n_a) {
   if(runif(1) < 1/3 && length(orig) > 1) { # false negative
     return(sample(orig, length(orig)-1))
@@ -222,6 +227,7 @@ mposts_list <- lapply(modified, lapply,
 ```
 
 ``` r
+
 par(mar = c(0, 0.1, 0, 0.1), mfrow = c(1, 3))
 for(i in 1:3) {
   probs <- do.call(rbind, lapply(posts_list[[i]], function(post) post$marg))
@@ -255,6 +261,7 @@ propose that these two cases can be distinguished by a simple
 diagnostic, that is, the proportion of mismatched markers.
 
 ``` r
+
 # count how many markers have some allele in epi1 but not in epi0
 count_recru_incompat <- function(epi0, epi1) {
   sum(mapply(function(x, y) !all(y %in% x), epi0, epi1))
@@ -287,7 +294,7 @@ mismatched markers compared to datasets from the second relationship
 graph (corresponding to relapse with error-free data). This shows that
 our proposed diagnostic is promising for detecting misclassification of
 recrudescence as relapse. Since the per marker per episode error rate is
-$2\%$, we expect a $\approx 4\%$ per marker error rate over two
+$`2\%`$, we expect a $`\approx 4\%`$ per marker error rate over two
 episodes, which matches the empirical proportion of mismatched markers
 for the first relationship graph.
 

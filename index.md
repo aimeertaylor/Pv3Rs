@@ -143,14 +143,14 @@ ramifications](https://aimeertaylor.github.io/Pv3Rs/articles/enumerate.pdf).
 The development of a more biologically-principled generative model on
 parasite relationships is merited.
 
-| Limitation                                                         | Reason                                                               |
-|--------------------------------------------------------------------|----------------------------------------------------------------------|
-| Possible misclassification of persistent and/or accumulated states | Modelling recurrent states as mutually exclusive                     |
-| Possible inconsistency with data on more-and-more markers          | Not modelling errors                                                 |
-| Possible misclassification of relapse as reinfection               | Half-sibling misspecification                                        |
-| Possible misclassification of recrudescence as relapse             | Not modelling errors                                                 |
-| Possible misclassification of reinfection                          | Not modelling population structure                                   |
-| Strong prior impact on posterior                                   | Recurrent states are not always identifiable from genetic data alone |
+| Limitation | Reason |
+|----|----|
+| Possible misclassification of persistent and/or accumulated states | Modelling recurrent states as mutually exclusive |
+| Possible inconsistency with data on more-and-more markers | Not modelling errors |
+| Possible misclassification of relapse as reinfection | Half-sibling misspecification |
+| Possible misclassification of recrudescence as relapse | Not modelling errors |
+| Possible misclassification of reinfection | Not modelling population structure |
+| Strong prior impact on posterior | Recurrent states are not always identifiable from genetic data alone |
 
 ### Computational limits:
 
@@ -199,6 +199,7 @@ experimental artefacts.
 ## Installation
 
 ``` r
+
 # Install Pv3Rs from CRAN:
 install.packages("Pv3Rs")
 
