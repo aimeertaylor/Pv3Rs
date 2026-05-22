@@ -1,5 +1,5 @@
 ---
-title: Understand priot impact
+title: Understand prior impact
 description: Exlores the impact of the prior in a very limited setting
 ---
 
