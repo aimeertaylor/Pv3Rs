@@ -1,4 +1,4 @@
-# Understand priot impact
+# Understand prior impact
 
 ## Summary
 
