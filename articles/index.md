@@ -30,6 +30,11 @@
 
   Investigates runtime scaling of posterior computation
 
+- [Understand priot
+  impact](https://aimeertaylor.github.io/Pv3Rs/articles/prior-impact.md):
+
+  Exlores the impact of the prior in a very limited setting
+
 - [Advanced
   documentation](https://aimeertaylor.github.io/Pv3Rs/articles/links-to-pdfs.md):
 
