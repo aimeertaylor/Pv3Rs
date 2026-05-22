@@ -258,8 +258,7 @@ The \textit{a priori} assumption that all valid relationships graphs $\rg$ are e
 
 Because we assume that the three relationship graphs are equally likely given relapse, the probability distribution of the edge between the two genotypes given relapse is
 \begin{align}
-    \mathbb{P}(\text{the two genotypes are clones}\vert\bm{s}=\relap) &= \sfrac{1}{3},
-    \label{eq: 1st two C gvn L}\\
+    \mathbb{P}(\text{the two genotypes are clones}\vert\bm{s}=\relap) &= \sfrac{1}{3},\label{eq:1sttwoCgvnL}\\
     \mathbb{P}(\text{the two genotypes are siblings}\vert\bm{s}=\relap) &= \sfrac{1}{3},\\
     \mathbb{P}(\text{the two genotypes are strangers}\vert\bm{s}=\relap) &= \sfrac{1}{3}.
 \end{align}
@@ -267,8 +266,7 @@ Now consider the scenario in which there is an additional monoclonal recurrence.
 
 There are now 12 relationship graphs, which are assumed to be equally likely under relapses. Among them, between the first two genotypes, three have a clonal edge, four have a sibling edge, and five have a stranger edge. The probability distribution of the edge between the first two genotypes given relapses is thus
 \begin{align}
-    \mathbb{P}(\text{the first two genotypes are clones}\vert\bm{s}=\relap\relap) &= \sfrac{3}{12},
-    \label{eq: 1st two C gvn LL}\\
+    \mathbb{P}(\text{the first two genotypes are clones}\vert\bm{s}=\relap\relap) &= \sfrac{3}{12},\label{eq:1sttwoCgvnLL}\\
     \mathbb{P}(\text{the first two genotypes are siblings}\vert\bm{s}=\relap\relap) &= \sfrac{4}{12},\\
     \mathbb{P}(\text{the first two genotypes are strangers}\vert\bm{s}=\relap\relap) &= \sfrac{5}{12}.
 \end{align}
@@ -283,7 +281,7 @@ An explanation for the change in the probability distribution of the edge betwee
   \end{minipage}%
   \begin{minipage}[c]{0.5\textwidth}
     \vspace*{\fill}
-    \captionof{figure}{The probability that the first recurrence is a recrudescence / reinfection increases / decreases with additional recurrences devoid of data. The prior on recurrent states is uniform. The maximum probabilities are those based on knowledge that there are no recurrent data for all but the first recurrence and all episodes are monoclonal. For example, from equations \eqref{eq: 1st two C gvn L} and \eqref{eq: 1st two C gvn LL} we have $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3} > \sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$. Plugging $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3}$ into equation \eqref{eq:recru_prob_max}, and $\sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$ plus $\sfrac{|\RG_{\recru\recru}|}{|\RG_{\relap\recru}|} = \sfrac{1}{3}$ and $\sfrac{|\RG_{\recru\reinf}|}{|\RG_{\relap\reinf}|} = \sfrac{1}{3}$ into equation \eqref{eq:marginal_bound}, we see that the probability that the first recurrence is a recrudescence when recurrent states are equally likely \textit{a priori} increases slightly from $\sfrac{3}{4}$ to $\sfrac{3}{\left(3 + \sfrac{11}{12}\right)}$ with the addition of the second recurrence without data.}
+    \captionof{figure}{The probability that the first recurrence is a recrudescence / reinfection increases / decreases with additional recurrences devoid of data. The prior on recurrent states is uniform. The maximum probabilities are those based on knowledge that there are no recurrent data for all but the first recurrence and all episodes are monoclonal. For example, from equations \eqref{eq:1sttwoCgvnL} and \eqref{eq:1sttwoCgvnLL} we have $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3} > \sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$. Plugging $\sfrac{|\RG_\recru|}{|\RG_\relap|} = \sfrac{1}{3}$ into equation \eqref{eq:recru_prob_max}, and $\sfrac{|\RG_{\recru\relap}|}{|\RG_{\relap\relap}|} = \sfrac{3}{12}$ plus $\sfrac{|\RG_{\recru\recru}|}{|\RG_{\relap\recru}|} = \sfrac{1}{3}$ and $\sfrac{|\RG_{\recru\reinf}|}{|\RG_{\relap\reinf}|} = \sfrac{1}{3}$ into equation \eqref{eq:marginal_bound}, we see that the probability that the first recurrence is a recrudescence when recurrent states are equally likely \textit{a priori} increases slightly from $\sfrac{3}{4}$ to $\sfrac{3}{\left(3 + \sfrac{11}{12}\right)}$ with the addition of the second recurrence without data.}
     \label{fig:monoclonal_recurrences}
     \vspace*{\fill}
   \end{minipage}
