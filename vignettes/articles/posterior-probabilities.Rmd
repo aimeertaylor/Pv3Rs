@@ -63,10 +63,10 @@ model is misspecified because of
 More detailed results on sibling misspecification can be found in  
 [RelationshipStudy](https://github.com/aimeertaylor/Pv3Rs/tree/main/vignettes/articles/RelationshipStudy). 
 
-We characterise model misspecification due to genotyping errors and undetected
-alleles in [ADD LINK].
+We characterise model misspecification due to genotyping errors in 
+[Understand genotyping errors](https://aimeertaylor.github.io/Pv3Rs/articles/genotyping-errors.html).
 
-We have not yet characterised misspecification due to stranger parasites with
+We have not yet characterized misspecification due to stranger parasites with
 elevated relatedness:
 
 - Stranger parasites that are related insofar as the population is related on
